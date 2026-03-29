@@ -125,6 +125,120 @@ def should_contact(
     return True
 
 
+def classify_reply(reply_text: str, business_name: str, vertical: str) -> dict:
+    """
+    Classify an inbound reply using Claude Haiku (fast + cheap).
+    Returns intent, urgency, and a one-line summary.
+    """
+    client = _get_client()
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=150,
+        messages=[{
+            "role": "user",
+            "content": (
+                f"Classify this reply from a Lagos business owner. Vertical: {vertical}. "
+                f"Business: {business_name}.\n\nReply: \"{reply_text}\"\n\n"
+                "Return JSON only:\n"
+                "{\n"
+                "  \"intent\": \"interested\" | \"not_now\" | \"opted_out\" | \"referral\" | \"question\" | \"unknown\",\n"
+                "  \"urgency\": \"high\" | \"medium\" | \"low\",\n"
+                "  \"summary\": \"one sentence max\"\n"
+                "}"
+            ),
+        }],
+    )
+
+    import json
+    raw = response.content[0].text.strip()
+    try:
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        return json.loads(raw.strip())
+    except Exception:
+        log.warning("classify_reply_parse_failed", raw=raw)
+        return {"intent": "unknown", "urgency": "low", "summary": reply_text[:100]}
+
+
+def generate_outreach_message_for_client(
+    vertical: str,
+    business_name: str,
+    channel: str,
+    client_context: str,
+    address: Optional[str] = None,
+    category: Optional[str] = None,
+    rating: Optional[float] = None,
+    website: Optional[str] = None,
+    is_followup: bool = False,
+    attempt_number: int = 1,
+) -> dict:
+    """
+    Generate a message using a client-specific context prompt instead of the
+    generic vertical prompt. Used when a ReachNG client has a custom brief.
+    """
+    system = _load_prompt("system.txt")
+
+    location_hint = ""
+    if address:
+        for area in ["Victoria Island", "Lekki", "Ikoyi", "Ajah", "Chevron",
+                     "Ikeja", "Surulere", "Yaba", "Lagos Island"]:
+            if area.lower() in address.lower():
+                location_hint = area
+                break
+
+    followup_note = ""
+    if is_followup:
+        followup_note = f"\n\nIMPORTANT: This is follow-up attempt {attempt_number}. Acknowledge you reached out before. Keep it very brief and low pressure."
+
+    user_prompt = f"""
+Write a {channel} outreach message for the following business on behalf of our client.
+
+CLIENT BRIEF:
+{client_context}
+
+TARGET BUSINESS:
+Name: {business_name}
+Location: {location_hint or address or "Lagos"}
+Category: {category or "Not specified"}
+Google rating: {rating or "Unknown"}
+Website: {website or "None found"}
+Channel: {channel}
+{followup_note}
+
+Return ONLY:
+- For WhatsApp: the message text (max 4 sentences, no subject line)
+- For Email: JSON with keys "subject" and "message" (max 6 sentence body)
+
+No explanations. No preamble. Just the message.
+"""
+
+    client_api = _get_client()
+    response = client_api.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=400,
+        system=system,
+        messages=[{"role": "user", "content": user_prompt}],
+    )
+
+    raw = response.content[0].text.strip()
+
+    if channel == "email":
+        import json
+        try:
+            if raw.startswith("```"):
+                raw = raw.split("```")[1]
+                if raw.startswith("json"):
+                    raw = raw[4:]
+            return json.loads(raw.strip())
+        except Exception:
+            log.warning("client_email_parse_failed", raw=raw)
+            return {"subject": f"Quick question for {business_name}", "message": raw}
+
+    return {"message": raw}
+
+
 def generate_campaign_summary(stats: dict, vertical: str) -> str:
     """Generate a plain-English campaign summary for the dashboard."""
     client = _get_client()

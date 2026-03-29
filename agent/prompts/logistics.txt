@@ -1,0 +1,54 @@
+## Vertical: Logistics & Haulage
+
+### Who you're reaching
+Haulage companies, logistics firms, last-mile delivery businesses, and freight forwarders operating in Lagos and across Nigeria. They manage fleets of trucks, drivers, waybills, and client delivery schedules — almost entirely over WhatsApp and phone calls.
+
+### Their pain
+Lagos logistics runs on chaos. A dispatcher manages 20+ drivers over WhatsApp, manually tracking locations, breakdowns, delivery confirmations, and client ETAs. Waybills are handwritten or scattered across Excel sheets. When a truck breaks down in Shagamu at 2am, the dispatcher wakes up, the client is left waiting, and nobody has a record of what happened. Manual data entry causes invoice errors. Route planning is gut feel. Fleet maintenance is reactive, not predictive. Every hour of delay is a penalty clause or a lost client.
+
+### What ReachNG offers them
+A "Digital Dispatcher" — an AI agent that reads WhatsApp messages from drivers and clients, updates fleet status in a central database, drafts client ETA updates, flags breakdown requests for owner approval, and keeps a clean audit trail of every delivery. Also processes waybills and invoices from photos or PDFs, extracting structured data automatically. Never sleeps. Handles 50 drivers simultaneously. No missed messages.
+
+### The "truck broke down" demo (use this in every pitch)
+> Driver WhatsApps: "Oga, the truck broke down in Shagamu. We need ₦50k for a mechanic and a new alternator."
+>
+> The Digital Dispatcher: reads the message, checks that truck's maintenance history, verifies the driver's ID, drafts a ₦50k transfer approval for the owner to confirm in one tap, updates the client's delivery ETA automatically, logs the incident with timestamp and location.
+>
+> All in 10 seconds. Owner just taps "Approve." No phone calls, no confusion, full paper trail.
+
+This story closes the deal. Use it.
+
+### This is a high-value vertical
+- Setup fee: ₦2M–₦3M
+- Monthly retainer: ₦250k–₦400k
+- ROI framing: one dispatcher costs ₦200k–₦350k/mo and can only manage 10–15 drivers. The Digital Dispatcher handles unlimited drivers, never misses a message, and generates clean data for invoicing. One prevented penalty clause pays for the setup.
+
+### WhatsApp message template (personalise fully)
+---
+Hi [Name], I work with Lagos logistics companies to solve the WhatsApp chaos problem — drivers, clients, breakdowns, waybills, all in one place.
+
+I build "Digital Dispatchers" — AI agents that read your driver WhatsApps, update delivery status automatically, draft client ETAs, and flag issues for your approval. One company went from 3 missed deliveries a week to zero.
+
+Running a free operations audit for 2 haulage firms this month. Worth a quick call?
+---
+
+### Email message template
+---
+Subject: The WhatsApp chaos problem — solved for [Company Name]
+
+Hi [Name],
+
+Most Lagos haulage companies lose money the same way: a driver WhatsApps about a breakdown, it gets missed, the client calls, the dispatcher scrambles — and someone pays a penalty.
+
+I build "Digital Dispatchers" for Lagos logistics firms — AI agents that read driver messages, update fleet status, draft client updates, and process waybills automatically. No missed messages. Clean audit trail. Full paper record.
+
+I'm working with 2 firms this quarter on a pilot. Would you be open to a 20-minute call to walk through what this looks like for [Company Name]?
+---
+
+### Key signals that make a lead strong
+- Active haulage or logistics company (not just courier — fleet size matters)
+- Hiring for dispatchers, logistics coordinators, or data entry (signals manual pain)
+- Fleet of 5+ trucks visible on website or LinkedIn
+- Operates interstate routes (Lagos–Abuja, Lagos–PH) — higher complexity, higher pain
+- Located in Apapa, Tin Can, Ikorodu, Mile 2, Ojota — Lagos logistics clusters
+- Google Maps listing with reviews mentioning delivery or freight

@@ -1,0 +1,179 @@
+"""
+Reply router — polls Unipile for inbound replies and routes them to contacts.
+Matches by phone (WhatsApp) or email. Updates contact status to REPLIED.
+Runs every 30 minutes via the scheduler.
+"""
+from datetime import datetime, timezone
+from database import get_contacts, get_db
+from tools.outreach import check_whatsapp_replies, check_email_replies
+from tools.memory import mark_replied, Status
+from tools.notifier import notify_owner
+from agent.brain import classify_reply
+import structlog
+
+log = structlog.get_logger()
+
+
+def get_replies():
+    return get_db()["replies"]
+
+
+async def process_replies() -> dict:
+    """
+    Poll Unipile for new WhatsApp and email replies.
+    Match each reply to a contact. Mark matched contacts as REPLIED.
+    Returns summary: {processed, matched, already_seen, unmatched, errors}
+    """
+    summary = {"processed": 0, "matched": 0, "already_seen": 0, "unmatched": 0, "errors": 0}
+
+    try:
+        whatsapp_msgs = await check_whatsapp_replies()
+    except Exception as e:
+        log.error("reply_poll_whatsapp_failed", error=str(e))
+        whatsapp_msgs = []
+        summary["errors"] += 1
+
+    try:
+        email_msgs = await check_email_replies()
+    except Exception as e:
+        log.error("reply_poll_email_failed", error=str(e))
+        email_msgs = []
+        summary["errors"] += 1
+
+    for msg in whatsapp_msgs:
+        result = _route_reply(msg, channel="whatsapp")
+        _tally(summary, result)
+
+    for msg in email_msgs:
+        result = _route_reply(msg, channel="email")
+        _tally(summary, result)
+
+    log.info("reply_routing_complete", **summary)
+    return summary
+
+
+def _route_reply(msg: dict, channel: str) -> str:
+    """
+    Route one inbound message to the right contact.
+    Returns: "matched" | "already_seen" | "unmatched" | "error"
+    """
+    replies = get_replies()
+
+    # Deduplicate by Unipile message ID
+    msg_id = msg.get("id") or msg.get("message_id")
+    if not msg_id:
+        return "error"
+
+    if replies.find_one({"unipile_message_id": msg_id}):
+        return "already_seen"
+
+    sender = _extract_sender(msg, channel)
+    if not sender:
+        return "error"
+
+    contact = _find_contact(sender, channel)
+    now = datetime.now(timezone.utc)
+    reply_text = (msg.get("text") or msg.get("body") or msg.get("snippet") or "")[:2000]
+
+    # Classify reply intent via Claude Haiku (fast + cheap)
+    classification = {"intent": "unknown", "urgency": "low", "summary": reply_text[:100]}
+    if contact and reply_text:
+        try:
+            classification = classify_reply(
+                reply_text=reply_text,
+                business_name=contact.get("name", ""),
+                vertical=contact.get("vertical", ""),
+            )
+        except Exception as e:
+            log.warning("classify_reply_failed", error=str(e))
+
+    # Always store the raw reply + classification — full audit trail
+    replies.insert_one({
+        "unipile_message_id": msg_id,
+        "channel": channel,
+        "sender": sender,
+        "text": reply_text,
+        "contact_id": contact["_id"] if contact else None,
+        "contact_name": contact.get("name") if contact else None,
+        "intent": classification.get("intent", "unknown"),
+        "urgency": classification.get("urgency", "low"),
+        "summary": classification.get("summary", ""),
+        "received_at": now,
+    })
+
+    if not contact:
+        log.info("reply_unmatched", sender=sender, channel=channel)
+        return "unmatched"
+
+    # Only flip status if contact is still in CONTACTED state
+    if contact.get("status") == Status.CONTACTED:
+        mark_replied(str(contact["_id"]))
+        log.info(
+            "reply_matched",
+            contact=contact.get("name"),
+            vertical=contact.get("vertical"),
+            intent=classification.get("intent"),
+            channel=channel,
+        )
+
+    # Notify owner via WhatsApp + Slack
+    import asyncio
+    asyncio.create_task(notify_owner(
+        contact_name=contact.get("name", sender),
+        vertical=contact.get("vertical", ""),
+        channel=channel,
+        reply_text=reply_text,
+        intent=classification.get("intent", "unknown"),
+        urgency=classification.get("urgency", "low"),
+        summary=classification.get("summary", ""),
+    ))
+
+    return "matched"
+
+
+def _extract_sender(msg: dict, channel: str) -> str | None:
+    """Extract the sender's phone or email from a Unipile message payload."""
+    if channel == "whatsapp":
+        # Unipile returns attendees list — sender is the one who isn't us
+        for attendee in msg.get("attendees", []):
+            identifier = (
+                attendee.get("identifier")
+                or attendee.get("id")
+                or attendee.get("phone")
+            )
+            if identifier and identifier != msg.get("account_id"):
+                return identifier
+        return msg.get("from_attendee") or msg.get("sender_id")
+
+    elif channel == "email":
+        from_field = msg.get("from") or {}
+        if isinstance(from_field, dict):
+            return from_field.get("identifier") or from_field.get("address")
+        if isinstance(from_field, str):
+            return from_field
+
+    return None
+
+
+def _find_contact(sender: str, channel: str) -> dict | None:
+    """Look up contact by phone (WhatsApp) or email."""
+    contacts = get_contacts()
+
+    if channel == "whatsapp":
+        # Normalise — Unipile may return with or without leading +
+        normalised = sender if sender.startswith("+") else f"+{sender}"
+        return (
+            contacts.find_one({"phone": normalised})
+            or contacts.find_one({"phone": sender.lstrip("+")})
+        )
+
+    elif channel == "email":
+        return contacts.find_one({"email": sender.lower()})
+
+    return None
+
+
+def _tally(summary: dict, result: str):
+    summary["processed"] += 1
+    if result in summary:
+        summary[result] += 1

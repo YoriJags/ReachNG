@@ -13,6 +13,7 @@ from tools import (
     mark_replied, mark_converted, mark_opted_out,
 )
 from campaigns import CAMPAIGN_REGISTRY
+from services.data_liberation import query_client_data, get_client_sources
 
 mcp = FastMCP(
     name="ReachNG",
@@ -160,3 +161,39 @@ def mark_contact_opted_out(contact_id: str) -> dict:
     """Mark a contact as opted out — they will never be contacted again."""
     mark_opted_out(contact_id)
     return {"success": True, "contact_id": contact_id, "status": "opted_out"}
+
+
+# ─── Data Liberation tools ────────────────────────────────────────────────────
+
+@mcp.tool()
+async def ask_client_data(client_name: str, question: str) -> dict:
+    """
+    Ask a plain-English question about a client's uploaded business data.
+    Claude reasons over their PDFs, spreadsheets, and documents to answer.
+
+    Examples:
+    - ask_client_data("Mercury Lagos", "Which nights had the highest revenue last month?")
+    - ask_client_data("Apex Haulage", "Which driver had the most breakdowns this year?")
+    - ask_client_data("Okafor & Associates", "Find all contracts expiring in the next 90 days")
+
+    Args:
+        client_name: The client whose data to query
+        question: Any plain-English question about their business data
+    """
+    return await query_client_data(client_name=client_name, question=question)
+
+
+@mcp.tool()
+def list_client_data_sources(client_name: str) -> dict:
+    """
+    List all files that have been uploaded and indexed for a client.
+
+    Args:
+        client_name: The client to check
+    """
+    sources = get_client_sources(client_name)
+    return {
+        "client_name": client_name,
+        "total_files": len(sources),
+        "sources": sources,
+    }

@@ -43,6 +43,36 @@ VERTICAL_QUERIES = {
         "lounge bar Lekki Lagos",
         "event venue Lagos",
     ],
+    "fintech": [
+        "microfinance bank Lagos",
+        "digital lending company Lagos",
+        "fintech company Victoria Island Lagos",
+        "credit company Lagos",
+        "loan company Lekki Lagos",
+        "financial technology firm Lagos",
+        "investment company Ikoyi Lagos",
+        "fintech startup Lagos Island",
+    ],
+    "legal": [
+        "law firm Victoria Island Lagos",
+        "commercial law firm Lagos",
+        "corporate law firm Ikoyi Lagos",
+        "legal services company Lagos",
+        "law chambers Lagos Island",
+        "solicitors and advocates Lagos",
+        "real estate law firm Lagos",
+        "intellectual property law firm Lagos",
+    ],
+    "logistics": [
+        "haulage company Lagos",
+        "logistics company Apapa Lagos",
+        "freight company Lagos",
+        "trucking company Lagos",
+        "last mile delivery company Lagos",
+        "logistics firm Ikorodu Lagos",
+        "haulage firm Mile 2 Lagos",
+        "cargo company Tin Can Lagos",
+    ],
 }
 
 

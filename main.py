@@ -8,8 +8,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import ensure_indexes
+from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
-from api import campaigns_router, contacts_router
+from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router
 from mcp import mcp
 from config import get_settings
 
@@ -22,6 +23,7 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     log.info("reachng_starting", env=settings.app_env)
     ensure_indexes()
+    ensure_data_indexes()
     scheduler = setup_scheduler()
     scheduler.start()
     log.info("scheduler_started", jobs=[job.id for job in scheduler.get_jobs()])
@@ -48,6 +50,9 @@ app.add_middleware(
 # REST API routes
 app.include_router(campaigns_router, prefix="/api/v1")
 app.include_router(contacts_router, prefix="/api/v1")
+app.include_router(clients_router, prefix="/api/v1")
+app.include_router(data_router, prefix="/api/v1")
+app.include_router(dashboard_router)
 
 # Mount MCP server — exposes tools to Claude
 app.mount("/mcp", mcp.http_app())

@@ -7,6 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from campaigns import CAMPAIGN_REGISTRY
 from tools import is_daily_limit_reached
+from tools.reply_router import process_replies
 import structlog
 
 log = structlog.get_logger()
@@ -43,8 +44,27 @@ async def _followup_run():
             log.error("followup_vertical_failed", vertical=vertical, error=str(e))
 
 
+async def _reply_poll():
+    """Poll Unipile for inbound replies and route them to contacts."""
+    log.info("reply_poll_start")
+    try:
+        result = await process_replies()
+        log.info("reply_poll_done", **result)
+    except Exception as e:
+        log.error("reply_poll_failed", error=str(e))
+
+
 def setup_scheduler():
     """Register all jobs and return configured scheduler."""
+
+    # Reply polling: every 30 minutes between 8am and midnight Lagos time
+    scheduler.add_job(
+        _reply_poll,
+        CronTrigger(hour="8-23", minute="*/30", timezone="Africa/Lagos"),
+        id="reply_poll",
+        replace_existing=True,
+        misfire_grace_time=120,
+    )
 
     # Main outreach: every night at 10pm Lagos time
     scheduler.add_job(

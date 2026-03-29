@@ -1,0 +1,45 @@
+## Vertical: Law Firms & Legal Services
+
+### Who you're reaching
+Mid-sized law firms and legal service companies in Lagos — commercial litigation, corporate law, real estate law, and IP practices. Firms with 5–50 lawyers who handle large document volumes: contracts, discovery files, case briefs, due diligence packs. The senior partners make decisions, junior associates do the grunt work.
+
+### Their pain
+Junior associates spend 30–50 hours a week on document review — reading contracts, flagging risk clauses, cross-referencing case files, summarising discovery documents. It's billable time spent on low-skill tasks. Errors in review are expensive and reputationally damaging. Partners want faster turnaround and fewer human mistakes on document-heavy matters.
+
+### What ReachNG offers them
+A "Digital Associate" — an AI agent that reads uploaded contracts and case files, extracts key clauses, flags risk language, cross-references precedent, and produces a structured review memo. Handles 100-page documents in under 60 seconds. Never fatigued. Consistent output every time. Human associate reviews the memo instead of the raw document.
+
+### This is the highest-ticket vertical
+- Setup fee: ₦4M–₦7M (complexity of legal document processing justifies premium)
+- Monthly retainer: ₦400k–₦600k
+- ROI framing: one junior associate costs ₦400k–₦700k/mo fully loaded. The agent costs ₦400k/mo and processes 10x more documents with zero fatigue or attention errors.
+
+### Email message template (personalise fully, this is a guide only)
+---
+Subject: 40 hours of associate time — recovered per week
+
+Hi [Name],
+
+I work with Lagos law firms to deploy "Digital Associates" — AI agents that review contracts, flag risk clauses, and produce structured memos in under 60 seconds per document.
+
+Your associates spend hours on document review that could be done by an agent, freeing them for client-facing and strategic work. One firm I worked with recovered 40+ billable hours per week from their junior team.
+
+I'm working with 2 Lagos firms this quarter on a pilot. Would you be open to a 20-minute call to walk through what this looks like for [Firm Name]?
+---
+
+### WhatsApp message template
+---
+Hi [Name], I noticed [Firm Name] handles significant document work — contracts, due diligence, discovery.
+
+I build "Digital Associates" for Lagos law firms — AI agents that read and review legal documents, flag risk clauses, and produce review memos in under a minute. Firms using this recover 40+ associate hours per week.
+
+I'm running a free document review demo for 2 Lagos firms this month. Worth a quick conversation?
+---
+
+### Key signals that make a lead strong
+- Commercial law firm (not criminal/family law — document volume is lower there)
+- 5+ lawyers on the firm website or LinkedIn
+- Website mentions M&A, corporate, real estate, or IP practice areas — high document volume
+- Located in VI, Ikoyi, Marina — where commercial Lagos law firms operate
+- Partner names visible on website (allows personalisation to the decision maker)
+- Active on LinkedIn with thought leadership posts (signals the firm is open to innovation)

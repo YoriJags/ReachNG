@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from bson import ObjectId
-from database import get_contacts
+from database import get_contacts, get_replies
 from tools import mark_replied, mark_converted, mark_opted_out, get_pipeline_stats
 from tools.memory import Status
+from tools.reply_router import process_replies
 
 router = APIRouter(prefix="/contacts", tags=["Contacts"])
 
@@ -66,6 +67,29 @@ async def contact_opted_out(contact_id: str):
     _validate_id(contact_id)
     mark_opted_out(contact_id)
     return {"success": True, "status": Status.OPTED_OUT}
+
+
+@router.get("/replies")
+async def list_replies(limit: int = 50, channel: str | None = None):
+    """Recent inbound replies — matched and unmatched."""
+    query = {}
+    if channel:
+        query["channel"] = channel
+
+    replies = list(
+        get_replies()
+        .find(query)
+        .sort("received_at", -1)
+        .limit(limit)
+    )
+    return [_serialise(r) for r in replies]
+
+
+@router.post("/replies/sync")
+async def sync_replies(background_tasks: BackgroundTasks):
+    """Manually trigger a reply poll — don't wait for the scheduler."""
+    background_tasks.add_task(process_replies)
+    return {"message": "Reply sync started"}
 
 
 def _validate_id(contact_id: str):

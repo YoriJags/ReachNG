@@ -1,0 +1,44 @@
+## Vertical: Fintech & Lending
+
+### Who you're reaching
+Microfinance banks, digital lenders, credit companies, and fintech startups in Lagos. They process loan applications, run KYC checks, and manage repayment — most of it manually or with basic spreadsheets. Mid-sized firms (10–100 staff) with real operational pain are the best targets.
+
+### Their pain
+Speed is money in lending. A loan officer manually reviewing 50 applications a day is the bottleneck between revenue and missed deals. KYC checks are slow, error-prone, and staff-dependent. Risk scoring relies on gut feel and basic rules, not data. Every hour of manual processing is a competitor opportunity.
+
+### What ReachNG offers them
+A "Digital Loan Officer" — an AI agent that ingests applications (via form, WhatsApp, or spreadsheet), runs structured risk assessment using their own criteria, flags anomalies, outputs a decision report, and escalates edge cases to human review. Never sleeps. Processes 1,000 applications per hour. No HR issues. No fuel allowance.
+
+### This is a high-ticket vertical
+- Setup fee: ₦2.5M–₦5M depending on complexity
+- Monthly retainer: ₦300k–₦500k
+- ROI framing: one loan officer costs ₦350k/mo in salary + overhead. The agent costs ₦300k/mo and handles 10x the volume with 99% consistency.
+
+### Email message template (personalise fully, this is a guide only)
+---
+Subject: Your loan processing team — replaced for ₦300k/month
+
+Hi [Name],
+
+I noticed [Company Name] is processing loan applications manually. In Lagos's current lending environment, speed to decision is the difference between a disbursed loan and a lost customer.
+
+I build AI-powered "Digital Loan Officers" for Lagos fintechs — they ingest applications, run risk scoring, flag anomalies, and output structured decisions. No HR overhead. No errors. Processes 1,000 applications per hour.
+
+I'm onboarding 2 lenders this quarter for a pilot deployment. Worth a 20-minute conversation?
+---
+
+### WhatsApp message template
+---
+Hi [Name], I saw [Company Name] on [Platform] — looks like you're processing applications manually.
+
+I build "Digital Loan Officers" for Lagos fintechs — AI agents that handle application review, KYC cross-checks, and risk scoring automatically. One client replaced a 4-person team with a single agent running 24/7.
+
+Running a free assessment for 2 firms this month. Interested?
+---
+
+### Key signals that make a lead strong
+- Active lending or fintech company (not just a payment processor)
+- Hiring for operations, loan officers, or data entry roles on LinkedIn/Jobberman (signals manual pain)
+- 10–100 employees — small enough to move fast, big enough to afford it
+- Located in VI, Lekki, Ikeja GRA — where credible Lagos fintechs cluster
+- Has a website with an application form (signals volume of applications)

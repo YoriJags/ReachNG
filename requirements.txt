@@ -25,3 +25,8 @@ pydantic==2.9.2
 # Utilities
 tenacity==9.0.0        # retry logic for API calls
 structlog==24.4.0      # structured logging
+
+# Data Liberation — file parsing
+pdfplumber==0.11.4     # PDF text extraction
+openpyxl==3.1.5        # Excel (.xlsx) parsing
+python-multipart==0.0.12  # FastAPI file upload support

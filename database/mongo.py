@@ -32,6 +32,10 @@ def get_campaigns() -> Collection:
     return get_db()["campaigns"]
 
 
+def get_replies() -> Collection:
+    return get_db()["replies"]
+
+
 def ensure_indexes():
     """Create all required indexes on startup."""
     contacts = get_contacts()
@@ -46,3 +50,9 @@ def ensure_indexes():
     log.create_index([("contact_id", ASCENDING)])
     log.create_index([("sent_at", DESCENDING)])
     log.create_index([("channel", ASCENDING)])
+
+    replies = get_replies()
+    replies.create_index([("unipile_message_id", ASCENDING)], unique=True)
+    replies.create_index([("contact_id", ASCENDING)])
+    replies.create_index([("received_at", DESCENDING)])
+    replies.create_index([("channel", ASCENDING)])
