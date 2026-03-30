@@ -9,6 +9,9 @@ from tools import (
     is_daily_limit_reached, record_outreach, get_daily_send_count,
     send_whatsapp, send_email,
 )
+from tools.hitl import queue_draft, get_pending, approve_draft, edit_draft
+from tools.roi import log_roi_event
+from tools.notifier import notify_whatsapp as notify_owner_whatsapp
 from agent import generate_outreach_message, should_contact
 from config import get_settings
 import structlog
@@ -24,6 +27,7 @@ class BaseCampaign:
         self,
         max_new_contacts: int = 60,
         dry_run: bool = False,
+        hitl_mode: bool = False,
         query_override: Optional[str] = None,
     ) -> dict:
         """
@@ -36,9 +40,10 @@ class BaseCampaign:
         Returns summary stats.
         """
         settings = get_settings()
-        log.info("campaign_start", vertical=self.vertical, dry_run=dry_run)
+        log.info("campaign_start", vertical=self.vertical, dry_run=dry_run, hitl_mode=hitl_mode)
 
         sent = 0
+        queued = 0
         skipped_contacted = 0
         skipped_no_channel = 0
         errors = 0
@@ -110,16 +115,26 @@ class BaseCampaign:
                 continue
 
             if dry_run:
-                log.info(
-                    "dry_run_message",
-                    business=biz["name"],
-                    channel=channel,
-                    message=generated,
-                )
+                log.info("dry_run_message", business=biz["name"], channel=channel, message=generated)
                 sent += 1
                 continue
 
-            # Step 7: Send
+            # Step 7a: HITL mode — queue for human approval instead of sending
+            if hitl_mode:
+                queue_draft(
+                    contact_id=contact_id,
+                    contact_name=biz["name"],
+                    vertical=self.vertical,
+                    channel=channel,
+                    message=generated.get("message", ""),
+                    subject=generated.get("subject"),
+                    phone=biz.get("phone"),
+                    email=biz.get("email"),
+                )
+                queued += 1
+                continue
+
+            # Step 7b: Send directly
             try:
                 result = await self._send(channel, biz, generated)
                 if not result.get("success", True):
@@ -131,7 +146,7 @@ class BaseCampaign:
                 errors += 1
                 continue
 
-            # Step 8: Record
+            # Step 8: Record + ROI
             message_text = generated.get("message", str(generated))
             record_outreach(
                 contact_id=contact_id,
@@ -139,19 +154,40 @@ class BaseCampaign:
                 message=message_text,
                 attempt_number=1,
             )
+            log_roi_event(
+                contact_name=biz["name"],
+                vertical=self.vertical,
+                channel=channel,
+            )
             sent += 1
 
             # Polite delay — don't hammer APIs
             await asyncio.sleep(1.5)
 
+        # Notify owner if drafts are queued for approval
+        if hitl_mode and queued > 0:
+            settings = get_settings()
+            if settings.owner_whatsapp:
+                await notify_owner_whatsapp(
+                    contact_name="ReachNG",
+                    vertical=self.vertical,
+                    channel="system",
+                    reply_text="",
+                    intent="system",
+                    urgency="medium",
+                    summary=f"{queued} outreach draft(s) are ready for your approval on the dashboard.",
+                )
+
         summary = {
             "vertical": self.vertical,
             "sent": sent,
+            "queued_for_approval": queued,
             "skipped_already_contacted": skipped_contacted,
             "skipped_no_channel": skipped_no_channel,
             "errors": errors,
             "daily_total_sent": get_daily_send_count(),
             "dry_run": dry_run,
+            "hitl_mode": hitl_mode,
         }
         log.info("campaign_complete", **summary)
         return summary

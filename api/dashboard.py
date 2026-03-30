@@ -152,6 +152,97 @@ _HTML = """<!DOCTYPE html>
   .reply-meta { font-size: 12px; color: #555; margin-bottom: 8px; }
   .reply-summary { font-size: 13px; color: #aaa; line-height: 1.5; }
 
+  /* ── ROI banner ── */
+  .roi-banner {
+    background: linear-gradient(135deg, #1a1a0d 0%, #161616 100%);
+    border: 1px solid #333;
+    border-left: 3px solid #ff5c00;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .roi-label-text { font-size: 20px; font-weight: 700; color: #ff5c00; }
+  .roi-sub { font-size: 12px; color: #555; margin-top: 4px; }
+  .roi-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+  .roi-stat .r-val { font-size: 22px; font-weight: 700; }
+  .roi-stat .r-lbl { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 2px; }
+  .roi-stat.green .r-val { color: #00c851; }
+  .roi-stat.amber .r-val { color: #ffbb33; }
+  .roi-stat.blue  .r-val { color: #4da6ff; }
+
+  /* ── Approvals queue ── */
+  .approvals-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+
+  .approval-card {
+    background: #161616;
+    border: 1px solid #2a2a1a;
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  .approval-header {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 10px;
+  }
+
+  .approval-name { font-weight: 600; font-size: 15px; }
+  .approval-meta { font-size: 12px; color: #555; margin-bottom: 10px; }
+  .approval-message {
+    font-size: 13px; color: #ccc; line-height: 1.6;
+    background: #0d0d0d; border-radius: 8px; padding: 12px 14px;
+    margin-bottom: 12px; white-space: pre-wrap;
+  }
+
+  .approval-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .btn {
+    border: none; border-radius: 8px; padding: 7px 16px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    letter-spacing: 0.3px; transition: opacity 0.15s;
+  }
+  .btn:hover { opacity: 0.8; }
+  .btn-approve { background: #00c851; color: #000; }
+  .btn-skip    { background: #2a2a2a; color: #888; }
+  .btn-edit    { background: #1a2a3d; color: #4da6ff; }
+
+  .channel-badge {
+    font-size: 10px; font-weight: 600; padding: 2px 8px;
+    border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .channel-whatsapp { background: #1a3d1a; color: #00c851; }
+  .channel-email    { background: #1a2a3d; color: #4da6ff; }
+
+  .approvals-empty { color: #333; font-size: 14px; text-align: center; padding: 32px; }
+  .approve-all-bar {
+    display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .approve-count { font-size: 14px; color: #888; }
+
+  /* ── Edit modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85); z-index: 999;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: #161616; border: 1px solid #333; border-radius: 16px;
+    padding: 28px; width: 90%; max-width: 560px;
+  }
+  .modal-box h3 { font-size: 16px; margin-bottom: 16px; }
+  .modal-box textarea {
+    width: 100%; background: #0d0d0d; border: 1px solid #333;
+    border-radius: 8px; color: #e8e8e8; font-size: 14px; line-height: 1.6;
+    padding: 12px; resize: vertical; min-height: 140px;
+    font-family: inherit;
+  }
+  .modal-actions { display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end; }
+
   .empty { color: #333; font-size: 14px; text-align: center; padding: 40px; }
 
   #last-updated { font-size: 11px; color: #333; text-align: right; margin-top: 48px; }
@@ -163,6 +254,19 @@ _HTML = """<!DOCTYPE html>
   <div class="logo">Reach<span>NG</span></div>
   <div class="live-badge"><span class="status-dot"></span> Live — refreshes every 30s</div>
 </header>
+
+<!-- ROI Banner -->
+<div class="roi-banner" id="roi-banner">
+  <div>
+    <div class="roi-label-text" id="roi-label">Loading ROI…</div>
+    <div class="roi-sub">Last 30 days — AI vs manual outreach cost</div>
+  </div>
+  <div class="roi-stats">
+    <div class="roi-stat green"><div class="r-val" id="roi-value">—</div><div class="r-lbl">Value Generated</div></div>
+    <div class="roi-stat amber"><div class="r-val" id="roi-api-cost">—</div><div class="r-lbl">AI Cost</div></div>
+    <div class="roi-stat blue"><div class="r-val" id="roi-msgs">—</div><div class="r-lbl">Messages Sent</div></div>
+  </div>
+</div>
 
 <!-- Summary bar -->
 <div class="summary-bar" id="summary-bar">
@@ -189,17 +293,42 @@ _HTML = """<!DOCTYPE html>
   <div class="vertical-card"><div class="empty">Loading…</div></div>
 </div>
 
+<!-- Pending Approvals -->
+<p class="section-title">Pending Approvals <span id="approval-count-badge" style="color:#ff5c00;margin-left:8px;"></span></p>
+<div class="approve-all-bar" id="approve-all-bar" style="display:none;">
+  <button class="btn btn-approve" onclick="approveAll()">✓ Approve All</button>
+  <button class="btn btn-skip" onclick="skipAll()">✕ Skip All</button>
+  <span class="approve-count" id="approve-all-label"></span>
+</div>
+<div class="approvals-list" id="approvals-list">
+  <div class="approvals-empty">Loading…</div>
+</div>
+
 <!-- Recent replies -->
 <p class="section-title">Recent Replies</p>
 <div class="replies-list" id="replies-list">
   <div class="empty">Loading…</div>
 </div>
 
+<!-- Edit modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-box">
+    <h3>Edit message before sending</h3>
+    <textarea id="edit-textarea" placeholder="Type edited message…"></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-skip" onclick="closeEdit()">Cancel</button>
+      <button class="btn btn-approve" onclick="submitEdit()">✓ Save &amp; Send</button>
+    </div>
+  </div>
+</div>
+
 <div id="last-updated"></div>
 
 <script>
-const VERTICAL_ICONS = { real_estate: "🏠", recruitment: "👥", events: "🎉" };
+const VERTICAL_ICONS = { real_estate: "🏠", recruitment: "👥", events: "🎉", fintech: "💳", legal: "⚖️", logistics: "🚚" };
 const INTENT_LABELS  = { interested:"Interested", not_now:"Not Now", opted_out:"Opted Out", referral:"Referral", question:"Question", unknown:"Unknown" };
+
+let editTargetId = null;
 
 async function fetchJSON(url) {
   const r = await fetch(url);
@@ -207,14 +336,114 @@ async function fetchJSON(url) {
   return r.json();
 }
 
+async function postJSON(url, body) {
+  const r = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
 function fmt(n) { return n === undefined || n === null ? "0" : String(n); }
+
+function fmtNgn(n) {
+  if (!n && n !== 0) return "—";
+  if (n >= 1_000_000) return "₦" + (n / 1_000_000).toFixed(1) + "M";
+  if (n >= 1_000) return "₦" + (n / 1_000).toFixed(0) + "k";
+  return "₦" + n;
+}
+
+// ── Approval actions ──────────────────────────────────────────────────────────
+
+async function approveOne(id) {
+  await postJSON(`/api/v1/approvals/${id}/approve`);
+  refresh();
+}
+
+async function skipOne(id) {
+  await postJSON(`/api/v1/approvals/${id}/skip`);
+  refresh();
+}
+
+function openEdit(id, currentMsg) {
+  editTargetId = id;
+  document.getElementById("edit-textarea").value = currentMsg;
+  document.getElementById("edit-modal").classList.add("open");
+}
+
+function closeEdit() {
+  editTargetId = null;
+  document.getElementById("edit-modal").classList.remove("open");
+}
+
+async function submitEdit() {
+  const msg = document.getElementById("edit-textarea").value.trim();
+  if (!msg || !editTargetId) return;
+  await postJSON(`/api/v1/approvals/${editTargetId}/edit`, { new_message: msg });
+  closeEdit();
+  refresh();
+}
+
+async function approveAll() {
+  await postJSON("/api/v1/approvals/approve-all");
+  refresh();
+}
+
+async function skipAll() {
+  await postJSON("/api/v1/approvals/skip-all");
+  refresh();
+}
+
+// ── Main refresh ──────────────────────────────────────────────────────────────
 
 async function refresh() {
   try {
-    const [pipeline, replies] = await Promise.all([
+    const [pipeline, replies, approvals, roi] = await Promise.all([
       fetchJSON("/api/v1/contacts/pipeline"),
       fetchJSON("/api/v1/contacts/replies?limit=10"),
+      fetchJSON("/api/v1/approvals/"),
+      fetchJSON("/api/v1/roi/summary"),
     ]);
+
+    // ── ROI banner ──
+    document.getElementById("roi-label").textContent   = roi.roi_label || "No activity yet";
+    document.getElementById("roi-value").textContent   = fmtNgn(roi.value_generated_ngn);
+    document.getElementById("roi-api-cost").textContent = fmtNgn(roi.api_cost_ngn);
+    document.getElementById("roi-msgs").textContent    = fmt(roi.messages_sent);
+
+    // ── Pending approvals ──
+    const aList = document.getElementById("approvals-list");
+    const badge = document.getElementById("approval-count-badge");
+    const allBar = document.getElementById("approve-all-bar");
+    badge.textContent = approvals.length ? `(${approvals.length})` : "";
+    allBar.style.display = approvals.length > 1 ? "flex" : "none";
+    document.getElementById("approve-all-label").textContent = `${approvals.length} draft${approvals.length !== 1 ? "s" : ""} waiting`;
+
+    if (!approvals.length) {
+      aList.innerHTML = '<div class="approvals-empty">No pending drafts — all clear.</div>';
+    } else {
+      aList.innerHTML = approvals.map(a => {
+        const ch = a.channel || "whatsapp";
+        const msg = a.message || "";
+        const escaped = msg.replace(/'/g, "\\'").replace(/\n/g, "\\n");
+        return `
+          <div class="approval-card">
+            <div class="approval-header">
+              <span class="approval-name">${a.contact_name || "Unknown"}</span>
+              <span class="channel-badge channel-${ch}">${ch === "whatsapp" ? "📱 " : "✉️ "}${ch}</span>
+            </div>
+            <div class="approval-meta">${(a.vertical || "").replace(/_/g," ").toUpperCase()}</div>
+            <div class="approval-message">${msg}</div>
+            <div class="approval-actions">
+              <button class="btn btn-approve" onclick="approveOne('${a.id}')">✓ Approve &amp; Send</button>
+              <button class="btn btn-edit"    onclick="openEdit('${a.id}', '${escaped}')">✎ Edit</button>
+              <button class="btn btn-skip"    onclick="skipOne('${a.id}')">✕ Skip</button>
+            </div>
+          </div>`;
+      }).join("");
+    }
 
     // ── Summary totals ──
     const all = pipeline.all || {};
@@ -233,7 +462,7 @@ async function refresh() {
     // ── Verticals grid ──
     const vGrid = document.getElementById("verticals-grid");
     vGrid.innerHTML = "";
-    ["real_estate", "recruitment", "events"].forEach(v => {
+    ["real_estate", "recruitment", "events", "fintech", "legal", "logistics"].forEach(v => {
       const s   = pipeline[v] || {};
       const icon = VERTICAL_ICONS[v] || "📋";
       const label = v.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
