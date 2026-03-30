@@ -36,7 +36,7 @@ class Settings(BaseSettings):
 
     # App
     app_env: str = Field(default="development", env="APP_ENV")
-    app_port: int = Field(default=8000, env="APP_PORT")
+    app_port: int = Field(default=8000, env="PORT")
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
 
     class Config:
