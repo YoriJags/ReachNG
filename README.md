@@ -207,4 +207,4 @@ Set all environment variables in Railway dashboard under Variables.
 
 ---
 
-*Built to fund VIIBE — Lagos scene intelligence.*
+*Built for Lagos businesses.*
