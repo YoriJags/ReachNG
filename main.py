@@ -11,7 +11,7 @@ from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
 from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router
-from mcp import mcp
+from mcp_server import mcp
 from config import get_settings
 
 log = structlog.get_logger()
