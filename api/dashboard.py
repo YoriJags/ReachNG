@@ -254,6 +254,41 @@ _HTML = """<!DOCTYPE html>
   }
   .approve-count { font-size: 14px; color: #888; }
 
+  /* ── Hook generator ── */
+  .hook-form {
+    background: #161616; border: 1px solid #222; border-radius: 12px;
+    padding: 24px; margin-bottom: 16px;
+  }
+  .hook-form .row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .hook-form input, .hook-form select {
+    background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 8px;
+    color: #e8e8e8; font-size: 14px; padding: 9px 14px;
+    font-family: inherit; flex: 1; min-width: 160px;
+  }
+  .hook-form input:focus, .hook-form select:focus { outline: none; border-color: #ff5c00; }
+
+  .hooks-output { display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; }
+  .hook-card {
+    background: #161616; border: 1px solid #222; border-radius: 10px;
+    padding: 16px 20px;
+  }
+  .hook-text { font-size: 16px; font-weight: 600; color: #e8e8e8; margin-bottom: 6px; }
+  .hook-meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .hook-format { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 0.6px; }
+  .hook-why { font-size: 12px; color: #888; flex: 1; }
+  .hook-copy {
+    font-size: 11px; background: #222; color: #aaa; border: none;
+    border-radius: 6px; padding: 4px 10px; cursor: pointer;
+  }
+  .hook-copy:hover { background: #333; }
+
+  .trending-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
+  .trending-pill {
+    background: #1a1a2e; color: #888; font-size: 12px;
+    padding: 5px 12px; border-radius: 20px; max-width: 340px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
   /* ── Edit modal ── */
   .modal-overlay {
     display: none; position: fixed; inset: 0;
@@ -349,6 +384,38 @@ _HTML = """<!DOCTYPE html>
 <div class="replies-list" id="replies-list">
   <div class="empty">Loading…</div>
 </div>
+
+<!-- Hook Generator -->
+<p class="section-title">Hook Generator <span style="color:#ff5c00;font-size:11px;margin-left:6px;">Content Intelligence</span></p>
+<div class="hook-form">
+  <div class="row">
+    <select id="hk-vertical">
+      <option value="real_estate">🏠 Real Estate</option>
+      <option value="recruitment">👥 Recruitment</option>
+      <option value="events">🎉 Events</option>
+      <option value="fintech">💳 Fintech</option>
+      <option value="legal">⚖️ Legal</option>
+      <option value="logistics">🚚 Logistics</option>
+    </select>
+    <select id="hk-platform">
+      <option value="instagram">📸 Instagram</option>
+      <option value="twitter">🐦 Twitter / X</option>
+      <option value="linkedin">💼 LinkedIn</option>
+      <option value="whatsapp">📱 WhatsApp</option>
+    </select>
+    <input id="hk-count" type="number" value="8" min="3" max="15" style="max-width:80px;" />
+  </div>
+  <div class="row">
+    <input id="hk-topic" placeholder="Topic — e.g. '3-bedroom apartments in Lekki Phase 1'" style="flex:2;" />
+    <input id="hk-client" placeholder="Client name (optional)" />
+  </div>
+  <div class="row">
+    <input id="hk-competitors" placeholder="Competitor handles (comma-separated, optional)" style="flex:2;" />
+    <button class="btn btn-approve" id="hk-btn" onclick="generateHooks()" style="white-space:nowrap;">⚡ Generate Hooks</button>
+  </div>
+</div>
+<div class="trending-pills" id="trending-pills" style="display:none;"></div>
+<div class="hooks-output" id="hooks-output"></div>
 
 <!-- Edit modal -->
 <div class="modal-overlay" id="edit-modal">
@@ -570,6 +637,64 @@ async function refresh() {
 
 refresh();
 setInterval(refresh, 30000);
+
+// ── Hook Generator ────────────────────────────────────────────────────────────
+
+async function generateHooks() {
+  const btn      = document.getElementById("hk-btn");
+  const topic    = document.getElementById("hk-topic").value.trim();
+  const vertical = document.getElementById("hk-vertical").value;
+  const platform = document.getElementById("hk-platform").value;
+  const count    = parseInt(document.getElementById("hk-count").value) || 8;
+  const client   = document.getElementById("hk-client").value.trim();
+  const compRaw  = document.getElementById("hk-competitors").value.trim();
+  const competitors = compRaw ? compRaw.split(",").map(s => s.trim()).filter(Boolean) : [];
+
+  if (!topic) { alert("Enter a topic first"); return; }
+
+  btn.textContent = "⏳ Researching & generating…";
+  btn.disabled = true;
+  document.getElementById("hooks-output").innerHTML = "";
+  document.getElementById("trending-pills").style.display = "none";
+
+  try {
+    const result = await postJSON("/api/v1/hooks/generate", {
+      vertical, topic, platform, count,
+      competitor_handles: competitors,
+      client_name: client || "default",
+    });
+
+    // Trending reference
+    if (result.trending_reference && result.trending_reference.length) {
+      const pills = document.getElementById("trending-pills");
+      pills.style.display = "flex";
+      pills.innerHTML = `<span style="font-size:11px;color:#555;align-self:center;margin-right:4px;">TRENDING REF:</span>` +
+        result.trending_reference.map(h => `<span class="trending-pill" title="${h}">${h}</span>`).join("");
+    }
+
+    // Hooks
+    const out = document.getElementById("hooks-output");
+    if (!result.hooks || !result.hooks.length) {
+      out.innerHTML = '<div class="empty">No hooks generated — check your Apify token.</div>';
+      return;
+    }
+    out.innerHTML = result.hooks.map((h, i) => `
+      <div class="hook-card">
+        <div class="hook-text">${i + 1}. ${h.hook || h}</div>
+        <div class="hook-meta">
+          <span class="hook-format">${(h.format || "").replace(/_/g," ")}</span>
+          <span class="hook-why">${h.why_it_works || ""}</span>
+          <button class="hook-copy" onclick="navigator.clipboard.writeText(${JSON.stringify(h.hook || h)});this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
+        </div>
+      </div>`).join("");
+
+  } catch (err) {
+    document.getElementById("hooks-output").innerHTML = `<div class="empty">Error: ${err.message}</div>`;
+  } finally {
+    btn.textContent = "⚡ Generate Hooks";
+    btn.disabled = false;
+  }
+}
 </script>
 </body>
 </html>"""

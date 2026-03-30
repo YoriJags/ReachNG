@@ -8,6 +8,8 @@ from apscheduler.triggers.cron import CronTrigger
 from campaigns import CAMPAIGN_REGISTRY
 from tools import is_daily_limit_reached
 from tools.reply_router import process_replies
+from tools.brief import compile_morning_brief
+from tools.notifier import notify_owner
 import structlog
 
 log = structlog.get_logger()
@@ -54,8 +56,28 @@ async def _reply_poll():
         log.error("reply_poll_failed", error=str(e))
 
 
+async def _morning_brief():
+    """Compile overnight stats and send WhatsApp brief to owner at 8am Lagos time."""
+    log.info("morning_brief_start")
+    try:
+        brief = compile_morning_brief()
+        await notify_owner(brief)
+        log.info("morning_brief_sent")
+    except Exception as e:
+        log.error("morning_brief_failed", error=str(e))
+
+
 def setup_scheduler():
     """Register all jobs and return configured scheduler."""
+
+    # Morning brief: every day at 8am Lagos time
+    scheduler.add_job(
+        _morning_brief,
+        CronTrigger(hour=8, minute=0, timezone="Africa/Lagos"),
+        id="morning_brief",
+        replace_existing=True,
+        misfire_grace_time=300,
+    )
 
     # Reply polling: every 30 minutes between 8am and midnight Lagos time
     scheduler.add_job(

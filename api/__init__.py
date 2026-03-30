@@ -6,8 +6,10 @@ from .data import router as data_router
 from .approvals import router as approvals_router
 from .roi import router as roi_router
 from .social import router as social_router
+from .hooks import router as hooks_router
 
 __all__ = [
     "campaigns_router", "contacts_router", "clients_router",
-    "dashboard_router", "data_router", "approvals_router", "roi_router", "social_router",
+    "dashboard_router", "data_router", "approvals_router",
+    "roi_router", "social_router", "hooks_router",
 ]
