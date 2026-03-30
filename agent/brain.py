@@ -239,6 +239,70 @@ No explanations. No preamble. Just the message.
     return {"message": raw}
 
 
+def generate_social_outreach_message(
+    vertical: str,
+    business_name: str,
+    channel: str,
+    platform: str,
+    post_text: str,
+    profile_url: str = "",
+    address: Optional[str] = None,
+) -> dict:
+    """
+    Generate a personalised message that references the contact's actual post.
+    Opens 10x better than cold outreach — they've already signalled intent.
+    """
+    system = _load_prompt("system.txt")
+    vertical_context = _load_prompt(f"{vertical}.txt")
+
+    platform_label = {"instagram": "Instagram", "twitter": "Twitter/X", "facebook": "Facebook"}.get(platform, platform)
+
+    user_prompt = f"""
+Write a {channel} outreach message for a Lagos business we discovered on {platform_label}.
+
+IMPORTANT: Their post is the reason we're reaching out. Reference it naturally — don't be creepy, be relevant.
+The opener should feel like "I came across your post..." or "Saw you're [doing X]..." — warm, not salesy.
+
+Business name: {business_name}
+Platform: {platform_label}
+Their post / bio text:
+\"\"\"{post_text}\"\"\"
+Profile: {profile_url or "N/A"}
+Location: {address or "Lagos"}
+Channel: {channel}
+
+Return ONLY:
+- For WhatsApp: the message text (max 4 sentences — reference the post, offer value, soft CTA)
+- For Email: JSON with keys "subject" and "message" (subject should reference their post context, max 6 sentence body)
+
+No explanations. No preamble. Just the message.
+"""
+
+    client = _get_client()
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=400,
+        system=f"{system}\n\n{vertical_context}",
+        messages=[{"role": "user", "content": user_prompt}],
+    )
+
+    raw = response.content[0].text.strip()
+
+    if channel == "email":
+        import json
+        try:
+            if raw.startswith("```"):
+                raw = raw.split("```")[1]
+                if raw.startswith("json"):
+                    raw = raw[4:]
+            return json.loads(raw.strip())
+        except Exception:
+            log.warning("social_email_parse_failed", raw=raw)
+            return {"subject": f"Saw your post about {vertical.replace('_', ' ')} — quick question", "message": raw}
+
+    return {"message": raw}
+
+
 def generate_campaign_summary(stats: dict, vertical: str) -> str:
     """Generate a plain-English campaign summary for the dashboard."""
     client = _get_client()

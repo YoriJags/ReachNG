@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
-from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router
+from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router
 from mcp import mcp
 from config import get_settings
 
@@ -26,8 +26,10 @@ async def lifespan(app: FastAPI):
     ensure_data_indexes()
     from tools.hitl import ensure_approval_indexes
     from tools.roi import ensure_roi_indexes
+    from tools.social import ensure_social_indexes
     ensure_approval_indexes()
     ensure_roi_indexes()
+    ensure_social_indexes()
     scheduler = setup_scheduler()
     scheduler.start()
     log.info("scheduler_started", jobs=[job.id for job in scheduler.get_jobs()])
@@ -58,6 +60,7 @@ app.include_router(clients_router, prefix="/api/v1")
 app.include_router(data_router, prefix="/api/v1")
 app.include_router(approvals_router, prefix="/api/v1")
 app.include_router(roi_router, prefix="/api/v1")
+app.include_router(social_router, prefix="/api/v1")
 app.include_router(dashboard_router)
 
 # Mount MCP server — exposes tools to Claude

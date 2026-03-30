@@ -12,7 +12,8 @@ from tools import (
 from tools.hitl import queue_draft, get_pending, approve_draft, edit_draft
 from tools.roi import log_roi_event
 from tools.notifier import notify_whatsapp as notify_owner_whatsapp
-from agent import generate_outreach_message, should_contact
+from tools.social import discover_social_leads
+from agent import generate_outreach_message, should_contact, generate_social_outreach_message
 from config import get_settings
 import structlog
 
@@ -48,13 +49,24 @@ class BaseCampaign:
         skipped_no_channel = 0
         errors = 0
 
-        # Step 1: Discover
-        businesses = await discover_businesses(
-            vertical=self.vertical,
-            max_results=max_new_contacts,
-            query_override=query_override,
-        )
-        log.info("discovery_done", vertical=self.vertical, found=len(businesses))
+        # Step 1: Discover — Google Maps + Social (run in parallel)
+        maps_quota   = max(10, max_new_contacts // 2)
+        social_quota = max_new_contacts - maps_quota
+
+        maps_task   = discover_businesses(vertical=self.vertical, max_results=maps_quota, query_override=query_override)
+        social_task = discover_social_leads(vertical=self.vertical, max_results=social_quota)
+
+        maps_leads, social_leads = await asyncio.gather(maps_task, social_task, return_exceptions=True)
+        if isinstance(maps_leads, Exception):
+            log.error("maps_discovery_failed", error=str(maps_leads))
+            maps_leads = []
+        if isinstance(social_leads, Exception):
+            log.error("social_discovery_failed", error=str(social_leads))
+            social_leads = []
+
+        # Social leads first — they're warmer
+        businesses = list(social_leads) + list(maps_leads)
+        log.info("discovery_done", vertical=self.vertical, maps=len(maps_leads), social=len(social_leads))
 
         for biz in businesses:
             # Step 2: Daily limit check
@@ -97,18 +109,29 @@ class BaseCampaign:
                 skipped_no_channel += 1
                 continue
 
-            # Step 6: Generate message
+            # Step 6: Generate message — social leads get post-aware opener
             try:
-                generated = generate_outreach_message(
-                    vertical=self.vertical,
-                    business_name=biz["name"],
-                    channel=channel,
-                    address=biz.get("address"),
-                    category=biz.get("category"),
-                    rating=biz.get("rating"),
-                    website=biz.get("website"),
-                    is_followup=False,
-                )
+                if biz.get("source") == "social" and biz.get("post_text"):
+                    generated = generate_social_outreach_message(
+                        vertical=self.vertical,
+                        business_name=biz["name"],
+                        channel=channel,
+                        platform=biz.get("platform", "social"),
+                        post_text=biz["post_text"],
+                        profile_url=biz.get("profile_url", ""),
+                        address=biz.get("address"),
+                    )
+                else:
+                    generated = generate_outreach_message(
+                        vertical=self.vertical,
+                        business_name=biz["name"],
+                        channel=channel,
+                        address=biz.get("address"),
+                        category=biz.get("category"),
+                        rating=biz.get("rating"),
+                        website=biz.get("website"),
+                        is_followup=False,
+                    )
             except Exception as e:
                 log.error("message_generation_failed", business=biz["name"], error=str(e))
                 errors += 1
@@ -130,6 +153,10 @@ class BaseCampaign:
                     subject=generated.get("subject"),
                     phone=biz.get("phone"),
                     email=biz.get("email"),
+                    source=biz.get("source", "maps"),
+                    platform=biz.get("platform"),
+                    post_context=biz.get("post_text"),
+                    profile_url=biz.get("profile_url"),
                 )
                 queued += 1
                 continue

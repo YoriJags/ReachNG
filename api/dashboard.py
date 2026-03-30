@@ -217,6 +217,37 @@ _HTML = """<!DOCTYPE html>
   .channel-whatsapp { background: #1a3d1a; color: #00c851; }
   .channel-email    { background: #1a2a3d; color: #4da6ff; }
 
+  .post-context {
+    font-size: 12px; color: #666; font-style: italic;
+    background: #111; border-left: 2px solid #333;
+    padding: 8px 12px; border-radius: 0 6px 6px 0;
+    margin-bottom: 10px; line-height: 1.5;
+  }
+
+  .source-badge {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 20px; margin-left: 6px;
+  }
+  .source-maps     { background: #1a1a2e; color: #4da6ff; }
+  .source-social   { background: #1a0d2e; color: #c084fc; }
+  .platform-instagram { color: #e1306c; }
+  .platform-twitter   { color: #1da1f2; }
+  .platform-facebook  { color: #4267B2; }
+
+  /* ── Social signals ── */
+  .signals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .signal-stat {
+    background: #161616; border: 1px solid #222; border-radius: 10px;
+    padding: 16px 20px;
+  }
+  .signal-stat .s-val { font-size: 28px; font-weight: 700; color: #c084fc; }
+  .signal-stat .s-lbl { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 4px; }
+
   .approvals-empty { color: #333; font-size: 14px; text-align: center; padding: 32px; }
   .approve-all-bar {
     display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
@@ -291,6 +322,15 @@ _HTML = """<!DOCTYPE html>
 <p class="section-title">Pipeline by Vertical</p>
 <div class="verticals" id="verticals-grid">
   <div class="vertical-card"><div class="empty">Loading…</div></div>
+</div>
+
+<!-- Social Signals -->
+<p class="section-title">Social Signals <span style="color:#c084fc;font-size:11px;margin-left:6px;">Instagram · Twitter · Facebook</span></p>
+<div class="signals-grid" id="signals-grid">
+  <div class="signal-stat"><div class="s-val" id="sig-total">—</div><div class="s-lbl">Found This Week</div></div>
+  <div class="signal-stat"><div class="s-val" id="sig-ig" style="color:#e1306c;">—</div><div class="s-lbl">Instagram</div></div>
+  <div class="signal-stat"><div class="s-val" id="sig-tw" style="color:#1da1f2;">—</div><div class="s-lbl">Twitter / X</div></div>
+  <div class="signal-stat"><div class="s-val" id="sig-fb" style="color:#4267B2;">—</div><div class="s-lbl">Facebook</div></div>
 </div>
 
 <!-- Pending Approvals -->
@@ -400,12 +440,20 @@ async function skipAll() {
 
 async function refresh() {
   try {
-    const [pipeline, replies, approvals, roi] = await Promise.all([
+    const [pipeline, replies, approvals, roi, socialStats] = await Promise.all([
       fetchJSON("/api/v1/contacts/pipeline"),
       fetchJSON("/api/v1/contacts/replies?limit=10"),
       fetchJSON("/api/v1/approvals/"),
       fetchJSON("/api/v1/roi/summary"),
+      fetchJSON("/api/v1/social/stats"),
     ]);
+
+    // ── Social signals stats ──
+    const byPlatform = socialStats.by_platform || {};
+    document.getElementById("sig-total").textContent = fmt(socialStats.total_7d);
+    document.getElementById("sig-ig").textContent    = fmt(byPlatform.instagram);
+    document.getElementById("sig-tw").textContent    = fmt(byPlatform.twitter);
+    document.getElementById("sig-fb").textContent    = fmt(byPlatform.facebook);
 
     // ── ROI banner ──
     document.getElementById("roi-label").textContent   = roi.roi_label || "No activity yet";
@@ -425,16 +473,29 @@ async function refresh() {
       aList.innerHTML = '<div class="approvals-empty">No pending drafts — all clear.</div>';
     } else {
       aList.innerHTML = approvals.map(a => {
-        const ch = a.channel || "whatsapp";
-        const msg = a.message || "";
+        const ch      = a.channel || "whatsapp";
+        const msg     = a.message || "";
         const escaped = msg.replace(/'/g, "\\'").replace(/\n/g, "\\n");
+        const src     = a.source || "maps";
+        const plat    = a.platform || "";
+        const platIcon = {instagram:"📸", twitter:"🐦", facebook:"📘"}[plat] || "";
+        const sourceBadge = src === "social"
+          ? `<span class="source-badge source-social">${platIcon} ${plat || "social"}</span>`
+          : `<span class="source-badge source-maps">📍 maps</span>`;
+        const postCtx = a.post_context
+          ? `<div class="post-context">💬 "${a.post_context.slice(0, 160)}${a.post_context.length > 160 ? "…" : ""}"</div>`
+          : "";
+        const profileLink = a.profile_url
+          ? `<a href="${a.profile_url}" target="_blank" style="color:#555;font-size:11px;margin-left:8px;">↗ profile</a>`
+          : "";
         return `
           <div class="approval-card">
             <div class="approval-header">
-              <span class="approval-name">${a.contact_name || "Unknown"}</span>
+              <span class="approval-name">${a.contact_name || "Unknown"}${sourceBadge}</span>
               <span class="channel-badge channel-${ch}">${ch === "whatsapp" ? "📱 " : "✉️ "}${ch}</span>
             </div>
-            <div class="approval-meta">${(a.vertical || "").replace(/_/g," ").toUpperCase()}</div>
+            <div class="approval-meta">${(a.vertical || "").replace(/_/g," ").toUpperCase()}${profileLink}</div>
+            ${postCtx}
             <div class="approval-message">${msg}</div>
             <div class="approval-actions">
               <button class="btn btn-approve" onclick="approveOne('${a.id}')">✓ Approve &amp; Send</button>

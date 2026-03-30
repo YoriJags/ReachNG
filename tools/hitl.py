@@ -42,24 +42,32 @@ def queue_draft(
     subject: str | None = None,
     phone: str | None = None,
     email: str | None = None,
+    source: str = "maps",           # "maps" | "social"
+    platform: str | None = None,    # "instagram" | "twitter" | "facebook"
+    post_context: str | None = None, # the triggering post/tweet text
+    profile_url: str | None = None,
 ) -> str:
     """Store a generated message as a pending approval. Returns approval _id."""
     col = get_approvals()
     result = col.insert_one({
-        "contact_id": ObjectId(contact_id),
-        "contact_name": contact_name,
-        "vertical": vertical,
-        "channel": channel,
-        "message": message,
-        "subject": subject,
-        "phone": phone,
-        "email": email,
-        "status": ApprovalStatus.PENDING,
-        "created_at": datetime.now(timezone.utc),
-        "actioned_at": None,
+        "contact_id":    ObjectId(contact_id),
+        "contact_name":  contact_name,
+        "vertical":      vertical,
+        "channel":       channel,
+        "message":       message,
+        "subject":       subject,
+        "phone":         phone,
+        "email":         email,
+        "source":        source,
+        "platform":      platform,
+        "post_context":  post_context,
+        "profile_url":   profile_url,
+        "status":        ApprovalStatus.PENDING,
+        "created_at":    datetime.now(timezone.utc),
+        "actioned_at":   None,
         "edited_message": None,
     })
-    log.info("draft_queued", contact=contact_name, channel=channel)
+    log.info("draft_queued", contact=contact_name, channel=channel, source=source)
     return str(result.inserted_id)
 
 

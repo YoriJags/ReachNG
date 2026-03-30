@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     followup_delay_hours: int = Field(default=48, env="FOLLOWUP_DELAY_HOURS")
     max_followup_attempts: int = Field(default=2, env="MAX_FOLLOWUP_ATTEMPTS")
 
+    # Social media discovery
+    apify_api_token: str | None = Field(default=None, env="APIFY_API_TOKEN")
+    twitter_bearer_token: str | None = Field(default=None, env="TWITTER_BEARER_TOKEN")
+
     # Owner notifications
     owner_whatsapp: str | None = Field(default=None, env="OWNER_WHATSAPP")
     slack_webhook_url: str | None = Field(default=None, env="SLACK_WEBHOOK_URL")
