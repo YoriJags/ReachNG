@@ -385,6 +385,27 @@ _HTML = r"""<!DOCTYPE html>
   <div class="empty">Loading…</div>
 </div>
 
+<!-- Run Campaign -->
+<p class="section-title">Run Campaign <span style="color:#ff5c00;font-size:11px;margin-left:6px;">Trigger Outreach</span></p>
+<div class="hook-form" id="run-campaign-form">
+  <div class="row">
+    <select id="rc-vertical">
+      <option value="real_estate">🏠 Real Estate</option>
+      <option value="recruitment">👥 Recruitment</option>
+      <option value="events">🎉 Events</option>
+      <option value="fintech">💳 Fintech</option>
+      <option value="legal">⚖️ Legal</option>
+      <option value="logistics">🚚 Logistics</option>
+    </select>
+    <input id="rc-max" type="number" value="10" min="1" max="60" style="max-width:90px;" title="Max contacts" />
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#aaa;white-space:nowrap;">
+      <input type="checkbox" id="rc-dryrun" checked style="width:auto;accent-color:#ff5c00;" /> Dry run
+    </label>
+    <button class="btn btn-approve" id="rc-btn" onclick="runCampaign()" style="white-space:nowrap;">▶ Run</button>
+  </div>
+  <div id="rc-result" style="margin-top:12px;display:none;"></div>
+</div>
+
 <!-- Hook Generator -->
 <p class="section-title">Hook Generator <span style="color:#ff5c00;font-size:11px;margin-left:6px;">Content Intelligence</span></p>
 <div class="hook-form">
@@ -692,6 +713,48 @@ async function generateHooks() {
     document.getElementById("hooks-output").innerHTML = `<div class="empty">Error: ${err.message}</div>`;
   } finally {
     btn.textContent = "⚡ Generate Hooks";
+    btn.disabled = false;
+  }
+}
+
+// ── Run Campaign ──────────────────────────────────────────────────────────────
+
+async function runCampaign() {
+  const btn      = document.getElementById("rc-btn");
+  const vertical = document.getElementById("rc-vertical").value;
+  const max      = parseInt(document.getElementById("rc-max").value) || 10;
+  const dryRun   = document.getElementById("rc-dryrun").checked;
+  const res      = document.getElementById("rc-result");
+
+  btn.textContent = "⏳ Running…";
+  btn.disabled = true;
+  res.style.display = "none";
+
+  try {
+    const result = await postJSON("/api/v1/campaigns/run", {
+      vertical, max_contacts: max, dry_run: dryRun,
+    });
+
+    const rows = Object.entries(result).map(([k, v]) => {
+      const label = k.replace(/_/g, " ");
+      const val   = typeof v === "boolean" ? (v ? "yes" : "no") : v;
+      return `<div class="v-row"><span class="lbl">${label}</span><span class="val">${val}</span></div>`;
+    }).join("");
+
+    res.innerHTML = `
+      <div style="background:#0d0d0d;border:1px solid #222;border-radius:10px;padding:16px 20px;">
+        <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;">
+          Result — ${vertical.replace(/_/g," ")} ${dryRun ? "(dry run)" : "(live)"}
+        </div>
+        ${rows}
+      </div>`;
+    res.style.display = "block";
+    if (!dryRun) refresh();
+  } catch (err) {
+    res.innerHTML = `<div class="empty" style="color:#ff4444;">Error: ${err.message}</div>`;
+    res.style.display = "block";
+  } finally {
+    btn.textContent = "▶ Run";
     btn.disabled = false;
   }
 }
