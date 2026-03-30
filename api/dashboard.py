@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse
 
 router = APIRouter(tags=["Dashboard"])
 
-_HTML = """<!DOCTYPE html>
+_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
