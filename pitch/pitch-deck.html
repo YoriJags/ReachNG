@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReachNG — Pitch Deck · Bootstrap 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --base:    #08070F;
+    --surface: #0f0e17;
+    --green:   #00C851;
+    --orange:  #FF5C00;
+    --gold:    #FFD700;
+    --white:   #FFFFFF;
+    --w60:     rgba(255,255,255,0.6);
+    --w35:     rgba(255,255,255,0.35);
+    --w10:     rgba(255,255,255,0.08);
+    --w05:     rgba(255,255,255,0.05);
+  }
+
+  html, body {
+    background: var(--base);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.3;
+  }
+
+  #deck { display: flex; flex-direction: column; height: 100vh; }
+
+  #slide-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    display: none;
+    height: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 80px;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .slide.active { display: flex; }
+
+  #bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-top: 1px solid var(--w05);
+    flex-shrink: 0;
+  }
+
+  .bar-nav { display: flex; align-items: center; gap: 16px; }
+
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--w35);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px 8px;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+  .nav-btn:hover { color: var(--white); }
+  .nav-btn:disabled { opacity: 0.2; cursor: default; }
+
+  .slide-counter {
+    font-family: 'Inter', monospace;
+    font-size: 10px;
+    color: var(--w35);
+    letter-spacing: 0.1em;
+  }
+
+  #progress { display: flex; gap: 4px; align-items: center; }
+  .dot {
+    height: 3px;
+    border-radius: 2px;
+    background: var(--w10);
+    cursor: pointer;
+    transition: width 0.3s, background 0.3s;
+    width: 8px;
+  }
+  .dot.active { width: 24px; background: var(--orange); }
+  .dot.past { background: rgba(255,92,0,0.3); }
+
+  #wordmark {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: rgba(255,92,0,0.3);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  #wordmark span { color: var(--orange); }
+
+  .label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .label.orange { color: var(--orange); }
+  .label.green  { color: var(--green);  }
+  .label.gold   { color: var(--gold);   }
+
+  .display {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  .mono { font-family: 'Inter', monospace; }
+  .muted { color: var(--w60); }
+  .dim   { color: var(--w35); }
+
+  .glow-orange { text-shadow: 0 0 20px rgba(255,92,0,0.5),  0 0 40px rgba(255,92,0,0.2); }
+  .glow-green  { text-shadow: 0 0 20px rgba(0,200,81,0.5),  0 0 40px rgba(0,200,81,0.2); }
+  .glow-gold   { text-shadow: 0 0 20px rgba(255,215,0,0.5), 0 0 40px rgba(255,215,0,0.2); }
+
+  .divider { width: 64px; height: 1px; background: var(--orange); margin: 32px 0; }
+
+  .border-left {
+    border-left: 2px solid;
+    padding-left: 24px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .bl-orange { border-color: var(--orange); }
+  .bl-green  { border-color: var(--green);  }
+  .bl-gold   { border-color: var(--gold);   }
+
+  .tag {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1px solid var(--w10);
+    color: var(--w35);
+    padding: 3px 8px;
+    font-weight: 600;
+  }
+
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; }
+
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--w05);
+    padding: 20px 24px;
+    max-width: 640px;
+  }
+  .code-block pre {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: rgba(0,200,81,0.8);
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+  .code-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--orange);
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  @media print {
+    #bar { display: none; }
+    html, body { overflow: visible; height: auto; }
+    #deck { height: auto; }
+    #slide-area { height: auto; overflow: visible; }
+    .slide { display: flex !important; page-break-after: always; height: 100vh; }
+    @page { size: A4 landscape; margin: 0; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="deck">
+  <div id="slide-area">
+
+    <!-- SLIDE 1 — TITLE -->
+    <div class="slide active" id="s0">
+      <p class="label orange">Bootstrap Round · 2026</p>
+      <h1 class="display" style="font-size: clamp(72px, 10vw, 120px); margin-bottom: 16px;">
+        Reach<span style="color:var(--orange);">NG</span>
+      </h1>
+      <p class="display" style="font-size: clamp(20px, 2.5vw, 30px); margin-bottom: 12px; color: var(--white);">Intelligent Outreach, at Scale, for Lagos Business.</p>
+      <p class="display glow-orange" style="font-size: clamp(14px, 1.8vw, 20px); color: var(--orange); margin-bottom: 32px;">"Lagos has 500,000 businesses. We reach all of them."</p>
+      <div class="divider"></div>
+      <p class="mono muted" style="font-size: 14px; line-height: 1.8; max-width: 520px;">
+        ReachNG discovers businesses on Google Maps, writes each one a personalised<br>
+        WhatsApp or email using Claude AI, and sends it — fully automated.<br>
+        <span style="color:var(--white);">Your pipeline runs while you sleep.</span>
+      </p>
+      <p class="mono dim" style="font-size: 11px; margin-top: 48px; letter-spacing: 0.1em;">Lagos, Nigeria · Live on Railway</p>
+      <div style="margin-top: 16px; display: flex; align-items: center; gap: 8px;">
+        <span style="width:6px;height:6px;border-radius:50%;background:#00D084;box-shadow:0 0 8px #00D084;display:inline-block;"></span>
+        <span class="mono dim" style="font-size: 11px; letter-spacing: 0.1em;">reachng-production.up.railway.app · Running in production</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 2 — PROBLEM -->
+    <div class="slide" id="s1">
+      <p class="label orange">The Problem</p>
+      <h2 class="display" style="font-size: clamp(36px, 4.5vw, 56px); margin-bottom: 16px;">Lagos has 500,000+ businesses.<br>Nobody is talking to them.</h2>
+      <p class="mono muted" style="font-size: 15px; margin-bottom: 40px; max-width: 560px;">
+        Real estate agents, recruiters, event companies — all need clients. All do outreach manually.
+        The result: expensive, slow, inconsistent, and completely unscalable.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="border-left bl-orange">
+          <p class="mono" style="font-size: 10px; color: var(--orange); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px;">Manual Cold Calling</p>
+          <p class="mono muted" style="font-size: 13px;">30–50 calls a day per rep. ₦200k+/month per hire. Conversion under 2%. No data.</p>
+        </div>
+        <div class="border-left bl-gold">
+          <p class="mono" style="font-size: 10px; color: var(--gold); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px;">Generic WhatsApp Blasts</p>
+          <p class="mono muted" style="font-size: 13px;">Spammy, impersonal, gets accounts banned. No segmentation. No follow-up logic.</p>
+        </div>
+        <div class="border-left bl-green">
+          <p class="mono" style="font-size: 10px; color: var(--green); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px;">Referrals Only</p>
+          <p class="mono muted" style="font-size: 13px;">The only scalable channel most Lagos businesses have — completely passive, unpredictable.</p>
+        </div>
+      </div>
+      <div style="margin-top: 32px; border-top: 1px solid var(--w05); padding-top: 20px;">
+        <p class="mono" style="font-size: 13px; color: var(--white);">The average Lagos SME spends <span style="color:var(--orange);">₦300k–₦800k/month</span> on outreach that could be automated for <span style="color:var(--green);">₦50k/month</span>.</p>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 — SOLUTION -->
+    <div class="slide" id="s2">
+      <p class="label green">The Solution</p>
+      <h2 class="display" style="font-size: clamp(34px, 4vw, 52px); margin-bottom: 24px;">
+        One command.<br><span style="color:var(--orange);" class="glow-orange">Hundreds of warm leads.</span>
+      </h2>
+      <p class="mono muted" style="font-size: 13px; line-height: 1.8; max-width: 560px; margin-bottom: 40px;">
+        ReachNG discovers businesses on Google Maps, scores them by quality, generates a
+        personalised WhatsApp or email message using Claude AI, and sends it via Unipile —
+        all in one pipeline. Human approval before every send. Full reply intelligence.
+      </p>
+      <div class="grid-4">
+        <div>
+          <p class="display glow-orange" style="font-size: 32px; color: var(--orange);">6</p>
+          <p class="mono dim" style="font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 6px;">Verticals</p>
+        </div>
+        <div>
+          <p class="display glow-green" style="font-size: 32px; color: var(--green);">50</p>
+          <p class="mono dim" style="font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 6px;">Messages/Day</p>
+        </div>
+        <div>
+          <p class="display glow-gold" style="font-size: 32px; color: var(--gold);">AI</p>
+          <p class="mono dim" style="font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 6px;">Personalised</p>
+        </div>
+        <div>
+          <p class="display" style="font-size: 32px; color: var(--white);">0</p>
+          <p class="mono dim" style="font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 6px;">Human Hours</p>
+        </div>
+      </div>
+      <div style="margin-top: 40px; border-top: 1px solid var(--w05); padding-top: 20px;">
+        <p class="mono dim" style="font-size: 11px; line-height: 1.8;">
+          Verticals live: <span class="muted">Real Estate</span> · <span class="muted">Recruitment</span> · <span class="muted">Events</span> · <span class="muted">Fintech</span> · <span class="muted">Legal</span> · <span class="muted">Logistics</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- SLIDE 4 — HOW IT WORKS -->
+    <div class="slide" id="s3">
+      <p class="label orange">How It Works</p>
+      <h2 class="display" style="font-size: clamp(28px, 3.5vw, 44px); margin-bottom: 32px;">Five steps. Fully automated.</h2>
+      <div style="display: flex; flex-direction: column; gap: 0;">
+        <div style="display: flex; align-items: flex-start; gap: 24px; border-bottom: 1px solid var(--w05); padding: 16px 0;">
+          <span class="mono" style="font-size: 28px; color: var(--orange); font-weight: 700; width: 40px; flex-shrink: 0; line-height: 1;">01</span>
+          <div>
+            <p class="mono" style="font-size: 13px; color: var(--white); margin-bottom: 4px;">Discovery</p>
+            <p class="mono muted" style="font-size: 12px; line-height: 1.7;">Google Maps Places API scans Lagos for businesses matching your vertical. Real-time. No CSV uploads.</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 24px; border-bottom: 1px solid var(--w05); padding: 16px 0;">
+          <span class="mono" style="font-size: 28px; color: var(--orange); font-weight: 700; width: 40px; flex-shrink: 0; line-height: 1;">02</span>
+          <div>
+            <p class="mono" style="font-size: 13px; color: var(--white); margin-bottom: 4px;">Qualify</p>
+            <p class="mono muted" style="font-size: 12px; line-height: 1.7;">AI scores each business: rating, category, has phone, has website. Only the best go to the next step.</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 24px; border-bottom: 1px solid var(--w05); padding: 16px 0;">
+          <span class="mono" style="font-size: 28px; color: var(--orange); font-weight: 700; width: 40px; flex-shrink: 0; line-height: 1;">03</span>
+          <div>
+            <p class="mono" style="font-size: 13px; color: var(--white); margin-bottom: 4px;">Generate</p>
+            <p class="mono muted" style="font-size: 12px; line-height: 1.7;">Claude AI writes a personalised WhatsApp or email using the business name, location, and category. Never generic.</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 24px; border-bottom: 1px solid var(--w05); padding: 16px 0;">
+          <span class="mono" style="font-size: 28px; color: var(--orange); font-weight: 700; width: 40px; flex-shrink: 0; line-height: 1;">04</span>
+          <div>
+            <p class="mono" style="font-size: 13px; color: var(--white); margin-bottom: 4px;">Approve &amp; Send</p>
+            <p class="mono muted" style="font-size: 12px; line-height: 1.7;">Human-in-the-loop dashboard. You approve, edit, or skip each draft. Approved messages send via Unipile (WhatsApp + email).</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 24px; padding: 16px 0;">
+          <span class="mono" style="font-size: 28px; color: var(--green); font-weight: 700; width: 40px; flex-shrink: 0; line-height: 1;">05</span>
+          <div>
+            <p class="mono" style="font-size: 13px; color: var(--white); margin-bottom: 4px;">Replies &amp; Follow-ups</p>
+            <p class="mono muted" style="font-size: 12px; line-height: 1.7;">AI classifies every reply (Interested / Not Now / Opted Out / Referral). Automated follow-ups at 48 hours. Full pipeline visible on dashboard.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5 — LIVE PRODUCT -->
+    <div class="slide" id="s4">
+      <p class="label green">Live Product</p>
+      <h2 class="display" style="font-size: clamp(34px, 4vw, 52px); margin-bottom: 8px;">Built. Deployed. Running.</h2>
+      <p class="mono muted" style="font-size: 13px; margin-bottom: 32px;">
+        ReachNG is live on Railway in production. Dashboard accessible now.
+      </p>
+      <div class="code-block">
+        <div class="code-label">
+          <div class="live-dot"></div>
+          <span class="mono dim" style="font-size: 10px;">reachng-production.up.railway.app/health</span>
+        </div>
+        <pre>{
+  "status": "ok",
+  "db": true,
+  "env": "production",
+  "scheduler": {
+    "jobs": ["reply_poll", "nightly_outreach", "morning_brief", "followup_run"]
+  },
+  "uptime": "running"
+}</pre>
+      </div>
+      <div style="margin-top: 28px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+          <p class="mono muted" style="font-size: 12px;">Dashboard at <span style="color:var(--white);">/dashboard</span> — live pipeline, approvals queue, ROI tracker, hook generator</p>
+        </div>
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+          <p class="mono muted" style="font-size: 12px;">Scheduler runs nightly at 10pm Lagos time, reply poll every 60 seconds</p>
+        </div>
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+          <p class="mono muted" style="font-size: 12px;">FastAPI + FastMCP + MongoDB + Claude + Unipile (WhatsApp + Email)</p>
+        </div>
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;"></span>
+          <p class="mono muted" style="font-size: 12px;"><span style="color:var(--white);">Blocked on:</span> Google Maps billing ($10 prepayment). Discovery pipeline ready to fire the moment it clears.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6 — BUSINESS MODEL -->
+    <div class="slide" id="s5">
+      <p class="label gold">The Business</p>
+      <h2 class="display" style="font-size: clamp(28px, 3.5vw, 44px); margin-bottom: 8px;">Sell the outcome. Not the software.</h2>
+      <p class="mono muted" style="font-size: 13px; margin-bottom: 36px; max-width: 560px;">
+        Clients pay for meetings booked and replies generated — not a SaaS subscription they have to figure out.
+        ReachNG runs as a managed service.
+      </p>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="display:inline-block;background:var(--orange);color:#000;font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;padding:4px 10px;border-radius:2px;">One-time setup fee = first month free. Then monthly from month 2.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0; margin-bottom: 32px;">
+        <div style="display: flex; align-items: center; gap: 24px; border-bottom: 1px solid var(--w05); padding: 14px 0;">
+          <span class="display" style="font-size: 14px; color: var(--orange); width: 160px; flex-shrink: 0;">Starter</span>
+          <span class="mono muted" style="font-size: 12px; flex: 1;">300 outreach messages/month · 1 vertical · WhatsApp only</span>
+          <div style="text-align:right;white-space:nowrap;">
+            <span class="mono" style="font-size: 14px; color: var(--white);">₦50,000/mo</span>
+            <br><span class="mono dim" style="font-size:10px;">₦50,000 setup · 1st month free</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 24px; border-bottom: 1px solid var(--w05); padding: 14px 0;">
+          <span class="display" style="font-size: 14px; color: var(--gold); width: 160px; flex-shrink: 0;">Growth</span>
+          <span class="mono muted" style="font-size: 12px; flex: 1;">1,000 messages/month · 3 verticals · WhatsApp + Email + follow-ups</span>
+          <div style="text-align:right;white-space:nowrap;">
+            <span class="mono" style="font-size: 14px; color: var(--white);">₦120,000/mo</span>
+            <br><span class="mono dim" style="font-size:10px;">₦120,000 setup · 1st month free</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 24px; padding: 14px 0;">
+          <span class="display" style="font-size: 14px; color: var(--green); width: 160px; flex-shrink: 0;">Agency</span>
+          <span class="mono muted" style="font-size: 12px; flex: 1;">Unlimited · All verticals · Dedicated pipeline · ROI reporting</span>
+          <div style="text-align:right;white-space:nowrap;">
+            <span class="mono" style="font-size: 14px; color: var(--white);">₦250,000/mo</span>
+            <br><span class="mono dim" style="font-size:10px;">₦250,000 setup · 1st month free</span>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 40px;">
+        <div>
+          <p class="display glow-orange" style="font-size: 28px; color: var(--orange);">5 clients</p>
+          <p class="mono dim" style="font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px;">= ₦600K/mo revenue</p>
+        </div>
+        <div>
+          <p class="display glow-green" style="font-size: 28px; color: var(--green);">85%+</p>
+          <p class="mono dim" style="font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px;">Gross Margin</p>
+        </div>
+        <div>
+          <p class="display glow-gold" style="font-size: 28px; color: var(--gold);">Month 2</p>
+          <p class="mono dim" style="font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px;">Break-even target</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7 — MARKET -->
+    <div class="slide" id="s6">
+      <p class="label gold">The Market</p>
+      <h2 class="display" style="font-size: clamp(30px, 3.8vw, 48px); margin-bottom: 40px;">Every Lagos business is a lead.</h2>
+      <div class="grid-3" style="margin-bottom: 36px;">
+        <div>
+          <p class="display glow-orange" style="font-size: 36px; color: var(--orange);">500K+</p>
+          <p class="mono muted" style="font-size: 12px; margin-top: 8px;">Registered businesses in Lagos</p>
+          <p class="mono dim" style="font-size: 11px; margin-top: 4px;">Serviceable from day one.</p>
+        </div>
+        <div>
+          <p class="display glow-gold" style="font-size: 36px; color: var(--gold);">₦2T+</p>
+          <p class="mono muted" style="font-size: 12px; margin-top: 8px;">Spent on sales & marketing annually</p>
+          <p class="mono dim" style="font-size: 11px; margin-top: 4px;">Lagos SME market.</p>
+        </div>
+        <div>
+          <p class="display glow-green" style="font-size: 36px; color: var(--green);">6</p>
+          <p class="mono muted" style="font-size: 12px; margin-top: 8px;">High-value verticals live</p>
+          <p class="mono dim" style="font-size: 11px; margin-top: 4px;">RE · Recruitment · Events · Fintech · Legal · Logistics</p>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="border-left bl-orange">
+          <p class="mono muted" style="font-size: 12px; line-height: 1.8;">
+            <strong style="color:var(--orange);">Real Estate Lagos:</strong> 3,000+ active agents. Average deal closes at ₦5M–₦50M. One closed deal from ReachNG pays for 12 months of subscription.
+          </p>
+        </div>
+        <div class="border-left bl-gold">
+          <p class="mono muted" style="font-size: 12px; line-height: 1.8;">
+            <strong style="color:var(--gold);">Recruitment Lagos:</strong> 500+ agencies competing for the same LinkedIn pool. WhatsApp outreach is the only channel that breaks through.
+          </p>
+        </div>
+        <div class="border-left bl-green">
+          <p class="mono muted" style="font-size: 12px; line-height: 1.8;">
+            <strong style="color:var(--green);">Expansion path:</strong> Abuja · Port Harcourt · Accra. Same codebase, different city query config. Zero rebuild cost.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8 — MOAT -->
+    <div class="slide" id="s7">
+      <p class="label orange">Why This Wins</p>
+      <h2 class="display" style="font-size: clamp(26px, 3.2vw, 42px); margin-bottom: 6px;">
+        Competitors send blasts.
+      </h2>
+      <h2 class="display glow-orange" style="font-size: clamp(26px, 3.2vw, 42px); color: var(--orange); margin-bottom: 28px;">
+        ReachNG sends conversations.
+      </h2>
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; align-items: flex-start; gap: 16px;">
+          <span class="mono" style="font-size: 11px; color: var(--orange); margin-top: 2px; flex-shrink: 0;">01</span>
+          <p class="mono muted" style="font-size: 12px; line-height: 1.7;"><span style="color:var(--white);">Google Maps as a lead source</span> — no competitor uses live Places API data as a discovery layer. Every run surfaces fresh, never-contacted businesses.</p>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 16px;">
+          <span class="mono" style="font-size: 11px; color: var(--orange); margin-top: 2px; flex-shrink: 0;">02</span>
+          <p class="mono muted" style="font-size: 12px; line-height: 1.7;"><span style="color:var(--white);">Claude AI personalisation</span> — each message references the business name, location, category, and context. Opens at 3–5× the rate of generic blasts.</p>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 16px;">
+          <span class="mono" style="font-size: 11px; color: var(--orange); margin-top: 2px; flex-shrink: 0;">03</span>
+          <p class="mono muted" style="font-size: 12px; line-height: 1.7;"><span style="color:var(--white);">Human-in-the-loop by design</span> — not a spam machine. Every message requires a human to approve before sending. Clients trust it because they stay in control.</p>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 16px;">
+          <span class="mono" style="font-size: 11px; color: var(--orange); margin-top: 2px; flex-shrink: 0;">04</span>
+          <p class="mono muted" style="font-size: 12px; line-height: 1.7;"><span style="color:var(--white);">Full reply intelligence</span> — AI reads every reply, classifies intent, routes warm leads instantly. No lead goes cold from missed follow-up.</p>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 16px;">
+          <span class="mono" style="font-size: 11px; color: var(--orange); margin-top: 2px; flex-shrink: 0;">05</span>
+          <p class="mono muted" style="font-size: 12px; line-height: 1.7;"><span style="color:var(--white);">MCP-native architecture</span> — ReachNG exposes its tools via FastMCP, making it natively callable by any AI agent or Claude plugin. First-mover on AI-to-AI B2B outreach.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9 — 90-DAY PLAN -->
+    <div class="slide" id="s8">
+      <p class="label green">90-Day Plan</p>
+      <h2 class="display" style="font-size: clamp(28px, 3.5vw, 44px); margin-bottom: 32px;">Bootstrap to ₦1M MRR in 3 months.</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; max-width: 760px;">
+
+        <div style="border: 1px solid rgba(255,92,0,0.3); padding: 20px;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange); margin-bottom: 12px;">Month 1 · Launch</p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">✓ Fix Google Maps billing</p>
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">✓ Run first 3 live campaigns</p>
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Sign 3 paying clients</p>
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Real Estate + Recruitment first</p>
+          </div>
+          <div style="margin-top: 16px; border-top: 1px solid var(--w05); padding-top: 12px;">
+            <p class="mono" style="font-size: 13px; color: var(--orange);">₦150K MRR</p>
+          </div>
+        </div>
+
+        <div style="border: 1px solid rgba(255,215,0,0.3); padding: 20px;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px;">Month 2 · Scale</p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Grow to 5 clients</p>
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Add Events vertical</p>
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">First referral client</p>
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Break-even on ops cost</p>
+          </div>
+          <div style="margin-top: 16px; border-top: 1px solid var(--w05); padding-top: 12px;">
+            <p class="mono" style="font-size: 13px; color: var(--gold);">₦500K MRR</p>
+          </div>
+        </div>
+
+        <div style="border: 1px solid rgba(0,200,81,0.3); padding: 20px;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--green); margin-bottom: 12px;">Month 3 · Profit</p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">10 clients across all 6 verticals</p>
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Abuja expansion begins</p>
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Agency plan launched</p>
+            <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Seed round deck ready</p>
+          </div>
+          <div style="margin-top: 16px; border-top: 1px solid var(--w05); padding-top: 12px;">
+            <p class="mono" style="font-size: 13px; color: var(--green);">₦1M+ MRR</p>
+          </div>
+        </div>
+
+      </div>
+      <div style="margin-top: 24px; border-top: 1px solid var(--w05); padding-top: 16px; display: flex; gap: 40px;">
+        <div>
+          <p class="mono dim" style="font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">Cost to operate</p>
+          <p class="mono" style="font-size: 14px; color: var(--white);">~₦85,000/month</p>
+          <p class="mono dim" style="font-size: 10px; margin-top: 2px;">Railway + APIs + Unipile</p>
+        </div>
+        <div>
+          <p class="mono dim" style="font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">Break-even clients</p>
+          <p class="mono" style="font-size: 14px; color: var(--white);">2 Starter clients</p>
+          <p class="mono dim" style="font-size: 10px; margin-top: 2px;">₦100,000/mo covers all costs</p>
+        </div>
+        <div>
+          <p class="mono dim" style="font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">Build status</p>
+          <p class="mono" style="font-size: 14px; color: var(--green);">100% done</p>
+          <p class="mono dim" style="font-size: 10px; margin-top: 2px;">Zero build risk</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10 — ROADMAP FEATURES -->
+    <div class="slide" id="s9">
+      <p class="label green">What's Coming</p>
+      <h2 class="display" style="font-size: clamp(28px, 3.5vw, 44px); margin-bottom: 8px;">Built to grow. Fast.</h2>
+      <p class="mono muted" style="font-size: 13px; margin-bottom: 28px; max-width: 560px;">Core pipeline is live. These 8 features are already scoped — each one deepens the moat.</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; max-width: 760px;">
+        <div style="border: 1px solid var(--w10); padding: 14px 18px;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange); margin-bottom: 6px;">Client Portal</p>
+          <p class="mono muted" style="font-size: 11px; line-height: 1.6;">White-label dashboard per client. They see only their pipeline. Agency-ready from day one.</p>
+        </div>
+        <div style="border: 1px solid var(--w10); padding: 14px 18px;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange); margin-bottom: 6px;">A/B Message Testing</p>
+          <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Run two message variants per campaign. Track which converts better. Continuous self-improvement.</p>
+        </div>
+        <div style="border: 1px solid var(--w10); padding: 14px 18px;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px;">Lead Scoring</p>
+          <p class="mono muted" style="font-size: 11px; line-height: 1.6;">AI ranks every discovered contact by conversion probability before a single message is sent.</p>
+        </div>
+        <div style="border: 1px solid var(--w10); padding: 14px 18px;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px;">Sheets / Notion Export</p>
+          <p class="mono muted" style="font-size: 11px; line-height: 1.6;">One-click lead export to Google Sheets or Notion. Clients keep their data in their tools.</p>
+        </div>
+        <div style="border: 1px solid var(--w10); padding: 14px 18px;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--green); margin-bottom: 6px;">Referral Chain Tracking</p>
+          <p class="mono muted" style="font-size: 11px; line-height: 1.6;">"Speak to my colleague" becomes an automatic new lead. No warm introduction goes cold.</p>
+        </div>
+        <div style="border: 1px solid var(--w10); padding: 14px 18px;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--green); margin-bottom: 6px;">Competitor Monitoring</p>
+          <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Scrape Google Maps reviews for pain point signals. Target businesses actively suffering from the problem you solve.</p>
+        </div>
+        <div style="border: 1px solid var(--w10); padding: 14px 18px;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--white); margin-bottom: 6px;">Multi-Client Agency Mode</p>
+          <p class="mono muted" style="font-size: 11px; line-height: 1.6;">One operator, multiple client pipelines running in parallel. The ₦250k/mo Agency plan at scale.</p>
+        </div>
+        <div style="border: 1px solid var(--w10); padding: 14px 18px;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--white); margin-bottom: 6px;">SMS Channel</p>
+          <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Reach contacts without smartphones via bulk SMS — expanding addressable market to every Lagos business with a SIM card.</p>
+        </div>
+      </div>
+      <div style="margin-top: 20px; border-top: 1px solid var(--w05); padding-top: 14px;">
+        <p class="mono" style="font-size: 12px; color: var(--white);">Every feature above ships within <span style="color:var(--orange);">90 days of funding.</span> <span class="muted">Zero external dependencies. Same stack. Same team.</span></p>
+      </div>
+    </div>
+
+    <!-- SLIDE 11 — ASK -->
+    <div class="slide" id="s10">
+      <p class="label orange">The Ask</p>
+      <div style="display: flex; gap: 48px; align-items: flex-start;">
+        <div style="flex: 1;">
+          <h2 class="display glow-gold" style="font-size: clamp(36px, 4.5vw, 56px); color: var(--gold); margin-bottom: 4px;">₦500K – ₦1.5M</h2>
+          <h3 class="display muted" style="font-size: clamp(16px, 2vw, 22px); margin-bottom: 28px;">Bootstrap Bridge · 3 Months</h3>
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span class="mono" style="font-size: 11px; color: var(--orange); width: 40px; flex-shrink: 0;">35%</span>
+              <div style="flex: 1; height: 1px; background: var(--w10);"></div>
+              <span class="mono muted" style="font-size: 11px;">Google Maps + API costs (3 months)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span class="mono" style="font-size: 11px; color: var(--orange); width: 40px; flex-shrink: 0;">30%</span>
+              <div style="flex: 1; height: 1px; background: var(--w10);"></div>
+              <span class="mono muted" style="font-size: 11px;">First client acquisition (outreach + demos)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span class="mono" style="font-size: 11px; color: var(--orange); width: 40px; flex-shrink: 0;">20%</span>
+              <div style="flex: 1; height: 1px; background: var(--w10);"></div>
+              <span class="mono muted" style="font-size: 11px;">Infrastructure runway (Railway + Unipile)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span class="mono" style="font-size: 11px; color: var(--orange); width: 40px; flex-shrink: 0;">15%</span>
+              <div style="flex: 1; height: 1px; background: var(--w10);"></div>
+              <span class="mono muted" style="font-size: 11px;">Reserve + legal (client contracts)</span>
+            </div>
+          </div>
+          <div class="border-left bl-green" style="padding: 12px 16px;">
+            <p class="mono muted" style="font-size: 12px; line-height: 1.7;">
+              This is a <strong style="color:var(--white);">bridge, not a bet.</strong> The product is built and deployed.
+              The ask covers 90 days of ops until MRR self-funds everything.
+              At 5 clients we are fully self-sustaining.
+            </p>
+          </div>
+        </div>
+
+        <div style="width: 1px; background: var(--w05); align-self: stretch;"></div>
+
+        <div style="flex: 1;">
+          <p class="mono" style="font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px;">What You Get</p>
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px;">
+            <div class="border-left bl-orange" style="padding: 10px 16px;">
+              <p class="mono" style="font-size: 10px; color: var(--orange); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">Equity</p>
+              <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Negotiable stake in ReachNG Ltd. Clean cap table. Founder retains control.</p>
+            </div>
+            <div class="border-left bl-green" style="padding: 10px 16px;">
+              <p class="mono" style="font-size: 10px; color: var(--green); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">Revenue Share Option</p>
+              <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Prefer no dilution? 15% of MRR until 2× return, then clean exit. Investor's choice.</p>
+            </div>
+            <div class="border-left bl-gold" style="padding: 10px 16px;">
+              <p class="mono" style="font-size: 10px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">First Client Rights</p>
+              <p class="mono muted" style="font-size: 11px; line-height: 1.6;">Investor's own business or portfolio gets 3 months free. See the product work on your leads.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid var(--w05); padding-top: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+          <p class="mono muted" style="font-size: 12px; line-height: 1.8; margin-bottom: 4px;">The machine is built. The pipeline is ready. The only thing missing is fuel.</p>
+          <p class="display" style="font-size: 18px;">Let's turn it on.</p>
+        </div>
+        <div style="text-align: right;">
+          <p class="mono dim" style="font-size: 11px; line-height: 1.8;">
+            Oluwaseun Oluyori Ajagun · Founder<br>
+            <a href="mailto:yoriajagun08@gmail.com" style="color: var(--orange); text-decoration: none;">yoriajagun08@gmail.com</a><br>
+            <a href="https://reachng-production.up.railway.app/dashboard" target="_blank" style="color: var(--green); text-decoration: none;">reachng-production.up.railway.app/dashboard</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /slide-area -->
+
+  <!-- Bottom bar -->
+  <div id="bar">
+    <div class="bar-nav">
+      <button class="nav-btn" id="btn-prev">&#8592;</button>
+      <span class="slide-counter" id="counter">01 / 11</span>
+      <button class="nav-btn" id="btn-next">&#8594;</button>
+    </div>
+    <div id="progress"></div>
+    <p id="wordmark">Reach<span>NG</span> · Confidential</p>
+  </div>
+</div>
+
+<script>
+  const TOTAL = 11;
+  let current = 0;
+
+  const slides   = document.querySelectorAll('.slide');
+  const counter  = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const btnPrev  = document.getElementById('btn-prev');
+  const btnNext  = document.getElementById('btn-next');
+
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    progress.appendChild(d);
+  }
+
+  function goTo(n) {
+    if (n < 0 || n >= TOTAL) return;
+    slides[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach((d, i) => {
+      d.className = 'dot' + (i === current ? ' active' : i < current ? ' past' : '');
+    });
+    counter.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(TOTAL).padStart(2, '0');
+    btnPrev.disabled = current === 0;
+    btnNext.disabled = current === TOTAL - 1;
+  }
+
+  btnPrev.addEventListener('click', () => goTo(current - 1));
+  btnNext.addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft')                    { e.preventDefault(); goTo(current - 1); }
+  });
+
+  document.getElementById('slide-area').addEventListener('click', (e) => {
+    const x = e.clientX / window.innerWidth;
+    if (x > 0.66) goTo(current + 1);
+    else if (x < 0.33) goTo(current - 1);
+  });
+
+  goTo(0);
+</script>
+</body>
+</html>

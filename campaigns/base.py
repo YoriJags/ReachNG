@@ -13,6 +13,7 @@ from tools.hitl import queue_draft, get_pending, approve_draft, edit_draft
 from tools.roi import log_roi_event
 from tools.notifier import notify_whatsapp as notify_owner_whatsapp
 from tools.social import discover_social_leads
+from tools.ab_testing import assign_variant, record_ab_send
 from agent import generate_outreach_message, should_contact, generate_social_outreach_message
 from config import get_settings
 import structlog
@@ -30,6 +31,7 @@ class BaseCampaign:
         dry_run: bool = False,
         hitl_mode: bool = False,
         query_override: Optional[str] = None,
+        client_name: Optional[str] = None,
     ) -> dict:
         """
         Full campaign run:
@@ -41,7 +43,20 @@ class BaseCampaign:
         Returns summary stats.
         """
         settings = get_settings()
-        log.info("campaign_start", vertical=self.vertical, dry_run=dry_run, hitl_mode=hitl_mode)
+        log.info("campaign_start", vertical=self.vertical, dry_run=dry_run, hitl_mode=hitl_mode, client=client_name)
+
+        # Agency mode: pull client brief to personalise messages
+        client_brief = None
+        if client_name:
+            from api.clients import get_clients
+            client_doc = get_clients().find_one(
+                {"name": {"$regex": f"^{client_name}$", "$options": "i"}, "active": True}
+            )
+            if client_doc:
+                client_brief = client_doc.get("brief")
+                # Override channel preference if client has one
+                if client_doc.get("preferred_channel"):
+                    self.preferred_channel = client_doc["preferred_channel"]
 
         sent = 0
         queued = 0
@@ -64,8 +79,19 @@ class BaseCampaign:
             log.error("social_discovery_failed", error=str(social_leads))
             social_leads = []
 
-        # Social leads first — they're warmer
-        businesses = list(social_leads) + list(maps_leads)
+        # Social leads first — they're warmer; sort by lead_score within each group
+        from tools.scoring import score_contact
+        def _score(b: dict) -> int:
+            return score_contact(
+                vertical=self.vertical,
+                rating=b.get("rating"),
+                has_phone=bool(b.get("phone")),
+                has_website=bool(b.get("website")),
+                category=b.get("category"),
+            )
+        social_sorted = sorted(social_leads, key=_score, reverse=True)
+        maps_sorted   = sorted(maps_leads,   key=_score, reverse=True)
+        businesses = social_sorted + maps_sorted
         log.info("discovery_done", vertical=self.vertical, maps=len(maps_leads), social=len(social_leads))
 
         for biz in businesses:
@@ -173,18 +199,27 @@ class BaseCampaign:
                 errors += 1
                 continue
 
-            # Step 8: Record + ROI
+            # Step 8: Record + ROI + A/B
             message_text = generated.get("message", str(generated))
+            variant = assign_variant()
             record_outreach(
                 contact_id=contact_id,
                 channel=channel,
                 message=message_text,
                 attempt_number=1,
             )
+            record_ab_send(
+                contact_id=contact_id,
+                vertical=self.vertical,
+                channel=channel,
+                variant=variant,
+                message=message_text,
+            )
             log_roi_event(
                 contact_name=biz["name"],
                 vertical=self.vertical,
                 channel=channel,
+                client_name=client_name,
             )
             sent += 1
 

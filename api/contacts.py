@@ -1,4 +1,8 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+import csv
+import io
+from datetime import datetime
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Query
+from fastapi.responses import StreamingResponse
 from bson import ObjectId
 from database import get_contacts, get_replies
 from tools import mark_replied, mark_converted, mark_opted_out, get_pipeline_stats
@@ -36,6 +40,47 @@ async def list_contacts(
         .limit(limit)
     )
     return [_serialise(c) for c in contacts]
+
+
+@router.get("/export")
+async def export_contacts(
+    vertical: str | None = None,
+    status: str | None = None,
+    fmt: str = Query(default="csv", pattern="^csv$"),
+):
+    """Export contacts as a CSV download. Importable directly into Google Sheets."""
+    query = {}
+    if vertical:
+        query["vertical"] = vertical
+    if status:
+        query["status"] = status
+
+    contacts = list(get_contacts().find(query).sort("created_at", -1))
+
+    fields = ["name", "vertical", "status", "phone", "email", "website",
+              "address", "category", "rating", "outreach_count",
+              "last_contacted_at", "created_at"]
+
+    buf = io.StringIO()
+    writer = csv.DictWriter(buf, fieldnames=fields, extrasaction="ignore")
+    writer.writeheader()
+    for c in contacts:
+        row = {f: c.get(f, "") for f in fields}
+        # Flatten datetime objects
+        for dt_field in ("last_contacted_at", "created_at"):
+            val = row.get(dt_field)
+            if hasattr(val, "isoformat"):
+                row[dt_field] = val.isoformat()
+        writer.writerow(row)
+
+    buf.seek(0)
+    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M")
+    filename = f"reachng_contacts_{timestamp}.csv"
+    return StreamingResponse(
+        iter([buf.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @router.get("/pipeline")

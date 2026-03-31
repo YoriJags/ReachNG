@@ -7,6 +7,7 @@ from typing import Optional
 from bson import ObjectId
 from database import get_contacts, get_outreach_log
 from config import get_settings
+from tools.scoring import score_contact
 
 
 # ─── Contact status states ────────────────────────────────────────────────────
@@ -36,6 +37,14 @@ def upsert_contact(
     contacts = get_contacts()
     now = datetime.now(timezone.utc)
 
+    lead_score = score_contact(
+        vertical=vertical,
+        rating=rating,
+        has_phone=bool(phone),
+        has_website=bool(website),
+        category=category,
+    )
+
     doc = {
         "place_id": place_id,
         "name": name,
@@ -46,6 +55,7 @@ def upsert_contact(
         "website": website,
         "rating": rating,
         "category": category,
+        "lead_score": lead_score,
         "updated_at": now,
     }
 

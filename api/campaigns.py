@@ -12,6 +12,7 @@ class RunCampaignRequest(BaseModel):
     max_contacts: int = Field(default=30, ge=1, le=60)
     dry_run: bool = Field(default=True, description="Set to false to actually send messages")
     query_override: Optional[str] = Field(default=None, description="Custom Google Maps search query")
+    client_name: Optional[str] = Field(default=None, description="Client name for agency mode — scopes the campaign to their brief")
 
 
 class RunAllRequest(BaseModel):
@@ -43,6 +44,7 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
         max_new_contacts=body.max_contacts,
         dry_run=body.dry_run,
         query_override=body.query_override,
+        client_name=body.client_name,
     )
     return result
 

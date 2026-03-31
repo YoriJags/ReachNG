@@ -406,6 +406,32 @@ _HTML = r"""<!DOCTYPE html>
   <div id="rc-result" style="margin-top:12px;display:none;"></div>
 </div>
 
+<!-- Export Contacts -->
+<p class="section-title">Export Contacts <span style="color:#ff5c00;font-size:11px;margin-left:6px;">Google Sheets / CSV</span></p>
+<div class="hook-form">
+  <div class="row">
+    <select id="exp-vertical">
+      <option value="">All Verticals</option>
+      <option value="real_estate">🏠 Real Estate</option>
+      <option value="recruitment">👥 Recruitment</option>
+      <option value="events">🎉 Events</option>
+      <option value="fintech">💳 Fintech</option>
+      <option value="legal">⚖️ Legal</option>
+      <option value="logistics">🚚 Logistics</option>
+    </select>
+    <select id="exp-status">
+      <option value="">All Statuses</option>
+      <option value="new">New</option>
+      <option value="contacted">Contacted</option>
+      <option value="replied">Replied</option>
+      <option value="converted">Converted</option>
+      <option value="opted_out">Opted Out</option>
+    </select>
+    <button class="btn btn-approve" onclick="exportContacts()" style="white-space:nowrap;">⬇ Download CSV</button>
+  </div>
+  <p style="font-size:12px;color:#666;margin-top:8px;">Open the CSV in Google Sheets via File → Import. All contact fields included.</p>
+</div>
+
 <!-- Hook Generator -->
 <p class="section-title">Hook Generator <span style="color:#ff5c00;font-size:11px;margin-left:6px;">Content Intelligence</span></p>
 <div class="hook-form">
@@ -715,6 +741,24 @@ async function generateHooks() {
     btn.textContent = "⚡ Generate Hooks";
     btn.disabled = false;
   }
+}
+
+// ── Export Contacts ────────────────────────────────────────────────────────────
+
+function exportContacts() {
+  const vertical = document.getElementById("exp-vertical").value;
+  const status   = document.getElementById("exp-status").value;
+  const params   = new URLSearchParams();
+  if (vertical) params.set("vertical", vertical);
+  if (status)   params.set("status", status);
+  const url = `/api/v1/contacts/export?${params.toString()}`;
+  // Trigger browser download — no JS fetch needed
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 // ── Run Campaign ──────────────────────────────────────────────────────────────
