@@ -406,6 +406,72 @@ _HTML = r"""<!DOCTYPE html>
   <div id="rc-result" style="margin-top:12px;display:none;"></div>
 </div>
 
+<!-- Client Onboarding -->
+<p class="section-title">Client Onboarding <span style="color:#ff5c00;font-size:11px;margin-left:6px;">3-Step Setup</span></p>
+<div class="hook-form">
+
+  <!-- Step 1: Brief -->
+  <p style="font-size:11px;color:#ff5c00;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Step 1 — Create Client Brief</p>
+  <div class="row">
+    <input id="ob-name" placeholder="Client name e.g. Mercury Lagos" style="flex:1;" />
+    <select id="ob-vertical">
+      <option value="real_estate">🏠 Real Estate</option>
+      <option value="recruitment">👥 Recruitment</option>
+      <option value="events">🎉 Events</option>
+      <option value="fintech">💳 Fintech</option>
+      <option value="legal">⚖️ Legal</option>
+      <option value="logistics">🚚 Logistics</option>
+    </select>
+    <select id="ob-channel">
+      <option value="whatsapp">WhatsApp</option>
+      <option value="email">Email</option>
+    </select>
+  </div>
+  <div class="row" style="margin-top:8px;">
+    <select id="ob-plan" style="flex:1;">
+      <option value="">— Select Plan —</option>
+      <option value="starter">Starter — ₦50,000 setup + ₦50,000/mo · 300 msgs · 1 vertical · WhatsApp</option>
+      <option value="growth">Growth — ₦120,000 setup + ₦120,000/mo · 1,000 msgs · 3 verticals · WhatsApp + Email</option>
+      <option value="agency">Agency — ₦250,000 setup + ₦250,000/mo · Unlimited · All verticals · ROI reporting</option>
+    </select>
+  </div>
+  <textarea id="ob-brief" rows="4" placeholder="Who is this client? What do they sell? What tone should messages take? Who is their target customer?&#10;&#10;Example: Mercury Lagos is a luxury property agency on Victoria Island. We sell high-end apartments ₦50M+. Tone: professional, warm. Target: developers, HNI buyers, diaspora investors." style="width:100%;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:12px;color:#e8e8e8;font-size:13px;resize:vertical;margin-top:8px;font-family:inherit;"></textarea>
+  <button class="btn btn-approve" id="ob-create-btn" onclick="createClient()" style="margin-top:10px;white-space:nowrap;">✓ Save Client</button>
+  <div id="ob-create-result" style="margin-top:10px;display:none;"></div>
+
+  <div style="border-top:1px solid #1e1e1e;margin:20px 0;"></div>
+
+  <!-- Step 2: Portal -->
+  <p style="font-size:11px;color:#ff5c00;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Step 2 — Generate Portal Link</p>
+  <div class="row">
+    <input id="ob-portal-name" placeholder="Client name (same as above)" style="flex:1;" />
+    <button class="btn" id="ob-portal-btn" onclick="generatePortal()" style="white-space:nowrap;background:#1a1a1a;border:1px solid #333;">🔗 Generate Portal</button>
+  </div>
+  <div id="ob-portal-result" style="margin-top:10px;display:none;"></div>
+
+  <div style="border-top:1px solid #1e1e1e;margin:20px 0;"></div>
+
+  <!-- Step 3: Run Campaign -->
+  <p style="font-size:11px;color:#ff5c00;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Step 3 — Run First Campaign</p>
+  <div class="row">
+    <input id="ob-run-name" placeholder="Client name" style="flex:1;" />
+    <select id="ob-run-vertical">
+      <option value="real_estate">🏠 Real Estate</option>
+      <option value="recruitment">👥 Recruitment</option>
+      <option value="events">🎉 Events</option>
+      <option value="fintech">💳 Fintech</option>
+      <option value="legal">⚖️ Legal</option>
+      <option value="logistics">🚚 Logistics</option>
+    </select>
+    <input id="ob-run-max" type="number" value="30" min="1" max="60" style="max-width:80px;" title="Max contacts" />
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#aaa;white-space:nowrap;">
+      <input type="checkbox" id="ob-run-dryrun" checked style="width:auto;accent-color:#ff5c00;" /> Dry run
+    </label>
+    <button class="btn btn-approve" id="ob-run-btn" onclick="runClientCampaign()" style="white-space:nowrap;">▶ Run</button>
+  </div>
+  <div id="ob-run-result" style="margin-top:10px;display:none;"></div>
+</div>
+
 <!-- Export Contacts -->
 <p class="section-title">Export Contacts <span style="color:#ff5c00;font-size:11px;margin-left:6px;">Google Sheets / CSV</span></p>
 <div class="hook-form">
@@ -740,6 +806,113 @@ async function generateHooks() {
   } finally {
     btn.textContent = "⚡ Generate Hooks";
     btn.disabled = false;
+  }
+}
+
+// ── Client Onboarding ─────────────────────────────────────────────────────────
+
+async function createClient() {
+  const btn   = document.getElementById("ob-create-btn");
+  const name  = document.getElementById("ob-name").value.trim();
+  const brief = document.getElementById("ob-brief").value.trim();
+  const vertical = document.getElementById("ob-vertical").value;
+  const channel  = document.getElementById("ob-channel").value;
+  const plan     = document.getElementById("ob-plan").value;
+  const res   = document.getElementById("ob-create-result");
+
+  if (!name || !brief) {
+    res.innerHTML = `<div class="empty" style="color:#ff4444;">Client name and brief are required.</div>`;
+    res.style.display = "block";
+    return;
+  }
+
+  btn.textContent = "Saving…"; btn.disabled = true;
+  try {
+    const data = await postJSON("/api/v1/clients/", {
+      name, vertical, brief, preferred_channel: channel, active: true, plan: plan || null,
+    });
+    res.innerHTML = `<div style="color:#00e5a0;font-size:13px;">✓ Client <strong>${name}</strong> ${data.action}. Now generate their portal link in Step 2.</div>`;
+    // Pre-fill step 2 and 3 name fields
+    document.getElementById("ob-portal-name").value = name;
+    document.getElementById("ob-run-name").value = name;
+    document.getElementById("ob-run-vertical").value = vertical;
+  } catch (err) {
+    res.innerHTML = `<div class="empty" style="color:#ff4444;">Error: ${err.message}</div>`;
+  } finally {
+    res.style.display = "block";
+    btn.textContent = "✓ Save Client"; btn.disabled = false;
+  }
+}
+
+async function generatePortal() {
+  const btn  = document.getElementById("ob-portal-btn");
+  const name = document.getElementById("ob-portal-name").value.trim();
+  const res  = document.getElementById("ob-portal-result");
+
+  if (!name) {
+    res.innerHTML = `<div class="empty" style="color:#ff4444;">Enter client name first.</div>`;
+    res.style.display = "block";
+    return;
+  }
+
+  btn.textContent = "Generating…"; btn.disabled = true;
+  try {
+    const data = await fetch(`/api/v1/portal/generate/${encodeURIComponent(name)}`, { method: "POST" }).then(r => r.json());
+    const url  = window.location.origin + data.portal_url;
+    res.innerHTML = `
+      <div style="background:#0d1a0d;border:1px solid #1a3a1a;border-radius:8px;padding:14px 16px;">
+        <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Portal Link for ${name}</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input value="${url}" readonly style="flex:1;background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:8px 10px;color:#00e5a0;font-size:13px;font-family:monospace;" onclick="this.select()" />
+          <button class="btn" style="background:#1a3a1a;border:1px solid #2a4a2a;white-space:nowrap;" onclick="navigator.clipboard.writeText('${url}').then(()=>this.textContent='Copied!').catch(()=>{})">Copy</button>
+        </div>
+        <p style="font-size:11px;color:#555;margin-top:8px;">Share this link with ${name}. No login required.</p>
+      </div>`;
+  } catch (err) {
+    res.innerHTML = `<div class="empty" style="color:#ff4444;">Error: ${err.message}</div>`;
+  } finally {
+    res.style.display = "block";
+    btn.textContent = "🔗 Generate Portal"; btn.disabled = false;
+  }
+}
+
+async function runClientCampaign() {
+  const btn      = document.getElementById("ob-run-btn");
+  const name     = document.getElementById("ob-run-name").value.trim();
+  const vertical = document.getElementById("ob-run-vertical").value;
+  const max      = parseInt(document.getElementById("ob-run-max").value) || 30;
+  const dryRun   = document.getElementById("ob-run-dryrun").checked;
+  const res      = document.getElementById("ob-run-result");
+
+  if (!name) {
+    res.innerHTML = `<div class="empty" style="color:#ff4444;">Enter client name first.</div>`;
+    res.style.display = "block";
+    return;
+  }
+
+  btn.textContent = "⏳ Running…"; btn.disabled = true;
+  try {
+    const result = await postJSON("/api/v1/campaigns/run", {
+      vertical, max_contacts: max, dry_run: dryRun, client_name: name,
+    });
+    const rows = Object.entries(result).map(([k, v]) => {
+      const label = k.replace(/_/g, " ");
+      const val   = typeof v === "boolean" ? (v ? "yes" : "no") : v;
+      return `<div class="v-row"><span class="lbl">${label}</span><span class="val">${val}</span></div>`;
+    }).join("");
+    res.innerHTML = `
+      <div style="background:#0d0d0d;border:1px solid #222;border-radius:10px;padding:16px 20px;">
+        <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;">
+          ${name} — ${vertical.replace(/_/g," ")} ${dryRun ? "(dry run)" : "(live)"}
+        </div>
+        ${rows}
+      </div>`;
+    if (!dryRun) refresh();
+  } catch (err) {
+    res.innerHTML = `<div class="empty" style="color:#ff4444;">Error: ${err.message}</div>`;
+  } finally {
+    res.style.display = "block";
+    btn.textContent = "▶ Run"; btn.disabled = false;
   }
 }
 

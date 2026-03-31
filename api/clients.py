@@ -28,6 +28,7 @@ class ClientUpsert(BaseModel):
     brief: str                   # Who they are, what they're selling, tone, target customer
     preferred_channel: str = "whatsapp"
     active: bool = True
+    plan: str | None = None      # starter | growth | agency
 
 
 # ─── Endpoints ────────────────────────────────────────────────────────────────
@@ -61,6 +62,7 @@ async def upsert_client(payload: ClientUpsert):
                 "brief": payload.brief,
                 "preferred_channel": payload.preferred_channel,
                 "active": payload.active,
+                "plan": payload.plan,
                 "updated_at": now,
             },
             "$setOnInsert": {"created_at": now},
