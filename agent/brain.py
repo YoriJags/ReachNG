@@ -101,6 +101,60 @@ No explanations. No preamble. Just the message.
     return {"message": raw}
 
 
+# ─── Invoice reminder generation ─────────────────────────────────────────────
+
+def generate_invoice_reminder(
+    client_name: str,
+    debtor_name: str,
+    amount_ngn: float,
+    description: str,
+    days_overdue: int,
+    tone: str,           # polite | firm | payment_plan | final
+    reminder_count: int,
+) -> str:
+    """
+    Generate a WhatsApp invoice reminder message.
+    Escalates in tone based on how overdue the invoice is.
+    """
+    tone_instructions = {
+        "polite": "Friendly and warm. Assume it was an oversight. No pressure. One short paragraph.",
+        "firm": "Professional and direct. Remind them the invoice is overdue. Request payment within 48 hours.",
+        "payment_plan": "Empathetic but firm. Offer a flexible payment plan — suggest paying in 2 instalments. Make it easy to say yes.",
+        "final": "Serious and final. This is the last reminder before the matter is escalated. Do not threaten legally — just say this is the final notice.",
+    }
+
+    amount_formatted = f"₦{amount_ngn:,.0f}"
+
+    user_prompt = f"""
+Write a WhatsApp message from {client_name} to {debtor_name} requesting payment of an overdue invoice.
+
+Invoice details:
+- Amount: {amount_formatted}
+- Description: {description or "Services rendered"}
+- Days overdue: {days_overdue}
+- Reminder number: {reminder_count + 1}
+- Tone: {tone_instructions.get(tone, tone_instructions["polite"])}
+
+Rules:
+- Write in first person as {client_name}
+- Keep it under 5 sentences
+- Include the amount prominently
+- Do NOT use aggressive or threatening language
+- Sound human, not automated
+- No subject line — this is WhatsApp
+
+Return ONLY the message text. No preamble.
+"""
+
+    client = _get_client()
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=200,
+        messages=[{"role": "user", "content": user_prompt}],
+    )
+    return response.content[0].text.strip()
+
+
 # ─── Campaign decision making ─────────────────────────────────────────────────
 
 def should_contact(

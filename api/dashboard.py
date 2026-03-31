@@ -498,6 +498,47 @@ _HTML = r"""<!DOCTYPE html>
   <p style="font-size:12px;color:#666;margin-top:8px;">Open the CSV in Google Sheets via File → Import. All contact fields included.</p>
 </div>
 
+<!-- Invoice Collection -->
+<p class="section-title">Invoice Collection <span style="color:#f5c842;font-size:11px;margin-left:6px;">Agency Pro · AI Payment Reminders</span></p>
+<div class="hook-form">
+  <!-- Add Invoice -->
+  <p style="font-size:11px;color:#ff5c00;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Add Invoice</p>
+  <div class="row">
+    <input id="inv-client" placeholder="Your client name" style="flex:1;" />
+    <input id="inv-debtor" placeholder="Debtor name (who owes)" style="flex:1;" />
+    <input id="inv-phone" placeholder="+2348012345678" style="flex:1;" />
+  </div>
+  <div class="row" style="margin-top:8px;">
+    <input id="inv-amount" type="number" placeholder="Amount (₦)" style="flex:1;" min="1" />
+    <input id="inv-due" type="date" style="flex:1;" />
+    <input id="inv-desc" placeholder="Description e.g. Web design services" style="flex:2;" />
+  </div>
+  <div class="row" style="margin-top:8px;">
+    <input id="inv-custom-days" placeholder="Custom reminder days (optional) e.g. 0,5,10,20" style="flex:1;" title="Comma-separated days after due date" />
+    <select id="inv-custom-tones" multiple style="flex:1;height:36px;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:4px 8px;color:#e8e8e8;font-size:13px;" title="Hold Ctrl to select multiple tones in order">
+      <option value="polite">Polite</option>
+      <option value="firm">Firm</option>
+      <option value="payment_plan">Payment Plan</option>
+      <option value="final">Final Notice</option>
+    </select>
+    <button class="btn btn-approve" id="inv-add-btn" onclick="addInvoice()" style="white-space:nowrap;">+ Add Invoice</button>
+  </div>
+  <div id="inv-add-result" style="margin-top:8px;display:none;"></div>
+
+  <div style="border-top:1px solid #1e1e1e;margin:20px 0;"></div>
+
+  <!-- Invoice Stats -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <p style="font-size:11px;color:#ff5c00;text-transform:uppercase;letter-spacing:0.1em;">Outstanding Invoices</p>
+    <div style="display:flex;gap:8px;">
+      <input id="inv-filter-client" placeholder="Filter by client" style="max-width:160px;font-size:12px;padding:4px 8px;" />
+      <button class="btn" onclick="loadInvoices()" style="background:#1a1a1a;border:1px solid #333;font-size:12px;padding:4px 12px;">Refresh</button>
+    </div>
+  </div>
+  <div id="inv-stats" style="display:flex;gap:24px;margin-bottom:16px;"></div>
+  <div id="inv-list"></div>
+</div>
+
 <!-- Hook Generator -->
 <p class="section-title">Hook Generator <span style="color:#ff5c00;font-size:11px;margin-left:6px;">Content Intelligence</span></p>
 <div class="hook-form">
@@ -808,6 +849,154 @@ async function generateHooks() {
     btn.disabled = false;
   }
 }
+
+// ── Invoice Collection ────────────────────────────────────────────────────────
+
+async function addInvoice() {
+  const btn    = document.getElementById("inv-add-btn");
+  const client = document.getElementById("inv-client").value.trim();
+  const debtor = document.getElementById("inv-debtor").value.trim();
+  const phone  = document.getElementById("inv-phone").value.trim();
+  const amount = parseFloat(document.getElementById("inv-amount").value);
+  const due    = document.getElementById("inv-due").value;
+  const desc   = document.getElementById("inv-desc").value.trim();
+  const res    = document.getElementById("inv-add-result");
+
+  const customDaysRaw = document.getElementById("inv-custom-days").value.trim();
+  const customTones   = Array.from(document.getElementById("inv-custom-tones").selectedOptions).map(o => o.value);
+
+  if (!client || !debtor || !phone || !amount || !due) {
+    res.innerHTML = `<div class="empty" style="color:#ff4444;">Client, debtor, phone, amount, and due date are required.</div>`;
+    res.style.display = "block"; return;
+  }
+
+  const body = {
+    client_name: client, debtor_name: debtor, debtor_phone: phone,
+    amount_ngn: amount, due_date: new Date(due).toISOString(), description: desc,
+  };
+  if (customDaysRaw) {
+    body.custom_reminder_days = customDaysRaw.split(",").map(d => parseInt(d.trim())).filter(n => !isNaN(n));
+  }
+  if (customTones.length > 0) body.custom_tones = customTones;
+
+  btn.textContent = "Saving…"; btn.disabled = true;
+  try {
+    const data = await postJSON("/api/v1/invoices/", body);
+    res.innerHTML = `<div style="color:#00e5a0;font-size:13px;">✓ Invoice added. ReachNG will send automatic reminders starting on the due date.</div>`;
+    // Clear fields
+    ["inv-client","inv-debtor","inv-phone","inv-amount","inv-due","inv-desc","inv-custom-days"].forEach(id => {
+      document.getElementById(id).value = "";
+    });
+    loadInvoices();
+  } catch (err) {
+    res.innerHTML = `<div class="empty" style="color:#ff4444;">Error: ${err.message}</div>`;
+  } finally {
+    res.style.display = "block";
+    btn.textContent = "+ Add Invoice"; btn.disabled = false;
+  }
+}
+
+async function loadInvoices() {
+  const client = document.getElementById("inv-filter-client").value.trim();
+  const params = new URLSearchParams();
+  if (client) params.set("client_name", client);
+
+  try {
+    const [invoices, stats] = await Promise.all([
+      fetch(`/api/v1/invoices/?${params}`).then(r => r.json()),
+      fetch(`/api/v1/invoices/stats${client ? "?client_name=" + encodeURIComponent(client) : ""}`).then(r => r.json()),
+    ]);
+
+    // Stats bar
+    const statsEl = document.getElementById("inv-stats");
+    const outstanding = stats.total_outstanding_ngn || 0;
+    const paid = stats.total_paid_ngn || 0;
+    const rate = stats.collection_rate || 0;
+    statsEl.innerHTML = `
+      <div class="card" style="background:#111;border:1px solid #222;padding:12px 16px;border-radius:6px;">
+        <div style="font-size:20px;color:#ff5c00;font-weight:700;">₦${outstanding.toLocaleString()}</div>
+        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-top:4px;">Outstanding</div>
+      </div>
+      <div class="card" style="background:#111;border:1px solid #222;padding:12px 16px;border-radius:6px;">
+        <div style="font-size:20px;color:#00e5a0;font-weight:700;">₦${paid.toLocaleString()}</div>
+        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-top:4px;">Collected</div>
+      </div>
+      <div class="card" style="background:#111;border:1px solid #222;padding:12px 16px;border-radius:6px;">
+        <div style="font-size:20px;color:#f5c842;font-weight:700;">${rate}%</div>
+        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-top:4px;">Collection Rate</div>
+      </div>`;
+
+    // Invoice list
+    const listEl = document.getElementById("inv-list");
+    if (!invoices.length) {
+      listEl.innerHTML = `<div class="empty">No invoices yet.</div>`; return;
+    }
+
+    const statusColor = { pending:"#555", reminded:"#ff5c00", followed_up:"#f5c842",
+      plan_offered:"#88f", final_notice:"#f44", responded:"#00e5a0", paid:"#00e5a0", written_off:"#333" };
+
+    listEl.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead><tr>
+        <th style="text-align:left;color:#555;border-bottom:1px solid #222;padding:6px;font-size:10px;text-transform:uppercase;">Debtor</th>
+        <th style="text-align:left;color:#555;border-bottom:1px solid #222;padding:6px;font-size:10px;text-transform:uppercase;">Client</th>
+        <th style="text-align:right;color:#555;border-bottom:1px solid #222;padding:6px;font-size:10px;text-transform:uppercase;">Amount</th>
+        <th style="text-align:left;color:#555;border-bottom:1px solid #222;padding:6px;font-size:10px;text-transform:uppercase;">Due</th>
+        <th style="text-align:left;color:#555;border-bottom:1px solid #222;padding:6px;font-size:10px;text-transform:uppercase;">Status</th>
+        <th style="text-align:left;color:#555;border-bottom:1px solid #222;padding:6px;font-size:10px;text-transform:uppercase;">Actions</th>
+      </tr></thead>
+      <tbody>
+        ${invoices.map(inv => `
+          <tr style="border-bottom:1px solid #1a1a1a;">
+            <td style="padding:8px 6px;">${inv.debtor_name}</td>
+            <td style="padding:8px 6px;color:#888;">${inv.client_name}</td>
+            <td style="padding:8px 6px;text-align:right;color:#ff5c00;">₦${inv.amount_ngn.toLocaleString()}</td>
+            <td style="padding:8px 6px;color:#888;">${inv.due_date ? inv.due_date.split("T")[0] : "—"}</td>
+            <td style="padding:8px 6px;">
+              <span style="color:${statusColor[inv.status]||"#888"};font-size:10px;text-transform:uppercase;letter-spacing:0.1em;">${inv.status.replace(/_/g," ")}</span>
+            </td>
+            <td style="padding:8px 6px;">
+              <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                <button onclick="remindNow('${inv.id}')" style="font-size:10px;padding:2px 8px;background:#1a1a00;border:1px solid #333;color:#f5c842;border-radius:4px;cursor:pointer;">Remind</button>
+                <button onclick="markInvoicePaid('${inv.id}')" style="font-size:10px;padding:2px 8px;background:#001a0a;border:1px solid #333;color:#00e5a0;border-radius:4px;cursor:pointer;">Paid</button>
+                <button onclick="markWrittenOff('${inv.id}')" style="font-size:10px;padding:2px 8px;background:#1a0000;border:1px solid #333;color:#888;border-radius:4px;cursor:pointer;">Write Off</button>
+              </div>
+            </td>
+          </tr>`).join("")}
+      </tbody>
+    </table>`;
+  } catch(err) {
+    document.getElementById("inv-list").innerHTML = `<div class="empty" style="color:#ff4444;">Error loading invoices.</div>`;
+  }
+}
+
+async function remindNow(invoiceId) {
+  const tone = prompt("Reminder tone? (polite / firm / payment_plan / final)", "polite");
+  if (!tone) return;
+  try {
+    await postJSON(`/api/v1/invoices/${invoiceId}/remind-now`, { tone });
+    alert("Reminder queued.");
+    loadInvoices();
+  } catch(err) { alert("Error: " + err.message); }
+}
+
+async function markInvoicePaid(invoiceId) {
+  if (!confirm("Mark this invoice as paid?")) return;
+  try {
+    await fetch(`/api/v1/invoices/${invoiceId}/paid`, { method: "POST" });
+    loadInvoices();
+  } catch(err) { alert("Error: " + err.message); }
+}
+
+async function markWrittenOff(invoiceId) {
+  if (!confirm("Write off this invoice? This cannot be undone.")) return;
+  try {
+    await fetch(`/api/v1/invoices/${invoiceId}/written-off`, { method: "POST" });
+    loadInvoices();
+  } catch(err) { alert("Error: " + err.message); }
+}
+
+// Load invoices on page load
+loadInvoices();
 
 // ── Client Onboarding ─────────────────────────────────────────────────────────
 

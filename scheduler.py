@@ -56,6 +56,67 @@ async def _reply_poll():
         log.error("reply_poll_failed", error=str(e))
 
 
+async def _invoice_reminder_run():
+    """Daily invoice collection — sends WhatsApp reminders for overdue invoices."""
+    from tools.invoices import get_due_reminders, record_reminder_sent, REMINDER_SEQUENCE
+    from agent import generate_invoice_reminder
+    from tools.outreach import send_whatsapp
+    from datetime import datetime, timezone
+
+    log.info("invoice_reminder_run_start")
+    reminders = get_due_reminders()
+    sent = 0
+    errors = 0
+
+    for invoice in reminders:
+        # Determine which tone/stage to use based on current status
+        stages = [s["stage"] for s in REMINDER_SEQUENCE]
+        current_status = invoice.get("status", "pending")
+
+        # Find the next stage in sequence
+        if current_status == "pending":
+            next_stage = REMINDER_SEQUENCE[0]
+        else:
+            try:
+                idx = stages.index(current_status)
+                if idx + 1 >= len(REMINDER_SEQUENCE):
+                    continue  # Completed sequence
+                next_stage = REMINDER_SEQUENCE[idx + 1]
+            except ValueError:
+                continue
+
+        due_date = invoice.get("due_date")
+        now = datetime.now(timezone.utc)
+        days_overdue = (now - due_date).days if due_date else 0
+
+        try:
+            message = generate_invoice_reminder(
+                client_name=invoice["client_name"],
+                debtor_name=invoice["debtor_name"],
+                amount_ngn=invoice["amount_ngn"],
+                description=invoice.get("description", ""),
+                days_overdue=days_overdue,
+                tone=next_stage["tone"],
+                reminder_count=invoice.get("reminder_count", 0),
+            )
+            result = await send_whatsapp(phone=invoice["debtor_phone"], message=message)
+            if result.get("success", True):
+                record_reminder_sent(invoice["id"], next_stage["stage"])
+                sent += 1
+                log.info("invoice_reminder_sent",
+                    debtor=invoice["debtor_name"],
+                    stage=next_stage["stage"],
+                    amount=invoice["amount_ngn"],
+                )
+            else:
+                errors += 1
+        except Exception as e:
+            log.error("invoice_reminder_failed", invoice_id=invoice["id"], error=str(e))
+            errors += 1
+
+    log.info("invoice_reminder_run_done", sent=sent, errors=errors)
+
+
 async def _morning_brief():
     """Compile overnight stats and send WhatsApp brief to owner at 8am Lagos time."""
     log.info("morning_brief_start")
@@ -102,6 +163,15 @@ def setup_scheduler():
         _followup_run,
         CronTrigger(hour=14, minute=0, timezone="Africa/Lagos"),
         id="followup_run",
+        replace_existing=True,
+        misfire_grace_time=300,
+    )
+
+    # Invoice reminders: every day at 9am Lagos time
+    scheduler.add_job(
+        _invoice_reminder_run,
+        CronTrigger(hour=9, minute=0, timezone="Africa/Lagos"),
+        id="invoice_reminder_run",
         replace_existing=True,
         misfire_grace_time=300,
     )
