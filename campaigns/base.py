@@ -5,7 +5,7 @@ Each vertical subclass just defines its vertical name and preferred channel.
 import asyncio
 from typing import Optional
 from tools import (
-    discover_businesses, upsert_contact, has_been_contacted,
+    discover_businesses, discover_apollo_leads, upsert_contact, has_been_contacted,
     is_daily_limit_reached, record_outreach, get_daily_send_count,
     send_whatsapp, send_email,
 )
@@ -73,22 +73,43 @@ class BaseCampaign:
         skipped_no_channel = 0
         errors = 0
 
-        # Step 1: Discover — Google Maps + Social (run in parallel)
-        maps_quota   = max(10, max_new_contacts // 2)
-        social_quota = max_new_contacts - maps_quota
+        # Step 1: Discover — Google Maps + Apollo + Social (run in parallel)
+        maps_quota   = max(10, max_new_contacts // 3)
+        apollo_quota = max(10, max_new_contacts // 3)
+        social_quota = max_new_contacts - maps_quota - apollo_quota
 
         maps_task   = discover_businesses(vertical=self.vertical, max_results=maps_quota, query_override=query_override, city_override=client_city)
+        apollo_task = discover_apollo_leads(vertical=self.vertical, max_results=apollo_quota, city_override=client_city)
         social_task = discover_social_leads(vertical=self.vertical, max_results=social_quota)
 
-        maps_leads, social_leads = await asyncio.gather(maps_task, social_task, return_exceptions=True)
+        maps_leads, apollo_leads, social_leads = await asyncio.gather(maps_task, apollo_task, social_task, return_exceptions=True)
         if isinstance(maps_leads, Exception):
             log.error("maps_discovery_failed", error=str(maps_leads))
             maps_leads = []
+        if isinstance(apollo_leads, Exception):
+            log.error("apollo_discovery_failed", error=str(apollo_leads))
+            apollo_leads = []
         if isinstance(social_leads, Exception):
             log.error("social_discovery_failed", error=str(social_leads))
             social_leads = []
 
-        # Social leads first — they're warmer; sort by lead_score within each group
+        # Deduplicate across sources by phone + email
+        seen_phones: set[str] = set()
+        seen_emails: set[str] = set()
+        def _is_duplicate(b: dict) -> bool:
+            phone = b.get("phone")
+            email = b.get("email")
+            if phone and phone in seen_phones:
+                return True
+            if email and email in seen_emails:
+                return True
+            if phone:
+                seen_phones.add(phone)
+            if email:
+                seen_emails.add(email)
+            return False
+
+        # Social leads first (warmest), then Apollo (B2B verified), then Maps
         from tools.scoring import score_contact
         def _score(b: dict) -> int:
             return score_contact(
@@ -99,9 +120,11 @@ class BaseCampaign:
                 category=b.get("category"),
             )
         social_sorted = sorted(social_leads, key=_score, reverse=True)
+        apollo_sorted = sorted(apollo_leads, key=_score, reverse=True)
         maps_sorted   = sorted(maps_leads,   key=_score, reverse=True)
-        businesses = social_sorted + maps_sorted
-        log.info("discovery_done", vertical=self.vertical, maps=len(maps_leads), social=len(social_leads))
+
+        businesses = [b for b in social_sorted + apollo_sorted + maps_sorted if not _is_duplicate(b)]
+        log.info("discovery_done", vertical=self.vertical, maps=len(maps_leads), apollo=len(apollo_leads), social=len(social_leads), total_deduped=len(businesses))
 
         for biz in businesses:
             # Step 2: Daily limit check

@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     followup_delay_hours: int = Field(default=48, env="FOLLOWUP_DELAY_HOURS")
     max_followup_attempts: int = Field(default=2, env="MAX_FOLLOWUP_ATTEMPTS")
 
+    # Apollo.io B2B discovery
+    apollo_api_key: str | None = Field(default=None, env="APOLLO_API_KEY")
+
     # Social media discovery
     apify_api_token: str | None = Field(default=None, env="APIFY_API_TOKEN")
     twitter_bearer_token: str | None = Field(default=None, env="TWITTER_BEARER_TOKEN")
