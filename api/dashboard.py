@@ -445,7 +445,7 @@ _HTML = r"""<!DOCTYPE html>
   <p style="font-size:11px;color:#ff5c00;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Step 2 — Generate Portal Link</p>
   <div class="row">
     <input id="ob-portal-name" placeholder="Client name (same as above)" style="flex:1;" />
-    <button class="btn" id="ob-portal-btn" onclick="generatePortal()" style="white-space:nowrap;background:#1a1a1a;border:1px solid #333;">🔗 Generate Portal</button>
+    <button class="btn btn-approve" id="ob-portal-btn" onclick="generatePortal()" style="white-space:nowrap;">🔗 Generate Portal</button>
   </div>
   <div id="ob-portal-result" style="margin-top:10px;display:none;"></div>
 
