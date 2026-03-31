@@ -16,6 +16,43 @@ Every idea below follows the same logic — existing infrastructure, no AI layer
 
 ---
 
+## Idea 0 — PLUGng (ReachNG for Artists) ⭐ PRIORITY
+
+**The concept:** ReachNG but for musicians and creatives. Instead of outreach to businesses, it scans an artist's social media presence, discovers music blogs, playlist curators, event promoters, radio producers, A&Rs, and brand managers — then generates personalised pitches to get the artist's music in front of the right people.
+
+"Plug" = connection in Nigerian slang. Every artist needs plugs. Nobody has automated finding them.
+
+**The pain:** Artists spend months manually DMing blogs, sending emails to curators who never reply, paying middlemen for "plugs" that don't convert. The whole process is manual, expensive, and relationship-dependent. An unknown artist with a great song has no system to get heard.
+
+**What you build:**
+- Artist signs up, connects their Spotify/Apple Music/Instagram
+- System scrapes music blogs, playlist curators (Spotify editorial + independent), radio producers, A&Rs at labels, event promoters, brand managers who do artist deals
+- Scores each target by relevance to the artist's genre, following size, and engagement
+- Claude generates a personalised pitch per target referencing their playlist, their blog post, their event — never generic
+- Sends via email or Instagram DM at scale
+- Tracks opens, replies, playlist adds, bookings
+
+**Who pays:** Independent artists, music managers, record labels (indie), entertainment companies like PLUGng.
+
+**Warm lead:** David Avante (Mercury VI / PLUGng) → Bizzle Osikoya network. This is the first client. Pitch it as a tool PLUGng uses to plug their roster of artists.
+
+**Pricing idea:**
+- Artist plan: ₦30,000/mo (individual artist)
+- Manager plan: ₦80,000/mo (up to 5 artists)
+- Label plan: ₦200,000/mo (unlimited roster)
+
+**Why it wins:**
+- No competitor exists for Nigerian/African artists specifically
+- The African music industry is exploding globally (Afrobeats, Amapiano) — every artist needs international plugs
+- Reuses 80% of ReachNG's codebase — social discovery, message generation, Unipile sending, reply tracking are all already built
+- David/PLUGng is the proof of concept and the first distribution channel
+
+**Build note:** Start with the David pitch. Get PLUGng as client #1. Let them validate the product before building everything. The MVP is ReachNG with an "artist" vertical and a curators/blogs discovery layer.
+
+**Priority: HIGHEST after ReachNG is generating revenue.**
+
+---
+
 ## Idea 1 — AI Voice Agent for Nigerian Businesses
 
 **The pain:** Every Lagos business misses calls. Clinics, restaurants, real estate agents, salons — a human can't be on the phone 24/7. No Nigerian-specific AI voice product exists that understands Nigerian English, Pidgin, and code-switching.
