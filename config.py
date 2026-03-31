@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     owner_whatsapp: str | None = Field(default=None, env="OWNER_WHATSAPP")
     slack_webhook_url: str | None = Field(default=None, env="SLACK_WEBHOOK_URL")
 
+    # Dashboard auth (set both in Railway → never leave blank in production)
+    dashboard_user: str | None = Field(default=None, env="DASHBOARD_USER")
+    dashboard_pass: str | None = Field(default=None, env="DASHBOARD_PASS")
+
     # App
     app_env: str = Field(default="development", env="APP_ENV")
     app_port: int = Field(default=8000, env="PORT")

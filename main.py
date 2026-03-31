@@ -5,12 +5,13 @@ Three verticals: Real Estate | Recruitment | Events
 import structlog
 import uvicorn
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
 from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router
+from auth import require_auth
 from mcp_server import mcp
 from config import get_settings
 
@@ -63,21 +64,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# REST API routes
-app.include_router(campaigns_router, prefix="/api/v1")
-app.include_router(contacts_router, prefix="/api/v1")
-app.include_router(clients_router, prefix="/api/v1")
-app.include_router(data_router, prefix="/api/v1")
-app.include_router(approvals_router, prefix="/api/v1")
-app.include_router(roi_router, prefix="/api/v1")
-app.include_router(social_router, prefix="/api/v1")
-app.include_router(hooks_router, prefix="/api/v1")
-app.include_router(ab_router, prefix="/api/v1")
-app.include_router(referrals_router, prefix="/api/v1")
-app.include_router(competitors_router, prefix="/api/v1")
-app.include_router(invoices_router, prefix="/api/v1")
-app.include_router(portal_router)
-app.include_router(dashboard_router)
+# REST API routes — all protected by Basic Auth
+_auth = {"dependencies": [Depends(require_auth)]}
+
+app.include_router(campaigns_router,   prefix="/api/v1", **_auth)
+app.include_router(contacts_router,    prefix="/api/v1", **_auth)
+app.include_router(clients_router,     prefix="/api/v1", **_auth)
+app.include_router(data_router,        prefix="/api/v1", **_auth)
+app.include_router(approvals_router,   prefix="/api/v1", **_auth)
+app.include_router(roi_router,         prefix="/api/v1", **_auth)
+app.include_router(social_router,      prefix="/api/v1", **_auth)
+app.include_router(hooks_router,       prefix="/api/v1", **_auth)
+app.include_router(ab_router,          prefix="/api/v1", **_auth)
+app.include_router(referrals_router,   prefix="/api/v1", **_auth)
+app.include_router(competitors_router, prefix="/api/v1", **_auth)
+app.include_router(invoices_router,    prefix="/api/v1", **_auth)
+app.include_router(portal_router)        # Portal uses token auth — no Basic Auth
+app.include_router(dashboard_router, **_auth)
 
 # Mount MCP server — exposes tools to Claude
 app.mount("/mcp", mcp.http_app())
