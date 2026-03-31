@@ -434,7 +434,13 @@ _HTML = r"""<!DOCTYPE html>
       <option value="growth">Growth — ₦120,000 setup + ₦120,000/mo · 1,000 msgs · 3 verticals · WhatsApp + Email</option>
       <option value="agency">Agency — ₦250,000 setup + ₦250,000/mo · Unlimited · All verticals · ROI reporting</option>
     </select>
+    <input id="ob-city" placeholder="City (default: Lagos) e.g. London, UK" style="flex:1;" title="Campaigns will search this city" />
   </div>
+  <div class="row" style="margin-top:8px;">
+    <input id="ob-wa-account" placeholder="Unipile WhatsApp Account ID (client's own number)" style="flex:1;" />
+    <input id="ob-email-account" placeholder="Unipile Email Account ID (optional)" style="flex:1;" />
+  </div>
+  <p style="font-size:11px;color:#555;margin-top:4px;margin-bottom:8px;">Account IDs found in Unipile dashboard after client scans QR code. Leave blank to use your default number.</p>
   <textarea id="ob-brief" rows="4" placeholder="Who is this client? What do they sell? What tone should messages take? Who is their target customer?&#10;&#10;Example: Mercury Lagos is a luxury property agency on Victoria Island. We sell high-end apartments ₦50M+. Tone: professional, warm. Target: developers, HNI buyers, diaspora investors." style="width:100%;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:12px;color:#e8e8e8;font-size:13px;resize:vertical;margin-top:8px;font-family:inherit;"></textarea>
   <button class="btn btn-approve" id="ob-create-btn" onclick="createClient()" style="margin-top:10px;white-space:nowrap;">✓ Save Client</button>
   <div id="ob-create-result" style="margin-top:10px;display:none;"></div>
@@ -1006,7 +1012,10 @@ async function createClient() {
   const brief = document.getElementById("ob-brief").value.trim();
   const vertical = document.getElementById("ob-vertical").value;
   const channel  = document.getElementById("ob-channel").value;
-  const plan     = document.getElementById("ob-plan").value;
+  const plan       = document.getElementById("ob-plan").value;
+  const city       = document.getElementById("ob-city").value.trim();
+  const waAccount  = document.getElementById("ob-wa-account").value.trim();
+  const emailAcct  = document.getElementById("ob-email-account").value.trim();
   const res   = document.getElementById("ob-create-result");
 
   if (!name || !brief) {
@@ -1018,7 +1027,11 @@ async function createClient() {
   btn.textContent = "Saving…"; btn.disabled = true;
   try {
     const data = await postJSON("/api/v1/clients/", {
-      name, vertical, brief, preferred_channel: channel, active: true, plan: plan || null,
+      name, vertical, brief, preferred_channel: channel, active: true,
+      plan: plan || null,
+      city: city || null,
+      whatsapp_account_id: waAccount || null,
+      email_account_id: emailAcct || null,
     });
     res.innerHTML = `<div style="color:#00e5a0;font-size:13px;">✓ Client <strong>${name}</strong> ${data.action}. Now generate their portal link in Step 2.</div>`;
     // Pre-fill step 2 and 3 name fields

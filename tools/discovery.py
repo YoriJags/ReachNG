@@ -118,15 +118,23 @@ async def discover_businesses(
     vertical: str,
     max_results: int = 60,
     query_override: Optional[str] = None,
+    city_override: Optional[str] = None,
 ) -> list[dict]:
     """
     Discover businesses for a vertical.
+    city_override: replaces "Lagos" in all queries — e.g. "London, UK" for international clients.
     Returns a list of enriched contact dicts ready for upsert.
     """
     settings = get_settings()
     api_key = settings.google_maps_api_key
+    city = city_override or settings.default_city.split(",")[0].strip()  # e.g. "Lagos"
 
-    queries = [query_override] if query_override else VERTICAL_QUERIES.get(vertical, [])
+    if query_override:
+        queries = [query_override]
+    else:
+        # Replace "Lagos" with the client's city in all queries
+        base_queries = VERTICAL_QUERIES.get(vertical, [])
+        queries = [q.replace("Lagos", city).replace("Victoria Island", city).replace("Lekki", city).replace("Ikoyi", city).replace("Ajah", city) for q in base_queries]
     seen_place_ids: set[str] = set()
     results: list[dict] = []
 

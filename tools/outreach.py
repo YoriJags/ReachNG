@@ -29,20 +29,22 @@ def _headers() -> dict:
 # ─── WhatsApp ─────────────────────────────────────────────────────────────────
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=8))
-async def send_whatsapp(phone: str, message: str) -> dict:
+async def send_whatsapp(phone: str, message: str, account_id: Optional[str] = None) -> dict:
     """
     Send a WhatsApp message to a phone number.
     Phone must be in E.164 format: +2348012345678
+    account_id: use client's own Unipile account if provided, else fall back to default.
     Returns Unipile response with message_id.
     """
     settings = get_settings()
+    wa_account = account_id or settings.unipile_whatsapp_account_id
 
     async with httpx.AsyncClient(timeout=20.0) as client:
         resp = await client.post(
             f"{_base_url()}/api/v1/chats",
             headers=_headers(),
             json={
-                "account_id": settings.unipile_whatsapp_account_id,
+                "account_id": wa_account,
                 "attendees_ids": [phone],
                 "text": message,
             },
@@ -68,15 +70,18 @@ async def send_email(
     subject: str,
     body: str,
     reply_to: Optional[str] = None,
+    account_id: Optional[str] = None,
 ) -> dict:
     """
     Send an email via Unipile.
+    account_id: use client's own Unipile account if provided, else fall back to default.
     Returns Unipile response with message_id.
     """
     settings = get_settings()
+    email_account = account_id or settings.unipile_email_account_id
 
     payload = {
-        "account_id": settings.unipile_email_account_id,
+        "account_id": email_account,
         "to": [{"identifier": to_email}],
         "subject": subject,
         "body": body,

@@ -29,6 +29,10 @@ class ClientUpsert(BaseModel):
     preferred_channel: str = "whatsapp"
     active: bool = True
     plan: str | None = None      # starter | growth | agency
+    # Per-client Unipile account IDs — messages send from their own number
+    whatsapp_account_id: str | None = None   # Client's Unipile WhatsApp account ID
+    email_account_id: str | None = None      # Client's Unipile email account ID
+    city: str | None = None                  # e.g. "London, UK" — overrides default city
 
 
 # ─── Endpoints ────────────────────────────────────────────────────────────────
@@ -63,6 +67,9 @@ async def upsert_client(payload: ClientUpsert):
                 "preferred_channel": payload.preferred_channel,
                 "active": payload.active,
                 "plan": payload.plan,
+                "whatsapp_account_id": payload.whatsapp_account_id,
+                "email_account_id": payload.email_account_id,
+                "city": payload.city,
                 "updated_at": now,
             },
             "$setOnInsert": {"created_at": now},

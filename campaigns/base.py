@@ -45,8 +45,11 @@ class BaseCampaign:
         settings = get_settings()
         log.info("campaign_start", vertical=self.vertical, dry_run=dry_run, hitl_mode=hitl_mode, client=client_name)
 
-        # Agency mode: pull client brief to personalise messages
+        # Agency mode: pull client config to personalise messages + route via their accounts
         client_brief = None
+        client_whatsapp_account_id = None
+        client_email_account_id = None
+        client_city = None
         if client_name:
             from api.clients import get_clients
             client_doc = get_clients().find_one(
@@ -54,9 +57,15 @@ class BaseCampaign:
             )
             if client_doc:
                 client_brief = client_doc.get("brief")
-                # Override channel preference if client has one
+                client_whatsapp_account_id = client_doc.get("whatsapp_account_id")
+                client_email_account_id    = client_doc.get("email_account_id")
+                client_city                = client_doc.get("city")
                 if client_doc.get("preferred_channel"):
                     self.preferred_channel = client_doc["preferred_channel"]
+                if client_whatsapp_account_id:
+                    log.info("campaign_using_client_whatsapp", client=client_name)
+                if client_city:
+                    log.info("campaign_using_client_city", client=client_name, city=client_city)
 
         sent = 0
         queued = 0
@@ -68,7 +77,7 @@ class BaseCampaign:
         maps_quota   = max(10, max_new_contacts // 2)
         social_quota = max_new_contacts - maps_quota
 
-        maps_task   = discover_businesses(vertical=self.vertical, max_results=maps_quota, query_override=query_override)
+        maps_task   = discover_businesses(vertical=self.vertical, max_results=maps_quota, query_override=query_override, city_override=client_city)
         social_task = discover_social_leads(vertical=self.vertical, max_results=social_quota)
 
         maps_leads, social_leads = await asyncio.gather(maps_task, social_task, return_exceptions=True)
@@ -187,9 +196,13 @@ class BaseCampaign:
                 queued += 1
                 continue
 
-            # Step 7b: Send directly
+            # Step 7b: Send directly — via client's own account if configured
             try:
-                result = await self._send(channel, biz, generated)
+                result = await self._send(
+                    channel, biz, generated,
+                    whatsapp_account_id=client_whatsapp_account_id,
+                    email_account_id=client_email_account_id,
+                )
                 if not result.get("success", True):
                     log.warning("send_failed", business=biz["name"], result=result)
                     errors += 1
@@ -320,16 +333,25 @@ class BaseCampaign:
             return "whatsapp"
         return None
 
-    async def _send(self, channel: str, biz: dict, generated: dict) -> dict:
+    async def _send(
+        self,
+        channel: str,
+        biz: dict,
+        generated: dict,
+        whatsapp_account_id: Optional[str] = None,
+        email_account_id: Optional[str] = None,
+    ) -> dict:
         if channel == "whatsapp":
             return await send_whatsapp(
                 phone=biz["phone"],
                 message=generated["message"],
+                account_id=whatsapp_account_id,   # None = use default (your number)
             )
         elif channel == "email":
             return await send_email(
                 to_email=biz["email"],
                 subject=generated.get("subject", f"Quick question for {biz['name']}"),
                 body=generated["message"],
+                account_id=email_account_id,       # None = use default
             )
         raise ValueError(f"Unknown channel: {channel}")
