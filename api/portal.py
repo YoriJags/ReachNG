@@ -99,6 +99,12 @@ async def get_portal_data(token: str):
     }
 
 
+@router.get("/demo", response_class=HTMLResponse)
+async def demo_portal():
+    """Public demo portal — shows realistic sample data for pitch/sales purposes."""
+    return HTMLResponse(_portal_html("demo", "Mercury Real Estate", "Real Estate", demo=True))
+
+
 @router.get("/{token}", response_class=HTMLResponse)
 async def client_portal(token: str):
     """Render the client portal HTML dashboard."""
@@ -114,7 +120,9 @@ async def client_portal(token: str):
 
 # ─── Portal HTML ──────────────────────────────────────────────────────────────
 
-def _portal_html(token: str, client_name: str, vertical: str) -> str:
+def _portal_html(token: str, client_name: str, vertical: str, demo: bool = False) -> str:
+    data_loader = "const data = DEMO_DATA;" if demo else f"const data = await fetch('/portal/data/{token}').then(r => r.json());"
+    demo_banner = '<p style="background:#1a1000;color:#f5c842;font-size:11px;padding:8px 16px;margin-bottom:24px;border:1px solid #f5c842;letter-spacing:0.1em;">DEMO — Sample data for illustration purposes</p>' if demo else ""
     return rf"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -154,6 +162,7 @@ def _portal_html(token: str, client_name: str, vertical: str) -> str:
 <h1>{client_name}</h1>
 <p class="sub">{vertical} &nbsp;·&nbsp; Powered by ReachNG &nbsp;·&nbsp; Last 30 days</p>
 
+{demo_banner}
 <div id="loading">Loading your dashboard…</div>
 <div id="content" style="display:none;">
   <div class="grid" id="stats-grid"></div>
@@ -170,8 +179,23 @@ def _portal_html(token: str, client_name: str, vertical: str) -> str:
 </div>
 
 <script>
+const DEMO_DATA = {{
+  stats: {{ contacted: 47, replied: 12, converted: 3, daily_sent: 18 }},
+  roi: {{ messages_sent: 47, value_generated_ngn: 450000, roi_percent: "9.0", roi_label: "Strong pipeline — 3 deals in progress" }},
+  contacts: [
+    {{ name: "Landmark Africa Properties", category: "Real Estate", phone: "+2348012345678", rating: 4.7, lead_score: 91, status: "replied" }},
+    {{ name: "Ocean Bay Developers", category: "Property Developer", phone: "+2348023456789", rating: 4.5, lead_score: 86, status: "contacted" }},
+    {{ name: "Lekki Phase 1 Realty", category: "Real Estate", phone: "+2348034567890", rating: 4.3, lead_score: 82, status: "converted" }},
+    {{ name: "VI Premium Homes", category: "Real Estate", phone: "+2348045678901", rating: 4.1, lead_score: 78, status: "contacted" }},
+    {{ name: "Ikoyi Luxury Estates", category: "Property Developer", phone: "+2348056789012", rating: 4.8, lead_score: 94, status: "replied" }},
+    {{ name: "Ajah New Town Developers", category: "Real Estate", phone: "+2348067890123", rating: 3.9, lead_score: 71, status: "new" }},
+    {{ name: "Greenfield Homes Lagos", category: "Real Estate", phone: "+2348078901234", rating: 4.2, lead_score: 79, status: "contacted" }},
+    {{ name: "Prime Properties NG", category: "Property Developer", phone: "+2348089012345", rating: 4.6, lead_score: 88, status: "converted" }},
+  ]
+}};
+
 async function load() {{
-  const data = await fetch('/portal/data/{token}').then(r => r.json());
+  {data_loader}
   document.getElementById('loading').style.display = 'none';
   document.getElementById('content').style.display = '';
 
