@@ -108,6 +108,37 @@ async def health():
     return {"status": "ok" if db_ok else "degraded", "db": db_ok}
 
 
+@app.get("/debug/apollo", dependencies=[Depends(require_auth)])
+async def debug_apollo():
+    """Hit Apollo API directly and return the raw response for diagnostics."""
+    import httpx
+    settings = get_settings()
+    api_key = getattr(settings, "apollo_api_key", None)
+    if not api_key:
+        return {"error": "APOLLO_API_KEY not set in environment"}
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        resp = await client.post(
+            "https://api.apollo.io/v1/mixed_people/search",
+            headers={"Content-Type": "application/json", "Cache-Control": "no-cache", "X-Api-Key": api_key},
+            json={
+                "person_titles": ["Real Estate Agent", "Property Developer"],
+                "person_locations": ["Lagos, Nigeria"],
+                "page": 1,
+                "per_page": 5,
+            },
+        )
+    data = resp.json()
+    return {
+        "http_status": resp.status_code,
+        "people_count": len(data.get("people", [])),
+        "contacts_count": len(data.get("contacts", [])),
+        "error": data.get("error"),
+        "message": data.get("message"),
+        "first_person": data.get("people", [{}])[0].get("name") if data.get("people") else None,
+        "key_prefix": api_key[:8] + "...",
+    }
+
+
 @app.get("/debug/maps", dependencies=[Depends(require_auth)])
 async def debug_maps():
     """Hit Google Places API directly and return the raw response for diagnostics."""
