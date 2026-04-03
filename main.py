@@ -121,20 +121,20 @@ async def debug_apollo():
             "https://api.apollo.io/v1/mixed_people/search",
             headers={"Content-Type": "application/json", "Cache-Control": "no-cache", "X-Api-Key": api_key},
             json={
-                "person_titles": ["Real Estate Agent", "Property Developer"],
-                "person_locations": ["Lagos, Nigeria"],
+                "q_keywords": "real estate property development",
+                "organization_locations": ["Lagos, Nigeria"],
                 "page": 1,
                 "per_page": 5,
             },
         )
     data = resp.json()
+    orgs = data.get("organizations", [])
     return {
         "http_status": resp.status_code,
-        "people_count": len(data.get("people", [])),
-        "contacts_count": len(data.get("contacts", [])),
+        "orgs_count": len(orgs),
         "error": data.get("error"),
         "message": data.get("message"),
-        "first_person": data.get("people", [{}])[0].get("name") if data.get("people") else None,
+        "first_org": orgs[0].get("name") if orgs else None,
         "key_prefix": api_key[:8] + "...",
     }
 

@@ -55,30 +55,27 @@ VERTICAL_KEYWORDS = {
 # ─── API calls ────────────────────────────────────────────────────────────────
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=8))
-async def _people_search(
-    titles: list[str],
+async def _org_search(
     keywords: list[str],
     city: str,
     api_key: str,
     page: int = 1,
     per_page: int = 25,
 ) -> dict:
-    """Apollo people search — returns contacts with company info."""
+    """Apollo organization search — available on free plan."""
     async with httpx.AsyncClient(timeout=20.0) as client:
         resp = await client.post(
-            f"{APOLLO_BASE}/mixed_people/search",
+            f"{APOLLO_BASE}/mixed_companies/search",
             headers={
                 "Content-Type": "application/json",
                 "Cache-Control": "no-cache",
                 "X-Api-Key": api_key,
             },
             json={
-                "person_titles": titles,
                 "q_keywords": " OR ".join(keywords),
-                "person_locations": [city],
+                "organization_locations": [city],
                 "page": page,
                 "per_page": per_page,
-                "contact_email_status": ["verified", "guessed", "unverified"],
             },
         )
         resp.raise_for_status()
@@ -108,13 +105,12 @@ async def discover_apollo_leads(
     keywords = VERTICAL_KEYWORDS.get(vertical, [vertical])
 
     results: list[dict] = []
-    seen_emails: set[str] = set()
+    seen_domains: set[str] = set()
     page = 1
 
     while len(results) < max_results:
         try:
-            data = await _people_search(
-                titles=titles,
+            data = await _org_search(
                 keywords=keywords,
                 city=city,
                 api_key=api_key,
@@ -125,53 +121,44 @@ async def discover_apollo_leads(
             log.error("apollo_search_failed", vertical=vertical, city=city, error=str(e))
             break
 
-        people = data.get("people", []) or data.get("contacts", [])
-        if not people:
-            break  # No more results
+        orgs = data.get("organizations", []) or data.get("accounts", [])
+        if not orgs:
+            break
 
-        for person in people:
+        for org in orgs:
             if len(results) >= max_results:
                 break
 
-            email = person.get("email")
-            phone = (
-                person.get("phone_numbers", [{}])[0].get("sanitized_number")
-                if person.get("phone_numbers")
-                else None
-            )
-
-            # Need at least one contact method
-            if not email and not phone:
-                continue
-
-            # Deduplicate by email
-            if email and email in seen_emails:
-                continue
-            if email:
-                seen_emails.add(email)
-
-            company = person.get("organization") or {}
-            name = company.get("name") or person.get("company_name") or ""
+            name = org.get("name") or ""
             if not name:
                 continue
 
+            website = org.get("website_url") or org.get("primary_domain")
+            phone = org.get("sanitized_phone") or org.get("phone")
+            domain = org.get("primary_domain")
+
+            # Deduplicate by domain
+            if domain and domain in seen_domains:
+                continue
+            if domain:
+                seen_domains.add(domain)
+
             results.append({
-                "place_id": f"apollo_{person.get('id', '')}",
+                "place_id": f"apollo_{org.get('id', '')}",
                 "name": name,
                 "vertical": vertical,
                 "phone": _format_phone(phone),
-                "email": email,
-                "address": _build_address(person, company),
-                "website": company.get("website_url"),
-                "rating": None,  # Apollo has no rating
+                "email": None,  # Org search doesn't return emails
+                "address": _build_org_address(org),
+                "website": website,
+                "rating": None,
                 "category": _vertical_to_category(vertical),
                 "source": "apollo",
-                "contact_name": f"{person.get('first_name', '')} {person.get('last_name', '')}".strip(),
-                "contact_title": person.get("title"),
-                "linkedin_url": person.get("linkedin_url"),
+                "contact_name": None,
+                "contact_title": None,
+                "linkedin_url": org.get("linkedin_url"),
             })
 
-        # Apollo pagination
         pagination = data.get("pagination", {})
         total_pages = pagination.get("total_pages", 1)
         if page >= total_pages:
@@ -191,10 +178,10 @@ def _format_phone(phone: Optional[str]) -> Optional[str]:
     return cleaned
 
 
-def _build_address(person: dict, company: dict) -> Optional[str]:
+def _build_org_address(org: dict) -> Optional[str]:
     parts = []
-    city = person.get("city") or company.get("city")
-    country = person.get("country") or company.get("country")
+    city = org.get("city")
+    country = org.get("country")
     if city:
         parts.append(city)
     if country:
