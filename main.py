@@ -108,6 +108,28 @@ async def health():
     return {"status": "ok" if db_ok else "degraded", "db": db_ok}
 
 
+@app.get("/debug/maps", dependencies=[Depends(require_auth)])
+async def debug_maps():
+    """Hit Google Places API directly and return the raw response for diagnostics."""
+    import httpx
+    settings = get_settings()
+    api_key = getattr(settings, "google_maps_api_key", None)
+    if not api_key:
+        return {"error": "GOOGLE_MAPS_API_KEY not set in environment"}
+    url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
+    params = {"query": "real estate agency Lagos Nigeria", "key": api_key, "region": "ng"}
+    async with httpx.AsyncClient(timeout=10) as client:
+        resp = await client.get(url, params=params)
+        data = resp.json()
+    return {
+        "status": data.get("status"),
+        "error_message": data.get("error_message"),
+        "results_count": len(data.get("results", [])),
+        "first_result": data.get("results", [{}])[0].get("name") if data.get("results") else None,
+        "key_prefix": api_key[:8] + "...",
+    }
+
+
 if __name__ == "__main__":
     import os
     settings = get_settings()
