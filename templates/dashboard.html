@@ -434,6 +434,9 @@
       <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#777;white-space:nowrap;">
         <input type="checkbox" id="rc-dryrun" checked style="width:auto;accent-color:#ff5c00;" /> Dry run
       </label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#f0a500;white-space:nowrap;" title="Queue messages for your review in Approvals tab before sending">
+        <input type="checkbox" id="rc-hitl" style="width:auto;accent-color:#f0a500;" /> Review before send
+      </label>
       <button class="btn btn-approve" id="rc-btn" onclick="runCampaign()" style="white-space:nowrap;">Run Campaign</button>
     </div>
     <div id="rc-result" style="margin-top:10px;display:none;"></div>
@@ -457,12 +460,53 @@
 <!-- ── Clients ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-clients">
 
+  <!-- Unipile WhatsApp Setup — critical workflow -->
+  <div style="background:#0d1a0d;border:1px solid #1a3a1a;border-left:4px solid #00e5a0;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <span style="font-size:16px;">📱</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#00e5a0;">Unipile WhatsApp Setup — Do This For Every Client</div>
+        <div style="font-size:11px;color:#2a5a2a;margin-top:2px;">Without this, all messages send from YOUR number. Each client must have their own.</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 12px;background:#0a170a;border-radius:8px;">
+        <span style="background:#00e5a0;color:#000;border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>
+        <div style="font-size:12px;color:#ccc;line-height:1.5;">
+          <b style="color:#e8e8e8;">Client gets a WhatsApp Business number</b> — can be their existing business phone or a new SIM dedicated to outreach.
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 12px;background:#0a170a;border-radius:8px;">
+        <span style="background:#00e5a0;color:#000;border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>
+        <div style="font-size:12px;color:#ccc;line-height:1.5;">
+          <b style="color:#e8e8e8;">Go to Unipile dashboard</b> → Accounts → Add Account → Select WhatsApp → client scans the QR code with their phone. Takes 30 seconds.
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 12px;background:#0a170a;border-radius:8px;">
+        <span style="background:#00e5a0;color:#000;border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span>
+        <div style="font-size:12px;color:#ccc;line-height:1.5;">
+          <b style="color:#e8e8e8;">Copy the Account ID</b> from Unipile (looks like <span style="font-family:monospace;color:#00e5a0;background:#0a0a0a;padding:1px 5px;border-radius:3px;">acc_xxxxxxxx</span>) — paste it into the client record below in the Unipile WhatsApp Account ID field.
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 12px;background:#0a170a;border-radius:8px;">
+        <span style="background:#00e5a0;color:#000;border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</span>
+        <div style="font-size:12px;color:#ccc;line-height:1.5;">
+          <b style="color:#e8e8e8;">All campaigns for this client now send from their number</b> — not yours. Replies come back to their WhatsApp and ReachNG picks them up automatically.
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:8px 12px;background:#061006;border-radius:6px;font-size:11px;color:#2a5a2a;">
+      ⚠️ <b style="color:#3a8a3a;">Cost:</b> Unipile charges ~$10–20/month per connected WhatsApp account. Pass this to the client as part of their monthly plan. Never use your own number for client campaigns.
+    </div>
+  </div>
+
   <div class="sop-box">
-    <div class="sop-title">Client Onboarding SOP</div>
-    <div class="sop-step"><span class="sop-num">1</span><span><b>Create client</b> — fill name, vertical, plan, city, Unipile account ID (from their WhatsApp QR scan), and a detailed brief.</span></div>
-    <div class="sop-step"><span class="sop-num">2</span><span><b>Generate portal link</b> — copy and send to client via WhatsApp. This is their live reporting dashboard.</span></div>
-    <div class="sop-step"><span class="sop-num">3</span><span><b>Run first campaign</b> as dry run → confirm leads → go live. Always use client name so messages come from their context.</span></div>
-    <div class="sop-step"><span class="sop-num">4</span><span>Update client brief monthly as their offering changes. Better brief = better AI messages.</span></div>
+    <div class="sop-title">Full Client Onboarding SOP — 5 Steps</div>
+    <div class="sop-step"><span class="sop-num">1</span><span><b>Collect brief</b> — who are they, what do they sell, target customer, tone. The more detail the better — AI uses this to write every message.</span></div>
+    <div class="sop-step"><span class="sop-num">2</span><span><b>Unipile QR scan</b> — follow the green box above. Get their Account ID before doing anything else.</span></div>
+    <div class="sop-step"><span class="sop-num">3</span><span><b>Create client record</b> below — fill all fields including the Unipile Account ID and brief.</span></div>
+    <div class="sop-step"><span class="sop-num">4</span><span><b>Generate portal link</b> → send to client via WhatsApp. This is their live dashboard — they can see contacts, replies, ROI.</span></div>
+    <div class="sop-step"><span class="sop-num">5</span><span><b>Run first campaign</b> — dry run first to preview leads, then go live with max 10 contacts. Scale up once confirmed working.</span></div>
   </div>
 
   <p class="section-title">Client Roster</p>
@@ -894,13 +938,14 @@ async function runCampaign() {
   const vertical = document.getElementById("rc-vertical").value;
   const max      = parseInt(document.getElementById("rc-max").value) || 10;
   const dryRun   = document.getElementById("rc-dryrun").checked;
+  const hitlMode = document.getElementById("rc-hitl").checked;
   const clientName = document.getElementById("rc-client").value.trim();
   const res      = document.getElementById("rc-result");
 
   btn.textContent = "Running…"; btn.disabled = true; res.style.display = "none";
   try {
     const result = await postJSON("/api/v1/campaigns/run", {
-      vertical, max_contacts: max, dry_run: dryRun,
+      vertical, max_contacts: max, dry_run: dryRun, hitl_mode: hitlMode,
       ...(clientName ? { client_name: clientName } : {}),
     });
     res.innerHTML = renderResult(result, vertical, dryRun);

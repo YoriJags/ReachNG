@@ -15,6 +15,7 @@ class RunCampaignRequest(BaseModel):
     dry_run: bool = Field(default=True, description="Set to false to actually send messages")
     query_override: Optional[str] = Field(default=None, description="Custom Google Maps search query")
     client_name: Optional[str] = Field(default=None, description="Client name for agency mode — scopes the campaign to their brief")
+    hitl_mode: bool = Field(default=False, description="Queue messages for human review before sending")
 
 
 class RunAllRequest(BaseModel):
@@ -37,6 +38,7 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
             dry_run=body.dry_run,
             query_override=body.query_override,
             client_name=body.client_name,
+            hitl_mode=body.hitl_mode,
         )
         return {"status": "started", "vertical": body.vertical, "message": "Campaign running in background"}
 
@@ -45,6 +47,7 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
         dry_run=body.dry_run,
         query_override=body.query_override,
         client_name=body.client_name,
+        hitl_mode=body.hitl_mode,
     )
     return result
 
