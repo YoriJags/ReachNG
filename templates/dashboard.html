@@ -12,7 +12,6 @@
     background: #0a0a0a;
     color: #e8e8e8;
     min-height: 100vh;
-    padding: 28px 24px;
   }
 
   /* ── Header ── */
@@ -20,644 +19,582 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 36px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #1e1e1e;
+    padding: 16px 28px;
+    border-bottom: 1px solid #1a1a1a;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #0a0a0a;
   }
 
-  .logo { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: #f0f0f0; }
+  .logo { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; color: #f0f0f0; }
   .logo span { color: #ff5c00; }
 
-  .health-pills { display: flex; gap: 10px; align-items: center; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
 
+  .health-pills { display: flex; gap: 8px; align-items: center; }
   .health-pill {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px; color: #888;
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; color: #555;
     background: #111; border: 1px solid #1e1e1e;
-    border-radius: 20px; padding: 4px 12px;
+    border-radius: 20px; padding: 3px 10px;
   }
-
-  .health-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #555;
-  }
-  .health-dot.ok { background: #00e5a0; box-shadow: 0 0 6px #00e5a040; }
-  .health-dot.warn { background: #f5c842; }
+  .health-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; }
+  .health-dot.ok    { background: #00e5a0; box-shadow: 0 0 6px #00e5a040; }
+  .health-dot.warn  { background: #f5c842; }
   .health-dot.error { background: #ff4444; }
 
-  .live-badge {
-    font-size: 11px; color: #555; display: flex; align-items: center; gap: 6px;
-    margin-left: 16px;
-  }
-  .live-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #00e5a0; animation: pulse 2s infinite;
-  }
+  .live-badge { font-size: 11px; color: #333; display: flex; align-items: center; gap: 5px; }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #00e5a0; animation: pulse 2s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ── Tab nav ── */
+  .tab-nav {
+    display: flex;
+    gap: 2px;
+    padding: 0 28px;
+    border-bottom: 1px solid #1a1a1a;
+    background: #0a0a0a;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    font-size: 12px; font-weight: 500;
+    color: #444; background: none; border: none;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s;
+    letter-spacing: 0.2px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tab-btn:hover { color: #888; }
+  .tab-btn.active { color: #f0f0f0; border-bottom-color: #ff5c00; }
+
+  .tab-badge {
+    background: #ff5c00; color: #fff;
+    font-size: 10px; font-weight: 700;
+    border-radius: 8px; padding: 1px 5px;
+    min-width: 16px; text-align: center;
+    display: none;
+  }
+  .tab-badge.show { display: inline-block; }
+
+  /* ── Tab panels ── */
+  .tab-panel { display: none; padding: 28px; max-width: 1400px; margin: 0 auto; }
+  .tab-panel.active { display: block; }
 
   /* ── Section title ── */
   .section-title {
-    font-size: 11px; color: #444; text-transform: uppercase;
-    letter-spacing: 1px; margin-bottom: 14px; margin-top: 36px;
+    font-size: 10px; color: #333; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px; margin-top: 32px;
     display: flex; align-items: center; gap: 10px;
   }
   .section-title:first-child { margin-top: 0; }
 
-  /* ── Revenue bar ── */
+  /* ── Stat cards ── */
   .summary-bar {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
     margin-bottom: 0;
   }
-
   .stat-card {
-    background: #111;
-    border: 1px solid #1e1e1e;
-    border-radius: 10px;
-    padding: 18px 20px;
+    background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 16px 18px;
   }
-
-  .stat-card .label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-  .stat-card .value { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat-card .label { font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
   .stat-card.fire .value  { color: #ff5c00; }
   .stat-card.green .value { color: #00e5a0; }
   .stat-card.amber .value { color: #f5c842; }
   .stat-card.blue .value  { color: #4488ff; }
 
   /* ── Daily limit bar ── */
-  .limit-bar-wrap { margin-top: 20px; }
-  .limit-label {
-    display: flex; justify-content: space-between;
-    font-size: 11px; color: #444; margin-bottom: 7px;
-  }
-  .limit-bar-track {
-    background: #1a1a1a; border-radius: 4px; height: 6px; overflow: hidden;
-  }
-  .limit-bar-fill {
-    height: 100%; border-radius: 4px;
-    background: linear-gradient(90deg, #ff5c00, #ff8c00);
-    transition: width 0.6s ease;
-  }
+  .limit-bar-wrap { margin-top: 16px; }
+  .limit-label { display: flex; justify-content: space-between; font-size: 11px; color: #333; margin-bottom: 6px; }
+  .limit-bar-track { background: #1a1a1a; border-radius: 4px; height: 5px; overflow: hidden; }
+  .limit-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #ff5c00, #ff8c00); transition: width 0.6s ease; }
 
-  /* ── Client roster ── */
-  .roster-table {
-    width: 100%; border-collapse: collapse; font-size: 13px;
+  /* ── ROI banner ── */
+  .roi-banner {
+    background: #111; border: 1px solid #1a1a1a; border-left: 3px solid #ff5c00;
+    border-radius: 10px; padding: 18px 22px;
+    display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between;
   }
-  .roster-table th {
-    text-align: left; color: #444; border-bottom: 1px solid #1e1e1e;
-    padding: 8px 10px; font-weight: 500; font-size: 10px;
-    text-transform: uppercase; letter-spacing: 0.8px;
-  }
-  .roster-table td {
-    padding: 11px 10px; border-bottom: 1px solid #141414; vertical-align: middle;
-  }
-  .roster-table tr:last-child td { border-bottom: none; }
-  .roster-table tr:hover td { background: #111; }
-
-  .plan-badge {
-    font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .plan-starter { background: #1a1a1a; color: #666; }
-  .plan-growth  { background: #1a1a00; color: #f5c842; }
-  .plan-agency  { background: #1a0a00; color: #ff5c00; }
-
-  .copy-link-btn {
-    font-size: 10px; padding: 3px 8px; background: #1a1a1a; border: 1px solid #2a2a2a;
-    border-radius: 4px; color: #888; cursor: pointer; transition: all 0.15s;
-  }
-  .copy-link-btn:hover { background: #222; color: #ccc; }
+  .roi-label-text { font-size: 17px; font-weight: 700; color: #ff5c00; }
+  .roi-sub { font-size: 11px; color: #333; margin-top: 4px; }
+  .roi-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+  .roi-stat .r-val { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .roi-stat .r-lbl { font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 2px; }
+  .roi-stat.green .r-val { color: #00e5a0; }
+  .roi-stat.amber .r-val { color: #f5c842; }
+  .roi-stat.blue  .r-val { color: #4488ff; }
 
   /* ── Verticals ── */
-  .verticals {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 12px;
-  }
-
-  .vertical-card {
-    background: #111;
-    border: 1px solid #1e1e1e;
-    border-radius: 10px;
-    padding: 20px;
-  }
-
-  .vertical-card h3 {
-    font-size: 13px; font-weight: 600; margin-bottom: 16px; color: #ccc;
-  }
-
-  .v-row {
-    display: flex; justify-content: space-between;
-    align-items: center; padding: 6px 0;
-    border-bottom: 1px solid #161616; font-size: 12px;
-  }
+  .verticals { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+  .vertical-card { background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 18px; }
+  .vertical-card h3 { font-size: 12px; font-weight: 600; margin-bottom: 14px; color: #bbb; }
+  .v-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #141414; font-size: 12px; }
   .v-row:last-child { border-bottom: none; }
-  .v-row .lbl { color: #555; }
+  .v-row .lbl { color: #444; }
   .v-row .val { font-weight: 600; font-variant-numeric: tabular-nums; }
   .val.replied   { color: #f5c842; }
   .val.converted { color: #00e5a0; }
   .val.contacted { color: #4488ff; }
 
-  /* ── ROI banner ── */
-  .roi-banner {
-    background: #111;
-    border: 1px solid #1e1e1e;
-    border-left: 3px solid #ff5c00;
-    border-radius: 10px;
-    padding: 20px 24px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    align-items: center;
-    justify-content: space-between;
+  /* ── Social signals ── */
+  .signals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .signal-stat { background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 16px 18px; }
+  .signal-stat .s-val { font-size: 24px; font-weight: 700; color: #c084fc; font-variant-numeric: tabular-nums; }
+  .signal-stat .s-lbl { font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 4px; }
+
+  /* ── Client roster ── */
+  .roster-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .roster-table th {
+    text-align: left; color: #333; border-bottom: 1px solid #1a1a1a;
+    padding: 8px 10px; font-weight: 500; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.8px;
   }
-  .roi-label-text { font-size: 18px; font-weight: 700; color: #ff5c00; }
-  .roi-sub { font-size: 11px; color: #444; margin-top: 4px; }
-  .roi-stats { display: flex; gap: 28px; flex-wrap: wrap; }
-  .roi-stat .r-val { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .roi-stat .r-lbl { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 2px; }
-  .roi-stat.green .r-val { color: #00e5a0; }
-  .roi-stat.amber .r-val { color: #f5c842; }
-  .roi-stat.blue  .r-val { color: #4488ff; }
+  .roster-table td { padding: 11px 10px; border-bottom: 1px solid #141414; vertical-align: middle; }
+  .roster-table tr:last-child td { border-bottom: none; }
+  .roster-table tr:hover td { background: #111; }
+  .plan-badge { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .plan-starter { background: #1a1a1a; color: #555; }
+  .plan-growth  { background: #1a1a00; color: #f5c842; }
+  .plan-agency  { background: #1a0a00; color: #ff5c00; }
+  .copy-link-btn { font-size: 10px; padding: 3px 8px; background: #1a1a1a; border: 1px solid #222; border-radius: 4px; color: #666; cursor: pointer; transition: all 0.15s; }
+  .copy-link-btn:hover { background: #222; color: #ccc; }
 
   /* ── Approvals ── */
   .approvals-list { display: flex; flex-direction: column; gap: 10px; }
-
-  .approval-card {
-    background: #111;
-    border: 1px solid #1e1e1e;
-    border-radius: 10px;
-    padding: 16px 18px;
-  }
-
-  .approval-header {
-    display: flex; justify-content: space-between;
-    align-items: center; margin-bottom: 8px;
-  }
-
+  .approval-card { background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 16px 18px; }
+  .approval-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .approval-name { font-weight: 600; font-size: 14px; }
-  .approval-meta { font-size: 11px; color: #444; margin-bottom: 8px; }
-  .approval-message {
-    font-size: 13px; color: #ccc; line-height: 1.6;
-    background: #0d0d0d; border-radius: 6px; padding: 10px 12px;
-    margin-bottom: 10px; white-space: pre-wrap;
-  }
-
+  .approval-meta { font-size: 11px; color: #333; margin-bottom: 8px; }
+  .approval-message { font-size: 13px; color: #ccc; line-height: 1.6; background: #0d0d0d; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; white-space: pre-wrap; }
   .approval-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-  .btn {
-    border: none; border-radius: 7px; padding: 7px 14px;
-    font-size: 12px; font-weight: 600; cursor: pointer;
-    letter-spacing: 0.2px; transition: opacity 0.15s;
-  }
-  .btn:hover { opacity: 0.8; }
-  .btn-approve { background: #00e5a0; color: #000; }
-  .btn-skip    { background: #1e1e1e; color: #666; }
-  .btn-edit    { background: #12223a; color: #4488ff; }
-
-  .channel-badge {
-    font-size: 10px; font-weight: 600; padding: 2px 8px;
-    border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .channel-whatsapp { background: #0e2e1e; color: #00e5a0; }
-  .channel-email    { background: #0e1e3a; color: #4488ff; }
-
-  .post-context {
-    font-size: 11px; color: #555; font-style: italic;
-    background: #0d0d0d; border-left: 2px solid #1e1e1e;
-    padding: 6px 10px; border-radius: 0 5px 5px 0;
-    margin-bottom: 8px; line-height: 1.5;
-  }
-
-  .source-badge {
-    font-size: 10px; font-weight: 600; padding: 2px 7px;
-    border-radius: 10px; margin-left: 6px;
-  }
+  .approve-all-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  .approve-count { font-size: 13px; color: #444; }
+  .approvals-empty { color: #333; font-size: 13px; text-align: center; padding: 36px; }
+  .post-context { font-size: 11px; color: #444; font-style: italic; background: #0d0d0d; border-left: 2px solid #1e1e1e; padding: 6px 10px; border-radius: 0 5px 5px 0; margin-bottom: 8px; line-height: 1.5; }
+  .source-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; margin-left: 6px; }
   .source-maps   { background: #0e1e3a; color: #4488ff; }
   .source-social { background: #1e0e3a; color: #c084fc; }
 
-  .approve-all-bar {
-    display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap;
-  }
-  .approve-count { font-size: 13px; color: #555; }
-  .approvals-empty { color: #333; font-size: 13px; text-align: center; padding: 28px; }
-
   /* ── Replies ── */
   .replies-list { display: flex; flex-direction: column; gap: 10px; }
-
-  .reply-card {
-    background: #111;
-    border: 1px solid #1e1e1e;
-    border-radius: 10px;
-    padding: 16px 18px;
-  }
-
-  .reply-header {
-    display: flex; justify-content: space-between;
-    align-items: center; margin-bottom: 8px;
-  }
-
+  .reply-card { background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 16px 18px; }
+  .reply-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .reply-name { font-weight: 600; font-size: 14px; }
-
-  .intent-badge {
-    font-size: 10px; font-weight: 600; padding: 3px 10px;
-    border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .intent-interested  { background: #0e2e1e; color: #00e5a0; }
-  .intent-not_now     { background: #2e2800; color: #f5c842; }
-  .intent-opted_out   { background: #2e0e0e; color: #ff4444; }
-  .intent-referral    { background: #0e1e3a; color: #4488ff; }
-  .intent-question    { background: #1e0e3a; color: #c084fc; }
-  .intent-unknown     { background: #1a1a1a; color: #444; }
-
-  .reply-meta { font-size: 11px; color: #444; margin-bottom: 6px; }
+  .intent-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .intent-interested { background: #0e2e1e; color: #00e5a0; }
+  .intent-not_now    { background: #2e2800; color: #f5c842; }
+  .intent-opted_out  { background: #2e0e0e; color: #ff4444; }
+  .intent-referral   { background: #0e1e3a; color: #4488ff; }
+  .intent-question   { background: #1e0e3a; color: #c084fc; }
+  .intent-unknown    { background: #1a1a1a; color: #333; }
+  .reply-meta { font-size: 11px; color: #333; margin-bottom: 6px; }
   .reply-summary { font-size: 13px; color: #999; line-height: 1.5; }
 
-  /* ── Social signals ── */
-  .signals-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
-  }
-  .signal-stat {
-    background: #111; border: 1px solid #1e1e1e; border-radius: 10px;
-    padding: 16px 18px;
-  }
-  .signal-stat .s-val { font-size: 26px; font-weight: 700; color: #c084fc; font-variant-numeric: tabular-nums; }
-  .signal-stat .s-lbl { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 4px; }
-
   /* ── Forms ── */
-  .form-card {
-    background: #111; border: 1px solid #1e1e1e; border-radius: 10px;
-    padding: 20px;
-  }
+  .form-card { background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 20px; }
   .form-card .row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
   .form-card .row:last-child { margin-bottom: 0; }
-
   .form-card input, .form-card select, .form-card textarea {
-    background: #0a0a0a; border: 1px solid #222; border-radius: 7px;
+    background: #0a0a0a; border: 1px solid #1e1e1e; border-radius: 7px;
     color: #e8e8e8; font-size: 13px; padding: 9px 12px;
     font-family: inherit; flex: 1; min-width: 140px;
     transition: border-color 0.15s;
   }
-  .form-card input:focus, .form-card select:focus, .form-card textarea:focus {
-    outline: none; border-color: #ff5c00;
-  }
+  .form-card input:focus, .form-card select:focus, .form-card textarea:focus { outline: none; border-color: #ff5c00; }
   .form-card textarea { resize: vertical; min-height: 100px; }
+  .step-label { font-size: 10px; color: #ff5c00; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+  .form-divider { border: none; border-top: 1px solid #1a1a1a; margin: 18px 0; }
+  .form-hint { font-size: 11px; color: #333; margin-top: 6px; }
 
-  .step-label {
-    font-size: 10px; color: #ff5c00; text-transform: uppercase;
-    letter-spacing: 0.1em; margin-bottom: 10px;
-  }
-  .form-divider { border: none; border-top: 1px solid #1e1e1e; margin: 18px 0; }
+  /* ── Buttons ── */
+  .btn { border: none; border-radius: 7px; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.2px; transition: opacity 0.15s; }
+  .btn:hover { opacity: 0.8; }
+  .btn-approve { background: #00e5a0; color: #000; }
+  .btn-skip    { background: #1e1e1e; color: #555; }
+  .btn-edit    { background: #12223a; color: #4488ff; }
 
-  .form-hint { font-size: 11px; color: #444; margin-top: 6px; }
-
-  /* ── Hook generator ── */
-  .hooks-output { display: flex; flex-direction: column; gap: 10px; }
-  .hook-card {
-    background: #111; border: 1px solid #1e1e1e; border-radius: 10px;
-    padding: 14px 18px;
-  }
-  .hook-text { font-size: 15px; font-weight: 600; color: #e8e8e8; margin-bottom: 6px; }
-  .hook-meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  .hook-format { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.6px; }
-  .hook-why { font-size: 12px; color: #777; flex: 1; }
-  .hook-copy {
-    font-size: 10px; background: #1a1a1a; color: #888; border: none;
-    border-radius: 5px; padding: 4px 10px; cursor: pointer;
-  }
-  .hook-copy:hover { background: #222; }
-
-  .trending-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-  .trending-pill {
-    background: #0e1e3a; color: #666; font-size: 11px;
-    padding: 4px 10px; border-radius: 10px; max-width: 320px;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-
-  /* ── Edit modal ── */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.88); z-index: 999;
-    align-items: center; justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal-box {
-    background: #111; border: 1px solid #2a2a2a; border-radius: 14px;
-    padding: 24px; width: 90%; max-width: 540px;
-  }
-  .modal-box h3 { font-size: 15px; margin-bottom: 14px; color: #ccc; }
-  .modal-box textarea {
-    width: 100%; background: #0a0a0a; border: 1px solid #222;
-    border-radius: 7px; color: #e8e8e8; font-size: 13px; line-height: 1.6;
-    padding: 12px; resize: vertical; min-height: 140px;
-    font-family: inherit;
-  }
-  .modal-actions { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; }
+  .channel-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .channel-whatsapp { background: #0e2e1e; color: #00e5a0; }
+  .channel-email    { background: #0e1e3a; color: #4488ff; }
 
   /* ── Invoice ── */
-  .inv-stat-card {
-    background: #111; border: 1px solid #1e1e1e; border-radius: 8px;
-    padding: 12px 16px;
-  }
+  .inv-stat-card { background: #111; border: 1px solid #1a1a1a; border-radius: 8px; padding: 12px 16px; }
   .inv-stat-card .i-val { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .inv-stat-card .i-lbl { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; }
+  .inv-stat-card .i-lbl { font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; }
 
-  .empty { color: #2a2a2a; font-size: 13px; text-align: center; padding: 36px; }
-  #last-updated { font-size: 10px; color: #2a2a2a; text-align: right; margin-top: 48px; }
+  /* ── Tone checkboxes ── */
+  .tone-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .tone-check { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #888; cursor: pointer; }
+  .tone-check input[type=checkbox] { accent-color: #ff5c00; width: 13px; height: 13px; cursor: pointer; }
+
+  /* ── Hook generator ── */
+  .hooks-output { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+  .hook-card { background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 14px 18px; }
+  .hook-text { font-size: 15px; font-weight: 600; color: #e8e8e8; margin-bottom: 6px; }
+  .hook-meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .hook-format { font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 0.6px; }
+  .hook-why { font-size: 12px; color: #666; flex: 1; }
+  .hook-copy { font-size: 10px; background: #1a1a1a; color: #666; border: none; border-radius: 5px; padding: 4px 10px; cursor: pointer; }
+  .hook-copy:hover { background: #222; }
+  .trending-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .trending-pill { background: #0e1e3a; color: #555; font-size: 11px; padding: 4px 10px; border-radius: 10px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ── Edit modal ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: #111; border: 1px solid #2a2a2a; border-radius: 14px; padding: 24px; width: 90%; max-width: 540px; }
+  .modal-box h3 { font-size: 15px; margin-bottom: 14px; color: #ccc; }
+  .modal-box textarea { width: 100%; background: #0a0a0a; border: 1px solid #222; border-radius: 7px; color: #e8e8e8; font-size: 13px; line-height: 1.6; padding: 12px; resize: vertical; min-height: 140px; font-family: inherit; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; }
+
+  .empty { color: #222; font-size: 13px; text-align: center; padding: 36px; }
+  #last-updated { font-size: 10px; color: #222; text-align: right; margin-top: 32px; }
+
+  /* ── 2-col layout ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo">Reach<span>NG</span></div>
-  <div style="display:flex;align-items:center;gap:16px;">
-    <div class="health-pills" id="health-pills">
-      <div class="health-pill"><span class="health-dot" id="dot-maps"></span> Google Maps</div>
+  <div class="header-right">
+    <div class="health-pills">
+      <div class="health-pill"><span class="health-dot" id="dot-maps"></span> Maps</div>
       <div class="health-pill"><span class="health-dot" id="dot-apollo"></span> Apollo</div>
       <div class="health-pill"><span class="health-dot" id="dot-unipile"></span> Unipile</div>
     </div>
-    <div class="live-badge"><span class="live-dot"></span> Live · 30s refresh</div>
+    <div class="live-badge"><span class="live-dot"></span> Live</div>
   </div>
 </header>
 
-<!-- Revenue bar -->
-<div class="summary-bar" id="summary-bar">
-  <div class="stat-card fire"><div class="label">Total Contacted</div><div class="value" id="s-contacted">—</div></div>
-  <div class="stat-card amber"><div class="label">Replied</div><div class="value" id="s-replied">—</div></div>
-  <div class="stat-card green"><div class="label">Converted</div><div class="value" id="s-converted">—</div></div>
-  <div class="stat-card blue"><div class="label">Active Clients</div><div class="value" id="s-clients">—</div></div>
-</div>
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+  <button class="tab-btn" onclick="switchTab('campaigns', this)">Campaigns</button>
+  <button class="tab-btn" onclick="switchTab('clients', this)">Clients</button>
+  <button class="tab-btn" onclick="switchTab('approvals', this)">Approvals <span class="tab-badge" id="tab-badge-approvals"></span></button>
+  <button class="tab-btn" onclick="switchTab('replies', this)">Replies</button>
+  <button class="tab-btn" onclick="switchTab('invoices', this)">Invoices</button>
+  <button class="tab-btn" onclick="switchTab('tools', this)">Tools</button>
+</nav>
 
-<!-- Daily send limit bar -->
-<div class="limit-bar-wrap">
-  <div class="limit-label">
-    <span>Daily send limit</span>
-    <span id="limit-label-right">— / —</span>
+<!-- ── Overview ───────────────────────────────────────────────────────────────── -->
+<div class="tab-panel active" id="tab-overview">
+
+  <div class="summary-bar">
+    <div class="stat-card fire"><div class="label">Total Contacted</div><div class="value" id="s-contacted">—</div></div>
+    <div class="stat-card amber"><div class="label">Replied</div><div class="value" id="s-replied">—</div></div>
+    <div class="stat-card green"><div class="label">Converted</div><div class="value" id="s-converted">—</div></div>
+    <div class="stat-card blue"><div class="label">Active Clients</div><div class="value" id="s-clients">—</div></div>
   </div>
-  <div class="limit-bar-track">
-    <div class="limit-bar-fill" id="limit-bar" style="width:0%"></div>
+
+  <div class="limit-bar-wrap">
+    <div class="limit-label"><span>Daily send limit</span><span id="limit-label-right">— / —</span></div>
+    <div class="limit-bar-track"><div class="limit-bar-fill" id="limit-bar" style="width:0%"></div></div>
   </div>
-</div>
 
-<!-- Client roster -->
-<p class="section-title">Client Roster</p>
-<div class="form-card" style="padding:0;overflow:hidden;">
-  <table class="roster-table" id="roster-table">
-    <thead>
-      <tr>
-        <th>Client</th>
-        <th>Vertical</th>
-        <th>City</th>
-        <th>Plan</th>
-        <th>Last Campaign</th>
-        <th>Portal</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="roster-tbody">
-      <tr><td colspan="7" class="empty">Loading clients…</td></tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- ROI Banner -->
-<p class="section-title">ROI Summary <span style="color:#444;font-size:10px;margin-left:6px;">Last 30 days</span></p>
-<div class="roi-banner" id="roi-banner">
-  <div>
-    <div class="roi-label-text" id="roi-label">Loading ROI…</div>
-    <div class="roi-sub">AI vs manual outreach cost</div>
-  </div>
-  <div class="roi-stats">
-    <div class="roi-stat green"><div class="r-val" id="roi-value">—</div><div class="r-lbl">Value Generated</div></div>
-    <div class="roi-stat amber"><div class="r-val" id="roi-api-cost">—</div><div class="r-lbl">AI Cost</div></div>
-    <div class="roi-stat blue"><div class="r-val" id="roi-msgs">—</div><div class="r-lbl">Messages Sent</div></div>
-  </div>
-</div>
-
-<!-- Pipeline by Vertical -->
-<p class="section-title">Pipeline by Vertical</p>
-<div class="verticals" id="verticals-grid">
-  <div class="vertical-card"><div class="empty">Loading…</div></div>
-</div>
-
-<!-- Social Signals -->
-<p class="section-title">Social Signals <span style="color:#c084fc;font-size:10px;margin-left:6px;">Instagram · Twitter · Facebook</span></p>
-<div class="signals-grid" id="signals-grid">
-  <div class="signal-stat"><div class="s-val" id="sig-total">—</div><div class="s-lbl">Found This Week</div></div>
-  <div class="signal-stat"><div class="s-val" id="sig-ig" style="color:#e1306c;">—</div><div class="s-lbl">Instagram</div></div>
-  <div class="signal-stat"><div class="s-val" id="sig-tw" style="color:#1da1f2;">—</div><div class="s-lbl">Twitter / X</div></div>
-  <div class="signal-stat"><div class="s-val" id="sig-fb" style="color:#4267B2;">—</div><div class="s-lbl">Facebook</div></div>
-</div>
-
-<!-- Pending Approvals -->
-<p class="section-title">Pending Approvals <span id="approval-count-badge" style="color:#ff5c00;margin-left:8px;"></span></p>
-<div class="approve-all-bar" id="approve-all-bar" style="display:none;">
-  <button class="btn btn-approve" onclick="approveAll()">Approve All</button>
-  <button class="btn btn-skip" onclick="skipAll()">Skip All</button>
-  <span class="approve-count" id="approve-all-label"></span>
-</div>
-<div class="approvals-list" id="approvals-list">
-  <div class="approvals-empty">Loading…</div>
-</div>
-
-<!-- Recent Replies -->
-<p class="section-title">Recent Replies</p>
-<div class="replies-list" id="replies-list">
-  <div class="empty">Loading…</div>
-</div>
-
-<!-- Run Campaign -->
-<p class="section-title">Run Campaign <span style="color:#ff5c00;font-size:10px;margin-left:6px;">Trigger Outreach</span></p>
-<div class="form-card">
-  <div class="row">
-    <select id="rc-vertical">
-      <option value="real_estate">Real Estate</option>
-      <option value="recruitment">Recruitment</option>
-      <option value="events">Events</option>
-      <option value="fintech">Fintech</option>
-      <option value="legal">Legal</option>
-      <option value="logistics">Logistics</option>
-    </select>
-    <input id="rc-client" placeholder="Client name (optional)" />
-    <input id="rc-max" type="number" value="10" min="1" max="60" style="max-width:80px;" title="Max contacts" />
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#888;white-space:nowrap;">
-      <input type="checkbox" id="rc-dryrun" checked style="width:auto;accent-color:#ff5c00;" /> Dry run
-    </label>
-    <button class="btn btn-approve" id="rc-btn" onclick="runCampaign()" style="white-space:nowrap;">Run</button>
-  </div>
-  <div id="rc-result" style="margin-top:10px;display:none;"></div>
-</div>
-
-<!-- Client Onboarding -->
-<p class="section-title">Client Onboarding <span style="color:#ff5c00;font-size:10px;margin-left:6px;">3-Step Setup</span></p>
-<div class="form-card">
-
-  <p class="step-label">Step 1 — Create Client</p>
-  <div class="row">
-    <input id="ob-name" placeholder="Client name e.g. Mercury Lagos" style="flex:1;" />
-    <select id="ob-vertical">
-      <option value="real_estate">Real Estate</option>
-      <option value="recruitment">Recruitment</option>
-      <option value="events">Events</option>
-      <option value="fintech">Fintech</option>
-      <option value="legal">Legal</option>
-      <option value="logistics">Logistics</option>
-    </select>
-    <select id="ob-channel">
-      <option value="whatsapp">WhatsApp</option>
-      <option value="email">Email</option>
-    </select>
-  </div>
-  <div class="row">
-    <select id="ob-plan" style="flex:1;">
-      <option value="">Select Plan</option>
-      <option value="starter">Starter — ₦50,000 setup + ₦50,000/mo · 300 msgs · 1 vertical</option>
-      <option value="growth">Growth — ₦120,000 setup + ₦120,000/mo · 1,000 msgs · 3 verticals</option>
-      <option value="agency">Agency — ₦250,000 setup + ₦250,000/mo · Unlimited · All verticals</option>
-    </select>
-    <input id="ob-city" placeholder="City (default: Lagos)" style="flex:1;" />
-  </div>
-  <div class="row">
-    <input id="ob-wa-account" placeholder="Unipile WhatsApp Account ID" style="flex:1;" />
-    <input id="ob-email-account" placeholder="Unipile Email Account ID (optional)" style="flex:1;" />
-  </div>
-  <p class="form-hint">Account IDs found in Unipile dashboard after client scans QR code. Leave blank to use your default number.</p>
-  <div class="row" style="margin-top:8px;">
-    <textarea id="ob-brief" placeholder="Who is this client? What do they sell? What tone should messages take? Who is their target customer?&#10;&#10;Example: Mercury Lagos is a luxury property agency on Victoria Island. We sell high-end apartments ₦50M+. Tone: professional, warm. Target: developers, HNI buyers, diaspora investors."></textarea>
-  </div>
-  <button class="btn btn-approve" id="ob-create-btn" onclick="createClient()" style="margin-top:2px;">Save Client</button>
-  <div id="ob-create-result" style="margin-top:10px;display:none;"></div>
-
-  <hr class="form-divider" />
-
-  <p class="step-label">Step 2 — Generate Portal Link</p>
-  <div class="row">
-    <input id="ob-portal-name" placeholder="Client name (same as above)" style="flex:1;" />
-    <button class="btn btn-approve" id="ob-portal-btn" onclick="generatePortal()" style="white-space:nowrap;">Generate Portal</button>
-  </div>
-  <div id="ob-portal-result" style="margin-top:10px;display:none;"></div>
-
-  <hr class="form-divider" />
-
-  <p class="step-label">Step 3 — Run First Campaign</p>
-  <div class="row">
-    <input id="ob-run-name" placeholder="Client name" style="flex:1;" />
-    <select id="ob-run-vertical">
-      <option value="real_estate">Real Estate</option>
-      <option value="recruitment">Recruitment</option>
-      <option value="events">Events</option>
-      <option value="fintech">Fintech</option>
-      <option value="legal">Legal</option>
-      <option value="logistics">Logistics</option>
-    </select>
-    <input id="ob-run-max" type="number" value="30" min="1" max="60" style="max-width:80px;" title="Max contacts" />
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#888;white-space:nowrap;">
-      <input type="checkbox" id="ob-run-dryrun" checked style="width:auto;accent-color:#ff5c00;" /> Dry run
-    </label>
-    <button class="btn btn-approve" id="ob-run-btn" onclick="runClientCampaign()" style="white-space:nowrap;">Run</button>
-  </div>
-  <div id="ob-run-result" style="margin-top:10px;display:none;"></div>
-</div>
-
-<!-- Export Contacts -->
-<p class="section-title">Export Contacts <span style="color:#ff5c00;font-size:10px;margin-left:6px;">CSV Download</span></p>
-<div class="form-card">
-  <div class="row">
-    <select id="exp-vertical">
-      <option value="">All Verticals</option>
-      <option value="real_estate">Real Estate</option>
-      <option value="recruitment">Recruitment</option>
-      <option value="events">Events</option>
-      <option value="fintech">Fintech</option>
-      <option value="legal">Legal</option>
-      <option value="logistics">Logistics</option>
-    </select>
-    <select id="exp-status">
-      <option value="">All Statuses</option>
-      <option value="new">New</option>
-      <option value="contacted">Contacted</option>
-      <option value="replied">Replied</option>
-      <option value="converted">Converted</option>
-      <option value="opted_out">Opted Out</option>
-    </select>
-    <button class="btn btn-approve" onclick="exportContacts()" style="white-space:nowrap;">Download CSV</button>
-  </div>
-  <p class="form-hint">Open the CSV in Google Sheets via File → Import. All contact fields included.</p>
-</div>
-
-<!-- Invoice Collection -->
-<p class="section-title">Invoice Collection <span style="color:#f5c842;font-size:10px;margin-left:6px;">Agency Pro · AI Payment Reminders</span></p>
-<div class="form-card">
-  <p class="step-label">Add Invoice</p>
-  <div class="row">
-    <input id="inv-client" placeholder="Your client name" style="flex:1;" />
-    <input id="inv-debtor" placeholder="Debtor name (who owes)" style="flex:1;" />
-    <input id="inv-phone" placeholder="+2348012345678" style="flex:1;" />
-  </div>
-  <div class="row">
-    <input id="inv-amount" type="number" placeholder="Amount (₦)" style="flex:1;" min="1" />
-    <input id="inv-due" type="date" style="flex:1;" />
-    <input id="inv-desc" placeholder="Description e.g. Web design services" style="flex:2;" />
-  </div>
-  <div class="row">
-    <input id="inv-custom-days" placeholder="Custom reminder days e.g. 0,5,10,20" style="flex:1;" title="Comma-separated days after due date" />
-    <select id="inv-custom-tones" multiple style="flex:1;height:36px;" title="Hold Ctrl to select multiple tones">
-      <option value="polite">Polite</option>
-      <option value="firm">Firm</option>
-      <option value="payment_plan">Payment Plan</option>
-      <option value="final">Final Notice</option>
-    </select>
-    <button class="btn btn-approve" id="inv-add-btn" onclick="addInvoice()" style="white-space:nowrap;">+ Add Invoice</button>
-  </div>
-  <div id="inv-add-result" style="margin-top:8px;display:none;"></div>
-
-  <hr class="form-divider" />
-
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-    <p class="step-label" style="margin-bottom:0;">Outstanding Invoices</p>
-    <div style="display:flex;gap:8px;">
-      <input id="inv-filter-client" placeholder="Filter by client" style="max-width:160px;font-size:12px;padding:4px 8px;background:#0a0a0a;border:1px solid #222;border-radius:6px;color:#e8e8e8;" />
-      <button class="btn" onclick="loadInvoices()" style="background:#1a1a1a;color:#888;border:1px solid #2a2a2a;font-size:11px;padding:4px 10px;">Refresh</button>
+  <p class="section-title">ROI Summary <span style="color:#333;font-size:10px;margin-left:6px;">Last 30 days</span></p>
+  <div class="roi-banner" id="roi-banner">
+    <div>
+      <div class="roi-label-text" id="roi-label">Loading ROI…</div>
+      <div class="roi-sub">AI vs manual outreach cost</div>
+    </div>
+    <div class="roi-stats">
+      <div class="roi-stat green"><div class="r-val" id="roi-value">—</div><div class="r-lbl">Value Generated</div></div>
+      <div class="roi-stat amber"><div class="r-val" id="roi-api-cost">—</div><div class="r-lbl">AI Cost</div></div>
+      <div class="roi-stat blue"><div class="r-val" id="roi-msgs">—</div><div class="r-lbl">Messages Sent</div></div>
     </div>
   </div>
-  <div id="inv-stats" style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;"></div>
-  <div id="inv-list"></div>
+
+  <p class="section-title">Pipeline by Vertical</p>
+  <div class="verticals" id="verticals-grid">
+    <div class="vertical-card"><div class="empty">Loading…</div></div>
+  </div>
+
+  <p class="section-title">Social Signals <span style="color:#c084fc;font-size:10px;margin-left:6px;">Instagram · Twitter · Facebook</span></p>
+  <div class="signals-grid">
+    <div class="signal-stat"><div class="s-val" id="sig-total">—</div><div class="s-lbl">Found This Week</div></div>
+    <div class="signal-stat"><div class="s-val" id="sig-ig" style="color:#e1306c;">—</div><div class="s-lbl">Instagram</div></div>
+    <div class="signal-stat"><div class="s-val" id="sig-tw" style="color:#1da1f2;">—</div><div class="s-lbl">Twitter / X</div></div>
+    <div class="signal-stat"><div class="s-val" id="sig-fb" style="color:#4267B2;">—</div><div class="s-lbl">Facebook</div></div>
+  </div>
+
+  <div id="last-updated"></div>
 </div>
 
-<!-- Hook Generator -->
-<p class="section-title">Hook Generator <span style="color:#ff5c00;font-size:10px;margin-left:6px;">Content Intelligence</span></p>
-<div class="form-card">
-  <div class="row">
-    <select id="hk-vertical">
-      <option value="real_estate">Real Estate</option>
-      <option value="recruitment">Recruitment</option>
-      <option value="events">Events</option>
-      <option value="fintech">Fintech</option>
-      <option value="legal">Legal</option>
-      <option value="logistics">Logistics</option>
-    </select>
-    <select id="hk-platform">
-      <option value="instagram">Instagram</option>
-      <option value="twitter">Twitter / X</option>
-      <option value="linkedin">LinkedIn</option>
-      <option value="whatsapp">WhatsApp</option>
-    </select>
-    <input id="hk-count" type="number" value="8" min="3" max="15" style="max-width:70px;" />
+<!-- ── Campaigns ───────────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-campaigns">
+
+  <p class="section-title">Run Campaign <span style="color:#ff5c00;font-size:10px;margin-left:6px;">Trigger Outreach</span></p>
+  <div class="form-card">
+    <div class="row">
+      <select id="rc-vertical">
+        <option value="real_estate">Real Estate</option>
+        <option value="recruitment">Recruitment</option>
+        <option value="events">Events</option>
+        <option value="fintech">Fintech</option>
+        <option value="legal">Legal</option>
+        <option value="logistics">Logistics</option>
+        <option value="agriculture">Agriculture</option>
+      </select>
+      <input id="rc-client" placeholder="Client name (optional)" />
+      <input id="rc-max" type="number" value="10" min="1" max="60" style="max-width:80px;" title="Max contacts" />
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#777;white-space:nowrap;">
+        <input type="checkbox" id="rc-dryrun" checked style="width:auto;accent-color:#ff5c00;" /> Dry run
+      </label>
+      <button class="btn btn-approve" id="rc-btn" onclick="runCampaign()" style="white-space:nowrap;">Run Campaign</button>
+    </div>
+    <div id="rc-result" style="margin-top:10px;display:none;"></div>
   </div>
-  <div class="row">
-    <input id="hk-topic" placeholder="Topic e.g. '3-bedroom apartments in Lekki Phase 1'" style="flex:2;" />
-    <input id="hk-client" placeholder="Client name (optional)" />
+
+  <p class="section-title" style="margin-top:28px;">Run All Verticals</p>
+  <div class="form-card">
+    <div class="row" style="align-items:center;">
+      <input id="ra-max" type="number" value="20" min="1" max="60" style="max-width:80px;" title="Max per vertical" />
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#777;white-space:nowrap;">
+        <input type="checkbox" id="ra-dryrun" checked style="width:auto;accent-color:#ff5c00;" /> Dry run
+      </label>
+      <button class="btn btn-approve" id="ra-btn" onclick="runAll()" style="white-space:nowrap;">Run All</button>
+      <span style="font-size:11px;color:#333;flex:1;">Fires all verticals in sequence. Use for scheduled full sweeps.</span>
+    </div>
+    <div id="ra-result" style="margin-top:10px;display:none;"></div>
   </div>
-  <div class="row">
-    <input id="hk-competitors" placeholder="Competitor handles (comma-separated, optional)" style="flex:2;" />
-    <button class="btn btn-approve" id="hk-btn" onclick="generateHooks()" style="white-space:nowrap;">Generate Hooks</button>
+
+</div>
+
+<!-- ── Clients ───────────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-clients">
+
+  <p class="section-title">Client Roster</p>
+  <div class="form-card" style="padding:0;overflow:hidden;">
+    <table class="roster-table" id="roster-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Vertical</th>
+          <th>City</th>
+          <th>Plan</th>
+          <th>Last Campaign</th>
+          <th>Portal</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="roster-tbody">
+        <tr><td colspan="7" class="empty">Loading clients…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="section-title" style="margin-top:32px;">Client Onboarding <span style="color:#ff5c00;font-size:10px;margin-left:6px;">3-Step Setup</span></p>
+  <div class="form-card">
+
+    <p class="step-label">Step 1 — Create Client</p>
+    <div class="row">
+      <input id="ob-name" placeholder="Client name e.g. Mercury Lagos" style="flex:2;" />
+      <select id="ob-vertical">
+        <option value="real_estate">Real Estate</option>
+        <option value="recruitment">Recruitment</option>
+        <option value="events">Events</option>
+        <option value="fintech">Fintech</option>
+        <option value="legal">Legal</option>
+        <option value="logistics">Logistics</option>
+        <option value="agriculture">Agriculture</option>
+      </select>
+      <select id="ob-channel">
+        <option value="whatsapp">WhatsApp</option>
+        <option value="email">Email</option>
+      </select>
+    </div>
+    <div class="row">
+      <select id="ob-plan" style="flex:1;">
+        <option value="">Select Plan</option>
+        <option value="starter">Starter — ₦50k setup + ₦50k/mo · 300 msgs · 1 vertical</option>
+        <option value="growth">Growth — ₦120k setup + ₦120k/mo · 1,000 msgs · 3 verticals</option>
+        <option value="agency">Agency — ₦250k setup + ₦250k/mo · Unlimited · All verticals</option>
+      </select>
+      <input id="ob-city" placeholder="City (default: Lagos)" style="flex:1;" />
+    </div>
+    <div class="row">
+      <input id="ob-wa-account" placeholder="Unipile WhatsApp Account ID" style="flex:1;" />
+      <input id="ob-email-account" placeholder="Unipile Email Account ID (optional)" style="flex:1;" />
+    </div>
+    <p class="form-hint">Account IDs from Unipile dashboard after client scans QR. Leave blank to use your default number.</p>
+    <div class="row" style="margin-top:8px;">
+      <textarea id="ob-brief" placeholder="Who is this client? What do they sell? What tone? Who is their target customer?&#10;&#10;Example: Mercury Lagos is a luxury property agency on Victoria Island. Tone: professional, warm. Target: HNI buyers, diaspora investors."></textarea>
+    </div>
+    <button class="btn btn-approve" id="ob-create-btn" onclick="createClient()" style="margin-top:4px;">Save Client</button>
+    <div id="ob-create-result" style="margin-top:10px;display:none;"></div>
+
+    <hr class="form-divider" />
+
+    <p class="step-label">Step 2 — Generate Portal Link</p>
+    <div class="row">
+      <input id="ob-portal-name" placeholder="Client name (same as above)" style="flex:1;" />
+      <button class="btn btn-approve" id="ob-portal-btn" onclick="generatePortal()" style="white-space:nowrap;">Generate Portal</button>
+    </div>
+    <div id="ob-portal-result" style="margin-top:10px;display:none;"></div>
+
+    <hr class="form-divider" />
+
+    <p class="step-label">Step 3 — Run First Campaign</p>
+    <div class="row">
+      <input id="ob-run-name" placeholder="Client name" style="flex:1;" />
+      <select id="ob-run-vertical">
+        <option value="real_estate">Real Estate</option>
+        <option value="recruitment">Recruitment</option>
+        <option value="events">Events</option>
+        <option value="fintech">Fintech</option>
+        <option value="legal">Legal</option>
+        <option value="logistics">Logistics</option>
+        <option value="agriculture">Agriculture</option>
+      </select>
+      <input id="ob-run-max" type="number" value="30" min="1" max="60" style="max-width:80px;" />
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#777;white-space:nowrap;">
+        <input type="checkbox" id="ob-run-dryrun" checked style="width:auto;accent-color:#ff5c00;" /> Dry run
+      </label>
+      <button class="btn btn-approve" id="ob-run-btn" onclick="runClientCampaign()" style="white-space:nowrap;">Run</button>
+    </div>
+    <div id="ob-run-result" style="margin-top:10px;display:none;"></div>
   </div>
 </div>
-<div class="trending-pills" id="trending-pills" style="display:none;margin-top:10px;"></div>
-<div class="hooks-output" id="hooks-output" style="margin-top:10px;"></div>
+
+<!-- ── Approvals ───────────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-approvals">
+
+  <p class="section-title">Pending Approvals <span id="approval-count-badge" style="color:#ff5c00;margin-left:8px;"></span></p>
+  <div class="approve-all-bar" id="approve-all-bar" style="display:none;">
+    <button class="btn btn-approve" onclick="approveAll()">Approve All</button>
+    <button class="btn btn-skip" onclick="skipAll()">Skip All</button>
+    <span class="approve-count" id="approve-all-label"></span>
+  </div>
+  <div class="approvals-list" id="approvals-list">
+    <div class="approvals-empty">Loading…</div>
+  </div>
+</div>
+
+<!-- ── Replies ───────────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-replies">
+
+  <p class="section-title">Recent Replies</p>
+  <div class="replies-list" id="replies-list">
+    <div class="empty">Loading…</div>
+  </div>
+</div>
+
+<!-- ── Invoices ───────────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-invoices">
+
+  <p class="section-title">Invoice Collection <span style="color:#f5c842;font-size:10px;margin-left:6px;">AI Payment Reminders</span></p>
+  <div class="form-card">
+    <p class="step-label">Add Invoice</p>
+    <div class="row">
+      <input id="inv-client" placeholder="Your client name" style="flex:1;" />
+      <input id="inv-debtor" placeholder="Debtor name (who owes)" style="flex:1;" />
+      <input id="inv-phone" placeholder="+2348012345678" style="flex:1;" />
+    </div>
+    <div class="row">
+      <input id="inv-amount" type="number" placeholder="Amount (₦)" style="flex:1;" min="1" />
+      <input id="inv-due" type="date" style="flex:1;" />
+      <input id="inv-desc" placeholder="Description e.g. Web design services" style="flex:2;" />
+    </div>
+    <div class="row" style="align-items:center;flex-wrap:wrap;gap:16px;">
+      <input id="inv-custom-days" placeholder="Reminder days e.g. 0,5,10,20" style="flex:1;min-width:200px;" title="Comma-separated days after due date" />
+      <div class="tone-group">
+        <span style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:0.8px;margin-right:4px;">Tones:</span>
+        <label class="tone-check"><input type="checkbox" value="polite" class="tone-checkbox" /> Polite</label>
+        <label class="tone-check"><input type="checkbox" value="firm" class="tone-checkbox" checked /> Firm</label>
+        <label class="tone-check"><input type="checkbox" value="payment_plan" class="tone-checkbox" /> Payment Plan</label>
+        <label class="tone-check"><input type="checkbox" value="final" class="tone-checkbox" /> Final Notice</label>
+      </div>
+      <button class="btn btn-approve" id="inv-add-btn" onclick="addInvoice()" style="white-space:nowrap;">+ Add Invoice</button>
+    </div>
+    <div id="inv-add-result" style="margin-top:8px;display:none;"></div>
+
+    <hr class="form-divider" />
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <p class="step-label" style="margin-bottom:0;">Outstanding Invoices</p>
+      <div style="display:flex;gap:8px;">
+        <input id="inv-filter-client" placeholder="Filter by client" style="max-width:160px;font-size:12px;padding:4px 8px;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:6px;color:#e8e8e8;" />
+        <button class="btn" onclick="loadInvoices()" style="background:#1a1a1a;color:#666;border:1px solid #222;font-size:11px;padding:4px 10px;">Refresh</button>
+      </div>
+    </div>
+    <div id="inv-stats" style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;"></div>
+    <div id="inv-list"></div>
+  </div>
+</div>
+
+<!-- ── Tools ───────────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-tools">
+
+  <p class="section-title">Export Contacts <span style="color:#ff5c00;font-size:10px;margin-left:6px;">CSV Download</span></p>
+  <div class="form-card">
+    <div class="row">
+      <select id="exp-vertical">
+        <option value="">All Verticals</option>
+        <option value="real_estate">Real Estate</option>
+        <option value="recruitment">Recruitment</option>
+        <option value="events">Events</option>
+        <option value="fintech">Fintech</option>
+        <option value="legal">Legal</option>
+        <option value="logistics">Logistics</option>
+        <option value="agriculture">Agriculture</option>
+      </select>
+      <select id="exp-status">
+        <option value="">All Statuses</option>
+        <option value="new">New</option>
+        <option value="contacted">Contacted</option>
+        <option value="replied">Replied</option>
+        <option value="converted">Converted</option>
+        <option value="opted_out">Opted Out</option>
+      </select>
+      <button class="btn btn-approve" onclick="exportContacts()" style="white-space:nowrap;">Download CSV</button>
+    </div>
+    <p class="form-hint">Open in Google Sheets via File → Import. All contact fields included.</p>
+  </div>
+
+  <p class="section-title" style="margin-top:32px;">Hook Generator <span style="color:#ff5c00;font-size:10px;margin-left:6px;">Content Intelligence</span></p>
+  <div class="form-card">
+    <div class="row">
+      <select id="hk-vertical">
+        <option value="real_estate">Real Estate</option>
+        <option value="recruitment">Recruitment</option>
+        <option value="events">Events</option>
+        <option value="fintech">Fintech</option>
+        <option value="legal">Legal</option>
+        <option value="logistics">Logistics</option>
+        <option value="agriculture">Agriculture</option>
+      </select>
+      <select id="hk-platform">
+        <option value="instagram">Instagram</option>
+        <option value="twitter">Twitter / X</option>
+        <option value="linkedin">LinkedIn</option>
+        <option value="whatsapp">WhatsApp</option>
+      </select>
+      <input id="hk-count" type="number" value="8" min="3" max="15" style="max-width:70px;" />
+    </div>
+    <div class="row">
+      <input id="hk-topic" placeholder="Topic e.g. '3-bedroom apartments in Lekki Phase 1'" style="flex:2;" />
+      <input id="hk-client" placeholder="Client name (optional)" />
+    </div>
+    <div class="row">
+      <input id="hk-competitors" placeholder="Competitor handles (comma-separated, optional)" style="flex:2;" />
+      <button class="btn btn-approve" id="hk-btn" onclick="generateHooks()" style="white-space:nowrap;">Generate Hooks</button>
+    </div>
+  </div>
+  <div class="trending-pills" id="trending-pills" style="display:none;"></div>
+  <div class="hooks-output" id="hooks-output"></div>
+</div>
 
 <!-- Edit modal -->
 <div class="modal-overlay" id="edit-modal">
@@ -671,13 +608,22 @@
   </div>
 </div>
 
-<div id="last-updated"></div>
-
 <script>
-const VERTICAL_ICONS = { real_estate: "RE", recruitment: "HR", events: "EV", fintech: "FT", legal: "LG", logistics: "LS" };
+const VERTICAL_ICONS = { real_estate:"RE", recruitment:"HR", events:"EV", fintech:"FT", legal:"LG", logistics:"LS", agriculture:"AG" };
 const INTENT_LABELS  = { interested:"Interested", not_now:"Not Now", opted_out:"Opted Out", referral:"Referral", question:"Question", unknown:"Unknown" };
 
 let editTargetId = null;
+
+// ── Tab switching ──────────────────────────────────────────────────────────────
+
+function switchTab(name, btn) {
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+  btn.classList.add("active");
+}
+
+// ── Fetch helpers ─────────────────────────────────────────────────────────────
 
 async function fetchJSON(url) {
   const r = await fetch(url);
@@ -712,7 +658,7 @@ async function refreshHealth() {
     const db = h.db;
     const setDot = (id, ok) => {
       const el = document.getElementById(id);
-      if (el) { el.className = "health-dot " + (ok ? "ok" : "error"); }
+      if (el) el.className = "health-dot " + (ok ? "ok" : "error");
     };
     setDot("dot-maps", db);
     setDot("dot-apollo", db);
@@ -732,7 +678,7 @@ async function refreshRoster() {
     const clients = await fetchJSON("/api/v1/clients/");
     const tbody = document.getElementById("roster-tbody");
     if (!clients || !clients.length) {
-      tbody.innerHTML = '<tr><td colspan="7" class="empty">No clients yet. Add one below.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="empty">No clients yet. Add one in Client Onboarding below.</td></tr>';
       document.getElementById("s-clients").textContent = "0";
       return;
     }
@@ -748,15 +694,12 @@ async function refreshRoster() {
       const portalUrl = portalToken ? window.location.origin + "/portal/" + portalToken : "";
       return `<tr>
         <td style="font-weight:600;">${c.name}</td>
-        <td style="color:#666;font-size:12px;">${(c.vertical||"").replace(/_/g," ").replace(/\b\w/g,x=>x.toUpperCase())}</td>
-        <td style="color:#666;font-size:12px;">${c.city || "Lagos"}</td>
+        <td style="color:#555;font-size:12px;">${(c.vertical||"").replace(/_/g," ").replace(/\b\w/g,x=>x.toUpperCase())}</td>
+        <td style="color:#555;font-size:12px;">${c.city || "Lagos"}</td>
         <td><span class="plan-badge ${planClass}">${planLabel}</span></td>
-        <td style="color:#555;font-size:12px;font-variant-numeric:tabular-nums;">${lastRun}</td>
-        <td>${portalUrl ? `<button class="copy-link-btn" onclick="navigator.clipboard.writeText('${portalUrl}').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',1500)})">Copy link</button>` : '<span style="color:#333;font-size:11px;">None</span>'}</td>
-        <td>
-          <button class="btn btn-approve" style="font-size:11px;padding:4px 10px;"
-            onclick="quickRunCampaign('${c.name}','${c.vertical||'real_estate'}')">Run</button>
-        </td>
+        <td style="color:#444;font-size:12px;">${lastRun}</td>
+        <td>${portalUrl ? `<button class="copy-link-btn" onclick="navigator.clipboard.writeText('${portalUrl}').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',1500)})">Copy link</button>` : '<span style="color:#222;font-size:11px;">None</span>'}</td>
+        <td><button class="btn btn-approve" style="font-size:11px;padding:4px 10px;" onclick="quickRunCampaign('${c.name}','${c.vertical||'real_estate'}')">Run</button></td>
       </tr>`;
     }).join("");
   } catch(e) {
@@ -779,27 +722,18 @@ async function quickRunCampaign(name, vertical) {
 
 // ── Approval actions ──────────────────────────────────────────────────────────
 
-async function approveOne(id) {
-  await postJSON(`/api/v1/approvals/${id}/approve`);
-  refresh();
-}
-
-async function skipOne(id) {
-  await postJSON(`/api/v1/approvals/${id}/skip`);
-  refresh();
-}
+async function approveOne(id) { await postJSON(`/api/v1/approvals/${id}/approve`); refresh(); }
+async function skipOne(id)    { await postJSON(`/api/v1/approvals/${id}/skip`);    refresh(); }
 
 function openEdit(id, currentMsg) {
   editTargetId = id;
   document.getElementById("edit-textarea").value = currentMsg;
   document.getElementById("edit-modal").classList.add("open");
 }
-
 function closeEdit() {
   editTargetId = null;
   document.getElementById("edit-modal").classList.remove("open");
 }
-
 async function submitEdit() {
   const msg = document.getElementById("edit-textarea").value.trim();
   if (!msg || !editTargetId) return;
@@ -807,15 +741,71 @@ async function submitEdit() {
   closeEdit();
   refresh();
 }
+async function approveAll() { await postJSON("/api/v1/approvals/approve-all"); refresh(); }
+async function skipAll()    { await postJSON("/api/v1/approvals/skip-all");    refresh(); }
 
-async function approveAll() {
-  await postJSON("/api/v1/approvals/approve-all");
-  refresh();
+// ── Run campaign ─────────────────────────────────────────────────────────────
+
+async function runCampaign() {
+  const btn      = document.getElementById("rc-btn");
+  const vertical = document.getElementById("rc-vertical").value;
+  const max      = parseInt(document.getElementById("rc-max").value) || 10;
+  const dryRun   = document.getElementById("rc-dryrun").checked;
+  const clientName = document.getElementById("rc-client").value.trim();
+  const res      = document.getElementById("rc-result");
+
+  btn.textContent = "Running…"; btn.disabled = true; res.style.display = "none";
+  try {
+    const result = await postJSON("/api/v1/campaigns/run", {
+      vertical, max_contacts: max, dry_run: dryRun,
+      ...(clientName ? { client_name: clientName } : {}),
+    });
+    res.innerHTML = renderResult(result, vertical, dryRun);
+    res.style.display = "block";
+    if (!dryRun) refresh();
+  } catch (err) {
+    res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Error: ${err.message}</div>`;
+    res.style.display = "block";
+  } finally {
+    btn.textContent = "Run Campaign"; btn.disabled = false;
+  }
 }
 
-async function skipAll() {
-  await postJSON("/api/v1/approvals/skip-all");
-  refresh();
+async function runAll() {
+  const btn    = document.getElementById("ra-btn");
+  const max    = parseInt(document.getElementById("ra-max").value) || 20;
+  const dryRun = document.getElementById("ra-dryrun").checked;
+  const res    = document.getElementById("ra-result");
+
+  btn.textContent = "Running…"; btn.disabled = true; res.style.display = "none";
+  try {
+    const result = await postJSON("/api/v1/campaigns/run-all", { max_per_vertical: max, dry_run: dryRun });
+    const rows = Object.entries(result).map(([v, r]) => {
+      const label = v.replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+      const sent  = r.sent !== undefined ? r.sent : (r.skipped ? "skipped" : "—");
+      return `<div class="v-row"><span class="lbl">${label}</span><span class="val">${sent}</span></div>`;
+    }).join("");
+    res.innerHTML = `<div style="background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:14px 18px;margin-top:10px;">${rows}</div>`;
+    res.style.display = "block";
+    if (!dryRun) refresh();
+  } catch (err) {
+    res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Error: ${err.message}</div>`;
+    res.style.display = "block";
+  } finally {
+    btn.textContent = "Run All"; btn.disabled = false;
+  }
+}
+
+function renderResult(result, vertical, dryRun) {
+  const rows = Object.entries(result).map(([k, v]) => {
+    const label = k.replace(/_/g, " ");
+    const val   = typeof v === "boolean" ? (v ? "yes" : "no") : v;
+    return `<div class="v-row"><span class="lbl">${label}</span><span class="val">${val}</span></div>`;
+  }).join("");
+  return `<div style="background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:14px 18px;">
+    <div style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">${vertical.replace(/_/g," ")} ${dryRun?"(dry run)":"(live)"}</div>
+    ${rows}
+  </div>`;
 }
 
 // ── Main refresh ──────────────────────────────────────────────────────────────
@@ -837,17 +827,22 @@ async function refresh() {
     document.getElementById("sig-tw").textContent    = fmt(byPlatform.twitter);
     document.getElementById("sig-fb").textContent    = fmt(byPlatform.facebook);
 
-    // ROI banner
+    // ROI
     document.getElementById("roi-label").textContent    = roi.roi_label || "No activity yet";
     document.getElementById("roi-value").textContent    = fmtNgn(roi.value_generated_ngn);
     document.getElementById("roi-api-cost").textContent = fmtNgn(roi.api_cost_ngn);
     document.getElementById("roi-msgs").textContent     = fmt(roi.messages_sent);
 
-    // Approvals
+    // Approvals tab badge
+    const badge = document.getElementById("tab-badge-approvals");
+    if (approvals.length) { badge.textContent = approvals.length; badge.classList.add("show"); }
+    else { badge.classList.remove("show"); }
+
+    // Approvals panel
     const aList = document.getElementById("approvals-list");
-    const badge = document.getElementById("approval-count-badge");
+    const countBadge = document.getElementById("approval-count-badge");
     const allBar = document.getElementById("approve-all-bar");
-    badge.textContent = approvals.length ? `(${approvals.length})` : "";
+    countBadge.textContent = approvals.length ? `(${approvals.length})` : "";
     allBar.style.display = approvals.length > 1 ? "flex" : "none";
     document.getElementById("approve-all-label").textContent = `${approvals.length} draft${approvals.length !== 1 ? "s" : ""} waiting`;
 
@@ -867,7 +862,7 @@ async function refresh() {
           ? `<div class="post-context">"${a.post_context.slice(0, 160)}${a.post_context.length > 160 ? "…" : ""}"</div>`
           : "";
         const profileLink = a.profile_url
-          ? `<a href="${a.profile_url}" target="_blank" style="color:#444;font-size:11px;margin-left:8px;">view profile</a>`
+          ? `<a href="${a.profile_url}" target="_blank" style="color:#333;font-size:11px;margin-left:8px;">view profile</a>`
           : "";
         return `
           <div class="approval-card">
@@ -903,7 +898,7 @@ async function refresh() {
     // Verticals grid
     const vGrid = document.getElementById("verticals-grid");
     vGrid.innerHTML = "";
-    ["real_estate", "recruitment", "events", "fintech", "legal", "logistics"].forEach(v => {
+    ["real_estate", "recruitment", "events", "fintech", "legal", "logistics", "agriculture"].forEach(v => {
       const s     = pipeline[v] || {};
       const label = v.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
       vGrid.innerHTML += `
@@ -924,8 +919,8 @@ async function refresh() {
       rList.innerHTML = '<div class="empty">No replies yet.</div>';
     } else {
       rList.innerHTML = replies.map(r => {
-        const intent   = r.intent || "unknown";
-        const time = r.received_at ? new Date(r.received_at).toLocaleString("en-NG", { timeZone: "Africa/Lagos" }) : "";
+        const intent = r.intent || "unknown";
+        const time   = r.received_at ? new Date(r.received_at).toLocaleString("en-NG", { timeZone: "Africa/Lagos" }) : "";
         return `
           <div class="reply-card">
             <div class="reply-header">
@@ -960,8 +955,7 @@ async function generateHooks() {
 
   if (!topic) { alert("Enter a topic first"); return; }
 
-  btn.textContent = "Researching…";
-  btn.disabled = true;
+  btn.textContent = "Researching…"; btn.disabled = true;
   document.getElementById("hooks-output").innerHTML = "";
   document.getElementById("trending-pills").style.display = "none";
 
@@ -975,7 +969,7 @@ async function generateHooks() {
     if (result.trending_reference && result.trending_reference.length) {
       const pills = document.getElementById("trending-pills");
       pills.style.display = "flex";
-      pills.innerHTML = `<span style="font-size:10px;color:#444;align-self:center;margin-right:4px;">TRENDING REF:</span>` +
+      pills.innerHTML = `<span style="font-size:10px;color:#333;align-self:center;margin-right:4px;">TRENDING REF:</span>` +
         result.trending_reference.map(h => `<span class="trending-pill" title="${h}">${h}</span>`).join("");
     }
 
@@ -993,12 +987,10 @@ async function generateHooks() {
           <button class="hook-copy" onclick="navigator.clipboard.writeText(${JSON.stringify(h.hook || h)});this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
         </div>
       </div>`).join("");
-
   } catch (err) {
     document.getElementById("hooks-output").innerHTML = `<div class="empty">Error: ${err.message}</div>`;
   } finally {
-    btn.textContent = "Generate Hooks";
-    btn.disabled = false;
+    btn.textContent = "Generate Hooks"; btn.disabled = false;
   }
 }
 
@@ -1015,7 +1007,7 @@ async function addInvoice() {
   const res    = document.getElementById("inv-add-result");
 
   const customDaysRaw = document.getElementById("inv-custom-days").value.trim();
-  const customTones   = Array.from(document.getElementById("inv-custom-tones").selectedOptions).map(o => o.value);
+  const customTones   = Array.from(document.querySelectorAll(".tone-checkbox:checked")).map(el => el.value);
 
   if (!client || !debtor || !phone || !amount || !due) {
     res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Client, debtor, phone, amount, and due date are required.</div>`;
@@ -1034,7 +1026,7 @@ async function addInvoice() {
   btn.textContent = "Saving…"; btn.disabled = true;
   try {
     await postJSON("/api/v1/invoices/", body);
-    res.innerHTML = `<div style="color:#00e5a0;font-size:13px;">Invoice added. ReachNG will send automatic reminders starting on the due date.</div>`;
+    res.innerHTML = `<div style="color:#00e5a0;font-size:13px;">Invoice added. Automatic reminders will start on the due date.</div>`;
     ["inv-client","inv-debtor","inv-phone","inv-amount","inv-due","inv-desc","inv-custom-days"].forEach(id => {
       document.getElementById(id).value = "";
     });
@@ -1059,46 +1051,39 @@ async function loadInvoices() {
     ]);
 
     const statsEl = document.getElementById("inv-stats");
-    const outstanding = stats.total_outstanding_ngn || 0;
-    const paid = stats.total_paid_ngn || 0;
-    const rate = stats.collection_rate || 0;
     statsEl.innerHTML = `
-      <div class="inv-stat-card"><div class="i-val" style="color:#ff5c00;">₦${outstanding.toLocaleString()}</div><div class="i-lbl">Outstanding</div></div>
-      <div class="inv-stat-card"><div class="i-val" style="color:#00e5a0;">₦${paid.toLocaleString()}</div><div class="i-lbl">Collected</div></div>
-      <div class="inv-stat-card"><div class="i-val" style="color:#f5c842;">${rate}%</div><div class="i-lbl">Collection Rate</div></div>`;
+      <div class="inv-stat-card"><div class="i-val" style="color:#ff5c00;">₦${(stats.total_outstanding_ngn||0).toLocaleString()}</div><div class="i-lbl">Outstanding</div></div>
+      <div class="inv-stat-card"><div class="i-val" style="color:#00e5a0;">₦${(stats.total_paid_ngn||0).toLocaleString()}</div><div class="i-lbl">Collected</div></div>
+      <div class="inv-stat-card"><div class="i-val" style="color:#f5c842;">${stats.collection_rate||0}%</div><div class="i-lbl">Collection Rate</div></div>`;
 
     const listEl = document.getElementById("inv-list");
-    if (!invoices.length) {
-      listEl.innerHTML = `<div class="empty">No invoices yet.</div>`; return;
-    }
+    if (!invoices.length) { listEl.innerHTML = `<div class="empty">No invoices yet.</div>`; return; }
 
-    const statusColor = { pending:"#444", reminded:"#ff5c00", followed_up:"#f5c842",
+    const statusColor = { pending:"#333", reminded:"#ff5c00", followed_up:"#f5c842",
       plan_offered:"#88f", final_notice:"#f44", responded:"#00e5a0", paid:"#00e5a0", written_off:"#2a2a2a" };
 
     listEl.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
       <thead><tr>
-        <th style="text-align:left;color:#444;border-bottom:1px solid #1e1e1e;padding:6px;font-size:10px;text-transform:uppercase;">Debtor</th>
-        <th style="text-align:left;color:#444;border-bottom:1px solid #1e1e1e;padding:6px;font-size:10px;text-transform:uppercase;">Client</th>
-        <th style="text-align:right;color:#444;border-bottom:1px solid #1e1e1e;padding:6px;font-size:10px;text-transform:uppercase;">Amount</th>
-        <th style="text-align:left;color:#444;border-bottom:1px solid #1e1e1e;padding:6px;font-size:10px;text-transform:uppercase;">Due</th>
-        <th style="text-align:left;color:#444;border-bottom:1px solid #1e1e1e;padding:6px;font-size:10px;text-transform:uppercase;">Status</th>
-        <th style="text-align:left;color:#444;border-bottom:1px solid #1e1e1e;padding:6px;font-size:10px;text-transform:uppercase;">Actions</th>
+        <th style="text-align:left;color:#333;border-bottom:1px solid #1a1a1a;padding:6px;font-size:10px;text-transform:uppercase;">Debtor</th>
+        <th style="text-align:left;color:#333;border-bottom:1px solid #1a1a1a;padding:6px;font-size:10px;text-transform:uppercase;">Client</th>
+        <th style="text-align:right;color:#333;border-bottom:1px solid #1a1a1a;padding:6px;font-size:10px;text-transform:uppercase;">Amount</th>
+        <th style="text-align:left;color:#333;border-bottom:1px solid #1a1a1a;padding:6px;font-size:10px;text-transform:uppercase;">Due</th>
+        <th style="text-align:left;color:#333;border-bottom:1px solid #1a1a1a;padding:6px;font-size:10px;text-transform:uppercase;">Status</th>
+        <th style="text-align:left;color:#333;border-bottom:1px solid #1a1a1a;padding:6px;font-size:10px;text-transform:uppercase;">Actions</th>
       </tr></thead>
       <tbody>
         ${invoices.map(inv => `
           <tr style="border-bottom:1px solid #141414;">
             <td style="padding:8px 6px;">${inv.debtor_name}</td>
-            <td style="padding:8px 6px;color:#555;">${inv.client_name}</td>
+            <td style="padding:8px 6px;color:#444;">${inv.client_name}</td>
             <td style="padding:8px 6px;text-align:right;color:#ff5c00;">₦${inv.amount_ngn.toLocaleString()}</td>
-            <td style="padding:8px 6px;color:#555;">${inv.due_date ? inv.due_date.split("T")[0] : "—"}</td>
-            <td style="padding:8px 6px;">
-              <span style="color:${statusColor[inv.status]||"#555"};font-size:10px;text-transform:uppercase;letter-spacing:0.1em;">${inv.status.replace(/_/g," ")}</span>
-            </td>
+            <td style="padding:8px 6px;color:#444;">${inv.due_date ? inv.due_date.split("T")[0] : "—"}</td>
+            <td style="padding:8px 6px;"><span style="color:${statusColor[inv.status]||"#444"};font-size:10px;text-transform:uppercase;letter-spacing:0.1em;">${inv.status.replace(/_/g," ")}</span></td>
             <td style="padding:8px 6px;">
               <div style="display:flex;gap:4px;flex-wrap:wrap;">
                 <button onclick="remindNow('${inv.id}')" style="font-size:10px;padding:2px 8px;background:#1a1500;border:1px solid #2a2a00;color:#f5c842;border-radius:4px;cursor:pointer;">Remind</button>
                 <button onclick="markInvoicePaid('${inv.id}')" style="font-size:10px;padding:2px 8px;background:#001a0d;border:1px solid #002a15;color:#00e5a0;border-radius:4px;cursor:pointer;">Paid</button>
-                <button onclick="markWrittenOff('${inv.id}')" style="font-size:10px;padding:2px 8px;background:#1a0a00;border:1px solid #2a1500;color:#666;border-radius:4px;cursor:pointer;">Write Off</button>
+                <button onclick="markWrittenOff('${inv.id}')" style="font-size:10px;padding:2px 8px;background:#1a0a00;border:1px solid #2a1500;color:#555;border-radius:4px;cursor:pointer;">Write Off</button>
               </div>
             </td>
           </tr>`).join("")}
@@ -1112,56 +1097,47 @@ async function loadInvoices() {
 async function remindNow(invoiceId) {
   const tone = prompt("Reminder tone? (polite / firm / payment_plan / final)", "polite");
   if (!tone) return;
-  try {
-    await postJSON(`/api/v1/invoices/${invoiceId}/remind-now`, { tone });
-    alert("Reminder queued.");
-    loadInvoices();
-  } catch(err) { alert("Error: " + err.message); }
+  try { await postJSON(`/api/v1/invoices/${invoiceId}/remind-now`, { tone }); alert("Reminder queued."); loadInvoices(); }
+  catch(err) { alert("Error: " + err.message); }
 }
 
 async function markInvoicePaid(invoiceId) {
   if (!confirm("Mark this invoice as paid?")) return;
-  try {
-    await fetch(`/api/v1/invoices/${invoiceId}/paid`, { method: "POST" });
-    loadInvoices();
-  } catch(err) { alert("Error: " + err.message); }
+  try { await fetch(`/api/v1/invoices/${invoiceId}/paid`, { method: "POST" }); loadInvoices(); }
+  catch(err) { alert("Error: " + err.message); }
 }
 
 async function markWrittenOff(invoiceId) {
   if (!confirm("Write off this invoice? This cannot be undone.")) return;
-  try {
-    await fetch(`/api/v1/invoices/${invoiceId}/written-off`, { method: "POST" });
-    loadInvoices();
-  } catch(err) { alert("Error: " + err.message); }
+  try { await fetch(`/api/v1/invoices/${invoiceId}/written-off`, { method: "POST" }); loadInvoices(); }
+  catch(err) { alert("Error: " + err.message); }
 }
 
 // ── Client Onboarding ─────────────────────────────────────────────────────────
 
 async function createClient() {
-  const btn   = document.getElementById("ob-create-btn");
-  const name  = document.getElementById("ob-name").value.trim();
-  const brief = document.getElementById("ob-brief").value.trim();
+  const btn      = document.getElementById("ob-create-btn");
+  const name     = document.getElementById("ob-name").value.trim();
+  const brief    = document.getElementById("ob-brief").value.trim();
   const vertical = document.getElementById("ob-vertical").value;
   const channel  = document.getElementById("ob-channel").value;
-  const plan       = document.getElementById("ob-plan").value;
-  const city       = document.getElementById("ob-city").value.trim();
-  const waAccount  = document.getElementById("ob-wa-account").value.trim();
-  const emailAcct  = document.getElementById("ob-email-account").value.trim();
-  const res   = document.getElementById("ob-create-result");
+  const plan     = document.getElementById("ob-plan").value;
+  const city     = document.getElementById("ob-city").value.trim();
+  const waAcct   = document.getElementById("ob-wa-account").value.trim();
+  const emailAcct= document.getElementById("ob-email-account").value.trim();
+  const res      = document.getElementById("ob-create-result");
 
   if (!name || !brief) {
     res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Client name and brief are required.</div>`;
-    res.style.display = "block";
-    return;
+    res.style.display = "block"; return;
   }
 
   btn.textContent = "Saving…"; btn.disabled = true;
   try {
     const data = await postJSON("/api/v1/clients/", {
       name, vertical, brief, preferred_channel: channel, active: true,
-      plan: plan || null,
-      city: city || null,
-      whatsapp_account_id: waAccount || null,
+      plan: plan || null, city: city || null,
+      whatsapp_account_id: waAcct || null,
       email_account_id: emailAcct || null,
     });
     res.innerHTML = `<div style="color:#00e5a0;font-size:13px;">Client <strong>${name}</strong> ${data.action}. Now generate their portal link in Step 2.</div>`;
@@ -1183,8 +1159,7 @@ async function generatePortal() {
 
   if (!name) {
     res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Enter client name first.</div>`;
-    res.style.display = "block";
-    return;
+    res.style.display = "block"; return;
   }
 
   btn.textContent = "Generating…"; btn.disabled = true;
@@ -1193,12 +1168,12 @@ async function generatePortal() {
     const url  = window.location.origin + data.portal_url;
     res.innerHTML = `
       <div style="background:#0a140a;border:1px solid #0e2e0e;border-radius:8px;padding:14px 16px;">
-        <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Portal Link for ${name}</div>
+        <div style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Portal Link for ${name}</div>
         <div style="display:flex;align-items:center;gap:10px;">
           <input value="${url}" readonly style="flex:1;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:6px;padding:8px 10px;color:#00e5a0;font-size:13px;font-family:monospace;" onclick="this.select()" />
           <button class="btn" style="background:#0e2e0e;border:1px solid #1a4a1a;color:#00e5a0;white-space:nowrap;" onclick="navigator.clipboard.writeText('${url}').then(()=>this.textContent='Copied!').catch(()=>{})">Copy</button>
         </div>
-        <p style="font-size:11px;color:#444;margin-top:8px;">Share this link with ${name}. No login required.</p>
+        <p style="font-size:11px;color:#333;margin-top:8px;">Share this with ${name}. No login required.</p>
       </div>`;
   } catch (err) {
     res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Error: ${err.message}</div>`;
@@ -1218,8 +1193,7 @@ async function runClientCampaign() {
 
   if (!name) {
     res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Enter client name first.</div>`;
-    res.style.display = "block";
-    return;
+    res.style.display = "block"; return;
   }
 
   btn.textContent = "Running…"; btn.disabled = true;
@@ -1227,18 +1201,7 @@ async function runClientCampaign() {
     const result = await postJSON("/api/v1/campaigns/run", {
       vertical, max_contacts: max, dry_run: dryRun, client_name: name,
     });
-    const rows = Object.entries(result).map(([k, v]) => {
-      const label = k.replace(/_/g, " ");
-      const val   = typeof v === "boolean" ? (v ? "yes" : "no") : v;
-      return `<div class="v-row"><span class="lbl">${label}</span><span class="val">${val}</span></div>`;
-    }).join("");
-    res.innerHTML = `
-      <div style="background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:14px 18px;">
-        <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">
-          ${name} — ${vertical.replace(/_/g," ")} ${dryRun ? "(dry run)" : "(live)"}
-        </div>
-        ${rows}
-      </div>`;
+    res.innerHTML = renderResult(result, vertical, dryRun);
     if (!dryRun) refresh();
   } catch (err) {
     res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Error: ${err.message}</div>`;
@@ -1248,7 +1211,7 @@ async function runClientCampaign() {
   }
 }
 
-// ── Export Contacts ───────────────────────────────────────────────────────────
+// ── Export ────────────────────────────────────────────────────────────────────
 
 function exportContacts() {
   const vertical = document.getElementById("exp-vertical").value;
@@ -1256,57 +1219,9 @@ function exportContacts() {
   const params   = new URLSearchParams();
   if (vertical) params.set("vertical", vertical);
   if (status)   params.set("status", status);
-  const url = `/api/v1/contacts/export?${params.toString()}`;
   const a = document.createElement("a");
-  a.href = url;
-  a.download = "";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
-// ── Run Campaign ──────────────────────────────────────────────────────────────
-
-async function runCampaign() {
-  const btn      = document.getElementById("rc-btn");
-  const vertical = document.getElementById("rc-vertical").value;
-  const max      = parseInt(document.getElementById("rc-max").value) || 10;
-  const dryRun   = document.getElementById("rc-dryrun").checked;
-  const clientName = document.getElementById("rc-client").value.trim();
-  const res      = document.getElementById("rc-result");
-
-  btn.textContent = "Running…";
-  btn.disabled = true;
-  res.style.display = "none";
-
-  try {
-    const result = await postJSON("/api/v1/campaigns/run", {
-      vertical, max_contacts: max, dry_run: dryRun,
-      ...(clientName ? { client_name: clientName } : {}),
-    });
-
-    const rows = Object.entries(result).map(([k, v]) => {
-      const label = k.replace(/_/g, " ");
-      const val   = typeof v === "boolean" ? (v ? "yes" : "no") : v;
-      return `<div class="v-row"><span class="lbl">${label}</span><span class="val">${val}</span></div>`;
-    }).join("");
-
-    res.innerHTML = `
-      <div style="background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:14px 18px;">
-        <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">
-          Result — ${vertical.replace(/_/g," ")} ${dryRun ? "(dry run)" : "(live)"}
-        </div>
-        ${rows}
-      </div>`;
-    res.style.display = "block";
-    if (!dryRun) refresh();
-  } catch (err) {
-    res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Error: ${err.message}</div>`;
-    res.style.display = "block";
-  } finally {
-    btn.textContent = "Run";
-    btn.disabled = false;
-  }
+  a.href = `/api/v1/contacts/export?${params.toString()}`;
+  a.download = ""; document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
