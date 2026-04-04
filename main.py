@@ -18,13 +18,45 @@ from config import get_settings
 log = structlog.get_logger()
 
 
+def _validate_env(settings) -> None:
+    """Fail fast with a clear message if critical env vars are missing or placeholder."""
+    placeholder_prefixes = ("sk-ant-...", "AIza...", "mongodb+srv://...", "...")
+    issues = []
+
+    checks = {
+        "ANTHROPIC_API_KEY": settings.anthropic_api_key,
+        "MONGODB_URI": settings.mongodb_uri,
+        "UNIPILE_API_KEY": settings.unipile_api_key,
+        "UNIPILE_DSN": settings.unipile_dsn,
+    }
+    for name, val in checks.items():
+        if not val or any(val.startswith(p) for p in placeholder_prefixes):
+            issues.append(f"  ✗ {name} is missing or still a placeholder")
+
+    if settings.app_env == "production":
+        if not settings.dashboard_user or not settings.dashboard_pass:
+            issues.append("  ✗ DASHBOARD_USER / DASHBOARD_PASS must be set in production")
+
+    if issues:
+        msg = "\n".join(["[ReachNG] Cannot start — fix your .env:\n"] + issues)
+        raise SystemExit(msg)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     settings = get_settings()
+    _validate_env(settings)
     log.info("reachng_starting", env=settings.app_env)
-    ensure_indexes()
-    ensure_data_indexes()
+    try:
+        ensure_indexes()
+        ensure_data_indexes()
+    except Exception as exc:
+        raise SystemExit(
+            f"[ReachNG] Cannot connect to MongoDB.\n"
+            f"  Check MONGODB_URI in your .env\n"
+            f"  Error: {exc}"
+        ) from exc
     from tools.hitl import ensure_approval_indexes
     from tools.roi import ensure_roi_indexes
     from tools.social import ensure_social_indexes

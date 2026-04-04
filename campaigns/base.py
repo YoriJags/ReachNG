@@ -3,6 +3,7 @@ Base campaign runner — shared logic for all verticals.
 Each vertical subclass just defines its vertical name and preferred channel.
 """
 import asyncio
+import re
 from typing import Optional
 from tools import (
     discover_businesses, discover_apollo_leads, upsert_contact, has_been_contacted,
@@ -53,7 +54,7 @@ class BaseCampaign:
         if client_name:
             from api.clients import get_clients
             client_doc = get_clients().find_one(
-                {"name": {"$regex": f"^{client_name}$", "$options": "i"}, "active": True}
+                {"name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"}, "active": True}
             )
             if client_doc:
                 client_brief = client_doc.get("brief")
@@ -198,6 +199,7 @@ class BaseCampaign:
                 website=biz.get("website"),
                 rating=biz.get("rating"),
                 category=biz.get("category"),
+                client_name=client_name,
             )
 
             # Step 7a: HITL mode — queue for human approval instead of sending

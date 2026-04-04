@@ -2,6 +2,7 @@
 Client management — each paying ReachNG client gets their own campaign brief.
 The brief replaces the generic vertical prompt, making every message on-brand for them.
 """
+import re
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from datetime import datetime, timezone
@@ -45,7 +46,7 @@ async def list_clients():
 
 @router.get("/{name}")
 async def get_client(name: str):
-    client = get_clients().find_one({"name": {"$regex": f"^{name}$", "$options": "i"}})
+    client = get_clients().find_one({"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}})
     if not client:
         raise HTTPException(404, f"Client '{name}' not found")
     return _serialise(client)
@@ -85,7 +86,7 @@ async def upsert_client(payload: ClientUpsert):
 async def deactivate_client(name: str):
     """Soft-delete — marks client inactive without removing their brief."""
     result = get_clients().update_one(
-        {"name": {"$regex": f"^{name}$", "$options": "i"}},
+        {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}},
         {"$set": {"active": False, "updated_at": datetime.now(timezone.utc)}},
     )
     if result.matched_count == 0:

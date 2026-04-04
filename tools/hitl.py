@@ -2,11 +2,16 @@
 HITL (Human-in-the-Loop) — approval queue for outreach drafts.
 Campaign generates messages → stored as pending → owner approves via dashboard.
 Nothing goes out without a human tap.
+
+Drafts expire after DRAFT_EXPIRY_HOURS (default 72h). Expired drafts are
+auto-skipped on approval attempt to prevent stale messages going out.
 """
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from bson import ObjectId
 from database import get_db
 import structlog
+
+DRAFT_EXPIRY_HOURS = 72
 
 log = structlog.get_logger()
 
@@ -64,6 +69,7 @@ def queue_draft(
         "profile_url":   profile_url,
         "status":        ApprovalStatus.PENDING,
         "created_at":    datetime.now(timezone.utc),
+        "expires_at":    datetime.now(timezone.utc) + timedelta(hours=DRAFT_EXPIRY_HOURS),
         "actioned_at":   None,
         "edited_message": None,
     })
@@ -72,8 +78,12 @@ def queue_draft(
 
 
 def get_pending(vertical: str | None = None, limit: int = 50) -> list[dict]:
-    """Return all pending approvals, optionally filtered by vertical."""
-    query = {"status": ApprovalStatus.PENDING}
+    """Return all non-expired pending approvals, optionally filtered by vertical."""
+    now = datetime.now(timezone.utc)
+    query = {
+        "status": ApprovalStatus.PENDING,
+        "$or": [{"expires_at": {"$gt": now}}, {"expires_at": {"$exists": False}}],
+    }
     if vertical:
         query["vertical"] = vertical
     return list(
@@ -93,7 +103,16 @@ def get_approval_stats() -> dict:
 
 
 def approve_draft(approval_id: str) -> dict | None:
-    """Mark as approved. Returns the approval doc for sending."""
+    """Mark as approved. Returns the approval doc for sending. Returns None if expired."""
+    col = get_approvals()
+    draft = col.find_one({"_id": ObjectId(approval_id)})
+    if not draft:
+        return None
+    expires_at = draft.get("expires_at")
+    if expires_at and datetime.now(timezone.utc) > expires_at:
+        _update_status(approval_id, ApprovalStatus.SKIPPED)
+        log.warning("draft_expired_on_approve", approval_id=approval_id, contact=draft.get("contact_name"))
+        return None
     return _update_status(approval_id, ApprovalStatus.APPROVED)
 
 

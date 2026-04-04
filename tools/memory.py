@@ -32,6 +32,7 @@ def upsert_contact(
     website: Optional[str] = None,
     rating: Optional[float] = None,
     category: Optional[str] = None,
+    client_name: Optional[str] = None,
 ) -> str:
     """Insert or update a contact. Returns the contact _id as string."""
     contacts = get_contacts()
@@ -58,6 +59,8 @@ def upsert_contact(
         "lead_score": lead_score,
         "updated_at": now,
     }
+    if client_name:
+        doc["client_name"] = client_name
 
     result = contacts.update_one(
         {"place_id": place_id},

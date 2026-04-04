@@ -96,6 +96,7 @@ async def pipeline_summary():
 @router.patch("/{contact_id}/replied")
 async def contact_replied(contact_id: str):
     _validate_id(contact_id)
+    _require_contact(contact_id)
     mark_replied(contact_id)
     return {"success": True, "status": Status.REPLIED}
 
@@ -103,6 +104,7 @@ async def contact_replied(contact_id: str):
 @router.patch("/{contact_id}/converted")
 async def contact_converted(contact_id: str):
     _validate_id(contact_id)
+    _require_contact(contact_id)
     mark_converted(contact_id)
     return {"success": True, "status": Status.CONVERTED}
 
@@ -110,6 +112,7 @@ async def contact_converted(contact_id: str):
 @router.patch("/{contact_id}/opted-out")
 async def contact_opted_out(contact_id: str):
     _validate_id(contact_id)
+    _require_contact(contact_id)
     mark_opted_out(contact_id)
     return {"success": True, "status": Status.OPTED_OUT}
 
@@ -142,3 +145,8 @@ def _validate_id(contact_id: str):
         ObjectId(contact_id)
     except Exception:
         raise HTTPException(400, "Invalid contact ID")
+
+
+def _require_contact(contact_id: str):
+    if not get_contacts().find_one({"_id": ObjectId(contact_id)}, {"_id": 1}):
+        raise HTTPException(404, "Contact not found")

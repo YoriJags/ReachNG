@@ -1,14 +1,16 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Literal, Optional
 from campaigns import CAMPAIGN_REGISTRY
 from tools import get_pipeline_stats, get_daily_send_count, is_daily_limit_reached
 
 router = APIRouter(prefix="/campaigns", tags=["Campaigns"])
 
+VerticalType = Literal["real_estate", "recruitment", "events", "fintech", "legal", "logistics"]
+
 
 class RunCampaignRequest(BaseModel):
-    vertical: str = Field(..., description="real_estate | recruitment | events")
+    vertical: VerticalType = Field(..., description="real_estate | recruitment | events | fintech | legal | logistics")
     max_contacts: int = Field(default=30, ge=1, le=60)
     dry_run: bool = Field(default=True, description="Set to false to actually send messages")
     query_override: Optional[str] = Field(default=None, description="Custom Google Maps search query")
@@ -22,9 +24,6 @@ class RunAllRequest(BaseModel):
 
 @router.post("/run")
 async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTasks):
-    if body.vertical not in CAMPAIGN_REGISTRY:
-        raise HTTPException(400, f"Unknown vertical. Choose from: {list(CAMPAIGN_REGISTRY.keys())}")
-
     if is_daily_limit_reached() and not body.dry_run:
         raise HTTPException(429, "Daily send limit reached. Try again tomorrow.")
 
@@ -37,6 +36,7 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
             max_new_contacts=body.max_contacts,
             dry_run=body.dry_run,
             query_override=body.query_override,
+            client_name=body.client_name,
         )
         return {"status": "started", "vertical": body.vertical, "message": "Campaign running in background"}
 
@@ -52,22 +52,24 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
 @router.post("/run-all")
 async def run_all_campaigns(body: RunAllRequest, background_tasks: BackgroundTasks):
     results = {}
+    all_skipped = True
     for vertical, CampaignClass in CAMPAIGN_REGISTRY.items():
         if is_daily_limit_reached() and not body.dry_run:
             results[vertical] = {"skipped": "daily_limit_reached"}
             continue
+        all_skipped = False
         campaign = CampaignClass()
         results[vertical] = await campaign.run(
             max_new_contacts=body.max_per_vertical,
             dry_run=body.dry_run,
         )
+    if all_skipped and not body.dry_run:
+        raise HTTPException(429, "Daily send limit reached. No campaigns ran.")
     return results
 
 
 @router.post("/{vertical}/followups")
-async def run_followups(vertical: str, dry_run: bool = True):
-    if vertical not in CAMPAIGN_REGISTRY:
-        raise HTTPException(400, f"Unknown vertical: {vertical}")
+async def run_followups(vertical: VerticalType, dry_run: bool = True):
     campaign = CAMPAIGN_REGISTRY[vertical]()
     return await campaign.run_followups(dry_run=dry_run)
 

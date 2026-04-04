@@ -70,10 +70,10 @@ async def get_portal_data(token: str):
     vertical = client.get("vertical")
     client_name = client["name"]
 
-    # Contacts for this vertical
+    # Contacts scoped to this client only — prevents cross-client data leak
     contacts = list(
         get_contacts()
-        .find({"vertical": vertical})
+        .find({"vertical": vertical, "client_name": client_name})
         .sort("lead_score", -1)
         .limit(100)
     )
