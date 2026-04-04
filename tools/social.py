@@ -202,7 +202,7 @@ async def scrape_instagram_hashtags(vertical: str, max_results: int = 20) -> lis
     if not hashtags:
         return []
 
-    items = await _run_apify("apify/instagram-hashtag-scraper", {
+    items = await _run_apify("apify/instagram-scraper", {
         "hashtags":     hashtags,
         "resultsType":  "posts",
         "resultsLimit": max_results,
@@ -248,7 +248,7 @@ async def scrape_twitter_leads(vertical: str, max_results: int = 20) -> list[dic
     # Combine queries with Lagos filter — we only want Lagos signal
     search_terms = [f"{q} Lagos" for q in queries[:3]]
 
-    items = await _run_apify("apify/twitter-scraper", {
+    items = await _run_apify("apidojo/tweet-scraper", {
         "searchTerms": search_terms,
         "maxItems":    max_results,
         "sort":        "Latest",
@@ -478,7 +478,7 @@ async def monitor_competitor_mentions(
     if not comp_terms:
         return []
 
-    items = await _run_apify("apify/twitter-scraper", {
+    items = await _run_apify("apidojo/tweet-scraper", {
         "searchTerms": comp_terms[:3],
         "maxItems":    max_results,
         "sort":        "Latest",
