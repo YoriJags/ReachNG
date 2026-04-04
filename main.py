@@ -198,6 +198,37 @@ async def debug_maps():
     }
 
 
+@app.get("/debug/apify", dependencies=[Depends(require_auth)])
+async def debug_apify():
+    """Verify Apify token and test TikTok scraper with a single hashtag."""
+    import httpx
+    settings = get_settings()
+    token = getattr(settings, "apify_api_token", None)
+    if not token:
+        return {"error": "APIFY_API_TOKEN not set in environment"}
+
+    url = "https://api.apify.com/v2/acts/clockworks~tiktok-scraper/run-sync-get-dataset-items"
+    params = {"token": token, "timeout": 30, "memory": 256}
+    try:
+        async with httpx.AsyncClient(timeout=40) as client:
+            resp = await client.post(url, json={
+                "hashtags": ["lagosrealestate"],
+                "resultsPerPage": 3,
+                "shouldDownloadVideos": False,
+                "shouldDownloadCovers": False,
+            }, params=params)
+        items = resp.json() if resp.status_code == 200 else []
+        return {
+            "http_status": resp.status_code,
+            "token_prefix": token[:8] + "...",
+            "items_returned": len(items) if isinstance(items, list) else 0,
+            "first_item_author": items[0].get("authorMeta", {}).get("name") if items and isinstance(items, list) else None,
+            "error": items.get("error") if isinstance(items, dict) else None,
+        }
+    except Exception as e:
+        return {"error": str(e), "token_prefix": token[:8] + "..."}
+
+
 if __name__ == "__main__":
     import os
     settings = get_settings()
