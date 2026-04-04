@@ -132,20 +132,7 @@ class BaseCampaign:
                 log.info("daily_limit_reached", sent=sent)
                 break
 
-            # Upsert contact record
-            contact_id = upsert_contact(
-                place_id=biz["place_id"],
-                name=biz["name"],
-                vertical=self.vertical,
-                phone=biz.get("phone"),
-                email=biz.get("email"),
-                address=biz.get("address"),
-                website=biz.get("website"),
-                rating=biz.get("rating"),
-                category=biz.get("category"),
-            )
-
-            # Step 3: Skip if already contacted
+            # Step 3: Skip if already contacted (check before writing)
             if has_been_contacted(biz["place_id"]):
                 skipped_contacted += 1
                 continue
@@ -199,6 +186,19 @@ class BaseCampaign:
                 log.info("dry_run_message", business=biz["name"], channel=channel, message=generated)
                 sent += 1
                 continue
+
+            # Upsert contact record (only on real runs, not dry runs)
+            contact_id = upsert_contact(
+                place_id=biz["place_id"],
+                name=biz["name"],
+                vertical=self.vertical,
+                phone=biz.get("phone"),
+                email=biz.get("email"),
+                address=biz.get("address"),
+                website=biz.get("website"),
+                rating=biz.get("rating"),
+                category=biz.get("category"),
+            )
 
             # Step 7a: HITL mode — queue for human approval instead of sending
             if hitl_mode:
