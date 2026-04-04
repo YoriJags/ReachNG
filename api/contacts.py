@@ -87,9 +87,24 @@ async def export_contacts(
 async def pipeline_summary():
     """Counts per status across all verticals — dashboard view."""
     summary = {}
-    for vertical in ["real_estate", "recruitment", "events"]:
-        summary[vertical] = get_pipeline_stats(vertical=vertical)
-    summary["all"] = get_pipeline_stats()
+    for vertical in ["real_estate", "recruitment", "events", "fintech", "legal", "logistics", "agriculture"]:
+        raw = get_pipeline_stats(vertical=vertical)
+        summary[vertical] = {
+            "contacted":     raw.get("contacted", 0),
+            "replied":       raw.get("replied", 0),
+            "converted":     raw.get("converted", 0),
+            "opted_out":     raw.get("opted_out", 0),
+            "not_contacted": raw.get("new", 0),
+            "daily_sent":    raw.get("daily_sent", 0),
+        }
+    all_raw = get_pipeline_stats()
+    summary["all"] = {
+        "contacted":  all_raw.get("contacted", 0),
+        "replied":    all_raw.get("replied", 0),
+        "converted":  all_raw.get("converted", 0),
+        "opted_out":  all_raw.get("opted_out", 0),
+        "daily_sent": all_raw.get("daily_sent", 0),
+    }
     return summary
 
 
