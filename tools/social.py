@@ -23,42 +23,49 @@ TWITTER_BASE = "https://api.twitter.com/2"
 VERTICAL_SOCIAL = {
     "real_estate": {
         "ig_hashtags":      ["LagosRealEstate", "LagosProperty", "LekkiRealEstate", "VILagos", "NigeriaRealEstate", "LagosHomes"],
+        "tt_hashtags":      ["lagosrealestate", "lagosproperty", "nigeriapropertymarket", "lekkiapartments", "buypropertylagos"],
         "twitter_queries":  ["Lagos real estate", "buy apartment Lekki", "looking for realtor Lagos", "property for sale Lagos island"],
         "fb_keywords":      ["Lagos real estate", "property Lagos", "house for sale Lagos"],
         "competitor_terms": ["estate agent Lagos", "property developer Lagos"],
     },
     "recruitment": {
         "ig_hashtags":      ["LagosJobs", "NigeriaJobs", "HiringLagos", "LagosRecruitment", "NigeriaCareer"],
+        "tt_hashtags":      ["lagosjobs", "nigeriajobs", "hiringlagos", "jobsinnigeria", "recruitmentlagos"],
         "twitter_queries":  ["hiring Lagos", "job opening Nigeria", "recruitment Lagos", "looking for talent Lagos", "we are hiring Nigeria"],
         "fb_keywords":      ["jobs Lagos", "hiring Nigeria", "recruitment Lagos"],
         "competitor_terms": ["recruitment agency Lagos", "staffing Nigeria", "headhunter Lagos"],
     },
     "events": {
         "ig_hashtags":      ["LagosEvents", "LagosParty", "NaijaEvents", "LagosEntertainment", "EventsLagos", "LagosNightlife"],
+        "tt_hashtags":      ["lagosevents", "naijaevents", "lagosparty", "eventplannerlagos", "corporateeventlagos"],
         "twitter_queries":  ["event planner Lagos", "corporate event Lagos", "event management Nigeria", "organise event Lagos"],
         "fb_keywords":      ["event planner Lagos", "event management Lagos"],
         "competitor_terms": ["event company Lagos", "event decorator Lagos"],
     },
     "fintech": {
         "ig_hashtags":      ["LagosFintech", "NigeriaFintech", "AfricanFintech", "LagosStartup", "NairaFinance"],
+        "tt_hashtags":      ["nigeriafintech", "lagostech", "africanstartup", "nigeriastartup", "digitalpaymentsnigeria"],
         "twitter_queries":  ["fintech Lagos", "digital payments Nigeria", "startup funding Lagos", "raise investment Nigeria"],
         "fb_keywords":      ["fintech Nigeria", "startup Lagos"],
         "competitor_terms": ["payment solution Lagos", "digital lender Nigeria"],
     },
     "legal": {
         "ig_hashtags":      ["LagosLawyer", "NigeriaLaw", "LagosLegal", "NigerianLawyer", "LawyerLagos"],
+        "tt_hashtags":      ["nigerianlawyer", "lagoslegal", "legaladvicenigeria", "nigerialaw", "corporatelawyerlagos"],
         "twitter_queries":  ["law firm Lagos", "legal advice Nigeria", "corporate lawyer Lagos", "need lawyer Lagos"],
         "fb_keywords":      ["lawyer Lagos", "legal services Nigeria"],
         "competitor_terms": ["law firm Lagos", "solicitor Lagos"],
     },
     "logistics": {
         "ig_hashtags":      ["LagosLogistics", "NigeriaLogistics", "LagosShipping", "LagosCourier", "FreightLagos"],
+        "tt_hashtags":      ["lagoslogistics", "nigerialogistics", "freightlagos", "haulagelagos", "deliverylagos"],
         "twitter_queries":  ["logistics Lagos", "freight Lagos", "haulage Nigeria", "shipping Apapa", "trucking Lagos"],
         "fb_keywords":      ["logistics Lagos", "haulage Nigeria", "courier Lagos"],
         "competitor_terms": ["logistics company Lagos", "freight forwarder Apapa"],
     },
     "agriculture": {
         "ig_hashtags":      ["NigeriaAgriculture", "AgribusinessNigeria", "FarmingNigeria", "NigeriaFarm", "AgricNigeria"],
+        "tt_hashtags":      ["nigeriafarming", "agribusinessnigeria", "farminginnigeria", "poultryfarmnigeria", "agrictok"],
         "twitter_queries":  ["agribusiness Nigeria", "farm produce Lagos", "poultry farm Nigeria", "food processing Nigeria", "agro commodity Nigeria"],
         "fb_keywords":      ["agribusiness Nigeria", "farm produce Lagos", "poultry Nigeria"],
         "competitor_terms": ["agribusiness company Nigeria", "farm produce supplier Lagos"],
@@ -364,22 +371,22 @@ async def scrape_facebook_mentions(vertical: str, max_results: int = 20) -> list
     if not keywords:
         return []
 
-    items = await _run_apify("apify/facebook-pages-scraper", {
+    items = await _run_apify("apify/facebook-posts-scraper", {
         "startUrls": [
-            {"url": f"https://www.facebook.com/search/pages?q={kw.replace(' ', '%20')}"}
+            {"url": f"https://www.facebook.com/search/posts?q={kw.replace(' ', '%20')}"}
             for kw in keywords[:2]
         ],
-        "maxPosts": max_results,
+        "resultsLimit": max_results,
     })
 
     leads = []
     for item in items:
-        username    = item.get("username") or item.get("pageId", "")
-        display_name = item.get("title") or item.get("name") or username
-        about       = item.get("about") or item.get("description", "")
-        page_url    = item.get("url") or f"https://facebook.com/{username}"
-        signal_id   = f"fb_{item.get('pageId') or username}"
-        followers   = item.get("likes") or item.get("followers", 0)
+        username     = item.get("pageName") or item.get("username") or item.get("pageId", "")
+        display_name = item.get("pageName") or item.get("title") or item.get("name") or username
+        about        = item.get("text") or item.get("about") or item.get("description", "")
+        page_url     = item.get("url") or item.get("pageUrl") or f"https://facebook.com/{username}"
+        signal_id    = f"fb_{item.get('postId') or item.get('pageId') or username}"
+        followers    = item.get("likes") or item.get("followers", 0)
 
         if not username or _is_seen(signal_id):
             continue
@@ -399,6 +406,58 @@ async def scrape_facebook_mentions(vertical: str, max_results: int = 20) -> list
         leads.append(lead)
 
     log.info("fb_leads_found", vertical=vertical, count=len(leads))
+    return leads
+
+
+# ── TikTok (Apify) ───────────────────────────────────────────────────────────
+
+async def scrape_tiktok_leads(vertical: str, max_results: int = 20) -> list[dict]:
+    """
+    Find businesses posting on TikTok under vertical-relevant hashtags.
+    TikTok is massive for Nigerian SMEs — product demos, service showcases,
+    business pitches all happen there. High intent signal.
+    """
+    config   = VERTICAL_SOCIAL.get(vertical, {})
+    hashtags = config.get("tt_hashtags", [])
+    if not hashtags:
+        return []
+
+    items = await _run_apify("clockworks/tiktok-scraper", {
+        "hashtags":   hashtags[:4],
+        "resultsPerPage": max_results,
+        "shouldDownloadVideos": False,
+        "shouldDownloadCovers": False,
+    })
+
+    leads = []
+    for item in items:
+        author       = item.get("authorMeta") or {}
+        username     = author.get("name") or item.get("author", "")
+        display_name = author.get("nickName") or username
+        bio          = author.get("signature") or ""
+        caption      = item.get("text") or ""
+        profile_url  = f"https://tiktok.com/@{username}"
+        signal_id    = f"tt_{item.get('id') or username + caption[:15]}"
+        followers    = author.get("fans") or 0
+
+        if not username or _is_seen(signal_id):
+            continue
+
+        lead = _normalise_lead(
+            platform="tiktok",
+            vertical=vertical,
+            username=username,
+            display_name=display_name,
+            bio=bio,
+            post_text=caption,
+            profile_url=profile_url,
+            follower_count=followers,
+            signal_id=signal_id,
+        )
+        _save_signal({**lead, "vertical": vertical, "signal_id": signal_id, "raw_caption": caption})
+        leads.append(lead)
+
+    log.info("tiktok_leads_found", vertical=vertical, count=len(leads))
     return leads
 
 
@@ -472,6 +531,7 @@ async def discover_social_leads(
 
     tasks = [
         scrape_instagram_hashtags(vertical, per_source),
+        scrape_tiktok_leads(vertical, per_source),
         scrape_twitter_leads(vertical, per_source),
         scrape_twitter_api(vertical, per_source),       # no-ops if no Bearer token
         scrape_facebook_mentions(vertical, per_source),
