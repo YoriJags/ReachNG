@@ -5,7 +5,7 @@ Shows their contacts, outreach stats, and ROI.
 """
 import secrets
 from datetime import datetime, timezone
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from bson import ObjectId
 from database import get_contacts, get_outreach_log, get_db
@@ -100,13 +100,14 @@ async def get_portal_data(token: str):
 
 
 @router.get("/demo", response_class=HTMLResponse)
-async def demo_portal():
+async def demo_portal(request: Request):
     """Public demo portal — shows realistic sample data for pitch/sales purposes."""
-    return HTMLResponse(_portal_html("demo", "Mercury Real Estate", "Real Estate", demo=True))
+    templates = request.app.state.templates
+    return templates.TemplateResponse("portal_demo.html", {"request": request})
 
 
 @router.get("/{token}", response_class=HTMLResponse)
-async def client_portal(token: str):
+async def client_portal(token: str, request: Request):
     """Render the client portal HTML dashboard."""
     client = _get_client_by_token(token)
     if not client:
@@ -115,7 +116,8 @@ async def client_portal(token: str):
     client_name = client["name"]
     vertical = client.get("vertical", "").replace("_", " ").title()
 
-    return HTMLResponse(_portal_html(token, client_name, vertical))
+    templates = request.app.state.templates
+    return templates.TemplateResponse("portal.html", {"request": request, "token": token, "client_name": client_name, "vertical": vertical})
 
 
 # ─── Portal HTML ──────────────────────────────────────────────────────────────

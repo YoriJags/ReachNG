@@ -1,0 +1,2243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nigeria AI Product Catalog — ReachNG Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --base:    #08070F;
+  --surface: #0f0e17;
+  --surface2:#151423;
+  --orange:  #FF5C00;
+  --green:   #00C851;
+  --gold:    #FFD700;
+  --cyan:    #00F0FF;
+  --white:   #FFFFFF;
+  --w60:     rgba(255,255,255,0.6);
+  --w35:     rgba(255,255,255,0.35);
+  --w15:     rgba(255,255,255,0.10);
+  --w05:     rgba(255,255,255,0.05);
+}
+
+html, body {
+  background: var(--base);
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.25;
+}
+
+/* NAV */
+#topnav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(8,7,15,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--w05);
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+}
+#topnav a {
+  display: block;
+  padding: 16px 16px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--w35);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+#topnav a:hover { color: var(--white); border-color: var(--orange); }
+#topnav .wordmark {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--orange);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding-right: 32px;
+  border-right: 1px solid var(--w05);
+  margin-right: 16px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+/* HERO */
+#hero {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 80px 40px 60px;
+}
+#hero .label {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--orange);
+  margin-bottom: 20px;
+}
+#hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+#hero h1 span { color: var(--orange); }
+#hero p {
+  font-size: 15px;
+  color: var(--w60);
+  max-width: 640px;
+  line-height: 1.8;
+}
+
+/* SUMMARY TABLE */
+#summary {
+  max-width: 1100px;
+  margin: 0 auto 60px;
+  padding: 0 40px;
+}
+#summary h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: var(--w60);
+}
+.tbl-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+thead th {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--w35);
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--w05);
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid var(--w05);
+  transition: background 0.15s;
+}
+tbody tr:hover { background: var(--w05); }
+tbody td {
+  padding: 10px 14px;
+  color: var(--w60);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+tbody td:first-child { color: var(--white); font-weight: 600; }
+.tier-o { color: var(--orange) !important; }
+.tier-g { color: var(--gold) !important; }
+.tier-gr { color: var(--green) !important; }
+.tier-c { color: var(--cyan) !important; }
+
+/* SECTOR SECTIONS */
+.sector {
+  max-width: 1100px;
+  margin: 0 auto 80px;
+  padding: 0 40px;
+  position: relative;
+  z-index: 1;
+}
+.sector-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--w05);
+}
+.sector-label {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 4px 10px;
+}
+.sector-label.orange { color: var(--orange); border: 1px solid rgba(255,92,0,0.3); }
+.sector-label.gold   { color: var(--gold);   border: 1px solid rgba(255,215,0,0.3); }
+.sector-label.green  { color: var(--green);  border: 1px solid rgba(0,200,81,0.3); }
+.sector-label.cyan   { color: var(--cyan);   border: 1px solid rgba(0,240,255,0.3); }
+
+.sector-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 2.5vw, 32px);
+  font-weight: 700;
+}
+
+/* PRODUCT CARDS */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  gap: 24px;
+}
+.product-card {
+  background: var(--surface);
+  border: 1px solid var(--w05);
+  position: relative;
+  overflow: hidden;
+}
+.product-card .accent { height: 2px; width: 100%; }
+.accent.orange { background: linear-gradient(90deg, var(--orange), transparent); }
+.accent.gold   { background: linear-gradient(90deg, var(--gold), transparent); }
+.accent.green  { background: linear-gradient(90deg, var(--green), transparent); }
+.accent.cyan   { background: linear-gradient(90deg, var(--cyan), transparent); }
+
+.card-header {
+  padding: 24px 24px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.card-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.card-tagline {
+  font-size: 11px;
+  color: var(--w35);
+  letter-spacing: 0.05em;
+}
+.margin-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border: 1px solid var(--w05);
+  color: var(--green);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.card-body { padding: 20px 24px; }
+
+.pain-block {
+  font-size: 12px;
+  color: var(--w60);
+  line-height: 1.7;
+  margin-bottom: 18px;
+  padding-left: 12px;
+  border-left: 2px solid var(--w15);
+}
+
+.section-label {
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--w35);
+  margin-bottom: 8px;
+}
+
+.loop-block {
+  background: var(--base);
+  border: 1px solid var(--w05);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.loop-block .step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--w60);
+  line-height: 1.5;
+}
+.loop-block .step:last-child { margin-bottom: 0; }
+.loop-block .step .num {
+  font-size: 8px;
+  color: var(--w35);
+  font-family: monospace;
+  padding-top: 2px;
+  min-width: 16px;
+  flex-shrink: 0;
+}
+.loop-block .step .highlight { color: var(--white); font-weight: 600; }
+.arrow {
+  color: var(--w35);
+  font-size: 10px;
+  margin: 0 4px;
+}
+
+.stack-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.stack-tag {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  padding: 3px 8px;
+  background: var(--w05);
+  border: 1px solid var(--w15);
+  color: var(--w60);
+  font-family: monospace;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.meta-item { }
+.meta-item .meta-label {
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--w35);
+  margin-bottom: 4px;
+}
+.meta-item .meta-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.4;
+}
+.meta-item .meta-sub {
+  font-size: 10px;
+  color: var(--w35);
+  margin-top: 2px;
+}
+
+.win-block {
+  background: rgba(255,92,0,0.04);
+  border-left: 2px solid var(--orange);
+  padding: 10px 14px;
+  font-size: 11px;
+  color: var(--w60);
+  line-height: 1.6;
+}
+.win-block.gold  { background: rgba(255,215,0,0.04); border-color: var(--gold); }
+.win-block.green { background: rgba(0,200,81,0.04);  border-color: var(--green); }
+.win-block.cyan  { background: rgba(0,240,255,0.04); border-color: var(--cyan); }
+
+/* PRINT */
+@media print {
+  #topnav { display: none; }
+  body { background: #fff; color: #000; }
+  .product-card { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav id="topnav">
+  <span class="wordmark">ReachNG Labs</span>
+  <a href="#payments">Payments</a>
+  <a href="#hiring">Hiring</a>
+  <a href="#docs">Documents</a>
+  <a href="#logistics">Logistics</a>
+  <a href="#education">Education</a>
+  <a href="#health">Healthcare</a>
+  <a href="#realestate">Real Estate</a>
+  <a href="#energy">Energy</a>
+  <a href="#legal">Legal</a>
+  <a href="#media">Media</a>
+  <a href="#govt">Government</a>
+  <a href="#agric">Agriculture</a>
+  <a href="#highend">High-End</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <p class="label">Nigeria AI Product Catalog · 2026</p>
+  <h1>45 AI Products<br>You Can Build and <span>Sell Now.</span></h1>
+  <p>Every product here solves a real Nigerian pain point using cheap APIs. Full technical spec, stack, pricing, and margins for each. Build one. White-label it. Repeat.</p>
+</section>
+
+<!-- SUMMARY TABLE -->
+<section id="summary">
+  <h2>Master Overview</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Product</th>
+          <th>Tier</th>
+          <th>Monthly Price</th>
+          <th>API Cost/mo</th>
+          <th>Gross Margin</th>
+          <th>Build Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>01</td><td>POS Reconciliation Agent</td><td class="tier-o">SME</td><td>₦30K–₦80K</td><td>~₦8K</td><td class="tier-gr">88%</td><td>3 days</td></tr>
+        <tr><td>02</td><td>Rent Collector</td><td class="tier-o">SME</td><td>₦15K–₦150K</td><td>~₦5K</td><td class="tier-gr">87%</td><td>3 days</td></tr>
+        <tr><td>03</td><td>Invoice Chaser</td><td class="tier-o">SME</td><td>₦10K/mo</td><td>~₦3K</td><td class="tier-gr">90%</td><td>2 days</td></tr>
+        <tr><td>04</td><td>Credit Scoring (Behavioral)</td><td class="tier-g">Mid</td><td>₦2K–₦5K/query</td><td>~₦100/query</td><td class="tier-gr">95%</td><td>2 weeks</td></tr>
+        <tr><td>05</td><td>Treasury FX Alert</td><td class="tier-g">Enterprise</td><td>₦300K–₦1M</td><td>~₦20K</td><td class="tier-gr">93%</td><td>1 week</td></tr>
+        <tr><td>06</td><td>WhatsApp Job Screener</td><td class="tier-g">Mid</td><td>₦50K/posting</td><td>~₦5K</td><td class="tier-gr">92%</td><td>1 week</td></tr>
+        <tr><td>07</td><td>Staff Attendance Auditor</td><td class="tier-o">SME</td><td>₦5K/employee</td><td>~₦50/employee</td><td class="tier-gr">99%</td><td>5 days</td></tr>
+        <tr><td>08</td><td>Salary Benchmarking Agent</td><td class="tier-o">SME</td><td>₦15K/report</td><td>~₦2K/report</td><td class="tier-gr">87%</td><td>3 days</td></tr>
+        <tr><td>09</td><td>Contract Review for SMEs</td><td class="tier-o">SME</td><td>₦5K/contract</td><td>~₦100/contract</td><td class="tier-gr">98%</td><td>3 days</td></tr>
+        <tr><td>10</td><td>CAC Document Preparer</td><td class="tier-o">Consumer</td><td>₦15K flat</td><td>~₦200/job</td><td class="tier-gr">99%</td><td>2 days</td></tr>
+        <tr><td>11</td><td>FIRS Tax Filing Assistant</td><td class="tier-o">SME</td><td>₦20K/mo</td><td>~₦3K</td><td class="tier-gr">85%</td><td>1 week</td></tr>
+        <tr><td>12</td><td>Board Resolution Generator</td><td class="tier-o">SME</td><td>₦8K/doc</td><td>~₦50/doc</td><td class="tier-gr">99%</td><td>1 day</td></tr>
+        <tr><td>13</td><td>Dispatch Coordinator</td><td class="tier-o">SME</td><td>₦80K–₦200K</td><td>~₦15K</td><td class="tier-gr">90%</td><td>1 week</td></tr>
+        <tr><td>14</td><td>Inventory Alert System</td><td class="tier-o">SME</td><td>₦20K–₦50K</td><td>~₦3K</td><td class="tier-gr">91%</td><td>3 days</td></tr>
+        <tr><td>15</td><td>Supplier Price Tracker</td><td class="tier-g">Mid</td><td>₦30K–₦80K</td><td>~₦5K</td><td class="tier-gr">88%</td><td>1 week</td></tr>
+        <tr><td>16</td><td>Cold Chain Monitor</td><td class="tier-g">Mid</td><td>₦150K–₦400K</td><td>~₦20K</td><td class="tier-gr">87%</td><td>2 weeks</td></tr>
+        <tr><td>17</td><td>School Fee Reminder System</td><td class="tier-o">SME</td><td>₦50K/school</td><td>~₦5K</td><td class="tier-gr">90%</td><td>5 days</td></tr>
+        <tr><td>18</td><td>Student Result Checker</td><td class="tier-o">SME</td><td>₦15K/mo</td><td>~₦2K</td><td class="tier-gr">87%</td><td>2 days</td></tr>
+        <tr><td>19</td><td>Lesson Notes Summarizer</td><td class="tier-o">SME</td><td>₦20K/mo</td><td>~₦3K</td><td class="tier-gr">85%</td><td>3 days</td></tr>
+        <tr><td>20</td><td>JAMB/WAEC Prep Agent</td><td class="tier-o">Consumer</td><td>₦3K/student</td><td>~₦200/student</td><td class="tier-gr">93%</td><td>1 week</td></tr>
+        <tr><td>21</td><td>Clinic Appointment System</td><td class="tier-o">SME</td><td>₦40K–₦80K</td><td>~₦8K</td><td class="tier-gr">89%</td><td>1 week</td></tr>
+        <tr><td>22</td><td>Drug Expiry Monitor</td><td class="tier-o">SME</td><td>₦25K/mo</td><td>~₦3K</td><td class="tier-gr">88%</td><td>2 days</td></tr>
+        <tr><td>23</td><td>Insurance Claims Processor</td><td class="tier-gr">Enterprise</td><td>₦500K–₦2M</td><td>~₦50K</td><td class="tier-gr">90%</td><td>3 weeks</td></tr>
+        <tr><td>24</td><td>Mental Health Check-in Bot</td><td class="tier-g">Mid</td><td>₦5K/employee</td><td>~₦100/employee</td><td class="tier-gr">98%</td><td>1 week</td></tr>
+        <tr><td>25</td><td>Tenant Background Screener</td><td class="tier-o">SME</td><td>₦5K–₦10K/screen</td><td>~₦150/screen</td><td class="tier-gr">97%</td><td>3 days</td></tr>
+        <tr><td>26</td><td>Property Listing Syndicator</td><td class="tier-o">SME</td><td>₦15K/mo</td><td>~₦3K</td><td class="tier-gr">80%</td><td>1 week</td></tr>
+        <tr><td>27</td><td>Diesel Price Arbitrage Scout</td><td class="tier-g">Mid</td><td>₦150K–₦400K</td><td>~₦10K</td><td class="tier-gr">93%</td><td>1 week</td></tr>
+        <tr><td>28</td><td>NNPC Tender Intelligence</td><td class="tier-gr">Enterprise</td><td>₦500K–₦2M</td><td>~₦30K</td><td class="tier-gr">94%</td><td>2 weeks</td></tr>
+        <tr><td>29</td><td>NAFDAC/SON Compliance Monitor</td><td class="tier-gr">Enterprise</td><td>₦300K–₦800K</td><td>~₦15K</td><td class="tier-gr">95%</td><td>2 weeks</td></tr>
+        <tr><td>30</td><td>Court Cause List Monitor</td><td class="tier-g">Mid</td><td>₦80K–₦200K</td><td>~₦8K</td><td class="tier-gr">92%</td><td>1 week</td></tr>
+        <tr><td>31</td><td>Corporate Governance Tracker</td><td class="tier-gr">Enterprise</td><td>₦200K–₦500K</td><td>~₦10K</td><td class="tier-gr">95%</td><td>2 weeks</td></tr>
+        <tr><td>32</td><td>Influencer Fraud Detector</td><td class="tier-g">Mid</td><td>₦50K/report</td><td>~₦2K/report</td><td class="tier-gr">96%</td><td>1 week</td></tr>
+        <tr><td>33</td><td>Broadcast Monitoring</td><td class="tier-gr">Enterprise</td><td>₦1M–₦3M</td><td>~₦70K</td><td class="tier-gr">93%</td><td>3 weeks</td></tr>
+        <tr><td>34</td><td>IGR Optimizer</td><td class="tier-c">Government</td><td>₦5M–₦20M</td><td>~₦200K</td><td class="tier-gr">96%</td><td>6 weeks</td></tr>
+        <tr><td>35</td><td>Procurement Red Flag System</td><td class="tier-c">Government</td><td>₦10M–₦50M/yr</td><td>~₦500K</td><td class="tier-gr">94%</td><td>8 weeks</td></tr>
+        <tr><td>36</td><td>Commodity Price Intelligence</td><td class="tier-g">Mid</td><td>₦100K–₦500K</td><td>~₦15K</td><td class="tier-gr">91%</td><td>2 weeks</td></tr>
+        <tr><td>37</td><td>Farmer Input Cost Alert</td><td class="tier-o">SME</td><td>₦3K/farmer</td><td>~₦100/farmer</td><td class="tier-gr">97%</td><td>1 week</td></tr>
+        <tr><td>38</td><td>Telco Complaint Intelligence</td><td class="tier-gr">Enterprise</td><td>₦2M–₦5M</td><td>~₦80K</td><td class="tier-gr">96%</td><td>3 weeks</td></tr>
+        <tr><td>39</td><td>Hotel Revenue Manager</td><td class="tier-g">Mid</td><td>₦150K–₦400K</td><td>~₦15K</td><td class="tier-gr">91%</td><td>2 weeks</td></tr>
+        <tr><td>40</td><td>Staff Training Tracker</td><td class="tier-g">Mid</td><td>₦80K–₦200K</td><td>~₦10K</td><td class="tier-gr">92%</td><td>1 week</td></tr>
+        <tr><td>41</td><td>Morning Business Brief</td><td class="tier-o">Consumer</td><td>₦5K/subscriber</td><td>~₦30K</td><td class="tier-gr">85%</td><td>1 week</td></tr>
+        <tr><td>42</td><td>SME Loan Packager</td><td class="tier-o">Consumer</td><td>₦25K/application</td><td>~₦500/app</td><td class="tier-gr">98%</td><td>1 week</td></tr>
+        <tr><td>43</td><td>WhatsApp Commerce Assistant</td><td class="tier-o">SME</td><td>₦30K–₦60K</td><td>~₦8K</td><td class="tier-gr">87%</td><td>1 week</td></tr>
+        <tr><td>44</td><td>Diaspora Property Scout</td><td class="tier-g">Mid</td><td>$50/mo</td><td>~₦3K</td><td class="tier-gr">91%</td><td>1 week</td></tr>
+        <tr><td>45</td><td>Church/Mosque Giving Tracker</td><td class="tier-o">SME</td><td>₦50K–₦150K</td><td>~₦8K</td><td class="tier-gr">88%</td><td>5 days</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 1: MONEY & PAYMENTS -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="payments">
+  <div class="sector-header">
+    <span class="sector-label orange">Sector 01</span>
+    <h2 class="sector-title">Money &amp; Payments</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 01 POS RECONCILIATION -->
+    <div class="product-card">
+      <div class="accent orange"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">POS Reconciliation Agent</div>
+          <div class="card-tagline">End-of-day settlement — automated.</div>
+        </div>
+        <div class="margin-badge">88% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Every POS business in Lagos reconciles manually. End-of-day settlement rarely matches the printed receipts. A bookkeeper costs ₦60K/month to do this with a spreadsheet and still gets it wrong.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Paystack / Flutterwave webhooks stream every transaction in real time into MongoDB</span></div>
+          <div class="step"><span class="num">02</span><span>Gemini Flash matches incoming transactions against expected settlement amounts per terminal</span></div>
+          <div class="step"><span class="num">03</span><span><span class="highlight">Discrepancy detected</span> → Claude classifies: reversal, network failure, or fraud signal</span></div>
+          <div class="step"><span class="num">04</span><span>10pm daily: WhatsApp report to owner — matched, unmatched, flagged amounts + recommended actions</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Paystack Webhooks</span>
+          <span class="stack-tag">Flutterwave API</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">FastAPI</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦30K – ₦80K/mo</div>
+            <div class="meta-sub">₦30K setup fee. Month 1 free.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦8,000/mo</div>
+            <div class="meta-sub">Twilio + Gemini Flash. Near zero per transaction.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">POS operators, retailers, supermarkets</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">3 days</div>
+            <div class="meta-sub">Webhook → DB → report loop is simple</div>
+          </div>
+        </div>
+        <div class="win-block">Why it wins: Replaces a ₦60K/month bookkeeper. ROI on day one. Every POS business in Lagos has this problem and zero automated solution exists.</div>
+      </div>
+    </div>
+
+    <!-- 02 RENT COLLECTOR -->
+    <div class="product-card">
+      <div class="accent orange"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Rent Collector</div>
+          <div class="card-tagline">Never chase a tenant again.</div>
+        </div>
+        <div class="margin-badge">87% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigeria has 10M+ rental properties. Landlords chase tenants via personal WhatsApp — awkward, slow, and often ignored. No system exists. No receipts. No audit trail.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Landlord adds tenant name, phone, rent amount, and due date to dashboard</span></div>
+          <div class="step"><span class="num">02</span><span>30 days before: Gemini writes warm reminder → Twilio sends WhatsApp with payment link</span></div>
+          <div class="step"><span class="num">03</span><span>7 days before: firmer message. Due date: formal notice with <span class="highlight">Paystack payment link</span></span></div>
+          <div class="step"><span class="num">04</span><span>Paystack webhook fires on payment → <span class="highlight">auto-receipt generated as PDF</span> → WhatsApp to tenant + landlord</span></div>
+          <div class="step"><span class="num">05</span><span>Overdue: escalating sequence → final legal notice template at 30 days overdue</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Paystack</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">WeasyPrint (PDF)</span>
+          <span class="stack-tag">FastAPI</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦15K–₦40K/mo individual</div>
+            <div class="meta-sub">₦150K/mo for property management companies (portfolio)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦5,000/mo</div>
+            <div class="meta-sub">Twilio SMS + Gemini Flash. Very low per message.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Landlords (3–20 properties), estate management companies</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">3 days</div>
+          </div>
+        </div>
+        <div class="win-block">Why it wins: Zero competition. Problem is universal across every income class. Property managers managing 50+ units will pay ₦150K without hesitation to eliminate their most painful monthly task.</div>
+      </div>
+    </div>
+
+    <!-- 03 INVOICE CHASER -->
+    <div class="product-card">
+      <div class="accent orange"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Invoice Chaser</div>
+          <div class="card-tagline">Get paid. Without the awkward conversation.</div>
+        </div>
+        <div class="margin-badge">90% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian freelancers, designers, developers, and agencies get paid late constantly. Chasing payment feels unprofessional. Most let invoices go cold rather than follow up a 4th time.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Freelancer registers invoice: client name, phone, amount, due date, Paystack link</span></div>
+          <div class="step"><span class="num">02</span><span>Day 0: Gemini writes professional "invoice sent" message → Twilio delivers via WhatsApp</span></div>
+          <div class="step"><span class="num">03</span><span>Due date: <span class="highlight">friendly reminder</span> with payment link embedded</span></div>
+          <div class="step"><span class="num">04</span><span>+3 days: firmer follow-up. +7 days: formal notice. +14 days: "final notice before escalation"</span></div>
+          <div class="step"><span class="num">05</span><span>Paystack webhook fires on payment → invoice marked paid → <span class="highlight">thank you receipt auto-sent</span></span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Paystack Webhooks</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦10,000/mo unlimited</div>
+            <div class="meta-sub">Or ₦500 per recovered invoice (performance model)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦3,000/mo</div>
+            <div class="meta-sub">Gemini Flash is near free. Twilio is ~₦8/SMS.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Designers, devs, consultants, agencies</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">2 days</div>
+          </div>
+        </div>
+        <div class="win-block">Why it wins: Massive addressable market. Every freelancer in Nigeria has been stiffed. The performance model (₦500/recovery) is frictionless to sell — pay only when you get paid.</div>
+      </div>
+    </div>
+
+    <!-- 04 CREDIT SCORING -->
+    <div class="product-card">
+      <div class="accent gold"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Behavioral Credit Scorer</div>
+          <div class="card-tagline">Credit scores without a credit bureau.</div>
+        </div>
+        <div class="margin-badge">95% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian banks reject 80% of loan applicants because credit history doesn't exist. Meanwhile, every Nigerian has 6+ months of behavioral data on their phone that tells a far more accurate story.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Applicant grants read access to transaction history via Paystack/Flutterwave data share</span></div>
+          <div class="step"><span class="num">02</span><span>Agent analyzes: airtime recharge frequency, bill payment timing, transaction velocity, merchant categories</span></div>
+          <div class="step"><span class="num">03</span><span>Claude Haiku generates <span class="highlight">Behavioral Credit Score (0–850)</span> with top 3 positive + negative signals</span></div>
+          <div class="step"><span class="num">04</span><span>Lender receives: score + risk band + recommended maximum loan amount + 90-day trend</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Paystack Data API</span>
+          <span class="stack-tag">Flutterwave API</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">FastAPI</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦2,000–₦5,000/query</div>
+            <div class="meta-sub">1,000 queries/month = ₦2M–₦5M revenue</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦100/query</div>
+            <div class="meta-sub">Claude Haiku is ₦0.25/M tokens. Each score = ~₦50–₦100.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">MFBs, Carbon, FairMoney, Renmoney, SACCOs</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">2 weeks</div>
+          </div>
+        </div>
+        <div class="win-block gold">Why it wins: CRC and FirstCentral credit bureau data is thin and expensive. Behavioral data is richer, cheaper, and you own the model. Fintechs will pay anything to reduce default rates.</div>
+      </div>
+    </div>
+
+    <!-- 05 TREASURY FX -->
+    <div class="product-card">
+      <div class="accent gold"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Treasury FX Alert System</div>
+          <div class="card-tagline">Your CFO's AI co-pilot for naira volatility.</div>
+        </div>
+        <div class="margin-badge">93% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian companies with import exposure lose millions when naira moves overnight. Treasury teams watch rates manually. One bad week can wipe out a quarter's margin.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Agent monitors: CBN official rate, NAFEM window rate, parallel market (every 30 mins)</span></div>
+          <div class="step"><span class="num">02</span><span>Rate moves &gt;1.5% in 4 hours → trigger alert pipeline</span></div>
+          <div class="step"><span class="num">03</span><span>Claude Haiku calculates impact on client's registered open FX positions</span></div>
+          <div class="step"><span class="num">04</span><span><span class="highlight">WhatsApp to CFO + treasury team:</span> "NGN weakened 2.1% in 3hrs. Your $500K payable due Friday now costs ₦8.2M more. Recommend hedging now."</span></div>
+          <div class="step"><span class="num">05</span><span>Weekly summary: net FX exposure, rate movement log, cost impact vs budget</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">CBN API / Scraper</span>
+          <span class="stack-tag">NAFEM Feed</span>
+          <span class="stack-tag">Parallel Market Scraper (Apify)</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">Twilio</span>
+          <span class="stack-tag">MongoDB</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦300K–₦1M/mo</div>
+            <div class="meta-sub">One alert that saves ₦8M sells the product forever.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦20,000/mo</div>
+            <div class="meta-sub">Apify scraping + Haiku inference. Low volume.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Importers, manufacturers, Dangote Group, Unilever Nigeria, any company with USD costs</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block gold">Why it wins: High-ticket buyer. The subscription cost is rounding error vs the exposure. No competitive product exists in Nigeria for mid-market companies.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 2: HIRING -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="hiring">
+  <div class="sector-header">
+    <span class="sector-label gold">Sector 02</span>
+    <h2 class="sector-title">Hiring &amp; Staffing</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 06 JOB SCREENER -->
+    <div class="product-card">
+      <div class="accent gold"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">WhatsApp Job Screener</div>
+          <div class="card-tagline">Interview 200 candidates. Without reading 200 CVs.</div>
+        </div>
+        <div class="margin-badge">92% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian SMEs post jobs on LinkedIn or Jobberman and get flooded with 200+ CVs they never read. Most hiring happens via referral because screening is too painful. Jobberman charges ₦100K+ per listing with zero screening.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Company posts job → you give them a dedicated WhatsApp number for applicants</span></div>
+          <div class="step"><span class="num">02</span><span>Candidate texts in → agent responds: "Thanks! I'll ask you a few quick questions."</span></div>
+          <div class="step"><span class="num">03</span><span>Agent asks 5 role-specific questions (experience, tools, availability, salary expectation, scenario question)</span></div>
+          <div class="step"><span class="num">04</span><span>Gemini Flash scores each answer 1–10 against the job criteria stored in MongoDB</span></div>
+          <div class="step"><span class="num">05</span><span><span class="highlight">Top 10 shortlist</span> delivered to hiring manager with scores + answer summaries</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">FastAPI</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦50K per job posting</div>
+            <div class="meta-sub">₦150K/mo unlimited postings</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦5,000/mo</div>
+            <div class="meta-sub">Gemini Flash is cheap even at 1,000 interviews/mo</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Any company hiring 5+ people/year. Schools, hospitals, logistics firms</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block gold">Why it wins: Jobberman charges ₦100K per listing with zero screening included. You charge ₦50K and deliver a ranked shortlist of 10. The value is obvious.</div>
+      </div>
+    </div>
+
+    <!-- 07 ATTENDANCE AUDITOR -->
+    <div class="product-card">
+      <div class="accent gold"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Staff Attendance Auditor</div>
+          <div class="card-tagline">Ghost workers cost Nigerian companies billions. Stop them.</div>
+        </div>
+        <div class="margin-badge">99% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Construction sites, factories, and schools track attendance on paper registers that get falsified. Ghost workers — employees on payroll who don't show up — cost Nigerian companies billions annually.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Staff opens WhatsApp and sends a selfie at clock-in time</span></div>
+          <div class="step"><span class="num">02</span><span>Gemini Vision verifies: is it a real live photo (not a screenshot)? Is it the registered face?</span></div>
+          <div class="step"><span class="num">03</span><span>Location check: is the phone within the geofenced site boundary? (GPS metadata)</span></div>
+          <div class="step"><span class="num">04</span><span>MongoDB logs: employee, timestamp, location, photo hash</span></div>
+          <div class="step"><span class="num">05</span><span>Friday 5pm: <span class="highlight">payroll-ready report</span> — hours per person, late arrivals, absences flagged</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Gemini Flash Vision</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">GPS Metadata Parser</span>
+          <span class="stack-tag">WeasyPrint (PDF report)</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦5,000/employee/mo</div>
+            <div class="meta-sub">Company with 50 staff = ₦250K/mo</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦50/employee/mo</div>
+            <div class="meta-sub">Gemini Vision is near-free per image. Margin is extraordinary.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Construction firms, factories, schools, security companies</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">5 days</div>
+          </div>
+        </div>
+        <div class="win-block gold">Why it wins: 99% margin. Physical presence verification via phone — no hardware needed. A 50-person construction firm paying ₦250K/month is saving millions in ghost payroll.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 3: DOCUMENTS -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="docs">
+  <div class="sector-header">
+    <span class="sector-label orange">Sector 03</span>
+    <h2 class="sector-title">Document Hell</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 09 CONTRACT REVIEW -->
+    <div class="product-card">
+      <div class="accent orange"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Contract Review for SMEs</div>
+          <div class="card-tagline">A lawyer in your pocket. At ₦100 not ₦100,000.</div>
+        </div>
+        <div class="margin-badge">98% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">A lawyer in Lagos charges ₦50K–₦200K to review a simple vendor contract. Most SMEs sign without reading. They get burned on unlimited liability clauses, IP assignments, and no-exit terms.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Client uploads contract PDF via WhatsApp or web upload</span></div>
+          <div class="step"><span class="num">02</span><span>Reducto extracts clean text preserving clause structure and numbering</span></div>
+          <div class="step"><span class="num">03</span><span>Claude Sonnet reviews against 20 Nigerian-specific risk flags:<br/>— Unlimited indemnity · No dispute resolution · Weak IP assignment · One-sided termination · No payment terms · Missing FIRS compliance</span></div>
+          <div class="step"><span class="num">04</span><span><span class="highlight">Risk report in plain English</span> via WhatsApp in under 5 minutes: Red (fix before signing) / Yellow (negotiate) / Green (safe)</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Reducto (PDF extraction)</span>
+          <span class="stack-tag">Claude Sonnet</span>
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">FastAPI</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦5,000 per contract</div>
+            <div class="meta-sub">₦25,000/mo unlimited. Law firms: ₦100K/mo white-label.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦100 per contract</div>
+            <div class="meta-sub">Claude Sonnet + Reducto. Even 100 contracts/mo = ₦10K cost.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Startups, SMEs, freelancers, real estate buyers</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">3 days</div>
+          </div>
+        </div>
+        <div class="win-block">Why it wins: 98% margin at ₦5K price point. Accessible to every SME. A single "you should have read clause 14" moment sells the subscription for life.</div>
+      </div>
+    </div>
+
+    <!-- 10 CAC PREPARER -->
+    <div class="product-card">
+      <div class="accent orange"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">CAC Document Preparer</div>
+          <div class="card-tagline">Business registration paperwork. Done in 10 minutes.</div>
+        </div>
+        <div class="margin-badge">99% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Registering a business in Nigeria requires specific legal documents in specific formats. Most people pay CAC "agents" ₦50K–₦150K for paperwork that should cost ₦5K and take 10 minutes.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>User answers 10 questions via WhatsApp: company name, type (Ltd/BN/NGO), directors, address, share structure</span></div>
+          <div class="step"><span class="num">02</span><span>Claude Haiku generates all required documents in proper legal format:<br/>— Memorandum of Association · Articles of Association · Particulars of Directors (CAC Form 2) · Statement of Share Capital</span></div>
+          <div class="step"><span class="num">03</span><span>WeasyPrint renders as <span class="highlight">ready-to-submit PDFs</span></span></div>
+          <div class="step"><span class="num">04</span><span>Delivered to user's WhatsApp + email within 5 minutes of final question</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">WeasyPrint</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Cloudflare R2 (file storage)</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦15,000 flat per registration</div>
+            <div class="meta-sub">50 jobs/month = ₦750K revenue. API cost: ₦10K.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦200 per job</div>
+            <div class="meta-sub">Claude Haiku is the cheapest model that handles this perfectly.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">New entrepreneurs, market women going formal, diaspora registering Nigeria businesses</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">2 days</div>
+          </div>
+        </div>
+        <div class="win-block">Why it wins: ₦14,800 margin per transaction. No subscription friction — one-time purchase. Diaspora clients especially: they'll pay in dollars for this convenience.</div>
+      </div>
+    </div>
+
+    <!-- 11 FIRS -->
+    <div class="product-card">
+      <div class="accent orange"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">FIRS Tax Filing Assistant</div>
+          <div class="card-tagline">VAT returns without an accountant.</div>
+        </div>
+        <div class="margin-badge">85% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">FIRS returns are confusing. Accountants charge ₦50K+ for basic monthly VAT returns. Most Nigerian SMEs file late, file wrong, or don't file at all — racking up penalties.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Client uploads month's receipts + invoices via WhatsApp (photos, PDFs, or CSV)</span></div>
+          <div class="step"><span class="num">02</span><span>Reducto + Gemini Flash extract: vendor name, amount, date, VAT portion</span></div>
+          <div class="step"><span class="num">03</span><span>Claude calculates: output VAT (on sales) minus input VAT (on purchases) = <span class="highlight">net VAT payable</span></span></div>
+          <div class="step"><span class="num">04</span><span>Generates pre-filled FIRS VAT return form + payment reference</span></div>
+          <div class="step"><span class="num">05</span><span>WhatsApp reminder 7 days before filing deadline with "ready to file" confirmation</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Reducto</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">Twilio</span>
+          <span class="stack-tag">WeasyPrint</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦20,000/mo</div>
+            <div class="meta-sub">Replaces a ₦50K/mo accountant for basic compliance.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦3,000/mo</div>
+            <div class="meta-sub">Reducto + Gemini Flash for document parsing. Very low.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">SMEs with monthly turnover under ₦50M. Sweet spot nobody serves.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block">Why it wins: FIRS penalties are real and painful. Every SME with a Paystack account should be filing monthly VAT. Most aren't. You solve the compliance anxiety.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 4: LOGISTICS -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="logistics">
+  <div class="sector-header">
+    <span class="sector-label green">Sector 04</span>
+    <h2 class="sector-title">Logistics &amp; Supply Chain</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 13 DISPATCH -->
+    <div class="product-card">
+      <div class="accent green"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Dispatch Coordinator</div>
+          <div class="card-tagline">Manage 10 riders from one WhatsApp number.</div>
+        </div>
+        <div class="margin-badge">90% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian courier companies manage dispatch via WhatsApp groups. Jobs get lost. Riders ghost clients. No tracking. No receipts. One coordinator burns out managing 10 riders on personal WhatsApp.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Customer texts order details: pickup address, dropoff, item description, preferred time</span></div>
+          <div class="step"><span class="num">02</span><span>Agent parses order → checks rider availability roster in MongoDB → <span class="highlight">auto-assigns nearest available rider</span></span></div>
+          <div class="step"><span class="num">03</span><span>Rider receives job details via WhatsApp → confirms acceptance</span></div>
+          <div class="step"><span class="num">04</span><span>Customer gets: rider name, ETA, tracking updates at pickup and dropoff</span></div>
+          <div class="step"><span class="num">05</span><span>Delivery confirmed → <span class="highlight">Paystack payment link</span> sent → receipt auto-generated</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Paystack</span>
+          <span class="stack-tag">Google Maps Distance API</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦80K–₦200K/mo</div>
+            <div class="meta-sub">Replaces 1 coordinator at ₦80K/mo salary + errors</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦15,000/mo</div>
+            <div class="meta-sub">Twilio + Gemini Flash + Google Maps. Well under ₦20K/mo.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Small courier companies, food delivery, e-commerce fulfillment</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block green">Why it wins: Replaces a full-time coordinator salary. Every small logistics company in Lagos has this exact problem. The ROI is immediate and obvious to the buyer.</div>
+      </div>
+    </div>
+
+    <!-- 16 COLD CHAIN -->
+    <div class="product-card">
+      <div class="accent green"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Cold Chain Compliance Monitor</div>
+          <div class="card-tagline">NAFDAC-ready temperature logs. Automatically.</div>
+        </div>
+        <div class="margin-badge">87% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Pharma distributors and vaccine cold chains must maintain temperature logs for NAFDAC compliance. Most use paper logs that get falsified. A single temperature breach on insulin or vaccines can mean product seizure and fines.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>IoT temperature sensors (ESP32 + SIM module, ~₦8K each) installed in cold storage units</span></div>
+          <div class="step"><span class="num">02</span><span>Sensors push readings every 15 minutes to Railway API endpoint</span></div>
+          <div class="step"><span class="num">03</span><span>Claude Haiku monitors: if temp breaches permitted range (e.g., 2°C–8°C for vaccines) → <span class="highlight">immediate WhatsApp alert</span> to pharmacist + manager</span></div>
+          <div class="step"><span class="num">04</span><span>Alert includes: current temp, duration of breach, affected products, recommended action</span></div>
+          <div class="step"><span class="num">05</span><span>Monthly: <span class="highlight">NAFDAC-grade PDF temperature log</span> auto-generated — ready for audit</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">ESP32 + SIM800 Hardware</span>
+          <span class="stack-tag">FastAPI (Railway)</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">Twilio</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">WeasyPrint</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦150K–₦400K/mo</div>
+            <div class="meta-sub">+ ₦8K per sensor (hardware upsell). Install 5 sensors per client = ₦40K hardware revenue.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦20,000/mo</div>
+            <div class="meta-sub">Very low. Mostly SIM data from sensors + Claude Haiku for alerts.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Pharma distributors, hospitals, vaccine cold chains, frozen food companies</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">2 weeks (includes hardware prototype)</div>
+          </div>
+        </div>
+        <div class="win-block green">Why it wins: NAFDAC fines for cold chain breach = product seizure. The subscription cost is nothing vs the downside. You also sell hardware — a second revenue stream per client.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 5: EDUCATION -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="education">
+  <div class="sector-header">
+    <span class="sector-label cyan">Sector 05</span>
+    <h2 class="sector-title">Education</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 17 SCHOOL FEE -->
+    <div class="product-card">
+      <div class="accent cyan"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">School Fee Reminder &amp; Receipt System</div>
+          <div class="card-tagline">Every private school's bursar problem. Solved.</div>
+        </div>
+        <div class="margin-badge">90% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Every private school in Nigeria has a bursar chasing parents on personal WhatsApp. Unprofessional, time-consuming, embarrassing for both sides. No receipts. No audit trail. End-of-term reconciliation is chaos. Lagos alone has 20,000+ private schools.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>School uploads: student list, parent phone numbers, fee structure, term dates</span></div>
+          <div class="step"><span class="num">02</span><span>4 weeks before deadline: "Term fees reminder" WhatsApp to each parent — personalized with child's name and exact amount due</span></div>
+          <div class="step"><span class="num">03</span><span>2 weeks: follow-up. 1 week: final reminder with <span class="highlight">Paystack payment link</span></span></div>
+          <div class="step"><span class="num">04</span><span>Payment confirmed via Paystack webhook → <span class="highlight">PDF receipt auto-generated</span> → WhatsApp to parent instantly</span></div>
+          <div class="step"><span class="num">05</span><span>Bursar dashboard: who has paid, who hasn't, outstanding by class, weekly summary report</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Paystack Webhooks</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">WeasyPrint</span>
+          <span class="stack-tag">FastAPI</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦50,000/mo per school</div>
+            <div class="meta-sub">20 schools = ₦1M MRR. Same codebase, zero rebuild.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦5,000/mo per school</div>
+            <div class="meta-sub">WhatsApp messages + Paystack (free webhooks). Very low.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Private schools (20,000+ in Lagos). Also lesson centers, after-school programs, universities</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">5 days</div>
+          </div>
+        </div>
+        <div class="win-block cyan">Why it wins: Zero competition. Clear decision maker (proprietor or bursar). Easy to demo. Paystack integration provides visible, immediate proof of value. Scales to every school in Nigeria with the same deploy.</div>
+      </div>
+    </div>
+
+    <!-- 20 JAMB PREP -->
+    <div class="product-card">
+      <div class="accent cyan"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">JAMB/WAEC Prep Agent</div>
+          <div class="card-tagline">5M students write JAMB every year. Help them pass.</div>
+        </div>
+        <div class="margin-badge">93% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">5 million students write JAMB annually. Most can't afford private tutors. They study from outdated textbooks with no feedback system. WAEC failure rates exceed 60% in core subjects. Parents spend ₦50K–₦200K on tutorials that barely work.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Student registers: subjects, target school, exam date → enters study schedule</span></div>
+          <div class="step"><span class="num">02</span><span>Daily: agent sends 10 past questions via WhatsApp for their weakest subject</span></div>
+          <div class="step"><span class="num">03</span><span>Student answers → agent checks → <span class="highlight">explains wrong answers in plain Nigerian English</span> (not textbook language)</span></div>
+          <div class="step"><span class="num">04</span><span>MongoDB tracks performance per topic → agent adjusts daily questions to focus on gaps</span></div>
+          <div class="step"><span class="num">05</span><span>Weekly report to parent: progress score, weak areas, predicted readiness for exam date</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">MongoDB (past questions DB)</span>
+          <span class="stack-tag">Paystack (subscription)</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦3,000/mo per student</div>
+            <div class="meta-sub">₦5,000/mo family plan. 1,000 students = ₦3M MRR.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦200/student/mo</div>
+            <div class="meta-sub">Claude Haiku at scale is extremely cheap per explanation.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">SS2/SS3 students, parents of exam candidates</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week (after sourcing past questions DB)</div>
+          </div>
+        </div>
+        <div class="win-block cyan">Why it wins: 5M students sit JAMB every year. Consumer product that scales to millions. No tutor, no classroom, no scheduling — just WhatsApp. Parents will pay ₦3K/month without hesitation if their child is improving.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 6: HEALTHCARE -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="health">
+  <div class="sector-header">
+    <span class="sector-label green">Sector 06</span>
+    <h2 class="sector-title">Healthcare</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 23 INSURANCE CLAIMS -->
+    <div class="product-card">
+      <div class="accent green"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Insurance Claims Pre-Processor</div>
+          <div class="card-tagline">Cut claims processing from 3 months to 3 days.</div>
+        </div>
+        <div class="margin-badge">90% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian insurance companies take 3–6 months to process claims. Adjusters are overwhelmed with paperwork. Fraudulent claims cost the industry billions annually. Legitimate claimants give up before getting paid.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Claimant submits via WhatsApp: incident photos, description, police report (if applicable), policy number</span></div>
+          <div class="step"><span class="num">02</span><span>Gemini Vision analyzes damage photos: is damage consistent with claimed incident? What's the estimated repair cost range?</span></div>
+          <div class="step"><span class="num">03</span><span>Reducto extracts policy terms → Claude cross-references: coverage limits, exclusions, deductibles</span></div>
+          <div class="step"><span class="num">04</span><span><span class="highlight">Fraud score generated (0–100)</span>: flags inconsistencies between photos, description, and claim history</span></div>
+          <div class="step"><span class="num">05</span><span>Adjuster receives pre-processed file: fraud score, damage estimate, policy match, recommended payout range. 15-min sign-off vs 2-hour manual review.</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Gemini Flash Vision</span>
+          <span class="stack-tag">Claude Sonnet</span>
+          <span class="stack-tag">Reducto</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Twilio</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦500K–₦2M/mo enterprise</div>
+            <div class="meta-sub">Or ₦2K–₦5K per claim processed. At 500 claims/mo: ₦1M–₦2.5M.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦50,000/mo</div>
+            <div class="meta-sub">Gemini Vision + Claude Sonnet per claim. Still 90%+ margin.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Leadway Assurance, AXA Mansard, Aiico Insurance, Custodian Investment</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">3 weeks</div>
+          </div>
+        </div>
+        <div class="win-block green">Why it wins: Enterprise buyer with budget. Reduces claims processing cost by 60%. Even at ₦500K/mo, the insurer saves far more in adjuster time and fraud losses. This is a ₦10M+/year contract waiting to happen.</div>
+      </div>
+    </div>
+
+    <!-- 21 CLINIC -->
+    <div class="product-card">
+      <div class="accent green"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Clinic Appointment System</div>
+          <div class="card-tagline">No-shows cost clinics 30% of revenue. Fix it.</div>
+        </div>
+        <div class="margin-badge">89% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian private clinics run on paper appointment books. Patients forget. No-shows are 30–40%. Receptionist spends 2 hours a day calling to confirm appointments. Clinics lose ₦50K–₦200K monthly to preventable no-shows.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Patient WhatsApps clinic number to book → agent asks: doctor, date preference, reason for visit</span></div>
+          <div class="step"><span class="num">02</span><span>Agent checks doctor availability from Google Sheets schedule → confirms slot → books in MongoDB</span></div>
+          <div class="step"><span class="num">03</span><span>24 hours before: <span class="highlight">automatic reminder</span> with "Reply 1 to confirm, 2 to reschedule"</span></div>
+          <div class="step"><span class="num">04</span><span>2 hours before: final reminder</span></div>
+          <div class="step"><span class="num">05</span><span>No-show: follow-up message 30 minutes after scheduled time → offer reschedule</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Google Sheets API</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦40,000–₦80,000/mo</div>
+            <div class="meta-sub">₦30K setup. Replaces receptionist phone-call time entirely.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦8,000/mo</div>
+            <div class="meta-sub">Low message volume. WhatsApp + Gemini Flash cheap at clinic scale.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Private clinics, dentists, physiotherapists, opticians, specialist practices</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block green">Why it wins: 30% no-show reduction = direct revenue recovery for the clinic. The subscription pays for itself in week one. Infinite repeatable clients across every state in Nigeria.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 7: REAL ESTATE -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="realestate">
+  <div class="sector-header">
+    <span class="sector-label orange">Sector 07</span>
+    <h2 class="sector-title">Real Estate</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 25 TENANT SCREENER -->
+    <div class="product-card">
+      <div class="accent orange"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Tenant Background Screener</div>
+          <div class="card-tagline">Know who you're renting to. Before they move in.</div>
+        </div>
+        <div class="margin-badge">97% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Lagos landlords get burned by bad tenants constantly — bounced cheques, property damage, disappearing without notice. There's no credit bureau or tenant history system in Nigeria. Landlords rely on gut feeling.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Prospective tenant WhatsApps their details: name, NIN, employer, current address, previous landlord contact</span></div>
+          <div class="step"><span class="num">02</span><span>Agent interviews via WhatsApp: employment stability, monthly income, reason for moving, duration of last tenancy</span></div>
+          <div class="step"><span class="num">03</span><span>Employer verified: Google Maps confirms company exists + is active at stated address</span></div>
+          <div class="step"><span class="num">04</span><span>Claude scores application: <span class="highlight">Risk Level (Low/Medium/High)</span> + reasoning + red flags</span></div>
+          <div class="step"><span class="num">05</span><span>Landlord receives: structured 1-page PDF report with score, signals, and recommended action</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">Google Maps API</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">WeasyPrint</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦5,000–₦10,000 per screen</div>
+            <div class="meta-sub">High volume: estate agents do 20+ screens/month. ₦100K–₦200K/mo for agencies.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦150 per screening</div>
+            <div class="meta-sub">Claude Haiku + Google Maps. Extraordinary margin per transaction.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Landlords, property management companies, estate agents</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">3 days</div>
+          </div>
+        </div>
+        <div class="win-block">Why it wins: 97% margin. Zero infrastructure needed beyond existing stack. Every landlord with a bad tenant experience is your customer. No comparable service exists in Nigeria.</div>
+      </div>
+    </div>
+
+    <!-- 26 LISTING SYNDICATOR -->
+    <div class="product-card">
+      <div class="accent orange"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Property Listing Syndicator</div>
+          <div class="card-tagline">List once. Appear everywhere.</div>
+        </div>
+        <div class="margin-badge">80% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian estate agents list on their WhatsApp status, then manually copy to PropertyPro, Private Property, and Jiji one by one. 3 hours per listing. Most agents only list on 1–2 platforms because it's too painful.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Agent sends property photos + voice note/text description via WhatsApp</span></div>
+          <div class="step"><span class="num">02</span><span>Gemini Vision extracts property features from photos: bedrooms, parking, pool, condition</span></div>
+          <div class="step"><span class="num">03</span><span>Claude writes <span class="highlight">professional listing copy</span> in PropertyPro/Jiji format with SEO keywords</span></div>
+          <div class="step"><span class="num">04</span><span>Auto-posts to: PropertyPro API + Jiji API + generates shareable HTML flyer (WhatsApp-optimized)</span></div>
+          <div class="step"><span class="num">05</span><span>Agent's WhatsApp broadcast list receives the flyer automatically</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Gemini Flash Vision</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">PropertyPro API</span>
+          <span class="stack-tag">Jiji API</span>
+          <span class="stack-tag">Apify</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦15,000/mo unlimited listings</div>
+            <div class="meta-sub">Lagos has 50,000+ active estate agents. Even 500 clients = ₦7.5M MRR.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦3,000/mo</div>
+            <div class="meta-sub">Gemini Vision + Claude Haiku. Near zero per listing at ₦15K price.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Individual estate agents, real estate agencies</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block">Why it wins: 50,000 estate agents in Lagos. ₦12K net margin per agent. The market is enormous and the pain is daily. Scale this to Abuja and PH with zero code changes.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 8: ENERGY -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="energy">
+  <div class="sector-header">
+    <span class="sector-label gold">Sector 08</span>
+    <h2 class="sector-title">Oil, Gas &amp; Energy</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 27 DIESEL -->
+    <div class="product-card">
+      <div class="accent gold"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Diesel Price Arbitrage Scout</div>
+          <div class="card-tagline">Find the cheapest diesel in Lagos before you drive to the wrong depot.</div>
+        </div>
+        <div class="margin-badge">93% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Every generator-dependent business buys diesel — hospitals, hotels, data centers, factories, estates. Price varies by ₦50–₦150/litre across Lagos depots daily. Nobody tracks this. A 10,000L order at the wrong depot wastes ₦1.3M.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Agent scrapes or calls 20 Lagos depot price feeds every morning at 7am</span></div>
+          <div class="step"><span class="num">02</span><span>Prices stored in MongoDB with depot name, location, stock availability</span></div>
+          <div class="step"><span class="num">03</span><span>8am WhatsApp to client: <span class="highlight">"Cheapest diesel today: XYZ depot, Apapa — ₦1,180/L. Your usual supplier: ₦1,310/L. On your 10,000L order = ₦1.3M savings."</span></span></div>
+          <div class="step"><span class="num">04</span><span>Client logs actual purchase → agent tracks: total savings delivered this month (proof of ROI)</span></div>
+          <div class="step"><span class="num">05</span><span>Monthly: price trend report — best times to bulk buy based on 90-day patterns</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Apify (depot scraper)</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦150,000–₦400,000/mo</div>
+            <div class="meta-sub">One day of savings pays for the entire subscription. Hospitals will pay without hesitation.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦10,000/mo</div>
+            <div class="meta-sub">Apify scraping + Gemini Flash + Twilio. Very low at this price point.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Hospitals, hotels, data centers, manufacturing plants, large estates</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block gold">Why it wins: Every large building in Lagos runs on diesel. The ROI is immediate and measurable. ₦1.3M saved on first order = client locked in forever.</div>
+      </div>
+    </div>
+
+    <!-- 28 NNPC TENDER -->
+    <div class="product-card">
+      <div class="accent gold"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">NNPC Tender Intelligence</div>
+          <div class="card-tagline">Never miss an oil &amp; gas contract opportunity again.</div>
+        </div>
+        <div class="margin-badge">94% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Oil & gas companies miss tender opportunities because NNPC, NAPIMS, and IOC procurement notices are scattered across portals, emails, and newspaper insertions. A ₦200M contract opportunity expires while the BD team is unaware.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Agent monitors daily: NNPC procurement portal, DPR/NUPRC notices, Vanguard/ThisDay tender bulletins, Shell/TotalEnergies/Chevron supplier portals</span></div>
+          <div class="step"><span class="num">02</span><span>Firecrawl + Apify extract: tender title, scope of work, deadline, estimated contract value, eligibility criteria</span></div>
+          <div class="step"><span class="num">03</span><span>Claude matches against client's registered service categories and certifications in MongoDB</span></div>
+          <div class="step"><span class="num">04</span><span>Match found → <span class="highlight">WhatsApp alert within 2 hours of publication:</span> "New tender: Shell SPDC — Marine Fabrication Works. Deadline: April 15. Est. value: $2M. You qualify (DPR-certified fabricator). Scope brief attached."</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Firecrawl</span>
+          <span class="stack-tag">Apify</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦500K–₦2M/mo</div>
+            <div class="meta-sub">Missing one $500K contract is worse than any annual subscription cost.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦30,000/mo</div>
+            <div class="meta-sub">Firecrawl + Apify + Claude Haiku. High margin even at ₦500K/mo.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Engineering firms, fabricators, logistics contractors, security companies in O&G</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">2 weeks</div>
+          </div>
+        </div>
+        <div class="win-block gold">Why it wins: High-ticket B2B buyer. One contract won from your alert = 5 years of subscription paid. Nobody currently offers automated tender monitoring for the Nigerian O&G sector.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 9: LEGAL & COMPLIANCE -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="legal">
+  <div class="sector-header">
+    <span class="sector-label gold">Sector 09</span>
+    <h2 class="sector-title">Legal &amp; Compliance</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 30 COURT CAUSE LIST -->
+    <div class="product-card">
+      <div class="accent gold"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Court Cause List Monitor</div>
+          <div class="card-tagline">Never miss a court date again.</div>
+        </div>
+        <div class="margin-badge">92% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian lawyers and their clients miss court dates because cause lists change without notice — matters get adjourned, rescheduled, or struck out overnight. Bench warrants get issued. Cases go cold. Clients lose faith. Currently no automated monitoring exists.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Law firm registers their active case numbers + court divisions (Lagos, Abuja, FHC)</span></div>
+          <div class="step"><span class="num">02</span><span>Agent scrapes Federal High Court and State High Court cause lists every night at 11pm</span></div>
+          <div class="step"><span class="num">03</span><span>Cross-references against firm's active case list</span></div>
+          <div class="step"><span class="num">04</span><span>Match found → <span class="highlight">48-hour alert:</span> "Your matter FHC/L/CS/1234/24 is listed for Tuesday, Court 7, Justice Omotosho. 9am."</span></div>
+          <div class="step"><span class="num">05</span><span>24-hour reminder. If matter struck out or adjourned: immediate notification with new date</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Apify (court scraper)</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦80,000–₦200,000/mo per firm</div>
+            <div class="meta-sub">Tiered by number of active matters. A missed hearing costs far more than any subscription.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦8,000/mo</div>
+            <div class="meta-sub">Apify scraping + Gemini Flash for parsing. Very low volume.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Law firms, in-house legal departments, corporate secretaries</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block gold">Why it wins: Zero competition. Problem is universal across every law firm. A bench warrant or struck-out case from a missed hearing is catastrophic. This sells itself on the first demo.</div>
+      </div>
+    </div>
+
+    <!-- 31 CORPORATE GOVERNANCE -->
+    <div class="product-card">
+      <div class="accent gold"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Corporate Governance Deadline Tracker</div>
+          <div class="card-tagline">Never pay a CAC or FIRS late-filing penalty again.</div>
+        </div>
+        <div class="margin-badge">95% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Companies listed on NGX or with CAC obligations miss statutory filing deadlines constantly. FIRS penalties are ₦500K–₦5M per breach. Company secretaries manage this with personal calendars and Excel — critical deadlines fall through the cracks.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Client registers: company type, fiscal year end, board composition, regulatory bodies</span></div>
+          <div class="step"><span class="num">02</span><span>Claude Haiku maps all statutory deadlines: CAC annual returns, FIRS corporate tax, NGX quarterly reports, AMCON compliance, PENCOM remittances, NESREA environmental returns</span></div>
+          <div class="step"><span class="num">03</span><span>Rolling 90-day compliance calendar generated in MongoDB</span></div>
+          <div class="step"><span class="num">04</span><span><span class="highlight">WhatsApp alerts:</span> 30 days, 14 days, 7 days, 48 hours before each deadline → with document templates and filing instructions</span></div>
+          <div class="step"><span class="num">05</span><span>Completed filing logged → audit trail report for board/auditors</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">WeasyPrint</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦200,000–₦500,000/mo</div>
+            <div class="meta-sub">The fine for one missed deadline pays for 2 years of subscription.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦10,000/mo</div>
+            <div class="meta-sub">Claude Haiku + Twilio. Very low volume. 95%+ margin at any tier.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">NGX-listed companies, large SMEs, group holding companies, banks</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">2 weeks</div>
+          </div>
+        </div>
+        <div class="win-block gold">Why it wins: Fear-driven purchase. One penalty avoidance sells the product forever. Company secretaries at large firms will champion this internally. High-trust, sticky product — clients never churn.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 10: MEDIA -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="media">
+  <div class="sector-header">
+    <span class="sector-label cyan">Sector 10</span>
+    <h2 class="sector-title">Media &amp; Telecoms</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 32 INFLUENCER FRAUD -->
+    <div class="product-card">
+      <div class="accent cyan"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Influencer Fraud Detector</div>
+          <div class="card-tagline">Know if you're paying for real humans or bots.</div>
+        </div>
+        <div class="margin-badge">96% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian brands spend ₦5M–₦50M on influencer campaigns. 30–60% of follower counts on Instagram are fake. No agency does verification before recommending. Brands routinely pay ₦3M for "500K followers" where real Nigerian reach is under 80K.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Brand submits influencer Instagram handle + proposed fee</span></div>
+          <div class="step"><span class="num">02</span><span>Apify scrapes: follower count + growth history, engagement rate, last 20 post performance, comment sample</span></div>
+          <div class="step"><span class="num">03</span><span>Gemini Flash analyzes comments: genuine vs bot (bot = generic emojis, repeated phrases, foreign accounts)</span></div>
+          <div class="step"><span class="num">04</span><span>Claude calculates: <span class="highlight">Authenticity Score (0–100)</span> + real Nigerian audience estimate + engagement quality grade</span></div>
+          <div class="step"><span class="num">05</span><span>Report delivered: "This influencer's 500K followers: 34% estimated fake. Real Nigerian reach: ~180K. Fair value: ₦800K not ₦3M."</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Apify (Instagram scraper)</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">WeasyPrint</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦50,000 per report</div>
+            <div class="meta-sub">₦500,000/mo unlimited for agencies. One saved bad deal pays for a year.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦2,000 per report</div>
+            <div class="meta-sub">Apify scraping + Gemini Flash + Claude Haiku. 96% margin at ₦50K.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Marketing agencies, brand managers, PR firms, FMCG companies</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block cyan">Why it wins: Every marketing agency in Lagos has been burned by fake influencer metrics. Per-report pricing means no subscription friction — first sale is easy. Agencies will use it on every campaign.</div>
+      </div>
+    </div>
+
+    <!-- 41 MORNING BRIEF -->
+    <div class="product-card">
+      <div class="accent cyan"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Nigerian Business Morning Brief</div>
+          <div class="card-tagline">The news that matters for your business. On WhatsApp at 6am.</div>
+        </div>
+        <div class="margin-badge">85% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian business owners don't read newsletters. They're too long, too generic, and arrive by email which nobody checks before 10am. But they read WhatsApp at 6am. The intelligence exists — it's just not delivered in the right format.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Agent runs at 5:30am daily: Firecrawl scrapes Nairametrics, BusinessDay, Stears, Punch Business, CBN press releases</span></div>
+          <div class="step"><span class="num">02</span><span>Gemini Flash deduplicates and ranks stories by business impact</span></div>
+          <div class="step"><span class="num">03</span><span>Claude writes <span class="highlight">5-story brief in plain, direct English</span> (not journalist English) → relevant to subscriber's chosen sector</span></div>
+          <div class="step"><span class="num">04</span><span>6am: WhatsApp broadcast to all subscribers</span></div>
+          <div class="step"><span class="num">05</span><span>At 5,000 subscribers: sell <span class="highlight">sponsored brief slots</span> at ₦500K–₦2M per brand per month</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Firecrawl</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">Twilio WhatsApp Broadcast</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦5,000/mo per subscriber</div>
+            <div class="meta-sub">5,000 subscribers = ₦25M MRR. + sponsorship revenue on top.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦30,000/mo fixed</div>
+            <div class="meta-sub">Firecrawl + Gemini Flash + Twilio. Same cost whether 100 or 10,000 subscribers.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Entrepreneurs, investors, business professionals (B2C subscription)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block cyan">Why it wins: This is media, not software — different ceiling. Fixed API cost at scale. At 5,000 subscribers: ₦25M MRR subscriber revenue + ₦5M+ sponsorship = ₦30M/mo from one WhatsApp broadcast. This is the highest-leverage product in this catalog.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 11: GOVERNMENT -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="govt">
+  <div class="sector-header">
+    <span class="sector-label green">Sector 11</span>
+    <h2 class="sector-title">Government &amp; Public Sector</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 34 IGR -->
+    <div class="product-card">
+      <div class="accent green"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">IGR Optimizer</div>
+          <div class="card-tagline">Help state governments collect what they're already owed.</div>
+        </div>
+        <div class="margin-badge">96% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian state governments have hundreds of thousands of registered taxpayers who never receive follow-up. LIRS collected ₦600B in 2023 — analysts estimate 30–40% more is collectible with better follow-up infrastructure. The gap is pure revenue leakage.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Agent ingests: taxpayer register, prior year payment history, current year assessments</span></div>
+          <div class="step"><span class="num">02</span><span>Claude segments taxpayers: likely to pay quickly vs needs multiple touches vs hardcases</span></div>
+          <div class="step"><span class="num">03</span><span>Gemini Flash generates personalized SMS/WhatsApp per segment — different tone for each risk band</span></div>
+          <div class="step"><span class="num">04</span><span>Payment link (state tax portal) embedded in every message</span></div>
+          <div class="step"><span class="num">05</span><span>Daily dashboard: collection rate by LGA, outstanding by sector, <span class="highlight">projected revenue vs target</span></span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Twilio SMS + WhatsApp</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">State Tax Portal API</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦5M–₦20M/mo</div>
+            <div class="meta-sub">Or performance: 0.5–1% of incremental revenue collected. LIRS: even 0.5% of ₦200B incremental = ₦1B/yr fee.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦200,000/mo</div>
+            <div class="meta-sub">High message volume but still 96%+ margin at ₦5M/mo.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">LIRS (Lagos), KIRS (Kano), RIRS (Rivers), FCT-IRS, all 36 state revenue services</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">6 weeks (procurement cycle is long — build while pitching)</div>
+          </div>
+        </div>
+        <div class="win-block green">Why it wins: Government has the budget. A 5% improvement in LIRS collection = ₦30B additional revenue. They'll pay ₦500M/year for infrastructure that delivers ₦30B. This is a ₦100M+ contract if you land one state.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 12: AGRICULTURE -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="agric">
+  <div class="sector-header">
+    <span class="sector-label green">Sector 12</span>
+    <h2 class="sector-title">Agriculture &amp; Commodities</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 36 COMMODITY INTEL -->
+    <div class="product-card">
+      <div class="accent green"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Commodity Price Intelligence</div>
+          <div class="card-tagline">Trade smarter. Know before the market moves.</div>
+        </div>
+        <div class="margin-badge">91% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian commodity traders move millions of naira daily based on price signals from phone calls and market visits. No systematic market intelligence exists. A trader who buys 1,000 bags of rice 2 weeks early saves ₦3M. Nobody is giving them that signal.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Agent monitors daily: AFEX commodity exchange prices, Kebbi/Kano/Benue state market reports, Mile 12 wholesale prices</span></div>
+          <div class="step"><span class="num">02</span><span>Cross-references: global prices (CBOT corn, palm oil futures), shipping indices, weather forecast for key farming states</span></div>
+          <div class="step"><span class="num">03</span><span>Claude synthesizes into actionable trade signal: <span class="highlight">"Dry spell forecast for Kano next 2 weeks. Onion prices likely up 15–20% by March 15. Current Mile 12 price: ₦45K/bag. Recommended: buy now, hold."</span></span></div>
+          <div class="step"><span class="num">04</span><span>6am WhatsApp brief to subscribers — 5 commodity signals per morning</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Firecrawl</span>
+          <span class="stack-tag">AFEX API</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">MongoDB</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦100,000–₦500,000/mo</div>
+            <div class="meta-sub">One correct trade call = subscription paid for a year. Flour Mills, Honeywell will pay ₦500K without hesitation.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦15,000/mo</div>
+            <div class="meta-sub">Firecrawl + Gemini Flash + Twilio. Very low at these price points.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Commodity traders, food manufacturers (Flour Mills, Honeywell), FMCG procurement teams</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">2 weeks</div>
+          </div>
+        </div>
+        <div class="win-block green">Why it wins: Trading intelligence is worth 10–100x the subscription cost to the right buyer. Nigerian food manufacturers have multi-billion naira procurement budgets. This product pays for itself on the first correct signal.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTOR 13: HIGH-END / META -->
+<!-- ═══════════════════════════════════════════ -->
+<section class="sector" id="highend">
+  <div class="sector-header">
+    <span class="sector-label cyan">Sector 13</span>
+    <h2 class="sector-title">High-End &amp; Meta Plays</h2>
+  </div>
+  <div class="product-grid">
+
+    <!-- 33 BROADCAST MONITORING -->
+    <div class="product-card">
+      <div class="accent cyan"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Broadcast Monitoring Agent</div>
+          <div class="card-tagline">Know when your brand is mentioned on TV or radio. Within 5 minutes.</div>
+        </div>
+        <div class="margin-badge">93% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">PR agencies in Nigeria have someone physically watching TV and listening to radio to catch brand mentions. 5-person monitoring teams cost ₦2M+/month. Mentions get missed. Response time to crises is hours, not minutes.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Deepgram transcribes Channels TV, TVC, AIT, and top radio stations in real-time (continuous audio stream)</span></div>
+          <div class="step"><span class="num">02</span><span>Claude Haiku monitors transcription stream for: brand names, competitor names, industry keywords, crisis signals</span></div>
+          <div class="step"><span class="num">03</span><span>Match detected → <span class="highlight">WhatsApp alert within 5 minutes:</span> "Channels TV just mentioned [Brand] at 7:34pm. Context: positive. Segment: economic news. Clip timestamp saved."</span></div>
+          <div class="step"><span class="num">04</span><span>All mentions logged to MongoDB with sentiment classification</span></div>
+          <div class="step"><span class="num">05</span><span>Monthly: share-of-voice report vs competitors, sentiment trend, crisis incident log</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Deepgram (real-time ASR)</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Railway</span>
+          <span class="stack-tag">WeasyPrint (monthly report)</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦1M–₦3M/mo enterprise</div>
+            <div class="meta-sub">Replaces a 5-person monitoring team at ₦2M+/mo. Obvious ROI.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦70,000/mo</div>
+            <div class="meta-sub">Deepgram: $0.0043/min. 24/7 monitoring of 3 channels = ~$450/mo = ₦700K. Still 93% margin at ₦1M.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">PR agencies (Quadrant MSL, Centrespread), large corporates (GTBank, MTN, Dangote)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">3 weeks</div>
+          </div>
+        </div>
+        <div class="win-block cyan">Why it wins: Replaces a human team. 5-minute alert vs same-day detection. PR agencies will pay ₦1M/mo without negotiation if you show them a demo catching a live mention. Enterprise sales — one client = ₦12M/yr.</div>
+      </div>
+    </div>
+
+    <!-- 43 WHATSAPP COMMERCE -->
+    <div class="product-card">
+      <div class="accent orange"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">WhatsApp Commerce Assistant</div>
+          <div class="card-tagline">Your AI sales rep. Working 24/7 on WhatsApp.</div>
+        </div>
+        <div class="margin-badge">87% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian fashion, food, and cosmetics vendors run their entire business on WhatsApp. One person managing the inbox — answering "how much?", "do you have my size?", "can I pay on delivery?" — 16 hours a day. Sales get missed when they're offline or asleep.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Vendor onboards: sends product photos + prices. Gemini Vision extracts product catalog into MongoDB.</span></div>
+          <div class="step"><span class="num">02</span><span>Customer messages business WhatsApp → AI handles all inbound: price enquiries, availability checks, size/color options</span></div>
+          <div class="step"><span class="num">03</span><span><span class="highlight">Order captured:</span> item, quantity, delivery address → order stored in MongoDB → Paystack payment link sent</span></div>
+          <div class="step"><span class="num">04</span><span>Payment confirmed → order confirmation + estimated delivery sent to customer automatically</span></div>
+          <div class="step"><span class="num">05</span><span>Complex complaints or returns → escalated to human with full context summary</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Gemini Flash Vision</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Paystack</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦30,000–₦60,000/mo</div>
+            <div class="meta-sub">Or ₦20K setup + 2% of transactions processed. Aligns incentives.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦8,000/mo</div>
+            <div class="meta-sub">Claude Haiku + Gemini Flash + Twilio. Very cheap per conversation.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Fashion vendors, food businesses, cosmetics, electronics resellers — any WhatsApp-native business</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block">Why it wins: Widest possible market. Every WhatsApp-native business in Nigeria has this pain. Frictionless to demo — show them their own WhatsApp number responding intelligently and they'll close on the spot.</div>
+      </div>
+    </div>
+
+    <!-- 44 DIASPORA PROPERTY -->
+    <div class="product-card">
+      <div class="accent gold"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Diaspora Property Scout</div>
+          <div class="card-tagline">Buy Nigerian property from London. Without being scammed.</div>
+        </div>
+        <div class="margin-badge">91% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerians in the UK, US, and Canada send billions home annually. Many want to buy land or property but get scammed — fake listings, inflated prices, double-selling. They can't physically verify. They don't trust agents they can't meet.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Diaspora texts criteria via WhatsApp: "3-bed house, Lekki Phase 1, under ₦80M, not waterlogged"</span></div>
+          <div class="step"><span class="num">02</span><span>Agent scans PropertyPro + Private Property + verified Facebook groups daily</span></div>
+          <div class="step"><span class="num">03</span><span>Claude flags <span class="highlight">price anomalies</span>: properties listed 40%+ below market average (likely scam or distressed sale)</span></div>
+          <div class="step"><span class="num">04</span><span>Weekly digest: 5 verified listings with market price comparison, listing age, and agent contact</span></div>
+          <div class="step"><span class="num">05</span><span>Add-on: agent will physically visit and video-verify shortlisted properties for ₦50K/visit</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Apify (PropertyPro scraper)</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">Claude Haiku</span>
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">$50/mo (diaspora pricing)</div>
+            <div class="meta-sub">API cost is ₦3K/mo. At $50 (~₦75K), margin is extraordinary. Payable in USD.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦3,000/mo</div>
+            <div class="meta-sub">Apify + Gemini Flash + Twilio. Extremely cheap per subscriber.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Nigerian diaspora in UK, US, Canada buying property back home</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">1 week</div>
+          </div>
+        </div>
+        <div class="win-block gold">Why it wins: You earn USD. API costs in Naira. Pure arbitrage. The diaspora property market is massive and underserved — no trusted, automated service exists. Each subscriber is low-maintenance, high-margin, global.</div>
+      </div>
+    </div>
+
+    <!-- 45 CHURCH -->
+    <div class="product-card">
+      <div class="accent orange"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-name">Church &amp; Mosque Giving Tracker</div>
+          <div class="card-tagline">The most overlooked fintech opportunity in Nigeria.</div>
+        </div>
+        <div class="margin-badge">88% MARGIN</div>
+      </div>
+      <div class="card-body">
+        <p class="section-label">The Pain</p>
+        <div class="pain-block">Nigerian religious organizations collect billions in tithes, offerings, and pledges weekly — tracked on paper offering envelopes and manually reconciled. No giving history. No receipts. No accountability. Pastors and administrators spend hours on what should be automated.</div>
+        <p class="section-label">The Loop</p>
+        <div class="loop-block">
+          <div class="step"><span class="num">01</span><span>Congregation member texts their reference number or name to the church WhatsApp line after giving</span></div>
+          <div class="step"><span class="num">02</span><span>MongoDB stores: member, amount, date, giving type (tithe/offering/pledge)</span></div>
+          <div class="step"><span class="num">03</span><span>End of month: <span class="highlight">personal giving statement</span> auto-generated as PDF → WhatsApp to member</span></div>
+          <div class="step"><span class="num">04</span><span>Admin dashboard: aggregate by giving type, month-over-month trend, top givers, outstanding pledges</span></div>
+          <div class="step"><span class="num">05</span><span>Before special offerings/harvest: agent sends personalized pledge reminder with giving history</span></div>
+        </div>
+        <p class="section-label">Tech Stack</p>
+        <div class="stack-row">
+          <span class="stack-tag">Twilio WhatsApp</span>
+          <span class="stack-tag">Paystack</span>
+          <span class="stack-tag">Gemini Flash</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">WeasyPrint</span>
+          <span class="stack-tag">Railway</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Pricing</div>
+            <div class="meta-value">₦50,000–₦150,000/mo</div>
+            <div class="meta-sub">Mega churches (5,000+ members): ₦300K+/mo. Every church in Nigeria is a prospect.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">API Cost</div>
+            <div class="meta-value">~₦8,000/mo</div>
+            <div class="meta-sub">Paystack webhooks are free. Twilio + Gemini Flash. Very cheap per member.</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Target Buyer</div>
+            <div class="meta-value">Churches (50,000+ in Nigeria), mosques, religious foundations</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Build Time</div>
+            <div class="meta-value">5 days</div>
+          </div>
+        </div>
+        <div class="win-block">Why it wins: 50,000+ registered churches in Nigeria. Decision maker is the pastor or financial secretary — clear, single point of contact. Religious organizations have reliable recurring income and rarely churn on tools that solve a genuine pain.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div style="max-width:1100px;margin:0 auto;padding:40px 40px 80px;border-top:1px solid var(--w05);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;">
+  <div>
+    <p style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--w35);margin-bottom:6px;">ReachNG Labs · Nigeria AI Product Catalog</p>
+    <p style="font-size:11px;color:var(--w35);">45 products · 13 sectors · All buildable on the same stack</p>
+  </div>
+  <p style="font-size:10px;color:var(--w35);letter-spacing:0.1em;">Confidential · 2026</p>
+</div>
+
+</body>
+</html>

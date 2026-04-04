@@ -7,6 +7,7 @@ import uvicorn
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
@@ -90,6 +91,7 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+app.state.templates = Jinja2Templates(directory="templates")
 
 app.add_middleware(
     CORSMiddleware,
