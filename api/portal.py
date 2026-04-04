@@ -103,7 +103,7 @@ async def get_portal_data(token: str):
 async def demo_portal(request: Request):
     """Public demo portal — shows realistic sample data for pitch/sales purposes."""
     templates = request.app.state.templates
-    return templates.TemplateResponse("portal_demo.html", {"request": request})
+    return templates.TemplateResponse(request, "portal_demo.html")
 
 
 @router.get("/{token}", response_class=HTMLResponse)
@@ -117,7 +117,7 @@ async def client_portal(token: str, request: Request):
     vertical = client.get("vertical", "").replace("_", " ").title()
 
     templates = request.app.state.templates
-    return templates.TemplateResponse("portal.html", {"request": request, "token": token, "client_name": client_name, "vertical": vertical})
+    return templates.TemplateResponse(request, "portal.html", {"token": token, "client_name": client_name, "vertical": vertical})
 
 
 # ─── Portal HTML ──────────────────────────────────────────────────────────────
