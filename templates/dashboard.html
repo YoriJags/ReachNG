@@ -271,6 +271,65 @@
   /* ── 2-col layout ── */
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ── Today's Work ── */
+  .todays-work {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .action-card {
+    background: #111; border: 1px solid #1a1a1a; border-radius: 10px;
+    padding: 16px 18px; cursor: pointer; transition: border-color 0.15s;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .action-card:hover { border-color: #333; }
+  .action-card.urgent { border-left: 3px solid #ff5c00; }
+  .action-card.hot    { border-left: 3px solid #00e5a0; }
+  .action-card.warn   { border-left: 3px solid #f5c842; }
+  .action-card.idle   { border-left: 3px solid #222; opacity: 0.5; }
+  .action-icon { font-size: 20px; margin-top: 1px; flex-shrink: 0; }
+  .action-body .action-title { font-size: 13px; font-weight: 600; color: #e8e8e8; margin-bottom: 3px; }
+  .action-body .action-desc  { font-size: 11px; color: #444; line-height: 1.4; }
+  .action-body .action-cta   { font-size: 10px; color: #ff5c00; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 6px; font-weight: 600; }
+
+  /* ── SOP hint ── */
+  .sop-box {
+    background: #0d0d0d; border: 1px solid #1a1a1a; border-left: 2px solid #222;
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
+  }
+  .sop-box .sop-title { font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .sop-step { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 6px; font-size: 12px; color: #444; line-height: 1.5; }
+  .sop-step:last-child { margin-bottom: 0; }
+  .sop-num { background: #1a1a1a; color: #555; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .sop-step b { color: #666; }
+
+  /* ── Floating quick-actions ── */
+  .quick-panel {
+    position: fixed; right: 20px; bottom: 24px; z-index: 200;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+  }
+  .quick-fab {
+    background: #ff5c00; color: #fff; border: none; border-radius: 50%;
+    width: 48px; height: 48px; font-size: 20px; cursor: pointer;
+    box-shadow: 0 4px 20px #ff5c0040;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s;
+  }
+  .quick-fab:hover { transform: scale(1.08); }
+  .quick-menu {
+    display: none; flex-direction: column; gap: 6px; align-items: flex-end;
+  }
+  .quick-menu.open { display: flex; }
+  .quick-action-btn {
+    background: #1a1a1a; border: 1px solid #2a2a2a; color: #ccc;
+    border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 500;
+    cursor: pointer; white-space: nowrap; transition: background 0.15s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .quick-action-btn:hover { background: #222; color: #fff; }
+  .quick-action-btn .q-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -299,6 +358,12 @@
 
 <!-- ── Overview ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel active" id="tab-overview">
+
+  <!-- Today's Work -->
+  <p class="section-title" style="margin-top:0;">Today's Work</p>
+  <div class="todays-work" id="todays-work">
+    <div class="action-card idle"><div class="action-icon">⏳</div><div class="action-body"><div class="action-title">Loading…</div></div></div>
+  </div>
 
   <div class="summary-bar">
     <div class="stat-card fire"><div class="label">Total Contacted</div><div class="value" id="s-contacted">—</div></div>
@@ -344,6 +409,14 @@
 <!-- ── Campaigns ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-campaigns">
 
+  <div class="sop-box">
+    <div class="sop-title">Campaign SOP — Do this every weekday morning</div>
+    <div class="sop-step"><span class="sop-num">1</span><span>Select a <b>vertical</b> and run a <b>dry run</b> first. Confirm lead count looks reasonable (5–30 leads).</span></div>
+    <div class="sop-step"><span class="sop-num">2</span><span>Uncheck <b>Dry run</b> and run live. Max 30 contacts per vertical per day to stay under limits.</span></div>
+    <div class="sop-step"><span class="sop-num">3</span><span>Check the <b>Approvals</b> tab — review any HITL drafts before they go out.</span></div>
+    <div class="sop-step"><span class="sop-num">4</span><span>Check <b>Replies</b> tab after 2 hours — respond to all <b>Interested</b> leads same day.</span></div>
+  </div>
+
   <p class="section-title">Run Campaign <span style="color:#ff5c00;font-size:10px;margin-left:6px;">Trigger Outreach</span></p>
   <div class="form-card">
     <div class="row">
@@ -383,6 +456,14 @@
 
 <!-- ── Clients ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-clients">
+
+  <div class="sop-box">
+    <div class="sop-title">Client Onboarding SOP</div>
+    <div class="sop-step"><span class="sop-num">1</span><span><b>Create client</b> — fill name, vertical, plan, city, Unipile account ID (from their WhatsApp QR scan), and a detailed brief.</span></div>
+    <div class="sop-step"><span class="sop-num">2</span><span><b>Generate portal link</b> — copy and send to client via WhatsApp. This is their live reporting dashboard.</span></div>
+    <div class="sop-step"><span class="sop-num">3</span><span><b>Run first campaign</b> as dry run → confirm leads → go live. Always use client name so messages come from their context.</span></div>
+    <div class="sop-step"><span class="sop-num">4</span><span>Update client brief monthly as their offering changes. Better brief = better AI messages.</span></div>
+  </div>
 
   <p class="section-title">Client Roster</p>
   <div class="form-card" style="padding:0;overflow:hidden;">
@@ -480,6 +561,14 @@
 <!-- ── Approvals ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-approvals">
 
+  <div class="sop-box">
+    <div class="sop-title">Approvals SOP — Check twice daily (9am and 3pm)</div>
+    <div class="sop-step"><span class="sop-num">1</span><span>Read each draft carefully. Check the tone matches the client brief and the vertical.</span></div>
+    <div class="sop-step"><span class="sop-num">2</span><span>Click <b>Edit</b> to tweak wording if needed — then Save & Send. Never send a message you wouldn't send yourself.</span></div>
+    <div class="sop-step"><span class="sop-num">3</span><span>Click <b>Approve & Send</b> when happy. Click <b>Skip</b> only if the contact is clearly wrong-fit.</span></div>
+    <div class="sop-step"><span class="sop-num">4</span><span>Use <b>Approve All</b> only when you've already reviewed all drafts in the list.</span></div>
+  </div>
+
   <p class="section-title">Pending Approvals <span id="approval-count-badge" style="color:#ff5c00;margin-left:8px;"></span></p>
   <div class="approve-all-bar" id="approve-all-bar" style="display:none;">
     <button class="btn btn-approve" onclick="approveAll()">Approve All</button>
@@ -493,6 +582,14 @@
 
 <!-- ── Replies ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-replies">
+
+  <div class="sop-box">
+    <div class="sop-title">Replies SOP — Check every 2–3 hours</div>
+    <div class="sop-step"><span class="sop-num">1</span><span><b>Interested</b> — reply within 2 hours. Ask what they need, book a call, send your deck. These are hot leads.</span></div>
+    <div class="sop-step"><span class="sop-num">2</span><span><b>Referral</b> — thank them and follow up with the referred contact directly.</span></div>
+    <div class="sop-step"><span class="sop-num">3</span><span><b>Question</b> — answer within 24 hours. They're interested but need more info.</span></div>
+    <div class="sop-step"><span class="sop-num">4</span><span><b>Not Now</b> — mark to follow up in 30 days. <b>Opted Out</b> — do not contact again.</span></div>
+  </div>
 
   <!-- Hot leads action bar -->
   <div id="hot-leads-bar" style="display:none;background:#0d1f0d;border:1px solid #1a3a1a;border-left:3px solid #00e5a0;border-radius:10px;padding:14px 18px;margin-bottom:20px;">
@@ -512,6 +609,14 @@
 
 <!-- ── Invoices ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-invoices">
+
+  <div class="sop-box">
+    <div class="sop-title">Invoice SOP</div>
+    <div class="sop-step"><span class="sop-num">1</span><span><b>Add invoice</b> on or before due date. Set reminder days: <b>0, 5, 10, 20</b> (day of, 5 days late, 10 days late, final).</span></div>
+    <div class="sop-step"><span class="sop-num">2</span><span>ReachNG sends automatic WhatsApp reminders with escalating tone: Polite → Firm → Payment Plan → Final Notice.</span></div>
+    <div class="sop-step"><span class="sop-num">3</span><span>Click <b>Paid</b> immediately when client pays. Click <b>Remind</b> to send a manual reminder anytime.</span></div>
+    <div class="sop-step"><span class="sop-num">4</span><span>Only <b>Write Off</b> invoices after 60+ days with no response and final notice sent.</span></div>
+  </div>
 
   <p class="section-title">Invoice Collection <span style="color:#f5c842;font-size:10px;margin-left:6px;">AI Payment Reminders</span></p>
   <div class="form-card">
@@ -555,6 +660,13 @@
 
 <!-- ── Tools ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-tools">
+
+  <div class="sop-box">
+    <div class="sop-title">Tools SOP</div>
+    <div class="sop-step"><span class="sop-num">1</span><span><b>Export Contacts</b> — send to client monthly as their lead report. Filter by their vertical and status.</span></div>
+    <div class="sop-step"><span class="sop-num">2</span><span><b>Hook Generator</b> — use weekly to create content for client social media. Give to them as a bonus deliverable.</span></div>
+    <div class="sop-step"><span class="sop-num">3</span><span>For hooks: always enter a specific topic, not generic ones. Specific = higher engagement.</span></div>
+  </div>
 
   <p class="section-title">Export Contacts <span style="color:#ff5c00;font-size:10px;margin-left:6px;">CSV Download</span></p>
   <div class="form-card">
@@ -613,6 +725,18 @@
   </div>
   <div class="trending-pills" id="trending-pills" style="display:none;"></div>
   <div class="hooks-output" id="hooks-output"></div>
+</div>
+
+<!-- Floating quick-actions -->
+<div class="quick-panel">
+  <div class="quick-menu" id="quick-menu">
+    <button class="quick-action-btn" onclick="quickApproveAll()"><span class="q-dot" style="background:#00e5a0;"></span> Approve All Drafts</button>
+    <button class="quick-action-btn" onclick="quickRunMorningBrief()"><span class="q-dot" style="background:#f5c842;"></span> Send Morning Brief</button>
+    <button class="quick-action-btn" onclick="quickExportAll()"><span class="q-dot" style="background:#4488ff;"></span> Export All Contacts</button>
+    <button class="quick-action-btn" onclick="switchTabByName('replies')"><span class="q-dot" style="background:#ff5c00;"></span> Check Hot Leads</button>
+    <button class="quick-action-btn" onclick="switchTabByName('campaigns')"><span class="q-dot" style="background:#c084fc;"></span> Run Campaign</button>
+  </div>
+  <button class="quick-fab" id="quick-fab" onclick="toggleQuickMenu()" title="Quick actions">⚡</button>
 </div>
 
 <!-- Edit modal -->
@@ -1292,15 +1416,117 @@ function exportContacts() {
   a.download = ""; document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 
+// ── Today's Work panel ────────────────────────────────────────────────────────
+
+function buildTodaysWork(approvals, replies, pipeline, invoices) {
+  const hotLeads    = replies.filter(r => r.intent === "interested").length;
+  const pendingAppr = approvals.length;
+  const all         = pipeline.all || {};
+  const sentToday   = all.daily_sent || 0;
+  const limit       = 50;
+  const limitPct    = Math.round((sentToday / limit) * 100);
+
+  // Overdue invoices: due_date < today and status not paid/written_off
+  const today = new Date().toISOString().split("T")[0];
+  const overdueInv = Array.isArray(invoices)
+    ? invoices.filter(inv => inv.due_date && inv.due_date.split("T")[0] < today && !["paid","written_off"].includes(inv.status)).length
+    : 0;
+
+  const cards = [];
+
+  if (hotLeads > 0) {
+    cards.push({ type: "hot", icon: "🔥", title: `${hotLeads} Hot Lead${hotLeads > 1 ? "s" : ""}`, desc: "Interested replies waiting. Reply within 2 hours.", cta: "Go to Replies →", tab: "replies" });
+  }
+  if (pendingAppr > 0) {
+    cards.push({ type: "urgent", icon: "✉️", title: `${pendingAppr} Draft${pendingAppr > 1 ? "s" : ""} to Approve`, desc: "Review each message before it goes out.", cta: "Go to Approvals →", tab: "approvals" });
+  }
+  if (overdueInv > 0) {
+    cards.push({ type: "warn", icon: "⚠️", title: `${overdueInv} Overdue Invoice${overdueInv > 1 ? "s" : ""}`, desc: "Payment reminders may need manual follow-up.", cta: "Go to Invoices →", tab: "invoices" });
+  }
+  if (sentToday === 0) {
+    cards.push({ type: "urgent", icon: "📤", title: "No Messages Sent Today", desc: "Run a campaign to keep the pipeline moving.", cta: "Go to Campaigns →", tab: "campaigns" });
+  } else {
+    cards.push({ type: limitPct >= 80 ? "warn" : "idle", icon: "📊", title: `${sentToday} / ${limit} Sent Today`, desc: limitPct >= 80 ? "Approaching daily limit." : "Daily send pace is healthy.", cta: null, tab: null });
+  }
+
+  if (hotLeads === 0 && pendingAppr === 0 && overdueInv === 0 && sentToday > 0) {
+    cards.push({ type: "idle", icon: "✅", title: "All Clear", desc: "No urgent actions. Great work.", cta: null, tab: null });
+  }
+
+  document.getElementById("todays-work").innerHTML = cards.map(c => `
+    <div class="action-card ${c.type}" ${c.tab ? `onclick="switchTabByName('${c.tab}')" style="cursor:pointer;"` : ""}>
+      <div class="action-icon">${c.icon}</div>
+      <div class="action-body">
+        <div class="action-title">${c.title}</div>
+        <div class="action-desc">${c.desc}</div>
+        ${c.cta ? `<div class="action-cta">${c.cta}</div>` : ""}
+      </div>
+    </div>`).join("");
+}
+
+// ── Quick actions ─────────────────────────────────────────────────────────────
+
+function toggleQuickMenu() {
+  const menu = document.getElementById("quick-menu");
+  const fab  = document.getElementById("quick-fab");
+  menu.classList.toggle("open");
+  fab.textContent = menu.classList.contains("open") ? "✕" : "⚡";
+}
+
+function switchTabByName(name) {
+  const btn = document.querySelector(`.tab-btn[onclick="switchTab('${name}', this)"]`);
+  if (btn) { switchTab(name, btn); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  const menu = document.getElementById("quick-menu");
+  menu.classList.remove("open");
+  document.getElementById("quick-fab").textContent = "⚡";
+}
+
+async function quickApproveAll() {
+  document.getElementById("quick-menu").classList.remove("open");
+  document.getElementById("quick-fab").textContent = "⚡";
+  if (!confirm("Approve and send all pending drafts?")) return;
+  try { await postJSON("/api/v1/approvals/approve-all"); refresh(); alert("All drafts approved and sent."); }
+  catch(e) { alert("Error: " + e.message); }
+}
+
+async function quickRunMorningBrief() {
+  document.getElementById("quick-menu").classList.remove("open");
+  document.getElementById("quick-fab").textContent = "⚡";
+  try {
+    await fetch("/api/v1/contacts/morning-brief", { method: "POST" });
+    alert("Morning brief sent to your WhatsApp.");
+  } catch(e) { alert("Error: " + e.message); }
+}
+
+function quickExportAll() {
+  document.getElementById("quick-menu").classList.remove("open");
+  document.getElementById("quick-fab").textContent = "⚡";
+  const a = document.createElement("a");
+  a.href = "/api/v1/contacts/export"; a.download = "";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 
+async function fullRefresh() {
+  await Promise.all([refresh(), refreshRoster()]);
+  // Build Today's Work after data is loaded
+  try {
+    const [approvals, replies, pipeline, invoices] = await Promise.all([
+      fetchJSON("/api/v1/approvals/"),
+      fetchJSON("/api/v1/contacts/replies?limit=50"),
+      fetchJSON("/api/v1/contacts/pipeline"),
+      fetch("/api/v1/invoices/").then(r => r.json()).catch(() => []),
+    ]);
+    buildTodaysWork(approvals, replies, pipeline, invoices);
+  } catch(e) { console.error("Today's work failed:", e); }
+}
+
 refreshHealth();
-refresh();
-refreshRoster();
+fullRefresh();
 loadInvoices();
-setInterval(refresh, 30000);
+setInterval(fullRefresh, 30000);
 setInterval(refreshHealth, 60000);
-setInterval(refreshRoster, 60000);
 </script>
 </body>
 </html>
