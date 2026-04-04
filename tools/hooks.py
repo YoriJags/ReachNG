@@ -71,6 +71,7 @@ VERTICAL_HASHTAGS = {
     "fintech":      ["LagosFintech", "NigeriaFintech", "AfricanFintech"],
     "legal":        ["LagosLawyer", "NigeriaLaw", "LagosLegal"],
     "logistics":    ["LagosLogistics", "NigeriaLogistics", "FreightLagos"],
+    "agriculture":  ["AgribusinessNigeria", "NigeriaFarm", "AgricNigeria"],
 }
 
 

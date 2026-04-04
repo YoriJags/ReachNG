@@ -108,6 +108,7 @@ def compile_morning_brief() -> str:
         "real_estate": "🏠 Real Estate", "recruitment": "👥 Recruitment",
         "events": "🎉 Events", "fintech": "💳 Fintech",
         "legal": "⚖️ Legal", "logistics": "🚚 Logistics",
+        "agriculture": "🌾 Agriculture",
     }
     pipeline_lines = []
     for v, stats in pipeline.items():

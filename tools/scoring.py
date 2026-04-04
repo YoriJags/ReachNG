@@ -19,6 +19,7 @@ HIGH_VALUE_CATEGORIES = {
     "fintech":      {"financial institution", "bank", "investment company"},
     "legal":        {"lawyer", "law firm", "legal services"},
     "logistics":    {"moving company", "freight forwarding", "logistics service"},
+    "agriculture":  {"farm", "agribusiness", "food processing company", "agricultural cooperative"},
 }
 
 

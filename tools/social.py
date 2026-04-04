@@ -57,6 +57,12 @@ VERTICAL_SOCIAL = {
         "fb_keywords":      ["logistics Lagos", "haulage Nigeria", "courier Lagos"],
         "competitor_terms": ["logistics company Lagos", "freight forwarder Apapa"],
     },
+    "agriculture": {
+        "ig_hashtags":      ["NigeriaAgriculture", "AgribusinessNigeria", "FarmingNigeria", "NigeriaFarm", "AgricNigeria"],
+        "twitter_queries":  ["agribusiness Nigeria", "farm produce Lagos", "poultry farm Nigeria", "food processing Nigeria", "agro commodity Nigeria"],
+        "fb_keywords":      ["agribusiness Nigeria", "farm produce Lagos", "poultry Nigeria"],
+        "competitor_terms": ["agribusiness company Nigeria", "farm produce supplier Lagos"],
+    },
 }
 
 

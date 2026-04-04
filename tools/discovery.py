@@ -73,6 +73,16 @@ VERTICAL_QUERIES = {
         "haulage firm Mile 2 Lagos",
         "cargo company Tin Can Lagos",
     ],
+    "agriculture": [
+        "agribusiness company Lagos",
+        "farm produce supplier Lagos",
+        "food processing company Lagos",
+        "agricultural cooperative Lagos",
+        "poultry farm Lagos",
+        "fish farm Lagos",
+        "crop farming company Ogun Nigeria",
+        "agro allied company Nigeria",
+    ],
 }
 
 

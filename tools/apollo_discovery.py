@@ -40,6 +40,10 @@ VERTICAL_TITLES = {
         "Operations Director", "Fleet Manager", "Head of Logistics",
         "Supply Chain Manager", "Freight Manager", "Chief Operations Officer",
     ],
+    "agriculture": [
+        "CEO", "Founder", "Head of Agribusiness",
+        "Farm Manager", "Agro Processing Director", "Head of Supply Chain",
+    ],
 }
 
 VERTICAL_KEYWORDS = {
@@ -49,6 +53,7 @@ VERTICAL_KEYWORDS = {
     "fintech": ["fintech", "digital lending", "microfinance", "payment solutions"],
     "legal": ["law firm", "legal services", "solicitors", "corporate law"],
     "logistics": ["haulage", "logistics", "freight forwarding", "last mile delivery"],
+    "agriculture": ["agribusiness", "farm produce", "food processing", "agricultural cooperative", "poultry", "aquaculture"],
 }
 
 
@@ -197,5 +202,6 @@ def _vertical_to_category(vertical: str) -> str:
         "fintech": "Financial Technology",
         "legal": "Law Firm",
         "logistics": "Logistics",
+        "agriculture": "Agriculture",
     }
     return mapping.get(vertical, vertical.replace("_", " ").title())
