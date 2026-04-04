@@ -39,6 +39,14 @@ def get_replies() -> Collection:
 def ensure_indexes():
     """Create all required indexes on startup."""
     contacts = get_contacts()
+
+    # Drop email/phone indexes if they exist without sparse=True (legacy migration)
+    existing = contacts.index_information()
+    for idx_name, idx_info in existing.items():
+        key_fields = [k for k, _ in idx_info.get("key", [])]
+        if ("email" in key_fields or "phone" in key_fields) and not idx_info.get("sparse"):
+            contacts.drop_index(idx_name)
+
     contacts.create_index([("phone", ASCENDING)], unique=True, sparse=True)
     contacts.create_index([("email", ASCENDING)], unique=True, sparse=True)
     contacts.create_index([("place_id", ASCENDING)], unique=True)
