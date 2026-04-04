@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
-from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router
+from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router
 from auth import require_auth
 from mcp_server import mcp
 from config import get_settings
@@ -65,6 +65,7 @@ async def lifespan(app: FastAPI):
     from tools.referral import ensure_referral_indexes
     from tools.competitor import ensure_competitor_indexes
     from tools.invoices import ensure_invoice_indexes
+    from tools.csv_import import ensure_b2c_indexes
     ensure_approval_indexes()
     ensure_roi_indexes()
     ensure_social_indexes()
@@ -73,6 +74,7 @@ async def lifespan(app: FastAPI):
     ensure_referral_indexes()
     ensure_competitor_indexes()
     ensure_invoice_indexes()
+    ensure_b2c_indexes()
     scheduler = setup_scheduler()
     scheduler.start()
     log.info("scheduler_started", jobs=[job.id for job in scheduler.get_jobs()])
@@ -111,6 +113,7 @@ app.include_router(ab_router,          prefix="/api/v1", **_auth)
 app.include_router(referrals_router,   prefix="/api/v1", **_auth)
 app.include_router(competitors_router, prefix="/api/v1", **_auth)
 app.include_router(invoices_router,    prefix="/api/v1", **_auth)
+app.include_router(b2c_router,         prefix="/api/v1", **_auth)
 app.include_router(portal_router)        # Portal uses token auth — no Basic Auth
 app.include_router(dashboard_router, **_auth)
 

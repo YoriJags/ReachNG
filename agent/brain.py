@@ -34,6 +34,7 @@ def generate_outreach_message(
     website: Optional[str] = None,
     is_followup: bool = False,
     attempt_number: int = 1,
+    enrichment_context: Optional[str] = None,   # from tools.enrichment.format_enrichment_for_prompt
 ) -> dict:
     """
     Generate a personalised outreach message for a business.
@@ -55,6 +56,8 @@ def generate_outreach_message(
     if is_followup:
         followup_note = f"\n\nIMPORTANT: This is follow-up attempt {attempt_number}. Acknowledge you reached out before. Keep it very brief and low pressure."
 
+    enrichment_block = f"\n{enrichment_context}" if enrichment_context else ""
+
     user_prompt = f"""
 Write a {channel} outreach message for the following business.
 
@@ -64,12 +67,14 @@ Category: {category or "Not specified"}
 Google rating: {rating or "Unknown"}
 Website: {website or "None found"}
 Channel: {channel}
+{enrichment_block}
 {followup_note}
 
 Return ONLY:
 - For WhatsApp: the message text (max 4 sentences, no subject line)
 - For Email: JSON with keys "subject" and "message" (max 6 sentence body)
 
+If website intelligence is provided above, reference at least one specific detail in the message.
 No explanations. No preamble. Just the message.
 """
 
@@ -97,6 +102,70 @@ No explanations. No preamble. Just the message.
             log.warning("email_parse_failed", raw=raw)
             # Fallback: use raw as message with generic subject
             return {"subject": f"Quick question for {business_name}", "message": raw}
+
+    return {"message": raw}
+
+
+# ─── B2C message generation ──────────────────────────────────────────────────
+
+def generate_b2c_message(
+    customer_name: str,
+    channel: str,               # "whatsapp" | "email"
+    vertical: str,
+    client_brief: Optional[str] = None,
+    notes: Optional[str] = None,
+    tags: Optional[list] = None,
+) -> dict:
+    """
+    Generate a personalized B2C outreach message for a customer.
+    Uses client brief + customer notes/tags for personalization.
+    Returns {"message": str} for WhatsApp or {"subject": str, "message": str} for email.
+    """
+    system = _load_prompt("system.txt")
+
+    brief_block = f"\nClient context: {client_brief}" if client_brief else ""
+    notes_block  = f"\nCustomer notes: {notes}" if notes else ""
+    tags_block   = f"\nCustomer tags/segments: {', '.join(tags)}" if tags else ""
+
+    user_prompt = f"""
+Write a {channel} message to a customer on behalf of a business.
+
+Customer name: {customer_name}
+Channel: {channel}
+{brief_block}
+{notes_block}
+{tags_block}
+
+This is a B2C message — warm, personal, conversational. Not a cold sales pitch.
+Reference the customer's name. Keep it friendly and to the point.
+
+Return ONLY:
+- For WhatsApp: the message text (max 4 sentences, no subject line)
+- For Email: JSON with keys "subject" and "message" (max 6 sentence body)
+
+No explanations. No preamble. Just the message.
+"""
+
+    import json
+    client = _get_client()
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=400,
+        system=system,
+        messages=[{"role": "user", "content": user_prompt}],
+    )
+
+    raw = response.content[0].text.strip()
+
+    if channel == "email":
+        try:
+            if raw.startswith("```"):
+                raw = raw.split("```")[1]
+                if raw.startswith("json"):
+                    raw = raw[4:]
+            return json.loads(raw.strip())
+        except Exception:
+            return {"subject": f"A message for you, {customer_name}", "message": raw}
 
     return {"message": raw}
 

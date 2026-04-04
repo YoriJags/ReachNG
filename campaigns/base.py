@@ -15,6 +15,7 @@ from tools.roi import log_roi_event
 from tools.notifier import notify_whatsapp as notify_owner_whatsapp
 from tools.social import discover_social_leads
 from tools.ab_testing import assign_variant, record_ab_send
+from tools.enrichment import enrich_business, format_enrichment_for_prompt
 from agent import generate_outreach_message, should_contact, generate_social_outreach_message
 from config import get_settings
 import structlog
@@ -155,6 +156,12 @@ class BaseCampaign:
                 skipped_no_channel += 1
                 continue
 
+            # Step 5.5: Deep personalization — crawl website before writing
+            enrichment_ctx = ""
+            if biz.get("website") and not biz.get("source") == "social":
+                enrichment = enrich_business(website=biz["website"], business_name=biz["name"])
+                enrichment_ctx = format_enrichment_for_prompt(enrichment, biz["name"])
+
             # Step 6: Generate message — social leads get post-aware opener
             try:
                 if biz.get("source") == "social" and biz.get("post_text"):
@@ -177,6 +184,7 @@ class BaseCampaign:
                         rating=biz.get("rating"),
                         website=biz.get("website"),
                         is_followup=False,
+                        enrichment_context=enrichment_ctx,
                     )
             except Exception as e:
                 log.error("message_generation_failed", business=biz["name"], error=str(e))
