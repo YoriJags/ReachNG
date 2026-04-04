@@ -198,6 +198,15 @@
   .intent-unknown    { background: #1a1a1a; color: #333; }
   .reply-meta { font-size: 11px; color: #333; margin-bottom: 6px; }
   .reply-summary { font-size: 13px; color: #999; line-height: 1.5; }
+  .reply-card.hot { border-color: #1a3a1a; border-left: 3px solid #00e5a0; }
+  .reply-card.warm { border-color: #1a1a00; border-left: 3px solid #f5c842; }
+  .reply-card.cold { opacity: 0.55; }
+
+  .priority-divider {
+    font-size: 10px; color: #222; text-transform: uppercase; letter-spacing: 1px;
+    padding: 14px 0 8px; display: flex; align-items: center; gap: 10px;
+  }
+  .priority-divider::after { content: ""; flex: 1; height: 1px; background: #1a1a1a; }
 
   /* ── Forms ── */
   .form-card { background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 20px; }
@@ -485,7 +494,17 @@
 <!-- ── Replies ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-replies">
 
-  <p class="section-title">Recent Replies</p>
+  <!-- Hot leads action bar -->
+  <div id="hot-leads-bar" style="display:none;background:#0d1f0d;border:1px solid #1a3a1a;border-left:3px solid #00e5a0;border-radius:10px;padding:14px 18px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:11px;color:#00e5a0;font-weight:700;text-transform:uppercase;letter-spacing:1px;">HOT LEADS</span>
+      <span id="hot-count" style="background:#00e5a0;color:#000;font-size:10px;font-weight:700;border-radius:8px;padding:1px 7px;"></span>
+      <span style="font-size:11px;color:#2a5a2a;margin-left:4px;">Reply now — these people are interested</span>
+    </div>
+    <div id="hot-leads-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+
+  <p class="section-title">All Replies <span style="color:#333;font-size:10px;margin-left:6px;">Sorted by priority</span></p>
   <div class="replies-list" id="replies-list">
     <div class="empty">Loading…</div>
   </div>
@@ -913,24 +932,73 @@ async function refresh() {
         </div>`;
     });
 
-    // Recent replies
+    // Replies — sorted by priority
+    const INTENT_PRIORITY = { interested: 0, referral: 1, question: 2, not_now: 3, opted_out: 4, unknown: 5 };
+    const INTENT_CLASS    = { interested: "hot", referral: "warm", question: "warm", not_now: "", opted_out: "cold", unknown: "cold" };
+
+    const sortedReplies = [...replies].sort((a, b) => {
+      const pa = INTENT_PRIORITY[a.intent] ?? 5;
+      const pb = INTENT_PRIORITY[b.intent] ?? 5;
+      return pa - pb;
+    });
+
+    const hotLeads = sortedReplies.filter(r => r.intent === "interested");
+    const hotBar   = document.getElementById("hot-leads-bar");
+    const hotList  = document.getElementById("hot-leads-list");
+    const hotCount = document.getElementById("hot-count");
+
+    if (hotLeads.length) {
+      hotBar.style.display = "block";
+      hotCount.textContent = hotLeads.length;
+      hotList.innerHTML = hotLeads.map(r => {
+        const time = r.received_at ? new Date(r.received_at).toLocaleString("en-NG", { timeZone: "Africa/Lagos", hour:"2-digit", minute:"2-digit" }) : "";
+        return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 12px;background:#0a170a;border-radius:8px;">
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:14px;color:#e8e8e8;margin-bottom:2px;">${r.contact_name || r.sender || "Unknown"}</div>
+            <div style="font-size:12px;color:#666;margin-bottom:4px;">${r.channel ? r.channel.toUpperCase() : ""} · ${r.vertical || ""} · ${time}</div>
+            <div style="font-size:13px;color:#ccc;line-height:1.5;">${r.summary || r.text || ""}</div>
+          </div>
+          <div style="font-size:10px;color:#00e5a0;font-weight:700;white-space:nowrap;margin-top:2px;">REPLY NOW</div>
+        </div>`;
+      }).join("");
+    } else {
+      hotBar.style.display = "none";
+    }
+
     const rList = document.getElementById("replies-list");
-    if (!replies.length) {
+    if (!sortedReplies.length) {
       rList.innerHTML = '<div class="empty">No replies yet.</div>';
     } else {
-      rList.innerHTML = replies.map(r => {
-        const intent = r.intent || "unknown";
-        const time   = r.received_at ? new Date(r.received_at).toLocaleString("en-NG", { timeZone: "Africa/Lagos" }) : "";
-        return `
-          <div class="reply-card">
-            <div class="reply-header">
-              <span class="reply-name">${r.contact_name || r.sender || "Unknown"}</span>
-              <span class="intent-badge intent-${intent}">${INTENT_LABELS[intent] || intent}</span>
-            </div>
-            <div class="reply-meta">${r.channel ? r.channel.toUpperCase() : ""} &nbsp;·&nbsp; ${time}</div>
-            <div class="reply-summary">${r.summary || r.text || ""}</div>
-          </div>`;
-      }).join("");
+      // Group by priority tier
+      const tiers = [
+        { label: "Interested",  intents: ["interested"], show: true },
+        { label: "Warm",        intents: ["referral", "question"], show: true },
+        { label: "Not Ready",   intents: ["not_now"], show: true },
+        { label: "Cold / Out",  intents: ["opted_out", "unknown"], show: true },
+      ];
+
+      let html = "";
+      tiers.forEach(tier => {
+        const group = sortedReplies.filter(r => tier.intents.includes(r.intent || "unknown"));
+        if (!group.length) return;
+        html += `<div class="priority-divider">${tier.label} (${group.length})</div>`;
+        html += group.map(r => {
+          const intent    = r.intent || "unknown";
+          const cardClass = INTENT_CLASS[intent] || "";
+          const time      = r.received_at ? new Date(r.received_at).toLocaleString("en-NG", { timeZone: "Africa/Lagos" }) : "";
+          return `
+            <div class="reply-card ${cardClass}">
+              <div class="reply-header">
+                <span class="reply-name">${r.contact_name || r.sender || "Unknown"}</span>
+                <span class="intent-badge intent-${intent}">${INTENT_LABELS[intent] || intent}</span>
+              </div>
+              <div class="reply-meta">${r.channel ? r.channel.toUpperCase() : ""} &nbsp;·&nbsp; ${r.vertical || ""} &nbsp;·&nbsp; ${time}</div>
+              <div class="reply-summary">${r.summary || r.text || ""}</div>
+            </div>`;
+        }).join("");
+      });
+
+      rList.innerHTML = html;
     }
 
     document.getElementById("last-updated").textContent =
