@@ -6,8 +6,8 @@ Runs every 30 minutes via the scheduler.
 from datetime import datetime, timezone
 from database import get_contacts, get_db
 from tools.outreach import check_whatsapp_replies, check_email_replies
-from tools.memory import mark_replied, Status
-from tools.notifier import notify_owner
+from tools.memory import mark_replied, mark_opted_out, Status
+from tools.notifier import notify_owner, notify_whatsapp as notify_owner_whatsapp
 from agent.brain import classify_reply
 import structlog
 
@@ -87,44 +87,81 @@ def _route_reply(msg: dict, channel: str) -> str:
         except Exception as e:
             log.warning("classify_reply_failed", error=str(e))
 
-    # Always store the raw reply + classification — full audit trail
+    # Always store the raw reply + full classification — dashboard + audit trail
     replies.insert_one({
-        "unipile_message_id": msg_id,
-        "channel": channel,
-        "sender": sender,
-        "text": reply_text,
-        "contact_id": contact["_id"] if contact else None,
-        "contact_name": contact.get("name") if contact else None,
-        "intent": classification.get("intent", "unknown"),
-        "urgency": classification.get("urgency", "low"),
-        "summary": classification.get("summary", ""),
-        "received_at": now,
+        "unipile_message_id":  msg_id,
+        "channel":             channel,
+        "sender":              sender,
+        "text":                reply_text,
+        "contact_id":          contact["_id"] if contact else None,
+        "contact_name":        contact.get("name") if contact else None,
+        "intent":              classification.get("intent", "unknown"),
+        "urgency":             classification.get("urgency", "low"),
+        "budget_authority":    classification.get("budget_authority", "unknown"),
+        "hot_lead":            classification.get("hot_lead", False),
+        "summary":             classification.get("summary", ""),
+        "received_at":         now,
     })
 
     if not contact:
         log.info("reply_unmatched", sender=sender, channel=channel)
         return "unmatched"
 
-    # Only flip status if contact is still in CONTACTED state
-    if contact.get("status") == Status.CONTACTED:
-        mark_replied(str(contact["_id"]))
+    contact_id  = str(contact["_id"])
+    intent      = classification.get("intent", "unknown")
+    urgency     = classification.get("urgency", "low")
+    hot_lead    = classification.get("hot_lead", False)
+
+    # Auto opt-out — act immediately, no manual step needed
+    if intent == "opted_out":
+        mark_opted_out(contact_id)
+        log.info("auto_opted_out", contact=contact.get("name"), sender=sender)
+    elif contact.get("status") == Status.CONTACTED:
+        mark_replied(contact_id)
         log.info(
             "reply_matched",
             contact=contact.get("name"),
             vertical=contact.get("vertical"),
-            intent=classification.get("intent"),
+            intent=intent,
+            hot_lead=hot_lead,
             channel=channel,
         )
 
-    # Notify owner via WhatsApp + Slack
     import asyncio
+
+    # Hot lead — fire an urgent separate WhatsApp ping to owner immediately
+    if hot_lead:
+        settings_obj = __import__("config", fromlist=["get_settings"]).get_settings()
+        if settings_obj.owner_whatsapp:
+            urgent_msg = (
+                f"🚨 HOT LEAD — {contact.get('name', sender)}\n"
+                f"Vertical: {contact.get('vertical', '').replace('_', ' ').title()}\n"
+                f"Channel: {channel.title()}\n"
+                f"Budget authority: {classification.get('budget_authority', 'unknown').upper()}\n\n"
+                f"Their message:\n\"{reply_text[:300]}\"\n\n"
+                f"→ Follow up NOW."
+            )
+            asyncio.create_task(
+                notify_owner_whatsapp(
+                    contact_name=contact.get("name", sender),
+                    vertical=contact.get("vertical", ""),
+                    channel=channel,
+                    reply_text=urgent_msg,
+                    intent="interested",
+                    urgency="high",
+                    summary=classification.get("summary", ""),
+                )
+            )
+        log.info("hot_lead_alert_fired", contact=contact.get("name"))
+
+    # Standard notify — both WhatsApp + Slack
     asyncio.create_task(notify_owner(
         contact_name=contact.get("name", sender),
         vertical=contact.get("vertical", ""),
         channel=channel,
         reply_text=reply_text,
-        intent=classification.get("intent", "unknown"),
-        urgency=classification.get("urgency", "low"),
+        intent=intent,
+        urgency=urgency,
         summary=classification.get("summary", ""),
     ))
 

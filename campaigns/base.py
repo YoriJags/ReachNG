@@ -269,8 +269,16 @@ class BaseCampaign:
             )
             sent += 1
 
-            # Polite delay — don't hammer APIs
-            await asyncio.sleep(1.5)
+            # Human-mimicry delay — randomised interval mimics a human typing/sending.
+            # Fixed intervals get WhatsApp accounts flagged by anti-spam AI.
+            # Range: 45–210 seconds, weighted toward 60–120s (natural typing pace).
+            import random
+            jitter = random.choices(
+                [random.uniform(45, 75), random.uniform(75, 150), random.uniform(150, 210)],
+                weights=[0.5, 0.35, 0.15],
+            )[0]
+            log.debug("human_jitter", seconds=round(jitter, 1), next_contact="pending")
+            await asyncio.sleep(jitter)
 
         # Notify owner if drafts are queued for approval
         if hitl_mode and queued > 0:
@@ -352,7 +360,8 @@ class BaseCampaign:
                     attempt_number=attempt,
                 )
             sent += 1
-            await asyncio.sleep(1.5)
+            import random
+            await asyncio.sleep(random.uniform(60, 180))
 
         return {"vertical": self.vertical, "followups_sent": sent, "errors": errors}
 

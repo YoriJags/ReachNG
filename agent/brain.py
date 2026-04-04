@@ -248,24 +248,44 @@ def should_contact(
     return True
 
 
-def classify_reply(reply_text: str, business_name: str, vertical: str) -> dict:
+def classify_reply(
+    reply_text: str,
+    business_name: str,
+    vertical: str,
+    market: str = "Nigeria",
+) -> dict:
     """
     Classify an inbound reply using Claude Haiku (fast + cheap).
-    Returns intent, urgency, and a one-line summary.
+
+    Returns:
+        intent:           interested | not_now | opted_out | referral | question | unknown
+        urgency:          high | medium | low
+        budget_authority: high | medium | low | unknown
+            — "high" means they sound like a decision-maker ready to spend
+        hot_lead:         bool — True when intent=interested AND budget_authority=high
+        summary:          one-line summary of what they said
     """
     client = _get_client()
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=150,
+        max_tokens=200,
         messages=[{
             "role": "user",
             "content": (
-                f"Classify this reply from a Lagos business owner. Vertical: {vertical}. "
-                f"Business: {business_name}.\n\nReply: \"{reply_text}\"\n\n"
+                f"Classify this reply from a business owner. "
+                f"Market: {market}. Vertical: {vertical}. Business: {business_name}.\n\n"
+                f"Reply: \"{reply_text}\"\n\n"
+                "Opt-out signals (any of these = opted_out): "
+                "Stop, Remove me, Unsubscribe, Not interested, Please don't contact, "
+                "Take me off, Don't message me, Wrong number.\n\n"
+                "Hot lead signals: mentions budget, asks for pricing/proposal/meeting, "
+                "says 'when can we talk', 'send me more info', 'we've been looking for this'.\n\n"
                 "Return JSON only:\n"
                 "{\n"
                 "  \"intent\": \"interested\" | \"not_now\" | \"opted_out\" | \"referral\" | \"question\" | \"unknown\",\n"
                 "  \"urgency\": \"high\" | \"medium\" | \"low\",\n"
+                "  \"budget_authority\": \"high\" | \"medium\" | \"low\" | \"unknown\",\n"
+                "  \"hot_lead\": true | false,\n"
                 "  \"summary\": \"one sentence max\"\n"
                 "}"
             ),
@@ -279,10 +299,21 @@ def classify_reply(reply_text: str, business_name: str, vertical: str) -> dict:
             raw = raw.split("```")[1]
             if raw.startswith("json"):
                 raw = raw[4:]
-        return json.loads(raw.strip())
+        result = json.loads(raw.strip())
+        # Derive hot_lead if Claude didn't return it
+        if "hot_lead" not in result:
+            result["hot_lead"] = (
+                result.get("intent") == "interested" and
+                result.get("budget_authority") in ("high", "medium")
+            )
+        return result
     except Exception:
         log.warning("classify_reply_parse_failed", raw=raw)
-        return {"intent": "unknown", "urgency": "low", "summary": reply_text[:100]}
+        return {
+            "intent": "unknown", "urgency": "low",
+            "budget_authority": "unknown", "hot_lead": False,
+            "summary": reply_text[:100],
+        }
 
 
 def generate_outreach_message_for_client(
