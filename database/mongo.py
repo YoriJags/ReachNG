@@ -40,12 +40,12 @@ def ensure_indexes():
     """Create all required indexes on startup."""
     contacts = get_contacts()
 
-    # Drop email/phone indexes if they exist without sparse=True (legacy migration)
-    existing = contacts.index_information()
-    for idx_name, idx_info in existing.items():
-        key_fields = [k for k, _ in idx_info.get("key", [])]
-        if ("email" in key_fields or "phone" in key_fields) and not idx_info.get("sparse"):
+    # Always drop and recreate email/phone indexes to ensure sparse=True
+    for idx_name in ("email_1", "phone_1"):
+        try:
             contacts.drop_index(idx_name)
+        except Exception:
+            pass  # Index didn't exist — fine
 
     contacts.create_index([("phone", ASCENDING)], unique=True, sparse=True)
     contacts.create_index([("email", ASCENDING)], unique=True, sparse=True)
