@@ -41,6 +41,10 @@ class Settings(BaseSettings):
     dashboard_user: str | None = Field(default=None, env="DASHBOARD_USER")
     dashboard_pass: str | None = Field(default=None, env="DASHBOARD_PASS")
 
+    # CORS — comma-separated allowed origins. Leave blank to allow all (dev only).
+    # Example: https://reachng.co,https://portal.reachng.co
+    allowed_origins: str | None = Field(default=None, env="ALLOWED_ORIGINS")
+
     # App
     app_env: str = Field(default="development", env="APP_ENV")
     app_port: int = Field(default=8000, env="PORT")

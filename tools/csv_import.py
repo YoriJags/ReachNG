@@ -76,8 +76,9 @@ def parse_and_import_csv(
 
             email = _clean_email(row.get(col_map.get("email", ""), "")) if col_map.get("email") else None
             name  = _extract_name(row, col_map)
-            notes = row.get(col_map.get("notes", ""), "").strip() if col_map.get("notes") else None
-            tags  = _parse_tags(row.get(col_map.get("tags", ""), "")) if col_map.get("tags") else []
+            notes_raw = row.get(col_map.get("notes", ""), "").strip() if col_map.get("notes") else None
+            notes = _sanitize_text_field(notes_raw) if notes_raw else None
+            tags  = [_sanitize_text_field(t) for t in (_parse_tags(row.get(col_map.get("tags", ""), "")) if col_map.get("tags") else [])]
             if campaign_tag:
                 tags.append(campaign_tag)
 
@@ -211,11 +212,11 @@ def _clean_email(raw: str) -> Optional[str]:
 
 def _extract_name(row: dict, col_map: dict) -> str:
     if col_map.get("name"):
-        name = row.get(col_map["name"], "").strip()
+        name = _sanitize_text_field(row.get(col_map["name"], "").strip())
         if name:
             return name
-    first = row.get(col_map.get("first_name", ""), "").strip()
-    last  = row.get(col_map.get("last_name", ""), "").strip()
+    first = _sanitize_text_field(row.get(col_map.get("first_name", ""), "").strip())
+    last  = _sanitize_text_field(row.get(col_map.get("last_name", ""), "").strip())
     if first or last:
         return f"{first} {last}".strip()
     return "Customer"
@@ -225,6 +226,17 @@ def _parse_tags(raw: str) -> list[str]:
     if not raw:
         return []
     return [t.strip() for t in re.split(r"[,;|]", raw) if t.strip()]
+
+
+def _sanitize_text_field(val: str) -> str:
+    """
+    Prevent CSV formula injection.
+    Cells starting with =, +, -, @, tab, or CR are treated as formulas
+    by Excel/Google Sheets. Prefix with a single quote to neutralize.
+    """
+    if val and val[0] in ('=', '+', '-', '@', '\t', '\r', '|', '%'):
+        return "'" + val
+    return val
 
 
 def _upsert_b2c_contact(

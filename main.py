@@ -93,11 +93,17 @@ app = FastAPI(
 )
 app.state.templates = Jinja2Templates(directory="templates")
 
+# CORS: restrict to configured origins in production.
+# Set ALLOWED_ORIGINS=https://yourdomain.com in Railway env vars.
+# Falls back to wildcard in development only.
+_raw_origins = getattr(get_settings(), "allowed_origins", "") or ""
+_allowed_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()] or ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_allowed_origins,
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
 )
 
 # REST API routes — all protected by Basic Auth

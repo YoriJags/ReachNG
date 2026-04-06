@@ -3,6 +3,7 @@ Client Portal — token-gated read-only dashboard for each paying ReachNG client
 Each client gets a unique URL: /portal/{token}
 Shows their contacts, outreach stats, and ROI.
 """
+import re
 import secrets
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Request
@@ -27,7 +28,7 @@ def generate_portal_token() -> str:
 def ensure_client_token(client_name: str) -> str:
     """Generate and store a portal token if the client doesn't have one yet."""
     clients = get_clients()
-    client = clients.find_one({"name": {"$regex": f"^{client_name}$", "$options": "i"}})
+    client = clients.find_one({"name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"}})
     if not client:
         raise ValueError(f"Client '{client_name}' not found")
     if client.get("portal_token"):

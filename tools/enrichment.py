@@ -14,6 +14,8 @@ No Instagram scraping — website crawling only (legal, reliable).
 Uses httpx with a 10s timeout. Falls back gracefully if site is unreachable.
 """
 import re
+import ipaddress
+import socket
 import httpx
 import structlog
 from typing import Optional
@@ -112,7 +114,7 @@ def format_enrichment_for_prompt(enrichment: dict, business_name: str) -> str:
 # ─── Internal helpers ─────────────────────────────────────────────────────────
 
 def _normalise_url(website: str) -> Optional[str]:
-    """Ensure URL has a scheme."""
+    """Ensure URL has a scheme and is safe to fetch (no SSRF)."""
     website = website.strip()
     if not website:
         return None
@@ -121,7 +123,35 @@ def _normalise_url(website: str) -> Optional[str]:
     parsed = urlparse(website)
     if not parsed.netloc:
         return None
+    if not _is_safe_host(parsed.hostname or ""):
+        log.warning("enrichment_ssrf_blocked", url=website)
+        return None
     return website
+
+
+def _is_safe_host(host: str) -> bool:
+    """Block private/internal IPs and localhost to prevent SSRF."""
+    if not host:
+        return False
+    # Block obvious hostnames
+    blocked_hosts = {"localhost", "metadata.google.internal"}
+    if host.lower() in blocked_hosts:
+        return False
+    # Resolve hostname to IP and check if it's public
+    try:
+        ip = ipaddress.ip_address(host)
+        return ip.is_global and not ip.is_private and not ip.is_loopback and not ip.is_link_local
+    except ValueError:
+        # It's a domain name — resolve and check
+        try:
+            resolved = socket.getaddrinfo(host, None)
+            for item in resolved:
+                ip = ipaddress.ip_address(item[4][0])
+                if not ip.is_global or ip.is_private or ip.is_loopback or ip.is_link_local:
+                    return False
+        except Exception:
+            return False
+    return True
 
 
 def _fetch(url: str) -> Optional[str]:

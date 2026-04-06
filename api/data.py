@@ -3,8 +3,9 @@ Data Liberation API — upload files, query them in plain English.
 This is the "Walled Data" service: clients upload their PDFs, Excels, CSVs,
 and WhatsApp exports, then ask questions in plain English via Claude.
 """
+import pathlib
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from services.data_liberation import (
     ingest_file, query_client_data, get_client_sources, delete_client_data
 )
@@ -13,13 +14,14 @@ from services.data_liberation.query import get_data_summary
 router = APIRouter(prefix="/data", tags=["Data Liberation"])
 
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20MB
+_ALLOWED_EXTENSIONS = {".pdf", ".xlsx", ".xls", ".csv", ".txt"}
 
 
 # ─── Schemas ──────────────────────────────────────────────────────────────────
 
 class QueryRequest(BaseModel):
-    client_name: str
-    question: str
+    client_name: str = Field(..., max_length=200)
+    question: str = Field(..., max_length=1000)
 
 
 # ─── Endpoints ────────────────────────────────────────────────────────────────
@@ -42,9 +44,17 @@ async def upload_file(
     if not file.filename:
         raise HTTPException(400, "Filename required.")
 
+    safe_name = pathlib.Path(file.filename).name  # strip any path traversal
+    if not safe_name:
+        raise HTTPException(400, "Invalid filename.")
+
+    ext = pathlib.Path(safe_name).suffix.lower()
+    if ext not in _ALLOWED_EXTENSIONS:
+        raise HTTPException(400, f"Unsupported file type '{ext}'. Allowed: {', '.join(_ALLOWED_EXTENSIONS)}")
+
     result = await ingest_file(
         client_name=client_name,
-        filename=file.filename,
+        filename=safe_name,
         content=content,
     )
 
@@ -52,7 +62,7 @@ async def upload_file(
         raise HTTPException(500, f"Ingestion failed: {result.get('error')}")
 
     return {
-        "message": f"'{file.filename}' ingested successfully for {client_name}.",
+        "message": f"'{safe_name}' ingested successfully for {client_name}.",
         **result,
     }
 

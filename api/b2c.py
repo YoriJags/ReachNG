@@ -8,6 +8,7 @@ Endpoints:
   GET  /b2c/stats/{client_name}          — Pipeline stats for B2C contacts
   PATCH /b2c/contacts/{id}/opted-out     — Manual opt-out (GDPR compliance)
 """
+import re
 from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
@@ -94,7 +95,7 @@ async def run_b2c_campaign(
     """
     # Load client config
     client_doc = get_db()["clients"].find_one(
-        {"name": {"$regex": f"^{client_name}$", "$options": "i"}, "active": True}
+        {"name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"}, "active": True}
     )
     if not client_doc:
         raise HTTPException(404, f"Client '{client_name}' not found or inactive")
@@ -130,7 +131,7 @@ async def list_b2c_contacts(
     skip: int = 0,
 ):
     """List B2C contacts for a client."""
-    query: dict = {"client_name": {"$regex": f"^{client_name}$", "$options": "i"}}
+    query: dict = {"client_name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"}}
     if vertical:
         query["vertical"] = vertical
     if status:
@@ -150,7 +151,7 @@ async def list_b2c_contacts(
 async def b2c_stats(client_name: str, vertical: Optional[str] = None):
     """Pipeline stats — how many contacts in each status."""
     col = get_db()["b2c_contacts"]
-    query: dict = {"client_name": {"$regex": f"^{client_name}$", "$options": "i"}}
+    query: dict = {"client_name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"}}
     if vertical:
         query["vertical"] = vertical
 
