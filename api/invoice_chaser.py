@@ -9,7 +9,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel, Field
 from database import get_db
 from agent.brain import extract_invoice_fields, generate_invoice_reminder
-from tools.messaging import send_whatsapp
+from tools.outreach import send_whatsapp
 import structlog
 
 log = structlog.get_logger()
@@ -111,7 +111,7 @@ async def send_reminder(req: InvoiceReminderRequest):
     # Send via Unipile
     try:
         await send_whatsapp(
-            to=req.debtor_phone,
+            phone=req.debtor_phone,
             message=message,
             account_id=None,  # uses default account
         )
