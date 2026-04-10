@@ -29,7 +29,12 @@ jinja2>=3.1.0
 tenacity>=9.0.0
 structlog>=24.4.0
 
+# Analytics
+posthog>=3.0.0
+
 # Data Liberation — file parsing
 pdfplumber>=0.11.4
 openpyxl>=3.1.5
 python-multipart>=0.0.12
+pymupdf
+google-generativeai

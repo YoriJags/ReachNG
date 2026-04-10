@@ -45,6 +45,13 @@ class Settings(BaseSettings):
     # Example: https://reachng.co,https://portal.reachng.co
     allowed_origins: str | None = Field(default=None, env="ALLOWED_ORIGINS")
 
+    # Gemini Flash (cheap extraction — PDF parsing, data scraping)
+    gemini_api_key: str | None = Field(default=None, env="GEMINI_API_KEY")
+
+    # PostHog analytics
+    posthog_api_key: str | None = Field(default=None, env="POSTHOG_API_KEY")
+    posthog_host: str = Field(default="https://us.i.posthog.com", env="POSTHOG_HOST")
+
     # App
     app_env: str = Field(default="development", env="APP_ENV")
     app_port: int = Field(default=8000, env="PORT")

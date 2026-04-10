@@ -4,6 +4,7 @@ Uses the Anthropic API directly for message generation.
 The FastMCP server exposes tools that Claude calls during agentic runs.
 """
 import anthropic
+import json as _json
 from pathlib import Path
 from typing import Optional
 from config import get_settings
@@ -455,6 +456,74 @@ No explanations. No preamble. Just the message.
             return {"subject": f"Saw your post about {vertical.replace('_', ' ')} — quick question", "message": raw}
 
     return {"message": raw}
+
+
+def extract_with_gemini(prompt: str, text: str) -> str:
+    """
+    Use Gemini Flash for cheap, fast extraction tasks.
+    Falls back to Claude Haiku if Gemini API key not configured.
+    Use this for: PDF data extraction, lead categorisation, bulk text parsing.
+    NOT for: outreach message writing (use Claude Sonnet for that).
+    """
+    settings = get_settings()
+    gemini_key = settings.gemini_api_key
+
+    if gemini_key:
+        try:
+            import httpx
+            resp = httpx.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}",
+                json={
+                    "contents": [{"parts": [{"text": f"{prompt}\n\n{text}"}]}],
+                    "generationConfig": {"maxOutputTokens": 500, "temperature": 0.1},
+                },
+                timeout=20.0,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        except Exception as e:
+            log.warning("gemini_extraction_failed", error=str(e), fallback="haiku")
+
+    # Fallback: Claude Haiku
+    client = _get_client()
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=500,
+        messages=[{"role": "user", "content": f"{prompt}\n\n{text}"}],
+    )
+    return response.content[0].text.strip()
+
+
+def extract_invoice_fields(pdf_text: str) -> dict:
+    """
+    Extract structured invoice data from raw PDF text using Gemini Flash.
+    Returns: {debtor_name, amount_ngn, description, due_date, invoice_number}
+    """
+    prompt = """Extract invoice details from this text. Return JSON only with these exact keys:
+{
+  "debtor_name": "full name or company name of who owes money",
+  "amount_ngn": numeric value in Naira (convert if in USD/GBP),
+  "description": "what the invoice is for",
+  "due_date": "YYYY-MM-DD format or null if not found",
+  "invoice_number": "invoice ref number or null"
+}
+If amount is in foreign currency, convert to Naira at: 1 USD = 1600 NGN, 1 GBP = 2000 NGN.
+Return ONLY the JSON. No preamble."""
+
+    raw = extract_with_gemini(prompt, pdf_text)
+    try:
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        return _json.loads(raw.strip())
+    except Exception:
+        log.warning("invoice_extraction_parse_failed", raw=raw)
+        return {
+            "debtor_name": None, "amount_ngn": None,
+            "description": None, "due_date": None, "invoice_number": None,
+        }
 
 
 def generate_campaign_summary(stats: dict, vertical: str) -> str:

@@ -5,18 +5,25 @@ Three verticals: Real Estate | Recruitment | Events
 import structlog
 import uvicorn
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
+from posthog import Posthog
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
-from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router
+from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router
 from auth import require_auth
 from mcp_server import mcp
 from config import get_settings
 
 log = structlog.get_logger()
+
+_posthog: Posthog | None = None
+
+
+def get_posthog() -> Posthog | None:
+    return _posthog
 
 
 def _validate_env(settings) -> None:
@@ -45,10 +52,18 @@ def _validate_env(settings) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global _posthog
     # Startup
     settings = get_settings()
     _validate_env(settings)
     log.info("reachng_starting", env=settings.app_env)
+    if settings.posthog_api_key:
+        _posthog = Posthog(
+            api_key=settings.posthog_api_key,
+            host=settings.posthog_host,
+        )
+        _posthog.capture("reachng", event="server_started", properties={"env": settings.app_env})
+        log.info("posthog_initialized", host=settings.posthog_host)
     try:
         ensure_indexes()
         ensure_data_indexes()
@@ -82,6 +97,8 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown
     scheduler.shutdown(wait=False)
+    if _posthog:
+        _posthog.shutdown()
     log.info("reachng_stopped")
 
 
@@ -106,6 +123,23 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "Accept"],
 )
 
+@app.middleware("http")
+async def posthog_request_middleware(request: Request, call_next):
+    response = await call_next(request)
+    ph = get_posthog()
+    if ph and request.url.path.startswith("/api/"):
+        ph.capture(
+            "reachng",
+            event="api_request",
+            properties={
+                "path": request.url.path,
+                "method": request.method,
+                "status_code": response.status_code,
+            },
+        )
+    return response
+
+
 # REST API routes — all protected by Basic Auth
 _auth = {"dependencies": [Depends(require_auth)]}
 
@@ -121,7 +155,8 @@ app.include_router(ab_router,          prefix="/api/v1", **_auth)
 app.include_router(referrals_router,   prefix="/api/v1", **_auth)
 app.include_router(competitors_router, prefix="/api/v1", **_auth)
 app.include_router(invoices_router,    prefix="/api/v1", **_auth)
-app.include_router(b2c_router,         prefix="/api/v1", **_auth)
+app.include_router(b2c_router,            prefix="/api/v1", **_auth)
+app.include_router(invoice_chaser_router, prefix="/api/v1", **_auth)
 app.include_router(portal_router)        # Portal uses token auth — no Basic Auth
 app.include_router(dashboard_router, **_auth)
 
