@@ -1596,6 +1596,17 @@ async function submitEdit() {
 async function approveAll() { await postJSON("/api/v1/approvals/approve-all"); refresh(); }
 async function skipAll()    { await postJSON("/api/v1/approvals/skip-all");    refresh(); }
 
+async function markContactStatus(contactId, status) {
+  try {
+    await fetch(`/api/v1/contacts/${contactId}/${status}`, { method: "PATCH", credentials: "include" });
+    const card = document.getElementById("reply-card-" + contactId);
+    if (card) {
+      card.style.opacity = "0.4";
+      card.querySelector("div[style*='gap:8px']").innerHTML = `<span style="font-size:11px;color:#555;">Marked as ${status.replace("-"," ")} ✓</span>`;
+    }
+  } catch(e) { alert("Error: " + e.message); }
+}
+
 // ── Run campaign ─────────────────────────────────────────────────────────────
 
 // Show/hide sector picker when agency_sales is selected
@@ -1844,14 +1855,20 @@ async function refresh() {
           const intent    = r.intent || "unknown";
           const cardClass = INTENT_CLASS[intent] || "";
           const time      = r.received_at ? new Date(r.received_at).toLocaleString("en-NG", { timeZone: "Africa/Lagos" }) : "";
+          const cid = r.contact_id || "";
           return `
-            <div class="reply-card ${cardClass}">
+            <div class="reply-card ${cardClass}" id="reply-card-${cid}">
               <div class="reply-header">
                 <span class="reply-name">${r.contact_name || r.sender || "Unknown"}</span>
                 <span class="intent-badge intent-${intent}">${INTENT_LABELS[intent] || intent}</span>
               </div>
               <div class="reply-meta">${r.channel ? r.channel.toUpperCase() : ""} &nbsp;·&nbsp; ${r.vertical || ""} &nbsp;·&nbsp; ${time}</div>
               <div class="reply-summary">${r.summary || r.text || ""}</div>
+              ${cid ? `<div style="display:flex;gap:8px;margin-top:8px;">
+                <button onclick="markContactStatus('${cid}','converted')" style="font-size:11px;padding:3px 10px;background:#00e5a020;border:1px solid #00e5a040;color:#00e5a0;border-radius:6px;cursor:pointer;">Became Client</button>
+                <button onclick="markContactStatus('${cid}','replied')" style="font-size:11px;padding:3px 10px;background:#1e1e1e;border:1px solid #333;color:#888;border-radius:6px;cursor:pointer;">Mark Replied</button>
+                <button onclick="markContactStatus('${cid}','opted-out')" style="font-size:11px;padding:3px 10px;background:#1e1e1e;border:1px solid #333;color:#555;border-radius:6px;cursor:pointer;">Not Interested</button>
+              </div>` : ""}
             </div>`;
         }).join("");
       });
