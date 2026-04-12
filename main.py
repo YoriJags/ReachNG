@@ -12,7 +12,7 @@ from posthog import Posthog
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
-from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router
+from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router, webhooks_router
 from auth import require_auth
 from mcp_server import mcp
 from config import get_settings
@@ -160,6 +160,7 @@ app.include_router(invoices_router,    prefix="/api/v1", **_auth)
 app.include_router(b2c_router,            prefix="/api/v1", **_auth)
 app.include_router(invoice_chaser_router, prefix="/api/v1", **_auth)
 app.include_router(school_fees_router,    prefix="/api/v1", **_auth)
+app.include_router(webhooks_router,       prefix="/api/v1")  # No Basic Auth — Unipile posts freely
 app.include_router(portal_router)        # Portal uses token auth — no Basic Auth
 app.include_router(dashboard_router, **_auth)
 

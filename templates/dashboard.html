@@ -425,6 +425,7 @@
   <button class="tab-btn" onclick="switchTab('sf_schools', this)">Schools</button>
   <button class="tab-btn" onclick="switchTab('sf_payments', this)">Payments</button>
   <button class="tab-btn" onclick="switchTab('sf_reminders', this)">Reminders</button>
+  <button class="tab-btn" id="sf-claims-tab-btn" onclick="switchTab('sf_claims', this)">Claims <span id="sf-claims-badge" style="background:#ff5c00;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:4px;display:none;">0</span></button>
 </nav>
 
 <!-- ── Overview ───────────────────────────────────────────────────────────────── -->
@@ -1058,6 +1059,25 @@
   <div id="sf-reminder-results" style="margin-top:20px;"></div>
 </div>
 
+<!-- ── Payment Claims ──────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-sf_claims" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Payment Claims — Awaiting Confirmation</p>
+  <p style="color:#888;font-size:12px;margin-bottom:16px;">Parents who replied "I paid" — confirm once you see their receipt/transfer, or reject to resume reminders.</p>
+  <div style="margin-bottom:12px;">
+    <select id="sf-claims-school" onchange="sfLoadClaims()" style="max-width:280px;">
+      <option value="">All Schools</option>
+    </select>
+  </div>
+  <table class="table" id="sf-claims-table">
+    <thead><tr>
+      <th>Student</th><th>Parent</th><th>Phone</th><th>Balance</th><th>Claimed At</th><th>Action</th>
+    </tr></thead>
+    <tbody id="sf-claims-tbody">
+      <tr><td colspan="6" class="empty">Loading…</td></tr>
+    </tbody>
+  </table>
+</div>
+
 <!-- Floating quick-actions -->
 <div class="quick-panel">
   <div class="quick-menu" id="quick-menu">
@@ -1122,6 +1142,7 @@ function switchProduct(product, pill) {
     sfLoadOverview();
     sfLoadSchoolsTable();
     sfPopulateSchoolSelects();
+    sfCheckClaimsBadge();
   }
 }
 
@@ -2026,6 +2047,8 @@ async function sfPopulateSchoolSelects() {
       const el = document.getElementById(id);
       if (el) el.innerHTML = '<option value="">Select School…</option>' + opts;
     });
+    const claimsEl = document.getElementById("sf-claims-school");
+    if (claimsEl) claimsEl.innerHTML = '<option value="">All Schools</option>' + opts;
   } catch(e) {}
 }
 
@@ -2113,6 +2136,69 @@ function sfViewSchool(id, name) {
     const sel = document.getElementById("sf-pay-school");
     if (sel) { sel.value = id; sfLoadStudentsForPayment(); }
   }, 100);
+}
+
+async function sfLoadClaims() {
+  const schoolId = document.getElementById("sf-claims-school")?.value || "";
+  const tbody = document.getElementById("sf-claims-tbody");
+  tbody.innerHTML = '<tr><td colspan="6" class="empty">Loading…</td></tr>';
+  try {
+    const url = schoolId
+      ? `/api/v1/school-fees/schools/${schoolId}/students?paid=false&claimed=true`
+      : `/api/v1/school-fees/students/claimed`; // fallback — we'll use per-school for now
+    const students = await fetchJSON(url);
+    const list = Array.isArray(students) ? students : (students.students || []);
+    // Update badge
+    const badge = document.getElementById("sf-claims-badge");
+    if (badge) { badge.textContent = list.length; badge.style.display = list.length ? "inline" : "none"; }
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">No pending claims.</td></tr>'; return; }
+    tbody.innerHTML = list.map(s => {
+      const balance = Math.max(0, s.fee_amount - (s.amount_paid || 0));
+      const claimedAt = s.claim_received_at ? new Date(s.claim_received_at).toLocaleString() : "—";
+      return `<tr>
+        <td style="font-weight:600;">${s.student_name}</td>
+        <td style="color:#aaa;font-size:12px;">${s.parent_name}</td>
+        <td style="color:#aaa;font-size:12px;">${s.parent_phone}</td>
+        <td>₦${balance.toLocaleString()}</td>
+        <td style="color:#aaa;font-size:11px;">${claimedAt}</td>
+        <td style="display:flex;gap:6px;">
+          <button class="btn btn-approve" style="font-size:11px;padding:3px 10px;" onclick="sfConfirmClaim('${s.id}')">Confirm Paid</button>
+          <button class="btn btn-reject" style="font-size:11px;padding:3px 10px;background:#1a1a1a;border:1px solid #444;color:#ff5c00;" onclick="sfRejectClaim('${s.id}')">Reject</button>
+        </td>
+      </tr>`;
+    }).join("");
+  } catch(e) { tbody.innerHTML = `<tr><td colspan="6" class="empty">Error: ${e.message}</td></tr>`; }
+}
+
+async function sfConfirmClaim(studentId) {
+  if (!confirm("Mark this student as fully paid?")) return;
+  try {
+    await postJSON(`/api/v1/school-fees/students/${studentId}/confirm-payment`, {});
+    sfLoadClaims();
+    sfLoadOverview();
+  } catch(e) { alert("Error: " + e.message); }
+}
+
+async function sfRejectClaim(studentId) {
+  if (!confirm("Reject this claim? Reminders will resume for this student.")) return;
+  try {
+    await postJSON(`/api/v1/school-fees/students/${studentId}/reject-claim`, {});
+    sfLoadClaims();
+  } catch(e) { alert("Error: " + e.message); }
+}
+
+async function sfCheckClaimsBadge() {
+  // Lightweight check — load all schools, sum claimed students
+  try {
+    const schools = await fetchJSON("/api/v1/school-fees/schools");
+    let total = 0;
+    for (const s of schools) {
+      const students = await fetchJSON(`/api/v1/school-fees/schools/${s.id}/students?paid=false&claimed=true`);
+      total += Array.isArray(students) ? students.length : 0;
+    }
+    const badge = document.getElementById("sf-claims-badge");
+    if (badge) { badge.textContent = total; badge.style.display = total ? "inline" : "none"; }
+  } catch(e) {}
 }
 
 // ── Fix initial panel visibility ──────────────────────────────────────────────

@@ -148,12 +148,41 @@ async def deactivate_school(school_id: str):
 # ─── Students ─────────────────────────────────────────────────────────────────
 
 @router.get("/schools/{school_id}/students")
-async def list_students(school_id: str, paid: Optional[bool] = None):
+async def list_students(school_id: str, paid: Optional[bool] = None, claimed: Optional[bool] = None):
     query: dict = {"school_id": school_id}
     if paid is not None:
         query["paid"] = paid
+    if claimed is not None:
+        query["claimed_paid"] = claimed
     students = list(_students().find(query).sort("student_name", 1))
     return [_serial(s) for s in students]
+
+
+@router.post("/students/{student_id}/confirm-payment")
+async def confirm_claimed_payment(student_id: str):
+    """Bursar confirms a parent's payment claim — marks student as fully paid."""
+    student = _students().find_one({"_id": ObjectId(student_id)})
+    if not student:
+        raise HTTPException(404, "Student not found")
+    now = datetime.now(timezone.utc)
+    _students().update_one(
+        {"_id": ObjectId(student_id)},
+        {"$set": {"paid": True, "amount_paid": student["fee_amount"], "paid_at": now, "claimed_paid": False, "updated_at": now}},
+    )
+    return {"success": True, "status": "confirmed"}
+
+
+@router.post("/students/{student_id}/reject-claim")
+async def reject_claimed_payment(student_id: str):
+    """Bursar rejects the claim — clears claimed_paid, reminders resume."""
+    student = _students().find_one({"_id": ObjectId(student_id)})
+    if not student:
+        raise HTTPException(404, "Student not found")
+    _students().update_one(
+        {"_id": ObjectId(student_id)},
+        {"$set": {"claimed_paid": False, "updated_at": datetime.now(timezone.utc)}},
+    )
+    return {"success": True, "status": "claim_rejected"}
 
 
 @router.post("/schools/{school_id}/students")
@@ -320,13 +349,32 @@ async def send_reminders(payload: SendReminders):
     results = []
 
     for student in unpaid:
+        # Skip students who claimed payment — hold until bursar confirms or rejects
+        if student.get("claimed_paid"):
+            results.append({
+                "student": student["student_name"],
+                "skipped": True,
+                "reason": "payment_claimed_awaiting_confirmation",
+            })
+            continue
+
         due = student.get("due_date", "")
         balance = max(0, student["fee_amount"] - student.get("amount_paid", 0))
+        reminder_count = student.get("reminder_count", 0)
+
+        # Tone escalates with reminder count
+        if reminder_count == 0:
+            tone_line = "Kindly make payment to avoid any disruption to your child's schooling."
+        elif reminder_count == 1:
+            tone_line = "Please note this is your second reminder. Prompt payment is required to avoid disruption."
+        else:
+            tone_line = "This is a final notice. Outstanding fees must be settled immediately to avoid suspension of school services."
+
         message = (
             f"Dear {student['parent_name']},\n\n"
             f"This is a reminder that {student['student_name']}'s {student['fee_label']} "
             f"of ₦{balance:,.0f} is due on {due}.\n\n"
-            f"Kindly make payment to avoid any disruption to your child's schooling.\n\n"
+            f"{tone_line}\n\n"
             f"Thank you,\n{school['name']}"
         )
 
