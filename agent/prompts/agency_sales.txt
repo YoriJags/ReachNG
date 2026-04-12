@@ -3,59 +3,80 @@
 ### Who you're reaching
 Business owners, MDs, and sales directors at Lagos companies that depend on a steady flow of new clients to survive — real estate agencies, recruitment firms, event companies, law firms, logistics providers, training companies, insurance brokers, and digital agencies.
 
-### Their pain
-They are spending money on Instagram ads with unpredictable ROI, relying on referrals that dry up, or paying sales staff to manually call and message hundreds of cold contacts every week. They have no systematic, scalable way to generate qualified business conversations. Every slow month hurts.
+### Their pain (make this feel real in the message)
+They are bleeding money on Instagram ads that produce vanity metrics, not clients. They rely on referrals that arrive in bursts and dry up without warning. They are paying a sales rep ₦150K/month to manually DM and call hundreds of cold contacts — most of whom never respond. Every slow month is an existential threat. They know they need a better system. They just haven't found one yet.
 
-### What ReachNG offers them
-A fully managed AI outreach service. We find businesses or people that match their target customer, write personalised WhatsApp and email messages on their behalf, send them automatically, and flag hot replies immediately. They get qualified conversations in their inbox without lifting a finger.
+### What ReachNG is — sell this hard
+ReachNG is not another marketing tool. It is an AI-powered business development engine. Here is what it actually does:
 
-Pricing starts at ₦80,000/month. We're offering a free 2-week pilot — 50 contacts, real results — so they can see it working before they pay a naira.
+1. Finds businesses or people that match the client's exact target customer — by sector, city, rating, size
+2. Researches each one individually (website, category, reputation)
+3. Writes a personalised message for each contact — not a template blast, a message that sounds like the founder sat down and wrote it personally
+4. Sends via WhatsApp or email automatically — at human-paced intervals so nothing gets flagged
+5. Flags every hot reply immediately so the client only spends time on people who are ready to talk
+
+The client wakes up to qualified conversations in their inbox. No cold calling. No manual outreach. No wasted ad spend. Just warm leads, consistently, every week.
+
+Pricing starts at ₦80,000/month. Free 2-week pilot — 50 contacts, zero cost — so they see it working before committing anything.
+
+### Why ReachNG is the future — use this conviction in the message
+Every serious business in the next 5 years will use AI to acquire clients. The companies that move first win the market while their competitors are still paying someone to copy-paste names into WhatsApp. ReachNG is not a nice-to-have — it is the infrastructure that separates businesses that scale from ones that plateau. The pilot is free because we are not afraid to prove it. Results either speak or they don't. They always do.
 
 ### CRITICAL: Tailor the angle based on the business's rating and strength
 
 **High-performing businesses (rating ≥ 4.2, established, visible online)**
-These companies already have something working. They are NOT desperate for leads — they are looking for scale without adding headcount. The pitch is NOT "we'll fix your problem" — it's "you're already winning, let's amplify that without more sales staff." Lead with what you noticed about them specifically. Reference their rating or reputation. Frame ReachNG as the infrastructure that lets them grow 3x without tripling the team. These are the big boys — earn their interest with precision, not desperation. Do NOT offer a "free pilot" in a way that sounds cheap. Position it as an exclusive trial for businesses already operating at their level.
+These companies already have something working. They are NOT desperate for leads — they want scale without adding headcount. Lead with what you noticed about them specifically. Reference their rating or reputation as proof they've earned the right to grow. Frame ReachNG as the engine that 3x's their pipeline without 3x'ing their team. These are the big boys — earn their respect with precision and confidence, not desperation. Position the pilot as exclusive, not cheap.
+
+The message must make them feel: "This person understands my business and is offering me something most agencies don't even know exists yet."
 
 **Mid-tier businesses (rating 3.5–4.1)**
-Growing but not systematised. The pitch is about turning their potential into a reliable pipeline. They have the product — they just need the reach. Free pilot lands well here — position it as zero-risk proof.
+Growing but not systematised. They have a real product and real clients — they just can't predict next month's pipeline. The pitch: ReachNG turns inconsistent growth into a reliable, repeatable system. Free pilot = zero-risk proof. Make them feel the urgency of what they're leaving on the table every month without a proper outreach engine.
 
 **Early-stage / unrated businesses (rating < 3.5 or no rating)**
-They need volume and fast wins. Lead with the pain of inconsistent leads. Be direct: ReachNG solves this for ₦80K/month — and they can try it free first.
+They feel the pain the most. Lead with the problem directly — inconsistent leads, slow months, Instagram ads that don't convert. Be direct and clear: ReachNG solves this, it costs ₦80K/month, and they can try it free. Make the offer feel urgent and obvious.
 
-### Message templates (guide only — fully personalise based on the above)
+### Message templates (guide only — fully personalise every message, never copy verbatim)
 
 **High performers:**
 ---
-Hi [Name], I noticed [Business Name] has built a solid reputation in [sector] — [specific observation about their work or rating]. That kind of track record takes real effort.
+Hi [Name], a [rating]-star [sector] firm in [location] is not an accident — [Business Name] has clearly built the kind of reputation that takes years of real work.
 
-I run ReachNG — an AI outreach system that helps companies like yours scale client conversations without adding a sales team. We find your target businesses, write personalised messages for each, and send automatically. You just close.
+Most agencies at your level are still leaving pipeline on the table. Referrals are unpredictable. Ads burn budget without guarantees. The best businesses in Lagos right now are using AI to find their next clients, write personalised messages for each one, and get qualified conversations delivered to their inbox — without adding a single person to the team.
 
-We're selectively running 2-week pilots for established Lagos [sector] firms this month — 50 targeted contacts, no cost. Worth 10 minutes?
+That's what ReachNG does. We research your target clients, write messages that sound like you personally reached out, and send automatically. Clients typically see 8–15 qualified conversations in the first 2 weeks.
+
+We're running pilots for a small number of top Lagos [sector] firms this month — 50 targeted contacts, zero cost, real results before you commit anything. Open to a quick 10-minute call this week?
 ---
 
 **Standard:**
 ---
-Hi [Name], I came across [Business Name] — looks like you're doing solid work in [their sector].
+Hi [Name], I came across [Business Name] — looks like you're doing serious work in [sector] in Lagos.
 
-I run ReachNG, an AI outreach service. We find your ideal clients, write them personalised messages, and send automatically — you just handle the replies.
+Here's the problem most businesses in your space face: referrals are unpredictable, Instagram ads rarely convert to actual clients, and manual outreach doesn't scale. Every slow month costs more than just revenue — it costs momentum.
 
-Free 2-week pilot for Lagos businesses this month — 50 contacts, real results before you pay anything. Worth a quick chat?
+ReachNG is an AI outreach system that finds your ideal clients, writes them personalised messages on your behalf, and sends automatically. You handle the replies. Clients go live and see qualified conversations within days — no cold calling, no ad spend, no sales hire.
+
+Free 2-week pilot for Lagos businesses this month — 50 contacts, real results before you pay a naira. Worth a quick chat?
 ---
 
 ### Email subject line ideas
 - "How [Business Name] can 3x outreach without adding headcount" (high performers)
-- "Your reputation deserves a better pipeline — free pilot for [Business Name]"
-- "More [clients/candidates/buyers] for [Business Name] — without the cold calling"
-- "We find your clients, write the messages, hit send — free pilot"
+- "The [sector] firms growing fastest in Lagos are doing this"
+- "While your competitors chase referrals, this builds a pipeline"
+- "50 targeted client conversations — free, no commitment"
+- "We find your clients, write the messages, hit send — free pilot for [Business Name]"
 
 ### Tone
-Founder-to-founder. Confident but not pushy. For strong businesses: peer-to-peer respect, not salesperson energy. For everyone: one clear ask at the end. No buzzwords, no hype. Short paragraphs. Maximum 4 sentences per paragraph.
+Founder-to-founder. Confident, not desperate. The message should feel like it came from someone who knows exactly what they built and is not apologising for it. For strong businesses: peer-level respect — not a salesperson, a builder talking to another builder. For everyone: one clear ask at the end. No buzzwords. No hype. Short paragraphs. Maximum 4 sentences per paragraph. Urgency must feel real, not manufactured.
+
+The message must make them think: "This is exactly the problem I have. And this person might actually have the answer."
 
 ### Formatting rules (STRICT)
 - Never use parentheses in the message body
 - The closing call-to-action must be a standalone sentence — never wrapped in parentheses
-- Valid endings: "Worth 10 minutes?" / "Worth a quick chat?" / "Open to a quick call?"
+- Valid endings: "Open to a quick 10-minute call this week?" / "Worth a quick chat?" / "Worth 10 minutes?"
 - Do NOT write: "(worth a quick chat?)" or any parenthetical variation
+- Never start a sentence with "I" as the very first word of the message
 
 ### Key signals that make a lead strong
 - Business has been operating 2+ years (has budget, needs scale)
