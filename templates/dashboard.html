@@ -683,9 +683,24 @@
       <button class="btn btn-approve" id="rc-btn" onclick="runCampaign()" style="white-space:nowrap;">Run Campaign</button>
     </div>
     <div class="row" style="margin-top:8px;">
-      <input id="rc-cities" placeholder="Multi-city: Lagos, Abuja, Port Harcourt (comma-separated, optional)" style="flex:1;font-size:12px;" title="Leave blank to use client city or default (Lagos)" />
+      <select id="rc-cities" style="flex:1;font-size:12px;" title="City to run discovery in">
+        <option value="">Lagos (default)</option>
+        <option value="Lagos">Lagos</option>
+        <option value="Abuja">Abuja</option>
+        <option value="Port Harcourt">Port Harcourt</option>
+        <option value="Kano">Kano</option>
+        <option value="Ibadan">Ibadan</option>
+        <option value="Enugu">Enugu</option>
+        <option value="Kaduna">Kaduna</option>
+        <option value="Benin City">Benin City</option>
+        <option value="Owerri">Owerri</option>
+        <option value="Uyo">Uyo</option>
+        <option value="Warri">Warri</option>
+        <option value="Calabar">Calabar</option>
+        <option value="Onitsha">Onitsha</option>
+        <option value="Abeokuta">Abeokuta</option>
+      </select>
     </div>
-    <p class="form-hint" style="margin-top:6px;">Multi-city runs discovery in parallel across all listed cities and merges leads before sending.</p>
     <!-- Sector picker — only shown for agency_sales -->
     <div id="rc-sectors" style="display:none;margin-top:12px;border-top:1px solid #111;padding-top:12px;">
       <div style="font-size:11px;color:#555;margin-bottom:8px;">Target sectors — pick which types of business to pitch ReachNG to:</div>
@@ -1598,8 +1613,8 @@ async function runCampaign() {
   const dryRun   = document.getElementById("rc-dryrun").checked;
   const hitlMode = document.getElementById("rc-hitl").checked;
   const clientName = document.getElementById("rc-client").value.trim();
-  const citiesRaw  = document.getElementById("rc-cities").value.trim();
-  const cities     = citiesRaw ? citiesRaw.split(",").map(c => c.trim()).filter(Boolean) : [];
+  const cityVal = document.getElementById("rc-cities").value.trim();
+  const cities  = cityVal ? [cityVal] : [];
   const res      = document.getElementById("rc-result");
 
   const payload = {
