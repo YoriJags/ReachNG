@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     # Gemini Flash (cheap extraction — PDF parsing, data scraping)
     gemini_api_key: str | None = Field(default=None, env="GEMINI_API_KEY")
 
+    # WhatsApp inbound webhook verify token (Meta handshake)
+    webhook_verify_token: str = Field(default="reachng-webhook", env="WEBHOOK_VERIFY_TOKEN")
+
     # PostHog analytics
     posthog_api_key: str | None = Field(default=None, env="POSTHOG_API_KEY")
     posthog_host: str = Field(default="https://us.i.posthog.com", env="POSTHOG_HOST")
