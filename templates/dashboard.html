@@ -674,6 +674,14 @@
       </select>
       <input id="rc-client" placeholder="Client name (optional)" />
       <input id="rc-max" type="number" value="10" min="1" max="60" style="max-width:80px;" title="Max contacts" />
+      <select id="rc-min-rating" title="Minimum Google rating to target" style="max-width:130px;font-size:12px;">
+        <option value="">Any rating</option>
+        <option value="3.0">3.0+ stars</option>
+        <option value="3.5">3.5+ stars</option>
+        <option value="4.0">4.0+ stars</option>
+        <option value="4.2">4.2+ stars (top tier)</option>
+        <option value="4.5">4.5+ stars (elite)</option>
+      </select>
       <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#777;white-space:nowrap;">
         <input type="checkbox" id="rc-dryrun" checked style="width:auto;accent-color:#ff5c00;" /> Dry run
       </label>
@@ -1625,14 +1633,17 @@ async function runCampaign() {
   const dryRun   = document.getElementById("rc-dryrun").checked;
   const hitlMode = document.getElementById("rc-hitl").checked;
   const clientName = document.getElementById("rc-client").value.trim();
-  const cityVal = document.getElementById("rc-cities").value.trim();
-  const cities  = cityVal ? [cityVal] : [];
+  const cityVal   = document.getElementById("rc-cities").value.trim();
+  const cities    = cityVal ? [cityVal] : [];
+  const minRating = document.getElementById("rc-min-rating").value;
+
   const res      = document.getElementById("rc-result");
 
   const payload = {
     vertical, max_contacts: max, dry_run: dryRun, hitl_mode: hitlMode,
     ...(clientName ? { client_name: clientName } : {}),
     ...(cities.length  ? { cities } : {}),
+    ...(minRating ? { min_rating: parseFloat(minRating) } : {}),
   };
 
   if (vertical === "agency_sales") {

@@ -38,6 +38,7 @@ class BaseCampaign:
         client_name: Optional[str] = None,
         cities: Optional[list] = None,
         target_sectors: Optional[list] = None,
+        min_rating: Optional[float] = None,
     ) -> dict:
         """
         Full campaign run:
@@ -172,6 +173,13 @@ class BaseCampaign:
             if has_been_contacted(biz["place_id"]):
                 skipped_contacted += 1
                 continue
+
+            # Step 3.5: Rating filter — skip if below minimum threshold
+            if min_rating is not None:
+                biz_rating = biz.get("rating")
+                if biz_rating is None or biz_rating < min_rating:
+                    skipped_no_channel += 1
+                    continue
 
             # Step 4: Quality filter
             if not should_contact(
