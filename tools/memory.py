@@ -10,6 +10,34 @@ from config import get_settings
 from tools.scoring import score_contact
 
 
+# ─── Nigerian state extraction ────────────────────────────────────────────────
+
+# Known Nigerian states + FCT. Used to tag contacts from their address string.
+_NG_STATES = [
+    "Lagos", "Abuja", "FCT", "Rivers", "Ogun", "Oyo", "Kano", "Kaduna",
+    "Delta", "Anambra", "Enugu", "Imo", "Akwa Ibom", "Cross River", "Edo",
+    "Benue", "Plateau", "Kwara", "Niger", "Kogi", "Ekiti", "Ondo", "Osun",
+    "Abia", "Ebonyi", "Bayelsa", "Taraba", "Adamawa", "Borno", "Yobe",
+    "Gombe", "Bauchi", "Jigawa", "Kebbi", "Sokoto", "Zamfara", "Nasarawa",
+]
+
+def _extract_state(address: Optional[str]) -> Optional[str]:
+    """Best-effort: pull Nigerian state name from a formatted address string."""
+    if not address:
+        return None
+    addr_upper = address.upper()
+    for state in _NG_STATES:
+        if state.upper() in addr_upper:
+            return "FCT" if state == "Abuja" else state
+    # Fallback: second-to-last comma-separated segment often contains state
+    parts = [p.strip() for p in address.split(",")]
+    if len(parts) >= 2:
+        candidate = parts[-2].strip().split()[0]
+        if len(candidate) > 3:
+            return candidate
+    return None
+
+
 # ─── Contact status states ────────────────────────────────────────────────────
 class Status:
     NOT_CONTACTED = "not_contacted"
@@ -47,6 +75,8 @@ def upsert_contact(
         category=category,
     )
 
+    state = _extract_state(address)
+
     doc = {
         "place_id": place_id,
         "name": name,
@@ -60,6 +90,8 @@ def upsert_contact(
         "lead_score": lead_score,
         "updated_at": now,
     }
+    if state:
+        doc["state"] = state
     if client_name:
         doc["client_name"] = client_name
     if source:

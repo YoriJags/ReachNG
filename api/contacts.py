@@ -25,6 +25,8 @@ def _serialise(doc: dict) -> dict:
 async def list_contacts(
     vertical: str | None = None,
     status: str | None = None,
+    state: str | None = None,
+    source: str | None = None,
     limit: int = 50,
     skip: int = 0,
 ):
@@ -33,6 +35,10 @@ async def list_contacts(
         query["vertical"] = vertical
     if status:
         query["status"] = status
+    if state:
+        query["state"] = {"$regex": f"^{state}$", "$options": "i"}
+    if source:
+        query["source"] = source
 
     contacts = list(
         get_contacts()
@@ -48,6 +54,8 @@ async def list_contacts(
 async def export_contacts(
     vertical: str | None = None,
     status: str | None = None,
+    state: str | None = None,
+    source: str | None = None,
     fmt: str = Query(default="csv", pattern="^csv$"),
 ):
     """Export contacts as a CSV download. Importable directly into Google Sheets."""
@@ -56,11 +64,15 @@ async def export_contacts(
         query["vertical"] = vertical
     if status:
         query["status"] = status
+    if state:
+        query["state"] = {"$regex": f"^{state}$", "$options": "i"}
+    if source:
+        query["source"] = source
 
     contacts = list(get_contacts().find(query).sort("created_at", -1))
 
-    fields = ["name", "vertical", "status", "phone", "email", "website",
-              "address", "category", "rating", "outreach_count",
+    fields = ["name", "vertical", "status", "state", "source", "phone", "email",
+              "website", "address", "category", "rating", "outreach_count",
               "last_contacted_at", "created_at"]
 
     buf = io.StringIO()

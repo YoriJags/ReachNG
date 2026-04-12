@@ -503,6 +503,10 @@
       </label>
       <button class="btn btn-approve" id="rc-btn" onclick="runCampaign()" style="white-space:nowrap;">Run Campaign</button>
     </div>
+    <div class="row" style="margin-top:8px;">
+      <input id="rc-cities" placeholder="Multi-city: Lagos, Abuja, Port Harcourt (comma-separated, optional)" style="flex:1;font-size:12px;" title="Leave blank to use client city or default (Lagos)" />
+    </div>
+    <p class="form-hint" style="margin-top:6px;">Multi-city runs discovery in parallel across all listed cities and merges leads before sending.</p>
     <div id="rc-result" style="margin-top:10px;display:none;"></div>
   </div>
 
@@ -619,14 +623,34 @@
         <option value="starter">Starter — ₦50k setup + ₦50k/mo · 300 msgs · 1 vertical</option>
         <option value="growth">Growth — ₦120k setup + ₦120k/mo · 1,000 msgs · 3 verticals</option>
         <option value="agency">Agency — ₦250k setup + ₦250k/mo · Unlimited · All verticals</option>
+        <option value="national">National — ₦200k/mo · Multi-state · All verticals</option>
+        <option value="international">International — Custom · Cross-border campaigns</option>
       </select>
       <input id="ob-city" placeholder="City (default: Lagos)" style="flex:1;" />
+      <input id="ob-cities" placeholder="Multi-city: Lagos, Abuja, PH (optional)" style="flex:1;" title="Comma-separated cities for national-tier clients" />
     </div>
-    <div class="row">
+
+    <div class="row" style="margin-top:4px;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.6px;white-space:nowrap;">WhatsApp Provider:</span>
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:#888;cursor:pointer;">
+        <input type="radio" name="ob-wa-provider" id="ob-provider-unipile" value="unipile" checked style="accent-color:#ff5c00;" />
+        Unipile (QR scan)
+      </label>
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:#888;cursor:pointer;">
+        <input type="radio" name="ob-wa-provider" id="ob-provider-meta" value="meta" style="accent-color:#00e5a0;" />
+        Meta Cloud API (client's own number — no Unipile cost)
+      </label>
+    </div>
+
+    <div class="row" id="ob-unipile-fields">
       <input id="ob-wa-account" placeholder="Unipile WhatsApp Account ID" style="flex:1;" />
       <input id="ob-email-account" placeholder="Unipile Email Account ID (optional)" style="flex:1;" />
     </div>
-    <p class="form-hint">Account IDs from Unipile dashboard after client scans QR. Leave blank to use your default number.</p>
+    <div class="row" id="ob-meta-fields" style="display:none;">
+      <input id="ob-meta-phone-id" placeholder="Meta Phone Number ID (from Business Manager)" style="flex:1;" />
+      <input id="ob-meta-token" placeholder="Meta System User Access Token (permanent)" style="flex:1;" />
+    </div>
+    <p class="form-hint" id="ob-provider-hint">Unipile: client scans QR code — get Account ID from Unipile dashboard. ~$15/mo passed to client.</p>
     <div class="row" style="margin-top:8px;">
       <textarea id="ob-brief" placeholder="Who is this client? What do they sell? What tone? Who is their target customer?&#10;&#10;Example: Mercury Lagos is a luxury property agency on Victoria Island. Tone: professional, warm. Target: HNI buyers, diaspora investors."></textarea>
     </div>
@@ -794,15 +818,34 @@
       </select>
       <select id="exp-status">
         <option value="">All Statuses</option>
-        <option value="new">New</option>
+        <option value="not_contacted">Not Contacted</option>
         <option value="contacted">Contacted</option>
         <option value="replied">Replied</option>
         <option value="converted">Converted</option>
         <option value="opted_out">Opted Out</option>
       </select>
+      <select id="exp-state">
+        <option value="">All States</option>
+        <option value="Lagos">Lagos</option>
+        <option value="FCT">Abuja / FCT</option>
+        <option value="Rivers">Rivers (Port Harcourt)</option>
+        <option value="Ogun">Ogun</option>
+        <option value="Oyo">Oyo (Ibadan)</option>
+        <option value="Kano">Kano</option>
+        <option value="Delta">Delta</option>
+        <option value="Anambra">Anambra</option>
+        <option value="Edo">Edo (Benin)</option>
+        <option value="Enugu">Enugu</option>
+      </select>
+      <select id="exp-source">
+        <option value="">All Sources</option>
+        <option value="maps">Google Maps</option>
+        <option value="apollo">Apollo.io</option>
+        <option value="social">Social</option>
+      </select>
       <button class="btn btn-approve" onclick="exportContacts()" style="white-space:nowrap;">Download CSV</button>
     </div>
-    <p class="form-hint">Open in Google Sheets via File → Import. All contact fields included.</p>
+    <p class="form-hint">Includes state, source, and all contact fields. Open in Google Sheets via File → Import.</p>
   </div>
 
   <p class="section-title" style="margin-top:32px;">Hook Generator <span style="color:#ff5c00;font-size:10px;margin-left:6px;">Content Intelligence</span></p>
@@ -1007,6 +1050,8 @@ async function runCampaign() {
   const dryRun   = document.getElementById("rc-dryrun").checked;
   const hitlMode = document.getElementById("rc-hitl").checked;
   const clientName = document.getElementById("rc-client").value.trim();
+  const citiesRaw  = document.getElementById("rc-cities").value.trim();
+  const cities     = citiesRaw ? citiesRaw.split(",").map(c => c.trim()).filter(Boolean) : [];
   const res      = document.getElementById("rc-result");
 
   btn.textContent = "Running…"; btn.disabled = true; res.style.display = "none";
@@ -1014,6 +1059,7 @@ async function runCampaign() {
     const result = await postJSON("/api/v1/campaigns/run", {
       vertical, max_contacts: max, dry_run: dryRun, hitl_mode: hitlMode,
       ...(clientName ? { client_name: clientName } : {}),
+      ...(cities.length  ? { cities } : {}),
     });
     res.innerHTML = renderResult(result, vertical, dryRun);
     res.style.display = "block";
@@ -1417,19 +1463,37 @@ async function markWrittenOff(invoiceId) {
   catch(err) { alert("Error: " + err.message); }
 }
 
+// ── WhatsApp provider toggle ──────────────────────────────────────────────────
+
+document.querySelectorAll('input[name="ob-wa-provider"]').forEach(radio => {
+  radio.addEventListener("change", () => {
+    const isMeta = radio.value === "meta";
+    document.getElementById("ob-unipile-fields").style.display = isMeta ? "none" : "";
+    document.getElementById("ob-meta-fields").style.display    = isMeta ? ""     : "none";
+    document.getElementById("ob-provider-hint").textContent    = isMeta
+      ? "Meta Cloud API: client connects their WhatsApp Business number via Meta Business Manager. Free to integrate — client pays Meta per message (~₦5–40/msg)."
+      : "Unipile: client scans QR code — get Account ID from Unipile dashboard. ~$15/mo passed to client.";
+  });
+});
+
 // ── Client Onboarding ─────────────────────────────────────────────────────────
 
 async function createClient() {
   const btn      = document.getElementById("ob-create-btn");
-  const name     = document.getElementById("ob-name").value.trim();
-  const brief    = document.getElementById("ob-brief").value.trim();
-  const vertical = document.getElementById("ob-vertical").value;
-  const channel  = document.getElementById("ob-channel").value;
-  const plan     = document.getElementById("ob-plan").value;
-  const city     = document.getElementById("ob-city").value.trim();
-  const waAcct   = document.getElementById("ob-wa-account").value.trim();
-  const emailAcct= document.getElementById("ob-email-account").value.trim();
-  const res      = document.getElementById("ob-create-result");
+  const name       = document.getElementById("ob-name").value.trim();
+  const brief      = document.getElementById("ob-brief").value.trim();
+  const vertical   = document.getElementById("ob-vertical").value;
+  const channel    = document.getElementById("ob-channel").value;
+  const plan       = document.getElementById("ob-plan").value;
+  const city       = document.getElementById("ob-city").value.trim();
+  const citiesRaw  = document.getElementById("ob-cities").value.trim();
+  const cities     = citiesRaw ? citiesRaw.split(",").map(c => c.trim()).filter(Boolean) : [];
+  const provider   = document.querySelector('input[name="ob-wa-provider"]:checked')?.value || "unipile";
+  const waAcct     = document.getElementById("ob-wa-account").value.trim();
+  const emailAcct  = document.getElementById("ob-email-account").value.trim();
+  const metaPhoneId= document.getElementById("ob-meta-phone-id").value.trim();
+  const metaToken  = document.getElementById("ob-meta-token").value.trim();
+  const res        = document.getElementById("ob-create-result");
 
   if (!name || !brief) {
     res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Client name and brief are required.</div>`;
@@ -1440,9 +1504,12 @@ async function createClient() {
   try {
     const data = await postJSON("/api/v1/clients/", {
       name, vertical, brief, preferred_channel: channel, active: true,
-      plan: plan || null, city: city || null,
+      plan: plan || null, city: city || null, cities,
+      whatsapp_provider: provider,
       whatsapp_account_id: waAcct || null,
       email_account_id: emailAcct || null,
+      meta_phone_number_id: metaPhoneId || null,
+      meta_access_token: metaToken || null,
     });
     res.innerHTML = `<div style="color:#00e5a0;font-size:13px;">Client <strong>${name}</strong> ${data.action}. Now generate their portal link in Step 2.</div>`;
     document.getElementById("ob-portal-name").value = name;
@@ -1520,9 +1587,13 @@ async function runClientCampaign() {
 function exportContacts() {
   const vertical = document.getElementById("exp-vertical").value;
   const status   = document.getElementById("exp-status").value;
+  const state    = document.getElementById("exp-state").value;
+  const source   = document.getElementById("exp-source").value;
   const params   = new URLSearchParams();
   if (vertical) params.set("vertical", vertical);
   if (status)   params.set("status", status);
+  if (state)    params.set("state", state);
+  if (source)   params.set("source", source);
   const a = document.createElement("a");
   a.href = `/api/v1/contacts/export?${params.toString()}`;
   a.download = ""; document.body.appendChild(a); a.click(); document.body.removeChild(a);

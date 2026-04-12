@@ -62,6 +62,72 @@ async def send_whatsapp(phone: str, message: str, account_id: Optional[str] = No
         return {"success": True, "chat_id": data.get("id")}
 
 
+# ─── Meta Cloud API WhatsApp ──────────────────────────────────────────────────
+
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=8))
+async def send_whatsapp_meta(
+    phone: str,
+    message: str,
+    phone_number_id: str,
+    access_token: str,
+) -> dict:
+    """
+    Send a WhatsApp message via Meta Cloud API (official Business API).
+    Client connects their own WhatsApp Business number — zero cost per account.
+    Phone must be E.164 format: +2348012345678
+    phone_number_id: from Meta Business Manager / WhatsApp Business API setup
+    access_token: permanent system user token from Meta Business Manager
+    """
+    url = f"https://graph.facebook.com/v19.0/{phone_number_id}/messages"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": phone,
+        "type": "text",
+        "text": {"preview_url": False, "body": message},
+    }
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        resp = await client.post(url, headers=headers, json=payload)
+        if resp.status_code == 400:
+            body = resp.json()
+            log.warning("meta_whatsapp_bad_request", phone=phone, detail=body)
+            return {"success": False, "error": "bad_request", "detail": body}
+        resp.raise_for_status()
+        data = resp.json()
+        msg_id = data.get("messages", [{}])[0].get("id")
+        log.info("meta_whatsapp_sent", phone=phone, message_id=msg_id)
+        return {"success": True, "message_id": msg_id}
+
+
+async def send_whatsapp_for_client(
+    phone: str,
+    message: str,
+    client_doc: Optional[dict] = None,
+) -> dict:
+    """
+    Route WhatsApp send through the right provider based on client config.
+    - client.whatsapp_provider == 'meta'    → Meta Cloud API (client's own number, no Unipile cost)
+    - client.whatsapp_provider == 'unipile' → Unipile (default, uses client's account_id)
+    - no client_doc                         → Unipile default account (your own number)
+    """
+    if client_doc and client_doc.get("whatsapp_provider") == "meta":
+        phone_number_id = client_doc.get("meta_phone_number_id")
+        access_token    = client_doc.get("meta_access_token")
+        if not phone_number_id or not access_token:
+            log.warning("meta_credentials_missing", client=client_doc.get("name"))
+            # Fallback to Unipile
+        else:
+            return await send_whatsapp_meta(phone, message, phone_number_id, access_token)
+
+    # Unipile path
+    account_id = client_doc.get("whatsapp_account_id") if client_doc else None
+    return await send_whatsapp(phone, message, account_id=account_id)
+
+
 # ─── Email ────────────────────────────────────────────────────────────────────
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=8))

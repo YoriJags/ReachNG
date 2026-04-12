@@ -30,10 +30,16 @@ class ClientUpsert(BaseModel):
     preferred_channel: str = "whatsapp"
     active: bool = True
     plan: str | None = None      # starter | growth | agency
-    # Per-client Unipile account IDs — messages send from their own number
-    whatsapp_account_id: str | None = None   # Client's Unipile WhatsApp account ID
-    email_account_id: str | None = None      # Client's Unipile email account ID
-    city: str | None = None                  # e.g. "London, UK" — overrides default city
+    cities: list[str] = []       # Multi-city: ["Lagos", "Abuja"] — blank = use city field
+    city: str | None = None      # Single city override e.g. "London, UK"
+    # WhatsApp provider — 'unipile' (default) or 'meta' (client's own Business API)
+    whatsapp_provider: str = "unipile"
+    # Unipile (legacy / your own number)
+    whatsapp_account_id: str | None = None
+    email_account_id: str | None = None
+    # Meta Cloud API (client's own WhatsApp Business number — no Unipile cost)
+    meta_phone_number_id: str | None = None  # From Meta Business Manager
+    meta_access_token: str | None = None     # Permanent system user token
 
 
 # ─── Endpoints ────────────────────────────────────────────────────────────────
@@ -68,9 +74,13 @@ async def upsert_client(payload: ClientUpsert):
                 "preferred_channel": payload.preferred_channel,
                 "active": payload.active,
                 "plan": payload.plan,
+                "city": payload.city,
+                "cities": payload.cities,
+                "whatsapp_provider": payload.whatsapp_provider,
                 "whatsapp_account_id": payload.whatsapp_account_id,
                 "email_account_id": payload.email_account_id,
-                "city": payload.city,
+                "meta_phone_number_id": payload.meta_phone_number_id,
+                "meta_access_token": payload.meta_access_token,
                 "updated_at": now,
             },
             "$setOnInsert": {"created_at": now},

@@ -10,6 +10,7 @@ from tools import (
     is_daily_limit_reached, record_outreach, get_daily_send_count,
     send_whatsapp, send_email,
 )
+from tools.outreach import send_whatsapp_for_client
 from tools.hitl import queue_draft, get_pending, approve_draft, edit_draft
 from tools.roi import log_roi_event
 from tools.notifier import notify_whatsapp as notify_owner_whatsapp
@@ -34,6 +35,7 @@ class BaseCampaign:
         hitl_mode: bool = False,
         query_override: Optional[str] = None,
         client_name: Optional[str] = None,
+        cities: Optional[list] = None,
     ) -> dict:
         """
         Full campaign run:
@@ -52,22 +54,26 @@ class BaseCampaign:
         client_whatsapp_account_id = None
         client_email_account_id = None
         client_city = None
+        _client_doc = None
         if client_name:
             from api.clients import get_clients
-            client_doc = get_clients().find_one(
+            _client_doc = get_clients().find_one(
                 {"name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"}, "active": True}
             )
-            if client_doc:
-                client_brief = client_doc.get("brief")
-                client_whatsapp_account_id = client_doc.get("whatsapp_account_id")
-                client_email_account_id    = client_doc.get("email_account_id")
-                client_city                = client_doc.get("city")
-                if client_doc.get("preferred_channel"):
-                    self.preferred_channel = client_doc["preferred_channel"]
-                if client_whatsapp_account_id:
-                    log.info("campaign_using_client_whatsapp", client=client_name)
-                if client_city:
-                    log.info("campaign_using_client_city", client=client_name, city=client_city)
+            if _client_doc:
+                client_brief = _client_doc.get("brief")
+                client_whatsapp_account_id = _client_doc.get("whatsapp_account_id")
+                client_email_account_id    = _client_doc.get("email_account_id")
+                client_city                = _client_doc.get("city")
+                # Multi-city from client config (overrides cities param if set)
+                if not cities and _client_doc.get("cities"):
+                    cities = _client_doc["cities"]
+                if _client_doc.get("preferred_channel"):
+                    self.preferred_channel = _client_doc["preferred_channel"]
+                log.info("campaign_client_config",
+                         client=client_name,
+                         provider=_client_doc.get("whatsapp_provider", "unipile"),
+                         cities=cities or client_city)
 
         sent = 0
         queued = 0
@@ -75,25 +81,50 @@ class BaseCampaign:
         skipped_no_channel = 0
         errors = 0
 
-        # Step 1: Discover — Google Maps + Apollo + Social (run in parallel)
+        # Step 1: Discover — Google Maps + Apollo + Social (run in parallel, optionally across multiple cities)
         maps_quota   = max(10, max_new_contacts // 3)
         apollo_quota = max(10, max_new_contacts // 3)
         social_quota = max_new_contacts - maps_quota - apollo_quota
 
-        maps_task   = discover_businesses(vertical=self.vertical, max_results=maps_quota, query_override=query_override, city_override=client_city)
-        apollo_task = discover_apollo_leads(vertical=self.vertical, max_results=apollo_quota, city_override=client_city)
-        social_task = discover_social_leads(vertical=self.vertical, max_results=social_quota)
+        # Multi-city: run Maps + Apollo per city in parallel, then flatten
+        target_cities = cities if cities else ([client_city] if client_city else [None])
+        per_city_quota = max(5, maps_quota // len(target_cities))
+        per_city_apollo = max(5, apollo_quota // len(target_cities))
 
-        maps_leads, apollo_leads, social_leads = await asyncio.gather(maps_task, apollo_task, social_task, return_exceptions=True)
-        if isinstance(maps_leads, Exception):
-            log.error("maps_discovery_failed", error=str(maps_leads))
-            maps_leads = []
-        if isinstance(apollo_leads, Exception):
-            log.error("apollo_discovery_failed", error=str(apollo_leads))
-            apollo_leads = []
-        if isinstance(social_leads, Exception):
-            log.error("social_discovery_failed", error=str(social_leads))
-            social_leads = []
+        city_tasks = []
+        for city in target_cities:
+            city_tasks.append(discover_businesses(
+                vertical=self.vertical, max_results=per_city_quota,
+                query_override=query_override, city_override=city,
+            ))
+            city_tasks.append(discover_apollo_leads(
+                vertical=self.vertical, max_results=per_city_apollo, city_override=city,
+            ))
+        city_tasks.append(discover_social_leads(vertical=self.vertical, max_results=social_quota))
+
+        all_results = await asyncio.gather(*city_tasks, return_exceptions=True)
+
+        maps_leads, apollo_leads, social_leads = [], [], []
+        # Results interleaved: [maps_city1, apollo_city1, maps_city2, apollo_city2, ..., social]
+        for i, city in enumerate(target_cities):
+            r_maps   = all_results[i * 2]
+            r_apollo = all_results[i * 2 + 1]
+            if isinstance(r_maps, Exception):
+                log.error("maps_discovery_failed", city=city, error=str(r_maps))
+            else:
+                maps_leads.extend(r_maps)
+            if isinstance(r_apollo, Exception):
+                log.error("apollo_discovery_failed", city=city, error=str(r_apollo))
+            else:
+                apollo_leads.extend(r_apollo)
+        r_social = all_results[-1]
+        if isinstance(r_social, Exception):
+            log.error("social_discovery_failed", error=str(r_social))
+        else:
+            social_leads = r_social
+
+        if cities:
+            log.info("multi_city_discovery", cities=cities, maps=len(maps_leads), apollo=len(apollo_leads))
 
         # Deduplicate across sources by phone + email
         seen_phones: set[str] = set()
@@ -230,12 +261,13 @@ class BaseCampaign:
                 queued += 1
                 continue
 
-            # Step 7b: Send directly — via client's own account if configured
+            # Step 7b: Send directly — routed via client's provider (Meta or Unipile)
             try:
                 result = await self._send(
                     channel, biz, generated,
                     whatsapp_account_id=client_whatsapp_account_id,
                     email_account_id=client_email_account_id,
+                    client_doc=_client_doc,
                 )
                 if not result.get("success", True):
                     log.warning("send_failed", business=biz["name"], result=result)
@@ -383,18 +415,20 @@ class BaseCampaign:
         generated: dict,
         whatsapp_account_id: Optional[str] = None,
         email_account_id: Optional[str] = None,
+        client_doc: Optional[dict] = None,
     ) -> dict:
         if channel == "whatsapp":
-            return await send_whatsapp(
+            # Routes to Meta Cloud API or Unipile based on client config
+            return await send_whatsapp_for_client(
                 phone=biz["phone"],
                 message=generated["message"],
-                account_id=whatsapp_account_id,   # None = use default (your number)
+                client_doc=client_doc,
             )
         elif channel == "email":
             return await send_email(
                 to_email=biz["email"],
                 subject=generated.get("subject", f"Quick question for {biz['name']}"),
                 body=generated["message"],
-                account_id=email_account_id,       # None = use default
+                account_id=email_account_id,
             )
         raise ValueError(f"Unknown channel: {channel}")
