@@ -8,4 +8,4 @@ class AgencySalesCampaign(BaseCampaign):
     Run this to find paying clients for ReachNG itself.
     """
     vertical = "agency_sales"
-    preferred_channel = "whatsapp"
+    preferred_channel = "email"
