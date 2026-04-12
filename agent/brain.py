@@ -526,6 +526,71 @@ Return ONLY the JSON. No preamble."""
         }
 
 
+def handle_payment_reply(
+    reply_text: str,
+    debtor_name: str,
+    amount_ngn: float,
+    due_date: str,
+    product: str = "school_fees",  # "school_fees" | "invoice_chaser" | "rent_collector"
+) -> dict:
+    """
+    Classify an inbound payment reply and generate a context-aware response.
+    Uses Claude Haiku — fast and cheap.
+
+    Returns:
+        intent:       payment_claim | payment_plan_request | question | dispute | other
+        auto_reply:   message to send back to the debtor
+        notify_bursar: short summary to forward to the client/bursar
+        claimed_paid: bool — True if debtor is claiming they already paid
+    """
+    client = _get_client()
+    product_label = {
+        "school_fees": "school fee",
+        "invoice_chaser": "invoice",
+        "rent_collector": "rent",
+    }.get(product, "payment")
+
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=400,
+        messages=[{
+            "role": "user",
+            "content": (
+                f"You are a professional payment assistant for a Nigerian business. "
+                f"A debtor named {debtor_name} replied to a {product_label} reminder. "
+                f"Amount owed: ₦{amount_ngn:,.0f}. Due date: {due_date}.\n\n"
+                f"Their reply: \"{reply_text}\"\n\n"
+                f"Classify the reply and write a short, professional WhatsApp response in Nigerian English. "
+                f"Be warm but firm. Never aggressive. Max 3 sentences for the auto_reply.\n\n"
+                f"Return JSON only:\n"
+                f"{{\n"
+                f"  \"intent\": \"payment_claim\" | \"payment_plan_request\" | \"question\" | \"dispute\" | \"other\",\n"
+                f"  \"claimed_paid\": true | false,\n"
+                f"  \"auto_reply\": \"message to send back to debtor\",\n"
+                f"  \"notify_bursar\": \"one-line summary for the client e.g. Bola's parent says they paid Monday\"\n"
+                f"}}"
+            ),
+        }],
+    )
+
+    import json
+    raw = response.content[0].text.strip()
+    try:
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        return json.loads(raw.strip())
+    except Exception:
+        log.warning("handle_payment_reply_parse_failed", raw=raw)
+        return {
+            "intent": "other",
+            "claimed_paid": False,
+            "auto_reply": "Thank you for your message. We will follow up shortly.",
+            "notify_bursar": f"Reply from {debtor_name}: \"{reply_text[:80]}\"",
+        }
+
+
 def generate_campaign_summary(stats: dict, vertical: str) -> str:
     """Generate a plain-English campaign summary for the dashboard."""
     client = _get_client()

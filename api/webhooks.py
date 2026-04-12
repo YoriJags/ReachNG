@@ -1,16 +1,13 @@
 """
 WhatsApp Inbound Webhook — handles replies from both Unipile and Meta Cloud API.
 
-Supports two inbound sources simultaneously:
-- Unipile: POST with {event, data: {from, body, account_id}}
-- Meta:    GET  for verification challenge + POST with {object, entry[].changes[].value.messages[]}
-
-When a parent/debtor replies:
-1. Parse sender + message from whichever source delivered it
-2. Log to inbound_messages collection
-3. Detect payment claim keywords ("I paid", "done", etc.)
-4. If claim → mark student/invoice as claimed_paid + auto-reply asking for receipt
-5. If source unavailable → return null-safe response, never crash
+Flow for every inbound message:
+1. Parse sender + body from Unipile or Meta payload
+2. Link to a student (school fees) or invoice (invoice chaser) by phone number
+3. Claude classifies the reply + generates a context-aware auto-reply
+4. Auto-reply sent back to debtor on WhatsApp
+5. Bursar/client forwarded a one-line notification on their WhatsApp
+6. Everything logged to inbound_messages collection
 """
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import PlainTextResponse
@@ -22,30 +19,12 @@ import structlog
 log = structlog.get_logger()
 router = APIRouter(prefix="/webhooks", tags=["Webhooks"])
 
-PAYMENT_KEYWORDS = [
-    "i paid", "i have paid", "already paid", "payment done", "transfer done",
-    "sent it", "i've paid", "ive paid", "done", "transferred", "i just paid",
-    "payment made", "paid already", "just sent", "i sent",
-]
-
-RECEIPT_REQUEST = (
-    "Thank you for letting us know! To confirm your payment, please reply with "
-    "your transaction reference or a screenshot of your receipt. "
-    "Once confirmed, no further reminders will be sent."
-)
-
-
-def _is_payment_claim(text: str) -> bool:
-    lower = (text or "").lower().strip()
-    return any(kw in lower for kw in PAYMENT_KEYWORDS)
-
 
 def _db():
     return get_db()
 
 
 def _parse_unipile(payload: dict) -> tuple[str | None, str, str | None]:
-    """Extract (sender_phone, message_body, account_id) from a Unipile payload."""
     data = payload.get("data", {})
     sender = data.get("from") or payload.get("from")
     body = data.get("body") or data.get("text") or payload.get("body", "")
@@ -53,11 +32,7 @@ def _parse_unipile(payload: dict) -> tuple[str | None, str, str | None]:
     return sender, body, account_id
 
 
-def _parse_meta(payload: dict) -> list[tuple[str | None, str]]:
-    """
-    Extract list of (sender_phone, message_body) from a Meta Cloud API payload.
-    Meta batches messages so we return a list.
-    """
+def _parse_meta(payload: dict) -> list[tuple[str, str]]:
     results = []
     try:
         for entry in payload.get("entry", []):
@@ -77,20 +52,14 @@ def _parse_meta(payload: dict) -> list[tuple[str | None, str]]:
 
 @router.get("/whatsapp")
 async def whatsapp_verify(request: Request):
-    """
-    Meta sends a GET to verify the webhook URL before activating it.
-    Must echo back hub.challenge if hub.verify_token matches our secret.
-    """
     params = dict(request.query_params)
     mode = params.get("hub.mode")
     token = params.get("hub.verify_token")
     challenge = params.get("hub.challenge")
-
     settings = get_settings()
     if mode == "subscribe" and token == settings.webhook_verify_token:
         log.info("meta_webhook_verified")
         return PlainTextResponse(challenge or "")
-
     log.warning("meta_webhook_verify_failed", token=token)
     return Response(status_code=403)
 
@@ -100,104 +69,194 @@ async def whatsapp_verify(request: Request):
 @router.post("/whatsapp")
 async def whatsapp_inbound(request: Request):
     """
-    Handles inbound WhatsApp messages from both Unipile and Meta.
-    Always returns 200 — never let delivery failures trigger retries from either provider.
+    Handles inbound WhatsApp replies from Unipile or Meta.
+    Always returns 200 — never retry-loops from either provider.
     """
     try:
         payload = await request.json()
     except Exception:
-        return {"ok": True}  # Malformed payload — ack and move on
+        return {"ok": True}
 
-    # Detect source and extract messages
     messages_to_process: list[tuple[str | None, str, str | None]] = []
 
     if payload.get("object") == "whatsapp_business_account":
-        # Meta Cloud API payload
         for sender, body in _parse_meta(payload):
             messages_to_process.append((sender, body, "meta"))
     else:
-        # Unipile payload
         sender, body, account_id = _parse_unipile(payload)
         messages_to_process.append((sender, body, account_id))
 
     for sender_phone, message_body, source in messages_to_process:
         if not sender_phone:
             continue
-        await _handle_message(sender_phone, message_body, source, payload.get("event", "message.received"))
+        try:
+            await _handle_message(sender_phone, message_body, source, payload.get("event", "message.received"))
+        except Exception as e:
+            log.error("inbound_handler_crashed", error=str(e), phone=sender_phone)
 
     return {"ok": True}
 
 
 async def _handle_message(sender_phone: str, message_body: str, source: str | None, event: str):
-    """Process a single inbound message — link, classify, auto-reply, log."""
+    """
+    Full pipeline for one inbound message:
+    link → classify via Claude → auto-reply to debtor → notify bursar → log
+    """
+    from tools.outreach import send_whatsapp_for_client
+
     now = datetime.now(timezone.utc)
-    is_claim = _is_payment_claim(message_body)
 
     log_doc = {
         "sender_phone": sender_phone,
         "body": message_body,
         "source": source,
         "event": event,
-        "is_payment_claim": is_claim,
         "received_at": now,
-        "linked_student_id": None,
         "linked_product": None,
+        "intent": None,
+        "claimed_paid": False,
         "auto_reply_sent": False,
+        "bursar_notified": False,
     }
 
-    try:
-        # ── Link to School Fees student ────────────────────────────────────────
-        student = _db()["sf_students"].find_one({"parent_phone": sender_phone, "active": True, "paid": False})
-        if student:
-            log_doc["linked_student_id"] = str(student["_id"])
-            log_doc["linked_product"] = "school_fees"
+    # ── Try to link to School Fees student ────────────────────────────────────
+    student = _db()["sf_students"].find_one({
+        "parent_phone": sender_phone,
+        "active": True,
+        "paid": False,
+    })
 
-            if is_claim:
+    if student:
+        log_doc["linked_product"] = "school_fees"
+        log_doc["linked_student_id"] = str(student["_id"])
+
+        try:
+            from bson import ObjectId
+            from agent.brain import handle_payment_reply
+
+            school = _db()["sf_schools"].find_one({"_id": ObjectId(student["school_id"])}) if student.get("school_id") else None
+            balance = max(0, student["fee_amount"] - student.get("amount_paid", 0))
+
+            result = handle_payment_reply(
+                reply_text=message_body,
+                debtor_name=student.get("parent_name", "Parent"),
+                amount_ngn=balance,
+                due_date=student.get("due_date", ""),
+                product="school_fees",
+            )
+
+            log_doc["intent"] = result.get("intent")
+            log_doc["claimed_paid"] = result.get("claimed_paid", False)
+
+            # Update student if payment claimed
+            if result.get("claimed_paid"):
                 _db()["sf_students"].update_one(
                     {"_id": student["_id"]},
                     {"$set": {"claimed_paid": True, "claim_received_at": now}},
                 )
-                log.info("payment_claim_received", product="school_fees", student=student.get("student_name"), phone=sender_phone)
+                log.info("payment_claim_received", product="school_fees",
+                         student=student.get("student_name"), phone=sender_phone)
 
-                # Auto-reply from the school's WhatsApp (Unipile or Meta — same router)
+            # Auto-reply to parent
+            auto_reply = result.get("auto_reply", "")
+            if auto_reply and school:
                 try:
-                    from bson import ObjectId
-                    from tools.outreach import send_whatsapp_for_client
-                    school = _db()["sf_schools"].find_one({"_id": ObjectId(student["school_id"])}) if student.get("school_id") else None
                     await send_whatsapp_for_client(
                         phone=sender_phone,
-                        message=RECEIPT_REQUEST,
+                        message=auto_reply,
                         client_doc=school,
                     )
                     log_doc["auto_reply_sent"] = True
                 except Exception as e:
                     log.warning("auto_reply_failed", error=str(e))
 
-        # ── Link to Invoice Chaser ─────────────────────────────────────────────
-        elif not log_doc["linked_student_id"]:
-            invoice = _db()["chased_invoices"].find_one(
-                {"debtor_phone": sender_phone, "status": "sent"},
-                sort=[("sent_at", -1)],
-            )
-            if invoice:
-                log_doc["linked_product"] = "invoice_chaser"
-                log_doc["linked_invoice_id"] = str(invoice["_id"])
-                if is_claim:
+            # Forward to bursar
+            bursar_summary = result.get("notify_bursar", "")
+            bursar_phone = school.get("contact_phone") if school else None
+            if bursar_summary and bursar_phone and school:
+                bursar_msg = f"[ReachNG] {bursar_summary}"
+                try:
+                    await send_whatsapp_for_client(
+                        phone=bursar_phone,
+                        message=bursar_msg,
+                        client_doc=school,
+                    )
+                    log_doc["bursar_notified"] = True
+                except Exception as e:
+                    log.warning("bursar_notify_failed", error=str(e))
+
+        except Exception as e:
+            log.error("school_fees_reply_processing_failed", error=str(e), phone=sender_phone)
+            log_doc["processing_error"] = str(e)
+
+    # ── Try to link to Invoice Chaser ─────────────────────────────────────────
+    else:
+        invoice = _db()["chased_invoices"].find_one(
+            {"debtor_phone": sender_phone, "status": "sent"},
+            sort=[("sent_at", -1)],
+        )
+        if invoice:
+            log_doc["linked_product"] = "invoice_chaser"
+            log_doc["linked_invoice_id"] = str(invoice["_id"])
+
+            try:
+                from agent.brain import handle_payment_reply
+
+                result = handle_payment_reply(
+                    reply_text=message_body,
+                    debtor_name=invoice.get("debtor_name", "Debtor"),
+                    amount_ngn=invoice.get("amount_ngn", 0),
+                    due_date="",
+                    product="invoice_chaser",
+                )
+
+                log_doc["intent"] = result.get("intent")
+                log_doc["claimed_paid"] = result.get("claimed_paid", False)
+
+                if result.get("claimed_paid"):
                     _db()["chased_invoices"].update_one(
                         {"_id": invoice["_id"]},
                         {"$set": {"claimed_paid": True, "claim_received_at": now}},
                     )
-                    log.info("payment_claim_received", product="invoice_chaser", phone=sender_phone)
 
-    except Exception as e:
-        log.error("inbound_message_processing_error", error=str(e), phone=sender_phone)
-        # Still log the raw message even if processing failed
-        log_doc["processing_error"] = str(e)
+                # Auto-reply to debtor (use platform default Unipile — no per-client doc here)
+                auto_reply = result.get("auto_reply", "")
+                if auto_reply:
+                    try:
+                        await send_whatsapp_for_client(phone=sender_phone, message=auto_reply)
+                        log_doc["auto_reply_sent"] = True
+                    except Exception as e:
+                        log.warning("auto_reply_failed", error=str(e))
 
+                # Notify the client who sent the invoice
+                bursar_summary = result.get("notify_bursar", "")
+                client_name = invoice.get("client_name", "")
+                if bursar_summary and client_name:
+                    # Look up client's phone from clients collection
+                    client_doc = _db()["clients"].find_one(
+                        {"name": {"$regex": f"^{client_name}$", "$options": "i"}},
+                    )
+                    client_phone = (client_doc or {}).get("whatsapp") or (client_doc or {}).get("contact_phone")
+                    if client_phone and client_doc:
+                        try:
+                            await send_whatsapp_for_client(
+                                phone=client_phone,
+                                message=f"[ReachNG] {bursar_summary}",
+                                client_doc=client_doc,
+                            )
+                            log_doc["bursar_notified"] = True
+                        except Exception as e:
+                            log.warning("client_notify_failed", error=str(e))
+
+            except Exception as e:
+                log.error("invoice_chaser_reply_processing_failed", error=str(e), phone=sender_phone)
+                log_doc["processing_error"] = str(e)
+
+    # ── Always log ────────────────────────────────────────────────────────────
     try:
         _db()["inbound_messages"].insert_one(log_doc)
     except Exception as e:
-        log.error("inbound_message_log_failed", error=str(e))
+        log.error("inbound_log_failed", error=str(e))
 
 
 # ─── Dashboard inbox ───────────────────────────────────────────────────────────
