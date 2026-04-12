@@ -659,29 +659,6 @@
     <div class="sop-step"><span class="sop-num">4</span><span>Check <b>Replies</b> tab after 2 hours — respond to all <b>Interested</b> leads same day.</span></div>
   </div>
 
-  <!-- Find Clients quick-launch -->
-  <div style="background:linear-gradient(135deg,#0d1a0d,#0a1200);border:1px solid #1a4a1a;border-left:4px solid #00e5a0;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
-    <div style="font-size:13px;font-weight:700;color:#00e5a0;margin-bottom:6px;">Find Paying Clients for ReachNG</div>
-    <div style="font-size:12px;color:#666;margin-bottom:14px;">Pick which sectors to target — ReachNG discovers businesses in those sectors and drafts a personalised pitch for each. Review every message before it sends.</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;" id="sector-checkboxes">
-      <label class="sector-chip"><input type="checkbox" value="real_estate" checked> Real Estate</label>
-      <label class="sector-chip"><input type="checkbox" value="recruitment" checked> Recruitment</label>
-      <label class="sector-chip"><input type="checkbox" value="legal"> Legal / Law Firms</label>
-      <label class="sector-chip"><input type="checkbox" value="events" checked> Events</label>
-      <label class="sector-chip"><input type="checkbox" value="insurance"> Insurance</label>
-      <label class="sector-chip"><input type="checkbox" value="marketing"> Digital Marketing</label>
-      <label class="sector-chip"><input type="checkbox" value="training"> Training / L&amp;D</label>
-      <label class="sector-chip"><input type="checkbox" value="consulting"> Consulting</label>
-      <label class="sector-chip"><input type="checkbox" value="logistics"> Logistics</label>
-      <label class="sector-chip"><input type="checkbox" value="accounting"> Accounting / Finance</label>
-    </div>
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <button class="btn btn-approve" onclick="launchAgencySales()" style="background:#00e5a0;color:#000;font-weight:700;white-space:nowrap;min-width:160px;">Find Clients Now</button>
-      <span style="font-size:11px;color:#555;">Only selected sectors will be searched</span>
-    </div>
-    <div id="agency-sales-result" style="margin-top:10px;display:none;font-size:12px;color:#00e5a0;"></div>
-  </div>
-
   <p class="section-title">Run Campaign <span style="color:#ff5c00;font-size:10px;margin-left:6px;">Trigger Outreach</span></p>
   <div class="form-card">
     <div class="row">
@@ -709,6 +686,22 @@
       <input id="rc-cities" placeholder="Multi-city: Lagos, Abuja, Port Harcourt (comma-separated, optional)" style="flex:1;font-size:12px;" title="Leave blank to use client city or default (Lagos)" />
     </div>
     <p class="form-hint" style="margin-top:6px;">Multi-city runs discovery in parallel across all listed cities and merges leads before sending.</p>
+    <!-- Sector picker — only shown for agency_sales -->
+    <div id="rc-sectors" style="display:none;margin-top:12px;border-top:1px solid #111;padding-top:12px;">
+      <div style="font-size:11px;color:#555;margin-bottom:8px;">Target sectors — pick which types of business to pitch ReachNG to:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="sector-checkboxes">
+        <label class="sector-chip"><input type="checkbox" value="real_estate" checked> Real Estate</label>
+        <label class="sector-chip"><input type="checkbox" value="recruitment" checked> Recruitment</label>
+        <label class="sector-chip"><input type="checkbox" value="legal"> Legal / Law Firms</label>
+        <label class="sector-chip"><input type="checkbox" value="events" checked> Events</label>
+        <label class="sector-chip"><input type="checkbox" value="insurance"> Insurance</label>
+        <label class="sector-chip"><input type="checkbox" value="marketing"> Digital Marketing</label>
+        <label class="sector-chip"><input type="checkbox" value="training"> Training / L&amp;D</label>
+        <label class="sector-chip"><input type="checkbox" value="consulting"> Consulting</label>
+        <label class="sector-chip"><input type="checkbox" value="logistics"> Logistics</label>
+        <label class="sector-chip"><input type="checkbox" value="accounting"> Accounting / Finance</label>
+      </div>
+    </div>
     <div id="rc-result" style="margin-top:10px;display:none;"></div>
   </div>
 
@@ -1589,35 +1582,13 @@ async function skipAll()    { await postJSON("/api/v1/approvals/skip-all");    r
 
 // ── Run campaign ─────────────────────────────────────────────────────────────
 
-async function launchAgencySales() {
-  const btn = document.querySelector('[onclick="launchAgencySales()"]');
-  const res = document.getElementById("agency-sales-result");
-  const sectors = [...document.querySelectorAll('#sector-checkboxes input:checked')].map(el => el.value);
-  if (!sectors.length) {
-    res.innerHTML = `<span style="color:#ff4444;">Select at least one sector to target.</span>`;
-    res.style.display = "block";
-    return;
-  }
-  btn.textContent = "Finding clients…"; btn.disabled = true;
-  res.style.display = "none";
-  try {
-    const result = await postJSON("/api/v1/campaigns/run", {
-      vertical: "agency_sales",
-      max_contacts: 30,
-      dry_run: false,
-      hitl_mode: true,
-      cities: ["Lagos"],
-      target_sectors: sectors,
-    });
-    const queued = result.queued_for_approval || 0;
-    res.innerHTML = `Drafted messages for <b>${queued}</b> potential clients across <b>${sectors.length}</b> sector(s) — review them in the <b>Approvals</b> tab before sending.`;
-    res.style.display = "block";
-  } catch (err) {
-    res.innerHTML = `<span style="color:#ff4444;">Error: ${err.message}</span>`;
-    res.style.display = "block";
-  } finally {
-    btn.textContent = "Find Clients Now"; btn.disabled = false;
-  }
+// Show/hide sector picker when agency_sales is selected
+document.getElementById("rc-vertical").addEventListener("change", function() {
+  document.getElementById("rc-sectors").style.display = this.value === "agency_sales" ? "block" : "none";
+});
+// Show on load if agency_sales is default
+if (document.getElementById("rc-vertical").value === "agency_sales") {
+  document.getElementById("rc-sectors").style.display = "block";
 }
 
 async function runCampaign() {
@@ -1631,13 +1602,25 @@ async function runCampaign() {
   const cities     = citiesRaw ? citiesRaw.split(",").map(c => c.trim()).filter(Boolean) : [];
   const res      = document.getElementById("rc-result");
 
+  const payload = {
+    vertical, max_contacts: max, dry_run: dryRun, hitl_mode: hitlMode,
+    ...(clientName ? { client_name: clientName } : {}),
+    ...(cities.length  ? { cities } : {}),
+  };
+
+  if (vertical === "agency_sales") {
+    const sectors = [...document.querySelectorAll('#sector-checkboxes input:checked')].map(el => el.value);
+    if (!sectors.length) {
+      res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Select at least one sector to target.</div>`;
+      res.style.display = "block";
+      return;
+    }
+    payload.target_sectors = sectors;
+  }
+
   btn.textContent = "Running…"; btn.disabled = true; res.style.display = "none";
   try {
-    const result = await postJSON("/api/v1/campaigns/run", {
-      vertical, max_contacts: max, dry_run: dryRun, hitl_mode: hitlMode,
-      ...(clientName ? { client_name: clientName } : {}),
-      ...(cities.length  ? { cities } : {}),
-    });
+    const result = await postJSON("/api/v1/campaigns/run", payload);
     res.innerHTML = renderResult(result, vertical, dryRun);
     res.style.display = "block";
     if (!dryRun) refresh();
