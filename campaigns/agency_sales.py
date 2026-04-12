@@ -8,4 +8,5 @@ class AgencySalesCampaign(BaseCampaign):
     Run this to find paying clients for ReachNG itself.
     """
     vertical = "agency_sales"
-    preferred_channel = "email"
+    preferred_channel = "whatsapp"
+    multi_channel = True   # Queue both WhatsApp + email drafts when both are available

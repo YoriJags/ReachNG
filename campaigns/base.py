@@ -27,6 +27,7 @@ log = structlog.get_logger()
 class BaseCampaign:
     vertical: str = ""                  # Override in subclass
     preferred_channel: str = "whatsapp" # Override in subclass
+    multi_channel: bool = False          # If True, queue drafts for ALL available channels
 
     async def run(
         self,
@@ -249,21 +250,30 @@ class BaseCampaign:
 
             # Step 7a: HITL mode — queue for human approval instead of sending
             if hitl_mode:
-                queue_draft(
-                    contact_id=contact_id,
-                    contact_name=biz["name"],
-                    vertical=self.vertical,
-                    channel=channel,
-                    message=generated.get("message", ""),
-                    subject=generated.get("subject"),
-                    phone=biz.get("phone"),
-                    email=biz.get("email"),
-                    source=biz.get("source", "maps"),
-                    platform=biz.get("platform"),
-                    post_context=biz.get("post_text"),
-                    profile_url=biz.get("profile_url"),
-                )
-                queued += 1
+                # Determine which channels to queue
+                channels_to_queue = [channel]
+                if self.multi_channel:
+                    if channel == "whatsapp" and biz.get("email"):
+                        channels_to_queue.append("email")
+                    elif channel == "email" and biz.get("phone"):
+                        channels_to_queue.insert(0, "whatsapp")
+
+                for ch in channels_to_queue:
+                    queue_draft(
+                        contact_id=contact_id,
+                        contact_name=biz["name"],
+                        vertical=self.vertical,
+                        channel=ch,
+                        message=generated.get("message", ""),
+                        subject=generated.get("subject"),
+                        phone=biz.get("phone"),
+                        email=biz.get("email"),
+                        source=biz.get("source", "maps"),
+                        platform=biz.get("platform"),
+                        post_context=biz.get("post_text"),
+                        profile_url=biz.get("profile_url"),
+                    )
+                    queued += 1
                 continue
 
             # Step 7b: Send directly — routed via client's provider (Meta or Unipile)
