@@ -189,6 +189,7 @@ async def discover_businesses(
                 "place_id": place_id,
                 "name": place.get("name", ""),
                 "vertical": vertical,
+                "source": "maps",
                 "phone": _normalise_phone(phone),
                 "website": details.get("website"),
                 "address": details.get("formatted_address") or place.get("formatted_address"),

@@ -33,6 +33,7 @@ def upsert_contact(
     rating: Optional[float] = None,
     category: Optional[str] = None,
     client_name: Optional[str] = None,
+    source: Optional[str] = None,
 ) -> str:
     """Insert or update a contact. Returns the contact _id as string."""
     contacts = get_contacts()
@@ -61,6 +62,8 @@ def upsert_contact(
     }
     if client_name:
         doc["client_name"] = client_name
+    if source:
+        doc["source"] = source
 
     result = contacts.update_one(
         {"place_id": place_id},

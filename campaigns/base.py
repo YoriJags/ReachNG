@@ -208,6 +208,7 @@ class BaseCampaign:
                 rating=biz.get("rating"),
                 category=biz.get("category"),
                 client_name=client_name,
+                source=biz.get("source", "maps"),
             )
 
             # Step 7a: HITL mode — queue for human approval instead of sending
