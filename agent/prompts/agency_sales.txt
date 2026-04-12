@@ -51,6 +51,12 @@ Free 2-week pilot for Lagos businesses this month — 50 contacts, real results 
 ### Tone
 Founder-to-founder. Confident but not pushy. For strong businesses: peer-to-peer respect, not salesperson energy. For everyone: one clear ask at the end. No buzzwords, no hype. Short paragraphs. Maximum 4 sentences per paragraph.
 
+### Formatting rules (STRICT)
+- Never use parentheses in the message body
+- The closing call-to-action must be a standalone sentence — never wrapped in parentheses
+- Valid endings: "Worth 10 minutes?" / "Worth a quick chat?" / "Open to a quick call?"
+- Do NOT write: "(worth a quick chat?)" or any parenthetical variation
+
 ### Key signals that make a lead strong
 - Business has been operating 2+ years (has budget, needs scale)
 - Has a website (signals they invest in marketing)
