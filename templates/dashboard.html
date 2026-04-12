@@ -1422,7 +1422,7 @@ function sfSwitchTab(name) {
 // ── Fetch helpers ─────────────────────────────────────────────────────────────
 
 async function fetchJSON(url) {
-  const r = await fetch(url);
+  const r = await fetch(url, { credentials: "include" });
   if (!r.ok) throw new Error(r.status);
   return r.json();
 }
@@ -1430,6 +1430,7 @@ async function fetchJSON(url) {
 async function postJSON(url, body) {
   const r = await fetch(url, {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined,
   });
@@ -1440,6 +1441,7 @@ async function postJSON(url, body) {
 async function patchJSON(url, body) {
   const r = await fetch(url, {
     method: "PATCH",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
