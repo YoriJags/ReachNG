@@ -103,6 +103,10 @@ async def _text_search(query: str, api_key: str) -> list[dict]:
         )
         resp.raise_for_status()
         data = resp.json()
+        status = data.get("status", "UNKNOWN")
+        if status not in ("OK", "ZERO_RESULTS"):
+            log.warning("places_api_status", query=query, status=status,
+                        error_message=data.get("error_message", ""))
         return data.get("results", [])
 
 
