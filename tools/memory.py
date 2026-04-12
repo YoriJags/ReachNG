@@ -81,15 +81,23 @@ def upsert_contact(
         "place_id": place_id,
         "name": name,
         "vertical": vertical,
-        "phone": phone,
-        "email": email,
-        "address": address,
-        "website": website,
-        "rating": rating,
-        "category": category,
         "lead_score": lead_score,
         "updated_at": now,
     }
+    # Only include indexed fields when they have values — avoids unique-index
+    # violations on null (even non-sparse indexes ignore absent fields).
+    if phone:
+        doc["phone"] = phone
+    if email:
+        doc["email"] = email
+    if address:
+        doc["address"] = address
+    if website:
+        doc["website"] = website
+    if rating is not None:
+        doc["rating"] = rating
+    if category:
+        doc["category"] = category
     if state:
         doc["state"] = state
     if client_name:
