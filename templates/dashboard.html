@@ -2000,13 +2000,13 @@ async function remindNow(invoiceId) {
 
 async function markInvoicePaid(invoiceId) {
   if (!confirm("Mark this invoice as paid?")) return;
-  try { await fetch(`/api/v1/invoices/${invoiceId}/paid`, { method: "POST" }); loadInvoices(); }
+  try { await fetch(`/api/v1/invoices/${invoiceId}/paid`, { method: "POST", credentials: "include" }); loadInvoices(); }
   catch(err) { alert("Error: " + err.message); }
 }
 
 async function markWrittenOff(invoiceId) {
   if (!confirm("Write off this invoice? This cannot be undone.")) return;
-  try { await fetch(`/api/v1/invoices/${invoiceId}/written-off`, { method: "POST" }); loadInvoices(); }
+  try { await fetch(`/api/v1/invoices/${invoiceId}/written-off`, { method: "POST", credentials: "include" }); loadInvoices(); }
   catch(err) { alert("Error: " + err.message); }
 }
 
@@ -2082,7 +2082,7 @@ async function generatePortal() {
 
   btn.textContent = "Generating…"; btn.disabled = true;
   try {
-    const data = await fetch(`/api/v1/portal/generate/${encodeURIComponent(name)}`, { method: "POST" }).then(r => r.json());
+    const data = await fetch(`/api/v1/portal/generate/${encodeURIComponent(name)}`, { method: "POST", credentials: "include" }).then(r => r.json());
     const url  = window.location.origin + data.portal_url;
     res.innerHTML = `
       <div style="background:#0a140a;border:1px solid #0e2e0e;border-radius:8px;padding:14px 16px;">
@@ -2223,7 +2223,7 @@ async function quickRunMorningBrief() {
   document.getElementById("quick-menu").classList.remove("open");
   document.getElementById("quick-fab").textContent = "⚡";
   try {
-    await fetch("/api/v1/contacts/morning-brief", { method: "POST" });
+    await fetch("/api/v1/contacts/morning-brief", { method: "POST", credentials: "include" });
     alert("Morning brief sent to your WhatsApp.");
   } catch(e) { alert("Error: " + e.message); }
 }
