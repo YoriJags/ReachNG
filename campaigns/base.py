@@ -190,8 +190,13 @@ class BaseCampaign:
             # Step 5.5: Deep personalization — crawl website before writing
             enrichment_ctx = ""
             if biz.get("website") and not biz.get("source") == "social":
-                enrichment = enrich_business(website=biz["website"], business_name=biz["name"])
+                enrichment = await enrich_business(website=biz["website"], business_name=biz["name"])
                 enrichment_ctx = format_enrichment_for_prompt(enrichment, biz["name"])
+                # Backfill email from website crawl if Maps didn't return one
+                if enrichment.get("email") and not biz.get("email"):
+                    biz["email"] = enrichment["email"]
+                    # Re-evaluate channel now that email is available
+                    channel = self._pick_channel(biz) or channel
 
             # Step 6: Generate message — social leads get post-aware opener
             try:

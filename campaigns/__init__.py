@@ -5,6 +5,7 @@ from .fintech import FintechCampaign
 from .legal import LegalCampaign
 from .logistics import LogisticsCampaign
 from .agriculture import AgricultureCampaign
+from .agency_sales import AgencySalesCampaign
 
 CAMPAIGN_REGISTRY = {
     "real_estate": RealEstateCampaign,
@@ -14,10 +15,11 @@ CAMPAIGN_REGISTRY = {
     "legal": LegalCampaign,
     "logistics": LogisticsCampaign,
     "agriculture": AgricultureCampaign,
+    "agency_sales": AgencySalesCampaign,
 }
 
 __all__ = [
     "RealEstateCampaign", "RecruitmentCampaign", "EventsCampaign",
     "FintechCampaign", "LegalCampaign", "LogisticsCampaign", "AgricultureCampaign",
-    "CAMPAIGN_REGISTRY",
+    "AgencySalesCampaign", "CAMPAIGN_REGISTRY",
 ]

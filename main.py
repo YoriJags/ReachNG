@@ -34,8 +34,6 @@ def _validate_env(settings) -> None:
     checks = {
         "ANTHROPIC_API_KEY": settings.anthropic_api_key,
         "MONGODB_URI": settings.mongodb_uri,
-        "UNIPILE_API_KEY": settings.unipile_api_key,
-        "UNIPILE_DSN": settings.unipile_dsn,
     }
     for name, val in checks.items():
         if not val or any(val.startswith(p) for p in placeholder_prefixes):
@@ -243,18 +241,11 @@ async def rich_health():
         result["apollo"] = "error"
 
     # Unipile
-    try:
-        if not settings.unipile_api_key or not settings.unipile_dsn:
-            result["unipile"] = "missing"
-        else:
-            async with httpx.AsyncClient(timeout=8) as client:
-                r = await client.get(
-                    f"https://{settings.unipile_dsn}/api/v1/accounts",
-                    headers={"X-API-KEY": settings.unipile_api_key},
-                )
-                result["unipile"] = "ok" if r.status_code in (200, 401) else "error"
-    except Exception:
-        result["unipile"] = "error"
+    # Meta WhatsApp
+    result["whatsapp"] = "ok" if (settings.meta_phone_number_id and settings.meta_access_token) else "missing"
+
+    # Gmail
+    result["email"] = "ok" if (settings.gmail_address and settings.gmail_app_password) else "missing"
 
     overall = "ok" if all(v == "ok" for v in result.values() if v != True) else "degraded"
     result["status"] = overall

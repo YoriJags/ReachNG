@@ -8,7 +8,7 @@ from database import get_contacts, get_db
 from tools.outreach import check_whatsapp_replies, check_email_replies
 from tools.memory import mark_replied, mark_opted_out, Status
 from tools.notifier import notify_owner, notify_whatsapp as notify_owner_whatsapp
-from agent.brain import classify_reply
+from agent.brain import classify_reply, generate_auto_reply_draft
 import structlog
 
 log = structlog.get_logger()
@@ -153,6 +153,40 @@ def _route_reply(msg: dict, channel: str) -> str:
                 )
             )
         log.info("hot_lead_alert_fired", contact=contact.get("name"))
+
+    # Auto-reply draft — queue to HITL for warm intents
+    _AUTO_REPLY_INTENTS = {"interested", "question", "price_question"}
+    if intent in _AUTO_REPLY_INTENTS and contact:
+        try:
+            # Find the last outreach message sent to this contact for context
+            from database import get_db
+            last_outreach = get_db()["outreach"].find_one(
+                {"contact_id": contact_id},
+                sort=[("sent_at", -1)],
+            )
+            original_msg = (last_outreach or {}).get("message", "")
+            draft = generate_auto_reply_draft(
+                original_message=original_msg,
+                their_reply=reply_text,
+                business_name=contact.get("name", ""),
+                vertical=contact.get("vertical", ""),
+                intent=intent,
+                channel=channel,
+            )
+            from tools.hitl import queue_draft
+            queue_draft(
+                contact_id=contact_id,
+                contact_name=contact.get("name", ""),
+                vertical=contact.get("vertical", ""),
+                channel=channel,
+                message=draft,
+                phone=contact.get("phone"),
+                email=contact.get("email"),
+                source="auto_reply",
+            )
+            log.info("auto_reply_draft_queued", contact=contact.get("name"), intent=intent)
+        except Exception as e:
+            log.warning("auto_reply_draft_failed", error=str(e))
 
     # Standard notify — both WhatsApp + Slack
     asyncio.create_task(notify_owner(

@@ -13,6 +13,7 @@ not just the business name and Google Maps category.
 No Instagram scraping — website crawling only (legal, reliable).
 Uses httpx with a 10s timeout. Falls back gracefully if site is unreachable.
 """
+import asyncio
 import re
 import ipaddress
 import socket
@@ -30,7 +31,7 @@ _USER_AGENT = "Mozilla/5.0 (compatible; ReachNG/1.0; outreach-bot)"
 
 # ─── Public interface ─────────────────────────────────────────────────────────
 
-def enrich_business(website: Optional[str], business_name: str) -> dict:
+async def enrich_business(website: Optional[str], business_name: str) -> dict:
     """
     Crawl the business website and return a dict with enrichment context.
 
@@ -40,10 +41,11 @@ def enrich_business(website: Optional[str], business_name: str) -> dict:
             "services": list[str],
             "team_names": list[str],
             "tagline": str | None,
+            "email": str | None,   # extracted from website contact page / footer
             "enriched": bool,      # False if crawl failed or no website
         }
     """
-    empty = {"description": None, "services": [], "team_names": [], "tagline": None, "enriched": False}
+    empty = {"description": None, "services": [], "team_names": [], "tagline": None, "email": None, "enriched": False}
 
     if not website:
         return empty
@@ -53,27 +55,35 @@ def enrich_business(website: Optional[str], business_name: str) -> dict:
         return empty
 
     try:
-        html = _fetch(url)
+        # Fetch homepage + /about + /contact concurrently for maximum email coverage
+        homepage_task = _fetch(url)
+        about_task    = _fetch(urljoin(url, "/about"))
+        contact_task  = _fetch(urljoin(url, "/contact"))
+
+        html, about_html, contact_html = await asyncio.gather(
+            homepage_task, about_task, contact_task, return_exceptions=True
+        )
+        html         = html         if isinstance(html, str)         else ""
+        about_html   = about_html   if isinstance(about_html, str)   else ""
+        contact_html = contact_html if isinstance(contact_html, str) else ""
+
         if not html:
             return empty
 
-        # Also try /about if homepage was thin
-        about_html = ""
-        about_url = urljoin(url, "/about")
-        if about_url != url:
-            about_html = _fetch(about_url) or ""
-
-        combined = html + " " + about_html
+        combined = html + " " + about_html + " " + contact_html
         text = _strip_html(combined)
 
         result = {
             "description": _extract_description(text, business_name),
-            "services": _extract_services(text),
-            "team_names": _extract_team_names(text),
-            "tagline": _extract_tagline(html),
-            "enriched": True,
+            "services":    _extract_services(text),
+            "team_names":  _extract_team_names(text),
+            "tagline":     _extract_tagline(html),
+            "email":       _extract_email(combined),
+            "enriched":    True,
         }
-        log.info("enrichment_done", business=business_name, services=len(result["services"]), team=len(result["team_names"]))
+        log.info("enrichment_done", business=business_name,
+                 services=len(result["services"]), team=len(result["team_names"]),
+                 email_found=bool(result["email"]))
         return result
 
     except Exception as exc:
@@ -154,14 +164,13 @@ def _is_safe_host(host: str) -> bool:
     return True
 
 
-def _fetch(url: str) -> Optional[str]:
-    """Fetch URL, return text or None. Respects size limit."""
+async def _fetch(url: str) -> Optional[str]:
+    """Fetch URL asynchronously, return text or None. Respects size limit."""
     try:
-        with httpx.Client(timeout=_TIMEOUT, follow_redirects=True, headers={"User-Agent": _USER_AGENT}) as client:
-            resp = client.get(url)
+        async with httpx.AsyncClient(timeout=_TIMEOUT, follow_redirects=True, headers={"User-Agent": _USER_AGENT}) as client:
+            resp = await client.get(url)
             if resp.status_code != 200:
                 return None
-            # Read only up to _MAX_BYTES
             content = resp.content[:_MAX_BYTES]
             return content.decode("utf-8", errors="ignore")
     except Exception:
@@ -234,6 +243,24 @@ def _extract_services(text: str) -> list[str]:
                 break
 
     return services
+
+
+def _extract_email(html: str) -> Optional[str]:
+    """Extract the first business email found in the page source."""
+    # Common mailto links first — most reliable
+    mailto = re.search(r'mailto:([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})', html)
+    if mailto:
+        return mailto.group(1).lower()
+    # Plain email pattern in text
+    match = re.search(r'\b([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})\b', html)
+    if match:
+        email = match.group(1).lower()
+        # Skip common false positives
+        skip = {"example.com", "domain.com", "yourdomain.com", "email.com",
+                "sentry.io", "w3.org", "schema.org"}
+        if not any(s in email for s in skip):
+            return email
+    return None
 
 
 def _extract_team_names(text: str) -> list[str]:

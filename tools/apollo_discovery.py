@@ -54,6 +54,7 @@ VERTICAL_KEYWORDS = {
     "legal": ["law firm", "legal services", "solicitors", "corporate law"],
     "logistics": ["haulage", "logistics", "freight forwarding", "last mile delivery"],
     "agriculture": ["agribusiness", "farm produce", "food processing", "agricultural cooperative", "poultry", "aquaculture"],
+    "agency_sales": ["real estate agency", "recruitment agency", "law firm", "event management", "insurance broker", "digital marketing agency", "consulting firm", "training company"],
 }
 
 

@@ -6,7 +6,7 @@ from tools import get_pipeline_stats, get_daily_send_count, is_daily_limit_reach
 
 router = APIRouter(prefix="/campaigns", tags=["Campaigns"])
 
-VerticalType = Literal["real_estate", "recruitment", "events", "fintech", "legal", "logistics", "agriculture"]
+VerticalType = Literal["real_estate", "recruitment", "events", "fintech", "legal", "logistics", "agriculture", "agency_sales"]
 
 
 class RunCampaignRequest(BaseModel):

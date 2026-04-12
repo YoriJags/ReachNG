@@ -649,10 +649,23 @@
     <div class="sop-step"><span class="sop-num">4</span><span>Check <b>Replies</b> tab after 2 hours — respond to all <b>Interested</b> leads same day.</span></div>
   </div>
 
+  <!-- Find Clients quick-launch -->
+  <div style="background:linear-gradient(135deg,#0d1a0d,#0a1200);border:1px solid #1a4a1a;border-left:4px solid #00e5a0;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#00e5a0;margin-bottom:4px;">Find Paying Clients for ReachNG</div>
+        <div style="font-size:12px;color:#666;max-width:520px;">Discovers real estate agents, recruitment firms, law firms, event companies &amp; more across Lagos — and sends each a personalised pitch for ReachNG's service. Review every message before it sends.</div>
+      </div>
+      <button class="btn btn-approve" onclick="launchAgencySales()" style="background:#00e5a0;color:#000;font-weight:700;white-space:nowrap;min-width:160px;">Find Clients Now</button>
+    </div>
+    <div id="agency-sales-result" style="margin-top:10px;display:none;font-size:12px;color:#00e5a0;"></div>
+  </div>
+
   <p class="section-title">Run Campaign <span style="color:#ff5c00;font-size:10px;margin-left:6px;">Trigger Outreach</span></p>
   <div class="form-card">
     <div class="row">
       <select id="rc-vertical">
+        <option value="agency_sales">⭐ Find ReachNG Clients</option>
         <option value="real_estate">Real Estate</option>
         <option value="recruitment">Recruitment</option>
         <option value="events">Events</option>
@@ -774,6 +787,7 @@
     <div class="row">
       <input id="ob-name" placeholder="Client name e.g. Mercury Lagos" style="flex:2;" />
       <select id="ob-vertical">
+        <option value="agency_sales">Find ReachNG Clients</option>
         <option value="real_estate">Real Estate</option>
         <option value="recruitment">Recruitment</option>
         <option value="events">Events</option>
@@ -1551,6 +1565,28 @@ async function approveAll() { await postJSON("/api/v1/approvals/approve-all"); r
 async function skipAll()    { await postJSON("/api/v1/approvals/skip-all");    refresh(); }
 
 // ── Run campaign ─────────────────────────────────────────────────────────────
+
+async function launchAgencySales() {
+  const btn = document.querySelector('[onclick="launchAgencySales()"]');
+  const res = document.getElementById("agency-sales-result");
+  btn.textContent = "Finding clients…"; btn.disabled = true;
+  try {
+    const result = await postJSON("/api/v1/campaigns/run", {
+      vertical: "agency_sales",
+      max_contacts: 30,
+      dry_run: false,
+      hitl_mode: true,  // Always HITL — review every message before it sends
+      cities: ["Lagos"],
+    });
+    res.innerHTML = `Messages drafted for <b>${result.queued_for_approval || 0}</b> potential clients — review them in the <b>Approvals</b> tab before sending.`;
+    res.style.display = "block";
+  } catch (err) {
+    res.innerHTML = `<span style="color:#ff4444;">Error: ${err.message}</span>`;
+    res.style.display = "block";
+  } finally {
+    btn.textContent = "Find Clients Now"; btn.disabled = false;
+  }
+}
 
 async function runCampaign() {
   const btn      = document.getElementById("rc-btn");

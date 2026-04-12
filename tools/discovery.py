@@ -84,6 +84,18 @@ VERTICAL_QUERIES = {
         "crop farming company {city}",
         "agro allied company {city}",
     ],
+    "agency_sales": [
+        "real estate agency {city}",
+        "recruitment agency {city}",
+        "law firm {city}",
+        "event management company {city}",
+        "insurance broker {city}",
+        "digital marketing agency {city}",
+        "training company {city}",
+        "consulting firm {city}",
+        "logistics company {city}",
+        "accounting firm {city}",
+    ],
 }
 
 

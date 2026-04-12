@@ -1,88 +1,41 @@
 """
-Unipile outreach tool — sends WhatsApp messages and emails.
-Unipile is a unified messaging API: one integration covers both channels.
-Docs: https://developer.unipile.com
+Outreach delivery — Meta Cloud API for WhatsApp, Gmail SMTP for email.
+Reply polling: Meta pushes replies via webhook; Gmail replies polled via IMAP.
 """
-import httpx
+import asyncio
+import imaplib
+import email as email_lib
+import smtplib
+import ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from typing import Optional
 from tenacity import retry, stop_after_attempt, wait_exponential
 from config import get_settings
+import httpx
 import structlog
 
 log = structlog.get_logger()
 
 
-def _base_url() -> str:
-    settings = get_settings()
-    return f"https://{settings.unipile_dsn}"
-
-
-def _headers() -> dict:
-    settings = get_settings()
-    return {
-        "X-API-KEY": settings.unipile_api_key,
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-    }
-
-
-# ─── WhatsApp ─────────────────────────────────────────────────────────────────
+# ─── WhatsApp — Meta Cloud API ────────────────────────────────────────────────
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=8))
 async def send_whatsapp(phone: str, message: str, account_id: Optional[str] = None) -> dict:
     """
-    Send a WhatsApp message to a phone number.
-    Phone must be in E.164 format: +2348012345678
-    account_id: use client's own Unipile account if provided, else fall back to default.
-    Returns Unipile response with message_id.
+    Send a WhatsApp message via Meta Cloud API.
+    phone: E.164 format — +2348012345678
+    account_id: ignored (kept for call-site compatibility — Meta uses env vars)
     """
     settings = get_settings()
-    wa_account = account_id or settings.unipile_whatsapp_account_id
+    phone_number_id = settings.meta_phone_number_id
+    access_token    = settings.meta_access_token
 
-    async with httpx.AsyncClient(timeout=20.0) as client:
-        resp = await client.post(
-            f"{_base_url()}/api/v1/chats",
-            headers=_headers(),
-            json={
-                "account_id": wa_account,
-                "attendees_ids": [phone],
-                "text": message,
-            },
-        )
+    if not phone_number_id or not access_token:
+        log.error("meta_credentials_missing")
+        return {"success": False, "error": "META credentials not configured"}
 
-        if resp.status_code == 400:
-            body = resp.json()
-            # Unipile returns 400 for invalid/unreachable numbers
-            log.warning("whatsapp_invalid_number", phone=phone, detail=body)
-            return {"success": False, "error": "invalid_number", "detail": body}
-
-        resp.raise_for_status()
-        data = resp.json()
-        log.info("whatsapp_sent", phone=phone, chat_id=data.get("id"))
-        return {"success": True, "chat_id": data.get("id")}
-
-
-# ─── Meta Cloud API WhatsApp ──────────────────────────────────────────────────
-
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=8))
-async def send_whatsapp_meta(
-    phone: str,
-    message: str,
-    phone_number_id: str,
-    access_token: str,
-) -> dict:
-    """
-    Send a WhatsApp message via Meta Cloud API (official Business API).
-    Client connects their own WhatsApp Business number — zero cost per account.
-    Phone must be E.164 format: +2348012345678
-    phone_number_id: from Meta Business Manager / WhatsApp Business API setup
-    access_token: permanent system user token from Meta Business Manager
-    """
     url = f"https://graph.facebook.com/v19.0/{phone_number_id}/messages"
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json",
-    }
     payload = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
@@ -91,11 +44,45 @@ async def send_whatsapp_meta(
         "text": {"preview_url": False, "body": message},
     }
     async with httpx.AsyncClient(timeout=20.0) as client:
-        resp = await client.post(url, headers=headers, json=payload)
+        resp = await client.post(
+            url,
+            headers={"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"},
+            json=payload,
+        )
         if resp.status_code == 400:
             body = resp.json()
             log.warning("meta_whatsapp_bad_request", phone=phone, detail=body)
             return {"success": False, "error": "bad_request", "detail": body}
+        resp.raise_for_status()
+        data = resp.json()
+        msg_id = data.get("messages", [{}])[0].get("id")
+        log.info("whatsapp_sent", phone=phone, message_id=msg_id)
+        return {"success": True, "message_id": msg_id}
+
+
+async def send_whatsapp_meta(
+    phone: str,
+    message: str,
+    phone_number_id: str,
+    access_token: str,
+) -> dict:
+    """Send via a specific client's Meta credentials (agency mode)."""
+    url = f"https://graph.facebook.com/v19.0/{phone_number_id}/messages"
+    payload = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": phone,
+        "type": "text",
+        "text": {"preview_url": False, "body": message},
+    }
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        resp = await client.post(
+            url,
+            headers={"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"},
+            json=payload,
+        )
+        if resp.status_code == 400:
+            return {"success": False, "error": "bad_request", "detail": resp.json()}
         resp.raise_for_status()
         data = resp.json()
         msg_id = data.get("messages", [{}])[0].get("id")
@@ -109,26 +96,22 @@ async def send_whatsapp_for_client(
     client_doc: Optional[dict] = None,
 ) -> dict:
     """
-    Route WhatsApp send through the right provider based on client config.
-    - client.whatsapp_provider == 'meta'    → Meta Cloud API (client's own number, no Unipile cost)
-    - client.whatsapp_provider == 'unipile' → Unipile (default, uses client's account_id)
-    - no client_doc                         → Unipile default account (your own number)
+    Route WhatsApp through the right Meta credentials.
+    If client has their own Meta credentials, use those.
+    Otherwise fall back to the default Meta account (env vars).
     """
     if client_doc and client_doc.get("whatsapp_provider") == "meta":
         phone_number_id = client_doc.get("meta_phone_number_id")
         access_token    = client_doc.get("meta_access_token")
-        if not phone_number_id or not access_token:
-            log.warning("meta_credentials_missing", client=client_doc.get("name"))
-            # Fallback to Unipile
-        else:
+        if phone_number_id and access_token:
             return await send_whatsapp_meta(phone, message, phone_number_id, access_token)
+        log.warning("client_meta_credentials_missing", client=client_doc.get("name"))
 
-    # Unipile path
-    account_id = client_doc.get("whatsapp_account_id") if client_doc else None
-    return await send_whatsapp(phone, message, account_id=account_id)
+    # Default: ReachNG's own Meta account
+    return await send_whatsapp(phone, message)
 
 
-# ─── Email ────────────────────────────────────────────────────────────────────
+# ─── Email — Gmail SMTP ───────────────────────────────────────────────────────
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=8))
 async def send_email(
@@ -136,63 +119,109 @@ async def send_email(
     subject: str,
     body: str,
     reply_to: Optional[str] = None,
-    account_id: Optional[str] = None,
+    account_id: Optional[str] = None,  # kept for call-site compatibility
 ) -> dict:
     """
-    Send an email via Unipile.
-    account_id: use client's own Unipile account if provided, else fall back to default.
-    Returns Unipile response with message_id.
+    Send email via Gmail SMTP using an App Password.
+    Runs the blocking smtplib call in a thread so it doesn't block the event loop.
+    Requires: GMAIL_ADDRESS + GMAIL_APP_PASSWORD in env.
     """
     settings = get_settings()
-    email_account = account_id or settings.unipile_email_account_id
+    gmail_address  = settings.gmail_address
+    app_password   = settings.gmail_app_password
 
-    payload = {
-        "account_id": email_account,
-        "to": [{"identifier": to_email}],
-        "subject": subject,
-        "body": body,
-    }
-    if reply_to:
-        payload["reply_to"] = [{"identifier": reply_to}]
+    if not gmail_address or not app_password:
+        log.error("gmail_credentials_missing")
+        return {"success": False, "error": "Gmail credentials not configured"}
 
-    async with httpx.AsyncClient(timeout=20.0) as client:
-        resp = await client.post(
-            f"{_base_url()}/api/v1/emails",
-            headers=_headers(),
-            json=payload,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        log.info("email_sent", to=to_email, subject=subject, message_id=data.get("id"))
-        return {"success": True, "message_id": data.get("id")}
+    def _send_sync():
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"]    = gmail_address
+        msg["To"]      = to_email
+        if reply_to:
+            msg["Reply-To"] = reply_to
+
+        msg.attach(MIMEText(body, "plain"))
+
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            server.login(gmail_address, app_password)
+            server.sendmail(gmail_address, to_email, msg.as_string())
+
+    try:
+        await asyncio.to_thread(_send_sync)
+        log.info("email_sent", to=to_email, subject=subject)
+        return {"success": True, "message_id": f"gmail-{to_email}-{subject[:20]}"}
+    except Exception as e:
+        log.error("email_send_failed", to=to_email, error=str(e))
+        return {"success": False, "error": str(e)}
 
 
-# ─── Response polling ─────────────────────────────────────────────────────────
-
-async def get_recent_replies(account_id: str, limit: int = 50) -> list[dict]:
-    """
-    Poll Unipile for recent messages received across all chats.
-    Used by the follow-up scheduler to detect replies.
-    """
-    async with httpx.AsyncClient(timeout=15.0) as client:
-        resp = await client.get(
-            f"{_base_url()}/api/v1/messages",
-            headers=_headers(),
-            params={
-                "account_id": account_id,
-                "limit": limit,
-                "role": "RECIPIENT",   # Messages sent TO us
-            },
-        )
-        resp.raise_for_status()
-        return resp.json().get("items", [])
-
+# ─── Reply polling ────────────────────────────────────────────────────────────
 
 async def check_whatsapp_replies() -> list[dict]:
-    settings = get_settings()
-    return await get_recent_replies(settings.unipile_whatsapp_account_id)
+    """
+    Meta pushes WhatsApp replies via webhook to /api/v1/webhooks.
+    Polling is not needed — return empty list and let the webhook handler do the work.
+    """
+    return []
 
 
 async def check_email_replies() -> list[dict]:
+    """
+    Poll Gmail IMAP for unread replies in the inbox.
+    Returns a list of message dicts compatible with reply_router._route_reply.
+    """
     settings = get_settings()
-    return await get_recent_replies(settings.unipile_email_account_id)
+    gmail_address = settings.gmail_address
+    app_password  = settings.gmail_app_password
+
+    if not gmail_address or not app_password:
+        return []
+
+    def _poll_imap() -> list[dict]:
+        messages = []
+        try:
+            with imaplib.IMAP4_SSL("imap.gmail.com") as mail:
+                mail.login(gmail_address, app_password)
+                mail.select("inbox")
+                _, data = mail.search(None, "UNSEEN")
+                uids = data[0].split()
+                for uid in uids[-50:]:  # last 50 unread
+                    _, msg_data = mail.fetch(uid, "(RFC822)")
+                    raw = msg_data[0][1]
+                    parsed = email_lib.message_from_bytes(raw)
+                    from_addr = parsed.get("From", "")
+                    # Extract plain email address
+                    import re
+                    match = re.search(r'[\w.+-]+@[\w.-]+\.\w+', from_addr)
+                    sender = match.group(0) if match else from_addr
+
+                    body = ""
+                    if parsed.is_multipart():
+                        for part in parsed.walk():
+                            if part.get_content_type() == "text/plain":
+                                body = part.get_payload(decode=True).decode("utf-8", errors="ignore")
+                                break
+                    else:
+                        body = parsed.get_payload(decode=True).decode("utf-8", errors="ignore")
+
+                    messages.append({
+                        "id": uid.decode(),
+                        "from": {"identifier": sender},
+                        "subject": parsed.get("Subject", ""),
+                        "body": body[:2000],
+                    })
+        except Exception as e:
+            log.error("gmail_imap_poll_failed", error=str(e))
+        return messages
+
+    return await asyncio.to_thread(_poll_imap)
+
+
+# ─── Legacy stubs — keep call sites working ──────────────────────────────────
+
+async def get_recent_replies(account_id: str, limit: int = 50) -> list[dict]:
+    """Deprecated — Meta uses webhooks, Gmail uses IMAP. Returns empty list."""
+    return []

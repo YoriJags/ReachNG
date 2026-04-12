@@ -10,11 +10,19 @@ class Settings(BaseSettings):
     # Google Maps
     google_maps_api_key: str = Field(..., env="GOOGLE_MAPS_API_KEY")
 
-    # Unipile
-    unipile_api_key: str = Field(..., env="UNIPILE_API_KEY")
-    unipile_dsn: str = Field(..., env="UNIPILE_DSN")
-    unipile_whatsapp_account_id: str = Field(..., env="UNIPILE_WHATSAPP_ACCOUNT_ID")
-    unipile_email_account_id: str = Field(..., env="UNIPILE_EMAIL_ACCOUNT_ID")
+    # Meta Cloud API — WhatsApp Business (replaces Unipile for WhatsApp)
+    meta_phone_number_id: str | None = Field(default=None, env="META_PHONE_NUMBER_ID")
+    meta_access_token: str | None = Field(default=None, env="META_ACCESS_TOKEN")
+
+    # Gmail SMTP/IMAP — email sending and reply polling (replaces Unipile for email)
+    gmail_address: str | None = Field(default=None, env="GMAIL_ADDRESS")
+    gmail_app_password: str | None = Field(default=None, env="GMAIL_APP_PASSWORD")
+
+    # Unipile — kept optional for clients still using it in agency mode
+    unipile_api_key: str | None = Field(default=None, env="UNIPILE_API_KEY")
+    unipile_dsn: str | None = Field(default=None, env="UNIPILE_DSN")
+    unipile_whatsapp_account_id: str | None = Field(default=None, env="UNIPILE_WHATSAPP_ACCOUNT_ID")
+    unipile_email_account_id: str | None = Field(default=None, env="UNIPILE_EMAIL_ACCOUNT_ID")
 
     # MongoDB
     mongodb_uri: str = Field(..., env="MONGODB_URI")

@@ -591,6 +591,50 @@ def handle_payment_reply(
         }
 
 
+def generate_auto_reply_draft(
+    original_message: str,
+    their_reply: str,
+    business_name: str,
+    vertical: str,
+    intent: str,
+    channel: str = "whatsapp",
+) -> str:
+    """
+    Draft a reply to an inbound message based on their intent.
+    Used when classify_reply returns interested/question/price_question.
+    Returns the draft message text (queued to HITL for human approval before sending).
+    """
+    intent_instructions = {
+        "interested":      "They want to know more. Confirm their interest, suggest a quick call or meeting, keep it warm and low-pressure.",
+        "question":        "Answer their question directly. Be helpful and brief. End with a soft next step.",
+        "price_question":  "Don't give a full price list. Say pricing depends on their needs and suggest a quick call to understand what they need.",
+        "not_now":         "Acknowledge their timing. Keep the door open. Don't push. One sentence max.",
+        "referral":        "Thank them for the referral mention. Ask who specifically to contact.",
+    }
+
+    instruction = intent_instructions.get(intent, "Respond helpfully and professionally.")
+
+    client = _get_client()
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=200,
+        messages=[{
+            "role": "user",
+            "content": (
+                f"You are drafting a reply on behalf of a Lagos business service. "
+                f"Vertical: {vertical.replace('_', ' ')}. Channel: {channel}.\n\n"
+                f"Your original message to {business_name}:\n\"{original_message}\"\n\n"
+                f"Their reply:\n\"{their_reply}\"\n\n"
+                f"Intent detected: {intent}. Instruction: {instruction}\n\n"
+                f"Write a natural, human-sounding {channel} reply. Max 3 sentences. "
+                f"Nigerian English tone — professional but warm. "
+                f"Return ONLY the message text. No preamble."
+            ),
+        }],
+    )
+    return response.content[0].text.strip()
+
+
 def generate_campaign_summary(stats: dict, vertical: str) -> str:
     """Generate a plain-English campaign summary for the dashboard."""
     client = _get_client()
