@@ -190,6 +190,76 @@ async def health():
     return {"status": "ok" if db_ok else "degraded", "db": db_ok}
 
 
+@app.get("/api/v1/health", dependencies=[Depends(require_auth)])
+async def rich_health():
+    """Detailed integration health check for the onboarding wizard and dashboard."""
+    import httpx
+    from config import get_settings
+    settings = get_settings()
+    result = {}
+
+    # Auth configured
+    result["auth_configured"] = bool(settings.dashboard_user and settings.dashboard_pass)
+
+    # Claude
+    result["claude"] = "ok" if settings.anthropic_api_key and not settings.anthropic_api_key.startswith("sk-ant-...") else "missing"
+
+    # MongoDB
+    try:
+        from database import get_db
+        get_db().command("ping")
+        result["mongodb"] = "ok"
+    except Exception:
+        result["mongodb"] = "error"
+
+    # Google Maps
+    try:
+        if not settings.google_maps_api_key:
+            result["maps"] = "missing"
+        else:
+            async with httpx.AsyncClient(timeout=8) as client:
+                r = await client.get(
+                    "https://maps.googleapis.com/maps/api/place/textsearch/json",
+                    params={"query": "restaurant Lagos", "key": settings.google_maps_api_key},
+                )
+                result["maps"] = "ok" if r.status_code == 200 and r.json().get("status") in ("OK", "ZERO_RESULTS") else "error"
+    except Exception:
+        result["maps"] = "error"
+
+    # Apollo
+    try:
+        if not settings.apollo_api_key:
+            result["apollo"] = "missing"
+        else:
+            async with httpx.AsyncClient(timeout=8) as client:
+                r = await client.post(
+                    "https://api.apollo.io/v1/mixed_companies/search",
+                    json={"q_organization_name": "test", "page": 1, "per_page": 1},
+                    headers={"x-api-key": settings.apollo_api_key, "Content-Type": "application/json"},
+                )
+                result["apollo"] = "ok" if r.status_code in (200, 422) else "error"
+    except Exception:
+        result["apollo"] = "error"
+
+    # Unipile
+    try:
+        if not settings.unipile_api_key or not settings.unipile_dsn:
+            result["unipile"] = "missing"
+        else:
+            async with httpx.AsyncClient(timeout=8) as client:
+                r = await client.get(
+                    f"https://{settings.unipile_dsn}/api/v1/accounts",
+                    headers={"X-API-KEY": settings.unipile_api_key},
+                )
+                result["unipile"] = "ok" if r.status_code in (200, 401) else "error"
+    except Exception:
+        result["unipile"] = "error"
+
+    overall = "ok" if all(v == "ok" for v in result.values() if v != True) else "degraded"
+    result["status"] = overall
+    return result
+
+
 @app.get("/debug/apollo", dependencies=[Depends(require_auth)])
 async def debug_apollo():
     """Hit Apollo API directly and return the raw response for diagnostics."""

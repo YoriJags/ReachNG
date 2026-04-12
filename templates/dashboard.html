@@ -361,6 +361,74 @@
   .quick-action-btn:hover { background: #222; color: #fff; }
   .quick-action-btn .q-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
+  /* ── Onboarding ── */
+  .onboarding-banner {
+    background: #0d0d0d; border: 1px solid #2a2a2a; border-left: 3px solid #ff5c00;
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 24px;
+  }
+  .ob-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .ob-title { font-size: 14px; font-weight: 700; color: #f0f0f0; }
+  .ob-subtitle { font-size: 11px; color: #444; margin-top: 2px; }
+  .ob-dismiss { font-size: 11px; color: #333; background: none; border: none; cursor: pointer; }
+  .ob-dismiss:hover { color: #555; }
+  .ob-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+  .ob-step {
+    background: #111; border: 1px solid #1e1e1e; border-radius: 8px;
+    padding: 14px 16px; display: flex; gap: 10px; align-items: flex-start;
+    transition: border-color 0.15s;
+  }
+  .ob-step.done { border-color: #0e2e1e; }
+  .ob-step.done .ob-step-title { color: #444; text-decoration: line-through; }
+  .ob-check {
+    width: 20px; height: 20px; border-radius: 50%; border: 2px solid #1e1e1e;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 11px; margin-top: 1px;
+  }
+  .ob-check.done { background: #00e5a0; border-color: #00e5a0; color: #000; font-weight: 700; }
+  .ob-check.pending { border-color: #ff5c00; color: #ff5c00; }
+  .ob-step-title { font-size: 12px; font-weight: 600; color: #ccc; margin-bottom: 2px; }
+  .ob-step-desc { font-size: 11px; color: #333; line-height: 1.4; }
+  .ob-step-action { font-size: 10px; color: #ff5c00; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 5px; cursor: pointer; font-weight: 600; }
+  .ob-progress { margin-top: 14px; }
+  .ob-prog-row { display: flex; justify-content: space-between; font-size: 10px; color: #333; margin-bottom: 5px; }
+  .ob-prog-track { background: #1a1a1a; border-radius: 4px; height: 3px; }
+  .ob-prog-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #ff5c00, #ff8c00); transition: width 0.6s ease; }
+
+  /* ── Setup wizard modal ── */
+  .wizard-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; align-items: center; justify-content: center; }
+  .wizard-overlay.open { display: flex; }
+  .wizard-box {
+    background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 16px;
+    padding: 32px; width: 92%; max-width: 580px; max-height: 90vh; overflow-y: auto;
+  }
+  .wizard-logo { font-size: 20px; font-weight: 700; color: #f0f0f0; margin-bottom: 4px; }
+  .wizard-logo span { color: #ff5c00; }
+  .wizard-tagline { font-size: 12px; color: #333; margin-bottom: 28px; }
+  .wizard-step-header { font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .wizard-step-title { font-size: 17px; font-weight: 700; color: #f0f0f0; margin-bottom: 6px; }
+  .wizard-step-desc { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 22px; }
+  .wizard-input-label { font-size: 11px; color: #444; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .wizard-input {
+    width: 100%; background: #111; border: 1px solid #1e1e1e; border-radius: 8px;
+    color: #e8e8e8; font-size: 13px; padding: 10px 14px; font-family: inherit;
+    margin-bottom: 14px; transition: border-color 0.15s;
+  }
+  .wizard-input:focus { outline: none; border-color: #ff5c00; }
+  .wizard-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
+  .wizard-dots { display: flex; gap: 6px; align-items: center; margin-bottom: 24px; }
+  .wizard-dot { width: 6px; height: 6px; border-radius: 50%; background: #1e1e1e; transition: background 0.2s; }
+  .wizard-dot.active { background: #ff5c00; }
+  .wizard-dot.done { background: #00e5a0; }
+  .wizard-skip { font-size: 11px; color: #333; background: none; border: none; cursor: pointer; margin-right: auto; }
+  .wizard-skip:hover { color: #555; }
+  .wizard-check-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #111; border: 1px solid #1a1a1a; border-radius: 8px; margin-bottom: 8px; }
+  .wizard-check-icon { font-size: 16px; }
+  .wizard-check-text { font-size: 13px; color: #888; flex: 1; }
+  .wizard-check-status { font-size: 11px; font-weight: 600; }
+  .wizard-check-status.ok { color: #00e5a0; }
+  .wizard-check-status.fail { color: #ff4444; }
+  .wizard-check-status.checking { color: #f5c842; }
+
   /* ── Product Switcher ── */
   .product-switcher {
     display: flex; align-items: center; gap: 6px;
@@ -423,6 +491,7 @@
 <nav class="tab-nav product-tabs" data-product="school_fees" style="display:none;">
   <button class="tab-btn active" onclick="switchTab('sf_overview', this)">Overview</button>
   <button class="tab-btn" onclick="switchTab('sf_schools', this)">Schools</button>
+  <button class="tab-btn" onclick="switchTab('sf_students', this)">Students</button>
   <button class="tab-btn" onclick="switchTab('sf_payments', this)">Payments</button>
   <button class="tab-btn" onclick="switchTab('sf_reminders', this)">Reminders</button>
   <button class="tab-btn" id="sf-claims-tab-btn" onclick="switchTab('sf_claims', this)">Claims <span id="sf-claims-badge" style="background:#ff5c00;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:4px;display:none;">0</span></button>
@@ -430,6 +499,63 @@
 
 <!-- ── Overview ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel active" id="tab-overview">
+
+  <!-- Onboarding Checklist — hidden once all steps complete -->
+  <div class="onboarding-banner" id="onboarding-banner" style="display:none;">
+    <div class="ob-header">
+      <div>
+        <div class="ob-title">Get ReachNG ready to run</div>
+        <div class="ob-subtitle">Complete these 5 steps to launch your first campaign</div>
+      </div>
+      <button class="ob-dismiss" onclick="dismissOnboarding()" title="Dismiss (shows again on refresh until complete)">✕ Dismiss</button>
+    </div>
+    <div class="ob-steps" id="ob-steps">
+      <div class="ob-step" id="obs-auth">
+        <div class="ob-check pending" id="obc-auth">1</div>
+        <div>
+          <div class="ob-step-title">Secure the dashboard</div>
+          <div class="ob-step-desc">Set DASHBOARD_USER and DASHBOARD_PASS in Railway environment variables.</div>
+          <div class="ob-step-action" onclick="window.open('https://railway.app','_blank')">Open Railway →</div>
+        </div>
+      </div>
+      <div class="ob-step" id="obs-maps">
+        <div class="ob-check pending" id="obc-maps">2</div>
+        <div>
+          <div class="ob-step-title">Verify Google Maps</div>
+          <div class="ob-step-desc">Google Places API must be active with billing enabled.</div>
+          <div class="ob-step-action" onclick="runSystemCheck()">Check now →</div>
+        </div>
+      </div>
+      <div class="ob-step" id="obs-apollo">
+        <div class="ob-check pending" id="obc-apollo">3</div>
+        <div>
+          <div class="ob-step-title">Connect Apollo.io</div>
+          <div class="ob-step-desc">Add your APOLLO_API_KEY to Railway for B2B lead discovery.</div>
+          <div class="ob-step-action" onclick="runSystemCheck()">Check now →</div>
+        </div>
+      </div>
+      <div class="ob-step" id="obs-client">
+        <div class="ob-check pending" id="obc-client">4</div>
+        <div>
+          <div class="ob-step-title">Add your first client</div>
+          <div class="ob-step-desc">Create a client brief so campaigns are personalised to their business.</div>
+          <div class="ob-step-action" onclick="switchTabByName('clients')">Go to Clients →</div>
+        </div>
+      </div>
+      <div class="ob-step" id="obs-campaign">
+        <div class="ob-check pending" id="obc-campaign">5</div>
+        <div>
+          <div class="ob-step-title">Run first dry run</div>
+          <div class="ob-step-desc">Run a dry run campaign to confirm leads are being discovered.</div>
+          <div class="ob-step-action" onclick="switchTabByName('campaigns')">Go to Campaigns →</div>
+        </div>
+      </div>
+    </div>
+    <div class="ob-progress">
+      <div class="ob-prog-row"><span id="ob-prog-label">0 of 5 complete</span><span id="ob-prog-pct">0%</span></div>
+      <div class="ob-prog-track"><div class="ob-prog-fill" id="ob-prog-fill" style="width:0%"></div></div>
+    </div>
+  </div>
 
   <!-- Today's Work -->
   <p class="section-title" style="margin-top:0;">Today's Work</p>
@@ -1060,6 +1186,30 @@
 </div>
 
 <!-- ── Payment Claims ──────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-sf_students" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Student Debtors</p>
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+    <select id="sf-stu-school" onchange="sfLoadStudentsTable()" style="max-width:280px;">
+      <option value="">All Schools</option>
+    </select>
+    <select id="sf-stu-filter" onchange="sfLoadStudentsTable()" style="max-width:160px;">
+      <option value="">All</option>
+      <option value="unpaid">Unpaid</option>
+      <option value="paid">Paid</option>
+      <option value="claimed">Claims Pending</option>
+    </select>
+    <span style="color:#888;font-size:12px;margin-left:auto;">Click any deadline to edit it inline.</span>
+  </div>
+  <table class="table" id="sf-stu-table">
+    <thead><tr>
+      <th>Student</th><th>Parent</th><th>Phone</th><th>Fee</th><th>Paid</th><th>Balance</th><th>Deadline</th><th>Status</th>
+    </tr></thead>
+    <tbody id="sf-stu-tbody">
+      <tr><td colspan="8" class="empty">Select a school to view students.</td></tr>
+    </tbody>
+  </table>
+</div>
+
 <div class="tab-panel" id="tab-sf_claims" style="display:none;">
   <p class="section-title" style="margin-top:0;">Payment Claims — Awaiting Confirmation</p>
   <p style="color:#888;font-size:12px;margin-bottom:16px;">Parents who replied "I paid" — confirm once you see their receipt/transfer, or reject to resume reminders.</p>
@@ -1076,6 +1226,88 @@
       <tr><td colspan="6" class="empty">Loading…</td></tr>
     </tbody>
   </table>
+</div>
+
+<!-- ── Setup Wizard Modal ── -->
+<div class="wizard-overlay" id="wizard-overlay">
+  <div class="wizard-box">
+    <div class="wizard-logo">Reach<span>NG</span></div>
+    <div class="wizard-tagline">Let's get you set up in 2 minutes.</div>
+    <div class="wizard-dots" id="wizard-dots"></div>
+
+    <!-- Step 1: Welcome -->
+    <div id="wz-step-0">
+      <div class="wizard-step-header">Step 1 of 4</div>
+      <div class="wizard-step-title">Welcome to ReachNG</div>
+      <div class="wizard-step-desc">ReachNG finds your next clients, writes personalised WhatsApp messages, and tells you who's interested — so you only spend time on people ready to buy.<br><br>This wizard will walk you through the 4 things you need to do before your first campaign goes live.</div>
+      <div class="wizard-actions">
+        <button class="wizard-skip" onclick="closeWizard()">Skip setup</button>
+        <button class="btn btn-approve" onclick="wizardNext()">Let's go →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: System check -->
+    <div id="wz-step-1" style="display:none;">
+      <div class="wizard-step-header">Step 2 of 4</div>
+      <div class="wizard-step-title">System Check</div>
+      <div class="wizard-step-desc">Verifying your API connections. All green means you're ready to discover leads.</div>
+      <div id="wz-checks">
+        <div class="wizard-check-row"><div class="wizard-check-icon">🗺️</div><div class="wizard-check-text">Google Maps / Places</div><div class="wizard-check-status checking" id="wz-maps-status">Checking…</div></div>
+        <div class="wizard-check-row"><div class="wizard-check-icon">🔍</div><div class="wizard-check-text">Apollo.io (B2B leads)</div><div class="wizard-check-status checking" id="wz-apollo-status">Checking…</div></div>
+        <div class="wizard-check-row"><div class="wizard-check-icon">💬</div><div class="wizard-check-text">Unipile (WhatsApp)</div><div class="wizard-check-status checking" id="wz-unipile-status">Checking…</div></div>
+        <div class="wizard-check-row"><div class="wizard-check-icon">🤖</div><div class="wizard-check-text">Claude AI (message generation)</div><div class="wizard-check-status checking" id="wz-claude-status">Checking…</div></div>
+      </div>
+      <div id="wz-check-hint" style="font-size:11px;color:#444;margin-top:12px;line-height:1.5;"></div>
+      <div class="wizard-actions" style="margin-top:16px;">
+        <button class="wizard-skip" onclick="wizardBack()">← Back</button>
+        <button class="btn btn-skip" onclick="runWizardChecks()" id="wz-recheck-btn">Re-check</button>
+        <button class="btn btn-approve" onclick="wizardNext()" id="wz-step1-next">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: First client -->
+    <div id="wz-step-2" style="display:none;">
+      <div class="wizard-step-header">Step 3 of 4</div>
+      <div class="wizard-step-title">Add your first client</div>
+      <div class="wizard-step-desc">Every campaign needs a client brief. This tells Claude who the client is, what they sell, and what tone to use — so every message feels personal, not generic.</div>
+      <div class="wizard-input-label">Client / Business Name</div>
+      <input class="wizard-input" id="wz-client-name" placeholder="e.g. Mercury Lagos" />
+      <div class="wizard-input-label">Vertical</div>
+      <select class="wizard-input" id="wz-client-vertical">
+        <option value="real_estate">Real Estate</option>
+        <option value="recruitment">Recruitment</option>
+        <option value="events">Events</option>
+        <option value="fintech">Fintech</option>
+        <option value="legal">Legal</option>
+        <option value="logistics">Logistics</option>
+        <option value="agriculture">Agriculture</option>
+      </select>
+      <div class="wizard-input-label">Brief — who are they, what do they sell, target customer, tone</div>
+      <textarea class="wizard-input" id="wz-client-brief" rows="4" placeholder="e.g. Mercury Lagos is a premium real estate agency in Lekki. They sell 2–4 bedroom apartments to young professionals. Tone: professional but approachable. Avoid hard sell."></textarea>
+      <div id="wz-client-msg" style="font-size:11px;color:#00e5a0;margin-top:-8px;min-height:16px;"></div>
+      <div class="wizard-actions">
+        <button class="wizard-skip" onclick="wizardBack()">← Back</button>
+        <button class="btn btn-skip" onclick="wizardNext()">Skip for now</button>
+        <button class="btn btn-approve" onclick="wizardSaveClient()">Save Client →</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Ready -->
+    <div id="wz-step-3" style="display:none;">
+      <div class="wizard-step-header">Step 4 of 4</div>
+      <div class="wizard-step-title">You're ready.</div>
+      <div class="wizard-step-desc">Your system is configured. Here's what to do next:<br><br>
+        <b style="color:#ccc;">1.</b> Go to the <b style="color:#ff5c00;">Campaigns</b> tab<br>
+        <b style="color:#ccc;">2.</b> Pick a vertical and run a <b style="color:#ff5c00;">dry run</b> first — confirm 5–30 leads come back<br>
+        <b style="color:#ccc;">3.</b> Uncheck dry run and go <b style="color:#00e5a0;">live</b> — messages send via WhatsApp<br>
+        <b style="color:#ccc;">4.</b> Check <b style="color:#ff5c00;">Replies</b> tab after 2 hours — hot leads at the top<br>
+        <b style="color:#ccc;">5.</b> Close deals. That's it.
+      </div>
+      <div class="wizard-actions">
+        <button class="btn btn-approve" onclick="closeWizard(); switchTabByName('campaigns');">Go to Campaigns →</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Floating quick-actions -->
@@ -1160,6 +1392,10 @@ function switchTab(name, btn) {
   const panel = document.getElementById("tab-" + name);
   if (panel) { panel.style.display = "block"; panel.classList.add("active"); }
   if (btn) btn.classList.add("active");
+
+  // Auto-load data for tabs that need it
+  if (name === "sf_students") sfLoadStudentsTable();
+  if (name === "sf_claims")   sfLoadClaims();
 }
 
 function sfSwitchTab(name) {
@@ -1182,6 +1418,16 @@ async function postJSON(url, body) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
+async function patchJSON(url, body) {
+  const r = await fetch(url, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
   if (!r.ok) throw new Error(r.status);
   return r.json();
@@ -2049,6 +2295,8 @@ async function sfPopulateSchoolSelects() {
     });
     const claimsEl = document.getElementById("sf-claims-school");
     if (claimsEl) claimsEl.innerHTML = '<option value="">All Schools</option>' + opts;
+    const stuEl = document.getElementById("sf-stu-school");
+    if (stuEl) stuEl.innerHTML = '<option value="">All Schools</option>' + opts;
   } catch(e) {}
 }
 
@@ -2201,6 +2449,77 @@ async function sfCheckClaimsBadge() {
   } catch(e) {}
 }
 
+// ── Students table with inline due-date editing ───────────────────────────────
+
+async function sfLoadStudentsTable() {
+  const tbody = document.getElementById("sf-stu-tbody");
+  const schoolId = document.getElementById("sf-stu-school").value;
+  const filter = document.getElementById("sf-stu-filter").value;
+  tbody.innerHTML = '<tr><td colspan="8" class="empty">Loading…</td></tr>';
+  try {
+    let url;
+    if (schoolId) {
+      let q = "?";
+      if (filter === "unpaid") q += "paid=false";
+      else if (filter === "paid") q += "paid=true";
+      else if (filter === "claimed") q += "paid=false&claimed=true";
+      url = `/api/v1/school-fees/schools/${schoolId}/students${q}`;
+    } else {
+      // Load all schools then aggregate
+      const schools = await fetchJSON("/api/v1/school-fees/schools");
+      let all = [];
+      for (const s of schools) {
+        let q = "?";
+        if (filter === "unpaid") q += "paid=false";
+        else if (filter === "paid") q += "paid=true";
+        else if (filter === "claimed") q += "paid=false&claimed=true";
+        const studs = await fetchJSON(`/api/v1/school-fees/schools/${s.id}/students${q}`);
+        all = all.concat(studs.map(st => ({...st, _schoolName: s.name})));
+      }
+      renderStudentsTable(tbody, all, true);
+      return;
+    }
+    const students = await fetchJSON(url);
+    renderStudentsTable(tbody, students, false);
+  } catch(e) { tbody.innerHTML = `<tr><td colspan="8" class="empty">Error: ${e.message}</td></tr>`; }
+}
+
+function renderStudentsTable(tbody, students, showSchool) {
+  if (!students.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">No students found.</td></tr>'; return; }
+  tbody.innerHTML = students.map(s => {
+    const balance = Math.max(0, s.fee_amount - (s.amount_paid || 0));
+    const statusLabel = s.paid ? '<span style="color:#00e5a0;font-size:11px;">Paid</span>'
+      : s.claimed_paid ? '<span style="color:#f5c842;font-size:11px;">Claim Pending</span>'
+      : '<span style="color:#ff5c00;font-size:11px;">Unpaid</span>';
+    const dueDisplay = s.due_date || "—";
+    const schoolCell = showSchool ? `<td style="color:#888;font-size:11px;">${s._schoolName || "—"}</td>` : "";
+    return `<tr>
+      <td style="font-weight:600;">${s.student_name}</td>
+      <td style="color:#aaa;font-size:12px;">${s.parent_name}</td>
+      <td style="color:#aaa;font-size:12px;">${s.parent_phone}</td>
+      <td>₦${s.fee_amount.toLocaleString()}</td>
+      <td style="color:#aaa;">₦${(s.amount_paid||0).toLocaleString()}</td>
+      <td style="color:${balance>0?"#ff5c00":"#00e5a0"};">₦${balance.toLocaleString()}</td>
+      <td>
+        <input type="date" value="${dueDisplay}" style="background:#111;border:1px solid #333;color:#eee;border-radius:4px;padding:3px 6px;font-size:12px;cursor:pointer;"
+          onchange="sfPatchDueDate('${s.id}', this.value, this)" title="Click to change deadline" />
+      </td>
+      <td>${statusLabel}</td>
+    </tr>`;
+  }).join("");
+}
+
+async function sfPatchDueDate(studentId, newDate, inputEl) {
+  try {
+    await patchJSON(`/api/v1/school-fees/students/${studentId}`, { due_date: newDate });
+    inputEl.style.borderColor = "#00e5a0";
+    setTimeout(() => { inputEl.style.borderColor = "#333"; }, 1500);
+  } catch(e) {
+    inputEl.style.borderColor = "#ff4444";
+    alert("Failed to update deadline: " + e.message);
+  }
+}
+
 // ── Fix initial panel visibility ──────────────────────────────────────────────
 // On load, make sure only the active outreach panel is visible
 document.querySelectorAll(".tab-panel").forEach((p, i) => {
@@ -2214,6 +2533,189 @@ loadInvoices();
 setInterval(fullRefresh, 30000);
 setInterval(refreshHealth, 60000);
 setInterval(loadDiscoveryHealth, 60000);
+
+// ── Onboarding ────────────────────────────────────────────────────────────────
+
+const OB_DISMISSED_KEY = "reachng_ob_dismissed";
+const OB_WIZARD_DONE   = "reachng_wizard_done";
+
+let wizardStep = 0;
+const WIZARD_STEPS = 4;
+
+function initOnboarding() {
+  const dismissed = sessionStorage.getItem(OB_DISMISSED_KEY);
+  if (!dismissed) {
+    document.getElementById("onboarding-banner").style.display = "block";
+    updateOnboardingChecklist();
+  }
+  // Show wizard only on very first load (no localStorage flag)
+  if (!localStorage.getItem(OB_WIZARD_DONE)) {
+    setTimeout(() => openWizard(), 800);
+  }
+}
+
+async function updateOnboardingChecklist() {
+  const steps = { auth: false, maps: false, apollo: false, client: false, campaign: false };
+
+  // Auth — we can only infer this if we're logged in (if we're here, basic auth passed if set)
+  // Check if DASHBOARD_USER is set via a dedicated endpoint
+  try {
+    const h = await fetchJSON("/api/v1/health");
+    steps.auth    = h.auth_configured === true;
+    steps.maps    = h.maps === "ok";
+    steps.apollo  = h.apollo === "ok";
+  } catch(e) {}
+
+  // Client — check if any clients exist
+  try {
+    const clients = await fetchJSON("/api/v1/clients/");
+    steps.client = Array.isArray(clients) && clients.length > 0;
+  } catch(e) {}
+
+  // Campaign — check if any contacts have been found
+  try {
+    const pipeline = await fetchJSON("/api/v1/contacts/pipeline");
+    const total = Object.values(pipeline).reduce((s, v) => s + (v.contacted || 0) + (v.not_contacted || 0), 0);
+    steps.campaign = total > 0;
+  } catch(e) {}
+
+  const stepIds = ["auth", "maps", "apollo", "client", "campaign"];
+  let done = 0;
+  stepIds.forEach(id => {
+    const stepEl  = document.getElementById(`obs-${id}`);
+    const checkEl = document.getElementById(`obc-${id}`);
+    if (!stepEl || !checkEl) return;
+    if (steps[id]) {
+      done++;
+      stepEl.classList.add("done");
+      checkEl.classList.remove("pending");
+      checkEl.classList.add("done");
+      checkEl.textContent = "✓";
+    } else {
+      stepEl.classList.remove("done");
+      checkEl.classList.remove("done");
+      checkEl.classList.add("pending");
+    }
+  });
+
+  const pct = Math.round((done / stepIds.length) * 100);
+  document.getElementById("ob-prog-fill").style.width  = pct + "%";
+  document.getElementById("ob-prog-pct").textContent   = pct + "%";
+  document.getElementById("ob-prog-label").textContent = `${done} of ${stepIds.length} complete`;
+
+  // Auto-hide banner when fully complete
+  if (done === stepIds.length) {
+    setTimeout(() => {
+      document.getElementById("onboarding-banner").style.display = "none";
+    }, 2000);
+  }
+}
+
+function dismissOnboarding() {
+  sessionStorage.setItem(OB_DISMISSED_KEY, "1");
+  document.getElementById("onboarding-banner").style.display = "none";
+}
+
+// ── Wizard ────────────────────────────────────────────────────────────────────
+
+function openWizard() {
+  wizardStep = 0;
+  renderWizardStep();
+  document.getElementById("wizard-overlay").classList.add("open");
+}
+
+function closeWizard() {
+  document.getElementById("wizard-overlay").classList.remove("open");
+  localStorage.setItem(OB_WIZARD_DONE, "1");
+  updateOnboardingChecklist();
+}
+
+function renderWizardStep() {
+  for (let i = 0; i < WIZARD_STEPS; i++) {
+    const el = document.getElementById(`wz-step-${i}`);
+    if (el) el.style.display = i === wizardStep ? "block" : "none";
+  }
+  // Render dots
+  const dotsEl = document.getElementById("wizard-dots");
+  dotsEl.innerHTML = Array.from({length: WIZARD_STEPS}, (_, i) => {
+    const cls = i < wizardStep ? "done" : i === wizardStep ? "active" : "";
+    return `<div class="wizard-dot ${cls}"></div>`;
+  }).join("");
+  // Auto-run checks on step 1
+  if (wizardStep === 1) runWizardChecks();
+}
+
+function wizardNext() {
+  if (wizardStep < WIZARD_STEPS - 1) {
+    wizardStep++;
+    renderWizardStep();
+  } else {
+    closeWizard();
+  }
+}
+
+function wizardBack() {
+  if (wizardStep > 0) { wizardStep--; renderWizardStep(); }
+}
+
+async function runWizardChecks() {
+  const set = (id, status, text) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = `wizard-check-status ${status}`;
+    el.textContent = text;
+  };
+  set("wz-maps-status",   "checking", "Checking…");
+  set("wz-apollo-status", "checking", "Checking…");
+  set("wz-unipile-status","checking", "Checking…");
+  set("wz-claude-status", "checking", "Checking…");
+
+  let hints = [];
+  try {
+    const h = await fetchJSON("/api/v1/health");
+    set("wz-maps-status",    h.maps    === "ok" ? "ok"   : "fail", h.maps    === "ok" ? "Connected" : "Not configured");
+    set("wz-apollo-status",  h.apollo  === "ok" ? "ok"   : "fail", h.apollo  === "ok" ? "Connected" : "Not configured");
+    set("wz-unipile-status", h.unipile === "ok" ? "ok"   : "fail", h.unipile === "ok" ? "Connected" : "Not configured");
+    set("wz-claude-status",  h.claude  === "ok" ? "ok"   : "fail", h.claude  === "ok" ? "Connected" : "Not configured");
+
+    if (h.maps    !== "ok") hints.push("Add GOOGLE_MAPS_API_KEY in Railway → Variables.");
+    if (h.apollo  !== "ok") hints.push("Add APOLLO_API_KEY in Railway → Variables.");
+    if (h.unipile !== "ok") hints.push("Add UNIPILE_API_KEY in Railway → Variables. Required to send WhatsApp messages.");
+    if (h.claude  !== "ok") hints.push("Add ANTHROPIC_API_KEY in Railway → Variables. Required for message generation.");
+  } catch(e) {
+    ["maps","apollo","unipile","claude"].forEach(k => set(`wz-${k}-status`, "fail", "Error"));
+    hints.push("Could not reach the health endpoint. Check Railway deploy logs.");
+  }
+
+  document.getElementById("wz-check-hint").innerHTML = hints.length
+    ? hints.map(h => `⚠️ ${h}`).join("<br>")
+    : "✅ All systems connected. You're ready to run campaigns.";
+}
+
+async function wizardSaveClient() {
+  const name    = document.getElementById("wz-client-name").value.trim();
+  const vert    = document.getElementById("wz-client-vertical").value;
+  const brief   = document.getElementById("wz-client-brief").value.trim();
+  const msgEl   = document.getElementById("wz-client-msg");
+
+  if (!name || !brief) { msgEl.style.color = "#ff4444"; msgEl.textContent = "Name and brief are required."; return; }
+
+  msgEl.style.color = "#f5c842"; msgEl.textContent = "Saving…";
+  try {
+    await postJSON("/api/v1/clients/", { name, vertical: vert, brief });
+    msgEl.style.color = "#00e5a0"; msgEl.textContent = "✓ Client saved.";
+    setTimeout(() => wizardNext(), 800);
+  } catch(e) {
+    msgEl.style.color = "#ff4444"; msgEl.textContent = "Failed to save. Try again.";
+  }
+}
+
+async function runSystemCheck() {
+  updateOnboardingChecklist();
+}
+
+// Run onboarding check on load
+initOnboarding();
 </script>
 </body>
 </html>
