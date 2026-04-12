@@ -32,8 +32,8 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
 
     campaign = CAMPAIGN_REGISTRY[body.vertical]()
 
-    # Run in background for large batches
-    if body.max_contacts > 10 and not body.dry_run:
+    # Run in background for large batches — but NOT for HITL (we need the queued count back)
+    if body.max_contacts > 10 and not body.dry_run and not body.hitl_mode:
         background_tasks.add_task(
             campaign.run,
             max_new_contacts=body.max_contacts,
