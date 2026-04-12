@@ -360,12 +360,31 @@
   }
   .quick-action-btn:hover { background: #222; color: #fff; }
   .quick-action-btn .q-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── Product Switcher ── */
+  .product-switcher {
+    display: flex; align-items: center; gap: 6px;
+    padding: 10px 28px 0;
+    background: #0a0a0a;
+  }
+  .product-pill {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+    padding: 5px 14px; border-radius: 20px;
+    border: 1px solid #1e1e1e; background: #111; color: #555;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .product-pill:hover { color: #aaa; border-color: #333; }
+  .product-pill.active { background: #1a1a1a; color: #f0f0f0; border-color: #2a2a2a; }
+  .product-pill-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .pill-add { color: #333; border-style: dashed; }
+  .pill-add:hover { color: #555; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Reach<span>NG</span></div>
+  <div class="logo">Reach<span>NG</span> <span style="font-size:11px;font-weight:400;color:#333;letter-spacing:0.5px;margin-left:4px;">Control Tower</span></div>
   <div class="header-right">
     <div class="health-pills">
       <div class="health-pill"><span class="health-dot" id="dot-maps"></span> Maps</div>
@@ -376,7 +395,21 @@
   </div>
 </header>
 
-<nav class="tab-nav">
+<!-- ── Product Switcher ── -->
+<div class="product-switcher" id="product-switcher">
+  <button class="product-pill active" data-product="outreach" onclick="switchProduct('outreach', this)">
+    <span class="product-pill-dot" style="background:#ff5c00;"></span> Outreach
+  </button>
+  <button class="product-pill" data-product="school_fees" onclick="switchProduct('school_fees', this)">
+    <span class="product-pill-dot" style="background:#00b4d8;"></span> School Fees
+  </button>
+  <button class="product-pill pill-add" onclick="alert('More products coming soon.')">
+    + Add Product
+  </button>
+</div>
+
+<!-- ── Outreach Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="outreach">
   <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
   <button class="tab-btn" onclick="switchTab('campaigns', this)">Campaigns</button>
   <button class="tab-btn" onclick="switchTab('clients', this)">Clients</button>
@@ -384,6 +417,14 @@
   <button class="tab-btn" onclick="switchTab('replies', this)">Replies</button>
   <button class="tab-btn" onclick="switchTab('invoices', this)">Invoices</button>
   <button class="tab-btn" onclick="switchTab('tools', this)">Tools</button>
+</nav>
+
+<!-- ── School Fees Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="school_fees" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('sf_overview', this)">Overview</button>
+  <button class="tab-btn" onclick="switchTab('sf_schools', this)">Schools</button>
+  <button class="tab-btn" onclick="switchTab('sf_payments', this)">Payments</button>
+  <button class="tab-btn" onclick="switchTab('sf_reminders', this)">Reminders</button>
 </nav>
 
 <!-- ── Overview ───────────────────────────────────────────────────────────────── -->
@@ -577,22 +618,24 @@
     <div class="sop-step"><span class="sop-num">5</span><span><b>Run first campaign</b> — dry run first to preview leads, then go live with max 10 contacts. Scale up once confirmed working.</span></div>
   </div>
 
-  <p class="section-title">Client Roster</p>
-  <div class="form-card" style="padding:0;overflow:hidden;">
+  <p class="section-title">Client Roster <span id="roster-count" style="color:#555;font-size:11px;margin-left:6px;"></span></p>
+  <div class="form-card" style="padding:0;overflow:hidden;overflow-x:auto;">
     <table class="roster-table" id="roster-table">
       <thead>
         <tr>
           <th>Client</th>
           <th>Vertical</th>
-          <th>City</th>
+          <th>Territory</th>
           <th>Plan</th>
+          <th>WhatsApp</th>
+          <th>Status</th>
           <th>Last Campaign</th>
           <th>Portal</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody id="roster-tbody">
-        <tr><td colspan="7" class="empty">Loading clients…</td></tr>
+        <tr><td colspan="9" class="empty">Loading clients…</td></tr>
       </tbody>
     </table>
   </div>
@@ -881,6 +924,140 @@
   <div class="hooks-output" id="hooks-output"></div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- SCHOOL FEES PANELS                                                       -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- ── SF Overview ─────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-sf_overview" style="display:none;">
+  <div class="summary-bar">
+    <div class="stat-card blue"><div class="label">Active Schools</div><div class="value" id="sf-stat-schools">—</div></div>
+    <div class="stat-card green"><div class="label">Paid Students</div><div class="value" id="sf-stat-paid">—</div></div>
+    <div class="stat-card amber"><div class="label">Outstanding</div><div class="value" id="sf-stat-outstanding">—</div></div>
+    <div class="stat-card fire"><div class="label">Total Collected</div><div class="value" id="sf-stat-collected">—</div></div>
+  </div>
+
+  <p class="section-title" style="margin-top:28px;">Collection Rate</p>
+  <div style="background:#111;border:1px solid #1e1e1e;border-radius:8px;padding:16px 20px;max-width:480px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:13px;color:#aaa;">Platform-wide</span>
+      <span style="font-size:20px;font-weight:700;color:#f0f0f0;" id="sf-collection-rate">—%</span>
+    </div>
+    <div style="background:#1a1a1a;border-radius:4px;height:6px;overflow:hidden;">
+      <div id="sf-collection-bar" style="height:100%;background:#00e5a0;border-radius:4px;width:0%;transition:width 0.5s;"></div>
+    </div>
+  </div>
+
+  <p class="section-title" style="margin-top:28px;">Quick Actions</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn btn-approve" onclick="sfSwitchTab('sf_schools')">+ Add School</button>
+    <button class="btn btn-approve" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;" onclick="sfSwitchTab('sf_reminders')">Send Reminders</button>
+    <button class="btn btn-approve" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;" onclick="sfSwitchTab('sf_payments')">View Payments</button>
+  </div>
+</div>
+
+<!-- ── SF Schools ──────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-sf_schools" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Register School</p>
+  <div class="form-card">
+    <div class="row">
+      <input id="sf-school-name" placeholder="School name e.g. Greenfield Int'l School" style="flex:2;" />
+      <input id="sf-school-city" placeholder="City" value="Lagos" />
+    </div>
+    <div class="row">
+      <input id="sf-school-contact" placeholder="Bursar / Contact name" />
+      <input id="sf-school-phone" placeholder="Bursar WhatsApp (+234...)" />
+      <input id="sf-school-email" placeholder="Email (optional)" />
+    </div>
+    <div class="row" style="align-items:center;gap:16px;">
+      <span style="font-size:12px;color:#666;">WhatsApp sender:</span>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#aaa;cursor:pointer;">
+        <input type="radio" name="sf-wa-provider" value="unipile" checked onchange="sfToggleProvider(this.value)" style="width:auto;" /> Unipile (default)
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#aaa;cursor:pointer;">
+        <input type="radio" name="sf-wa-provider" value="meta" onchange="sfToggleProvider(this.value)" style="width:auto;" /> Meta (school's own number)
+      </label>
+    </div>
+    <div id="sf-meta-fields" style="display:none;">
+      <div class="row">
+        <input id="sf-meta-phone-id" placeholder="Meta Phone Number ID" style="flex:1;" />
+        <input id="sf-meta-token" placeholder="Meta System User Access Token" style="flex:2;" />
+      </div>
+      <p class="form-hint">From Meta Business Manager → WhatsApp → Phone Numbers. Messages will send from the school's own WhatsApp Business number.</p>
+    </div>
+    <div class="row">
+      <button class="btn btn-approve" onclick="sfCreateSchool()">Save School</button>
+    </div>
+    <p class="form-hint" id="sf-school-msg"></p>
+  </div>
+
+  <p class="section-title" style="margin-top:28px;">All Schools</p>
+  <table class="contact-table">
+    <thead><tr><th>School</th><th>City</th><th>Contact</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody id="sf-schools-tbody">
+      <tr><td colspan="6" class="empty">Loading…</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── SF Payments ─────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-sf_payments" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Record Manual Payment</p>
+  <div class="form-card">
+    <div class="row">
+      <select id="sf-pay-school" onchange="sfLoadStudentsForPayment()">
+        <option value="">Select School…</option>
+      </select>
+      <select id="sf-pay-student">
+        <option value="">Select Student…</option>
+      </select>
+    </div>
+    <div class="row">
+      <input id="sf-pay-amount" type="number" placeholder="Amount paid (₦)" />
+      <select id="sf-pay-method">
+        <option value="transfer">Bank Transfer</option>
+        <option value="cash">Cash</option>
+        <option value="paystack">Paystack</option>
+      </select>
+      <input id="sf-pay-ref" placeholder="Reference / receipt # (optional)" />
+    </div>
+    <div class="row">
+      <button class="btn btn-approve" onclick="sfRecordPayment()">Record Payment</button>
+    </div>
+    <p class="form-hint" id="sf-pay-msg"></p>
+  </div>
+
+  <p class="section-title" style="margin-top:28px;">Recent Payments</p>
+  <table class="contact-table">
+    <thead><tr><th>Student</th><th>School</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead>
+    <tbody id="sf-payments-tbody">
+      <tr><td colspan="6" class="empty">Select a school to view payments</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── SF Reminders ────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-sf_reminders" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Send Fee Reminders</p>
+  <div class="form-card">
+    <div class="row">
+      <select id="sf-rem-school">
+        <option value="">Select School…</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:8px;color:#aaa;font-size:12px;cursor:pointer;">
+        <input type="checkbox" id="sf-rem-dryrun" checked style="width:auto;" />
+        Dry run (preview only)
+      </label>
+    </div>
+    <div class="row">
+      <button class="btn btn-approve" onclick="sfSendReminders()">Send Reminders</button>
+    </div>
+    <p class="form-hint" id="sf-rem-msg"></p>
+  </div>
+
+  <div id="sf-reminder-results" style="margin-top:20px;"></div>
+</div>
+
 <!-- Floating quick-actions -->
 <div class="quick-panel">
   <div class="quick-menu" id="quick-menu">
@@ -911,13 +1088,64 @@ const INTENT_LABELS  = { interested:"Interested", not_now:"Not Now", opted_out:"
 
 let editTargetId = null;
 
-// ── Tab switching ──────────────────────────────────────────────────────────────
+// ── Product + Tab switching ────────────────────────────────────────────────────
+
+let _activeProduct = "outreach";
+
+function switchProduct(product, pill) {
+  _activeProduct = product;
+  document.querySelectorAll(".product-pill").forEach(p => p.classList.remove("active"));
+  pill.classList.add("active");
+
+  // Show/hide tab navs
+  document.querySelectorAll(".product-tabs").forEach(nav => {
+    nav.style.display = nav.dataset.product === product ? "flex" : "none";
+  });
+
+  // Hide all panels
+  document.querySelectorAll(".tab-panel").forEach(p => {
+    p.classList.remove("active");
+    p.style.display = "none";
+  });
+
+  // Activate first tab of this product
+  const firstBtn = document.querySelector(`.product-tabs[data-product="${product}"] .tab-btn`);
+  if (firstBtn) {
+    firstBtn.classList.add("active");
+    const tabName = firstBtn.getAttribute("onclick").match(/switchTab\('([^']+)'/)[1];
+    const panel = document.getElementById("tab-" + tabName);
+    if (panel) { panel.style.display = "block"; panel.classList.add("active"); }
+  }
+
+  // Load data for new product
+  if (product === "school_fees") {
+    sfLoadOverview();
+    sfLoadSchoolsTable();
+    sfPopulateSchoolSelects();
+  }
+}
 
 function switchTab(name, btn) {
-  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById("tab-" + name).classList.add("active");
-  btn.classList.add("active");
+  // Only affect tabs belonging to the active product nav
+  const activeNav = document.querySelector(`.product-tabs[data-product="${_activeProduct}"]`);
+  if (activeNav) activeNav.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+
+  // Hide all panels (all products)
+  document.querySelectorAll(".tab-panel").forEach(p => {
+    p.classList.remove("active");
+    p.style.display = "none";
+  });
+
+  const panel = document.getElementById("tab-" + name);
+  if (panel) { panel.style.display = "block"; panel.classList.add("active"); }
+  if (btn) btn.classList.add("active");
+}
+
+function sfSwitchTab(name) {
+  const nav = document.querySelector('.product-tabs[data-product="school_fees"]');
+  if (!nav) return;
+  const btn = nav.querySelector(`button[onclick*="${name}"]`);
+  switchTab(name, btn);
 }
 
 // ── Fetch helpers ─────────────────────────────────────────────────────────────
@@ -975,7 +1203,7 @@ async function refreshRoster() {
     const clients = await fetchJSON("/api/v1/clients/");
     const tbody = document.getElementById("roster-tbody");
     if (!clients || !clients.length) {
-      tbody.innerHTML = '<tr><td colspan="7" class="empty">No clients yet. Add one in Client Onboarding below.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="empty">No clients yet. Add one in Client Onboarding below.</td></tr>';
       document.getElementById("s-clients").textContent = "0";
       return;
     }
@@ -989,11 +1217,25 @@ async function refreshRoster() {
         : "Never";
       const portalToken = c.portal_token || "";
       const portalUrl = portalToken ? window.location.origin + "/portal/" + portalToken : "";
+      // Territory: cities list takes priority over single city
+      const territory = (c.cities && c.cities.length)
+        ? c.cities.join(", ")
+        : (c.city || "Lagos");
+      // WhatsApp provider badge
+      const waProvider = (c.whatsapp_provider || "unipile") === "meta"
+        ? '<span style="background:#1877f2;color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;">Meta</span>'
+        : '<span style="background:#25d366;color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;">Unipile</span>';
+      // Active status badge
+      const statusBadge = c.active !== false
+        ? '<span style="background:#e8f5e9;color:#2e7d32;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;">Active</span>'
+        : '<span style="background:#fce4ec;color:#c62828;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;">Inactive</span>';
       return `<tr>
         <td style="font-weight:600;">${c.name}</td>
         <td style="color:#555;font-size:12px;">${(c.vertical||"").replace(/_/g," ").replace(/\b\w/g,x=>x.toUpperCase())}</td>
-        <td style="color:#555;font-size:12px;">${c.city || "Lagos"}</td>
+        <td style="color:#555;font-size:12px;">${territory}</td>
         <td><span class="plan-badge ${planClass}">${planLabel}</span></td>
+        <td>${waProvider}</td>
+        <td>${statusBadge}</td>
         <td style="color:#444;font-size:12px;">${lastRun}</td>
         <td>${portalUrl ? `<button class="copy-link-btn" onclick="navigator.clipboard.writeText('${portalUrl}').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',1500)})">Copy link</button>` : '<span style="color:#222;font-size:11px;">None</span>'}</td>
         <td><button class="btn btn-approve" style="font-size:11px;padding:4px 10px;" onclick="quickRunCampaign('${c.name}','${c.vertical||'real_estate'}')">Run</button></td>
@@ -1738,6 +1980,146 @@ async function fullRefresh() {
     buildTodaysWork(approvals, replies, pipeline, invoices);
   } catch(e) { console.error("Today's work failed:", e); }
 }
+
+// ── School Fees JS ────────────────────────────────────────────────────────────
+
+function sfToggleProvider(val) {
+  document.getElementById("sf-meta-fields").style.display = val === "meta" ? "block" : "none";
+}
+
+async function sfLoadOverview() {
+  try {
+    const s = await fetchJSON("/api/v1/school-fees/stats");
+    document.getElementById("sf-stat-schools").textContent     = s.active_schools;
+    document.getElementById("sf-stat-paid").textContent        = s.paid_students;
+    document.getElementById("sf-stat-outstanding").textContent = s.outstanding_students;
+    document.getElementById("sf-stat-collected").textContent   = "₦" + (s.total_collected / 1000).toFixed(0) + "K";
+    document.getElementById("sf-collection-rate").textContent  = s.collection_rate + "%";
+    document.getElementById("sf-collection-bar").style.width   = s.collection_rate + "%";
+  } catch(e) { console.error("SF overview failed:", e); }
+}
+
+async function sfLoadSchoolsTable() {
+  try {
+    const schools = await fetchJSON("/api/v1/school-fees/schools");
+    const tbody = document.getElementById("sf-schools-tbody");
+    if (!schools.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">No schools registered yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = schools.map(s => `<tr>
+      <td style="font-weight:600;">${s.name}</td>
+      <td style="color:#555;font-size:12px;">${s.city || "Lagos"}</td>
+      <td style="color:#555;font-size:12px;">${s.contact_name || "—"}</td>
+      <td style="color:#555;font-size:12px;">${s.contact_phone || "—"}</td>
+      <td>${s.active !== false ? '<span style="color:#00e5a0;font-size:11px;">Active</span>' : '<span style="color:#555;font-size:11px;">Inactive</span>'}</td>
+      <td><button class="btn btn-approve" style="font-size:11px;padding:3px 10px;" onclick="sfViewSchool('${s.id}','${s.name}')">View</button></td>
+    </tr>`).join("");
+  } catch(e) { console.error("SF schools table failed:", e); }
+}
+
+async function sfPopulateSchoolSelects() {
+  try {
+    const schools = await fetchJSON("/api/v1/school-fees/schools");
+    const opts = schools.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+    ["sf-pay-school", "sf-rem-school"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '<option value="">Select School…</option>' + opts;
+    });
+  } catch(e) {}
+}
+
+async function sfLoadStudentsForPayment() {
+  const schoolId = document.getElementById("sf-pay-school").value;
+  const sel = document.getElementById("sf-pay-student");
+  sel.innerHTML = '<option value="">Loading…</option>';
+  if (!schoolId) { sel.innerHTML = '<option value="">Select Student…</option>'; return; }
+  try {
+    const students = await fetchJSON(`/api/v1/school-fees/schools/${schoolId}/students?paid=false`);
+    sel.innerHTML = '<option value="">Select Student…</option>' +
+      students.map(s => `<option value="${s.id}">${s.student_name} — ₦${(s.fee_amount - (s.amount_paid || 0)).toLocaleString()} due</option>`).join("");
+  } catch(e) { sel.innerHTML = '<option value="">Error loading students</option>'; }
+}
+
+async function sfCreateSchool() {
+  const name = document.getElementById("sf-school-name").value.trim();
+  const city = document.getElementById("sf-school-city").value.trim() || "Lagos";
+  const contact_name = document.getElementById("sf-school-contact").value.trim();
+  const contact_phone = document.getElementById("sf-school-phone").value.trim();
+  const contact_email = document.getElementById("sf-school-email").value.trim() || null;
+  const whatsapp_provider = document.querySelector('input[name="sf-wa-provider"]:checked')?.value || "unipile";
+  const meta_phone_number_id = document.getElementById("sf-meta-phone-id").value.trim() || null;
+  const meta_access_token = document.getElementById("sf-meta-token").value.trim() || null;
+  const msg = document.getElementById("sf-school-msg");
+  if (!name || !contact_name || !contact_phone) { msg.textContent = "Name, contact name, and phone are required."; return; }
+  try {
+    const r = await postJSON("/api/v1/school-fees/schools", {
+      name, city, contact_name, contact_phone, contact_email,
+      whatsapp_provider, meta_phone_number_id, meta_access_token,
+    });
+    msg.style.color = "#00e5a0";
+    msg.textContent = `School ${r.action}: ${r.school}`;
+    ["sf-school-name","sf-school-contact","sf-school-phone","sf-school-email"].forEach(id => document.getElementById(id).value = "");
+    sfLoadSchoolsTable();
+    sfPopulateSchoolSelects();
+  } catch(e) { msg.style.color = "#ff4444"; msg.textContent = "Error: " + e.message; }
+}
+
+async function sfRecordPayment() {
+  const student_id = document.getElementById("sf-pay-student").value;
+  const amount_paid = parseFloat(document.getElementById("sf-pay-amount").value);
+  const payment_method = document.getElementById("sf-pay-method").value;
+  const reference = document.getElementById("sf-pay-ref").value.trim() || null;
+  const msg = document.getElementById("sf-pay-msg");
+  if (!student_id || !amount_paid) { msg.textContent = "Select a student and enter amount."; return; }
+  try {
+    const r = await postJSON("/api/v1/school-fees/payments/record", { student_id, amount_paid, payment_method, reference });
+    msg.style.color = "#00e5a0";
+    msg.textContent = `Recorded. ${r.fully_paid ? "Fully paid ✓" : `Balance: ₦${r.balance.toLocaleString()}`}`;
+    document.getElementById("sf-pay-amount").value = "";
+    document.getElementById("sf-pay-ref").value = "";
+    sfLoadOverview();
+    sfLoadStudentsForPayment();
+  } catch(e) { msg.style.color = "#ff4444"; msg.textContent = "Error: " + e.message; }
+}
+
+async function sfSendReminders() {
+  const school_id = document.getElementById("sf-rem-school").value;
+  const dry_run = document.getElementById("sf-rem-dryrun").checked;
+  const msg = document.getElementById("sf-rem-msg");
+  const results = document.getElementById("sf-reminder-results");
+  if (!school_id) { msg.textContent = "Select a school first."; return; }
+  msg.textContent = dry_run ? "Previewing…" : "Sending…";
+  results.innerHTML = "";
+  try {
+    const r = await postJSON("/api/v1/school-fees/reminders/send", { school_id, dry_run });
+    msg.style.color = "#00e5a0";
+    msg.textContent = `${r.reminders_queued} students ${dry_run ? "would receive reminders" : "messaged"} — ${r.school}`;
+    if (r.results && r.results.length) {
+      results.innerHTML = `<table class="contact-table"><thead><tr><th>Student</th><th>Parent</th><th>Balance</th><th>${dry_run ? "Preview" : "Status"}</th></tr></thead><tbody>` +
+        r.results.map(x => `<tr>
+          <td>${x.student || "—"}</td>
+          <td style="font-size:11px;color:#555;">${x.parent || "—"}</td>
+          <td>₦${(x.balance || 0).toLocaleString()}</td>
+          <td style="font-size:11px;color:${x.sent === false ? "#ff4444" : "#00e5a0"};">${dry_run ? (x.message_preview || "—") : (x.sent ? "Sent ✓" : "Failed")}</td>
+        </tr>`).join("") + "</tbody></table>";
+    }
+  } catch(e) { msg.style.color = "#ff4444"; msg.textContent = "Error: " + e.message; }
+}
+
+function sfViewSchool(id, name) {
+  sfSwitchTab("sf_payments");
+  setTimeout(() => {
+    const sel = document.getElementById("sf-pay-school");
+    if (sel) { sel.value = id; sfLoadStudentsForPayment(); }
+  }, 100);
+}
+
+// ── Fix initial panel visibility ──────────────────────────────────────────────
+// On load, make sure only the active outreach panel is visible
+document.querySelectorAll(".tab-panel").forEach((p, i) => {
+  if (!p.classList.contains("active")) p.style.display = "none";
+});
 
 refreshHealth();
 fullRefresh();

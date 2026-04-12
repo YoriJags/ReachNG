@@ -1,15 +1,16 @@
 """
 Invoice Chaser — upload a PDF invoice, extract fields via Gemini Flash,
-send automated WhatsApp payment reminders via Unipile.
+send automated WhatsApp payment reminders via Unipile or Meta Cloud API.
 Tier 1 product built on ReachNG infrastructure.
 """
 import pathlib
 from datetime import datetime, date
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel, Field
+from typing import Optional
 from database import get_db
 from agent.brain import extract_invoice_fields, generate_invoice_reminder
-from tools.outreach import send_whatsapp
+from tools.outreach import send_whatsapp_for_client
 import structlog
 
 log = structlog.get_logger()
@@ -28,6 +29,10 @@ class InvoiceReminderRequest(BaseModel):
     description: str = Field(default="Services rendered", max_length=500)
     days_overdue: int = Field(default=0, ge=0)
     reminder_count: int = Field(default=0, ge=0)    # 0=first, 1=second, 2=final
+    # Optional: send from client's own WhatsApp Business number via Meta
+    whatsapp_provider: str = "unipile"              # "unipile" | "meta"
+    meta_phone_number_id: Optional[str] = None
+    meta_access_token: Optional[str] = None
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -108,12 +113,17 @@ async def send_reminder(req: InvoiceReminderRequest):
         reminder_count=req.reminder_count,
     )
 
-    # Send via Unipile
+    # Build a client_doc-style dict so send_whatsapp_for_client can route correctly
+    client_doc = {
+        "whatsapp_provider": req.whatsapp_provider,
+        "meta_phone_number_id": req.meta_phone_number_id,
+        "meta_access_token": req.meta_access_token,
+    }
     try:
-        await send_whatsapp(
+        await send_whatsapp_for_client(
             phone=req.debtor_phone,
             message=message,
-            account_id=None,  # uses default account
+            client_doc=client_doc,
         )
         status = "sent"
     except Exception as e:
