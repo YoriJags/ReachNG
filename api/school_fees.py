@@ -158,6 +158,27 @@ async def list_students(school_id: str, paid: Optional[bool] = None, claimed: Op
     return [_serial(s) for s in students]
 
 
+class StudentPatch(BaseModel):
+    due_date: Optional[str] = None      # ISO date: "2026-02-28"
+    fee_amount: Optional[float] = None
+    fee_label: Optional[str] = None
+    active: Optional[bool] = None
+
+
+@router.patch("/students/{student_id}")
+async def patch_student(student_id: str, payload: StudentPatch):
+    """Bursar edits per-student deadline, fee amount, or label from the dashboard."""
+    student = _students().find_one({"_id": ObjectId(student_id)})
+    if not student:
+        raise HTTPException(404, "Student not found")
+    updates = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if not updates:
+        raise HTTPException(400, "Nothing to update")
+    updates["updated_at"] = datetime.now(timezone.utc)
+    _students().update_one({"_id": ObjectId(student_id)}, {"$set": updates})
+    return {"success": True, "updated": list(updates.keys())}
+
+
 @router.post("/students/{student_id}/confirm-payment")
 async def confirm_claimed_payment(student_id: str):
     """Bursar confirms a parent's payment claim — marks student as fully paid."""

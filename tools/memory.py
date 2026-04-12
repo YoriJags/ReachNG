@@ -97,19 +97,29 @@ def upsert_contact(
     if source:
         doc["source"] = source
 
-    result = contacts.update_one(
-        {"place_id": place_id},
-        {
-            "$set": doc,
-            "$setOnInsert": {
-                "status": Status.NOT_CONTACTED,
-                "outreach_count": 0,
-                "created_at": now,
-                "next_followup_at": None,
+    try:
+        result = contacts.update_one(
+            {"place_id": place_id},
+            {
+                "$set": doc,
+                "$setOnInsert": {
+                    "status": Status.NOT_CONTACTED,
+                    "outreach_count": 0,
+                    "created_at": now,
+                    "next_followup_at": None,
+                },
             },
-        },
-        upsert=True,
-    )
+            upsert=True,
+        )
+    except Exception as exc:
+        # Sparse index not yet applied on running instance — fall back to find
+        if "DuplicateKeyError" in type(exc).__name__ or "E11000" in str(exc):
+            contact = contacts.find_one({"place_id": place_id}, {"_id": 1})
+            if contact:
+                return str(contact["_id"])
+            # email collision from a different place_id — skip silently
+            raise
+        raise
 
     if result.upserted_id:
         return str(result.upserted_id)
