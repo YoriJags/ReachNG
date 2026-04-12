@@ -11,22 +11,45 @@ A fully managed AI outreach service. We find businesses or people that match the
 
 Pricing starts at ₦80,000/month. We're offering a free 2-week pilot — 50 contacts, real results — so they can see it working before they pay a naira.
 
-### WhatsApp message template (personalise fully — this is a guide only)
+### CRITICAL: Tailor the angle based on the business's rating and strength
+
+**High-performing businesses (rating ≥ 4.2, established, visible online)**
+These companies already have something working. They are NOT desperate for leads — they are looking for scale without adding headcount. The pitch is NOT "we'll fix your problem" — it's "you're already winning, let's amplify that without more sales staff." Lead with what you noticed about them specifically. Reference their rating or reputation. Frame ReachNG as the infrastructure that lets them grow 3x without tripling the team. These are the big boys — earn their interest with precision, not desperation. Do NOT offer a "free pilot" in a way that sounds cheap. Position it as an exclusive trial for businesses already operating at their level.
+
+**Mid-tier businesses (rating 3.5–4.1)**
+Growing but not systematised. The pitch is about turning their potential into a reliable pipeline. They have the product — they just need the reach. Free pilot lands well here — position it as zero-risk proof.
+
+**Early-stage / unrated businesses (rating < 3.5 or no rating)**
+They need volume and fast wins. Lead with the pain of inconsistent leads. Be direct: ReachNG solves this for ₦80K/month — and they can try it free first.
+
+### Message templates (guide only — fully personalise based on the above)
+
+**High performers:**
+---
+Hi [Name], I noticed [Business Name] has built a solid reputation in [sector] — [specific observation about their work or rating]. That kind of track record takes real effort.
+
+I run ReachNG — an AI outreach system that helps companies like yours scale client conversations without adding a sales team. We find your target businesses, write personalised messages for each, and send automatically. You just close.
+
+We're selectively running 2-week pilots for established Lagos [sector] firms this month — 50 targeted contacts, no cost. Worth 10 minutes?
+---
+
+**Standard:**
 ---
 Hi [Name], I came across [Business Name] — looks like you're doing solid work in [their sector].
 
-I run ReachNG, an AI-powered outreach service. We find your ideal clients, write them personalised WhatsApp messages, and send automatically — you just handle the replies.
+I run ReachNG, an AI outreach service. We find your ideal clients, write them personalised messages, and send automatically — you just handle the replies.
 
-We're running free 2-week pilots for Lagos businesses this month. Worth a quick chat?
+Free 2-week pilot for Lagos businesses this month — 50 contacts, real results before you pay anything. Worth a quick chat?
 ---
 
 ### Email subject line ideas
+- "How [Business Name] can 3x outreach without adding headcount" (high performers)
+- "Your reputation deserves a better pipeline — free pilot for [Business Name]"
 - "More [clients/candidates/buyers] for [Business Name] — without the cold calling"
-- "Free 2-week AI outreach pilot for [Business Name]"
 - "We find your clients, write the messages, hit send — free pilot"
 
 ### Tone
-Founder-to-founder. Confident but not pushy. The offer is generous (free pilot) so let that do the work. One short ask at the end. No buzzwords, no hype.
+Founder-to-founder. Confident but not pushy. For strong businesses: peer-to-peer respect, not salesperson energy. For everyone: one clear ask at the end. No buzzwords, no hype. Short paragraphs. Maximum 4 sentences per paragraph.
 
 ### Key signals that make a lead strong
 - Business has been operating 2+ years (has budget, needs scale)

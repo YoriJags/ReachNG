@@ -98,6 +98,20 @@ VERTICAL_QUERIES = {
     ],
 }
 
+# Sector-level query groups within agency_sales — used for targeted outreach
+AGENCY_SALES_SECTORS = {
+    "real_estate":  ["real estate agency {city}", "property developer {city}", "estate management company {city}"],
+    "recruitment":  ["recruitment agency {city}", "staffing agency {city}", "HR consulting firm {city}"],
+    "legal":        ["law firm {city}", "legal services {city}", "solicitors {city}"],
+    "events":       ["event management company {city}", "event planning company {city}", "corporate events {city}"],
+    "insurance":    ["insurance broker {city}", "insurance company {city}", "insurance agent {city}"],
+    "marketing":    ["digital marketing agency {city}", "advertising agency {city}", "PR agency {city}"],
+    "training":     ["training company {city}", "professional development {city}", "corporate training {city}"],
+    "consulting":   ["consulting firm {city}", "management consulting {city}", "business advisory {city}"],
+    "logistics":    ["logistics company {city}", "freight company {city}", "courier service {city}"],
+    "accounting":   ["accounting firm {city}", "audit firm {city}", "tax advisory {city}"],
+}
+
 
 # ─── API calls ────────────────────────────────────────────────────────────────
 
@@ -146,6 +160,7 @@ async def discover_businesses(
     max_results: int = 60,
     query_override: Optional[str] = None,
     city_override: Optional[str] = None,
+    target_sectors: Optional[list[str]] = None,
 ) -> list[dict]:
     """
     Discover businesses for a vertical.
@@ -158,6 +173,13 @@ async def discover_businesses(
 
     if query_override:
         queries = [query_override]
+    elif vertical == "agency_sales" and target_sectors:
+        # Build queries from only the requested sectors
+        raw_queries = []
+        for sector in target_sectors:
+            raw_queries.extend(AGENCY_SALES_SECTORS.get(sector, []))
+        queries = [q.format(city=city) for q in raw_queries] if raw_queries else \
+                  [q.format(city=city) for q in VERTICAL_QUERIES.get(vertical, [])]
     else:
         base_queries = VERTICAL_QUERIES.get(vertical, [])
         queries = [q.format(city=city) for q in base_queries]

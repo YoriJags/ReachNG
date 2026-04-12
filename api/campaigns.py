@@ -17,6 +17,7 @@ class RunCampaignRequest(BaseModel):
     client_name: Optional[str] = Field(default=None, description="Client name for agency mode — scopes the campaign to their brief")
     hitl_mode: bool = Field(default=False, description="Queue messages for human review before sending")
     cities: list[str] = Field(default=[], max_length=10, description="Run discovery across multiple cities. e.g. ['Lagos', 'Abuja', 'Port Harcourt']")
+    target_sectors: list[str] = Field(default=[], description="agency_sales only: limit discovery to these sectors e.g. ['real_estate','recruitment']")
 
 
 class RunAllRequest(BaseModel):
@@ -41,6 +42,7 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
             client_name=body.client_name,
             hitl_mode=body.hitl_mode,
             cities=body.cities or None,
+            target_sectors=body.target_sectors or None,
         )
         return {"status": "started", "vertical": body.vertical, "message": "Campaign running in background"}
 
@@ -51,6 +53,7 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
         client_name=body.client_name,
         hitl_mode=body.hitl_mode,
         cities=body.cities or None,
+        target_sectors=body.target_sectors or None,
     )
     return result
 

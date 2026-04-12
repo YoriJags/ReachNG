@@ -37,6 +37,7 @@ class BaseCampaign:
         query_override: Optional[str] = None,
         client_name: Optional[str] = None,
         cities: Optional[list] = None,
+        target_sectors: Optional[list] = None,
     ) -> dict:
         """
         Full campaign run:
@@ -97,6 +98,7 @@ class BaseCampaign:
             city_tasks.append(discover_businesses(
                 vertical=self.vertical, max_results=per_city_quota,
                 query_override=query_override, city_override=city,
+                target_sectors=target_sectors,
             ))
             city_tasks.append(discover_apollo_leads(
                 vertical=self.vertical, max_results=per_city_apollo, city_override=city,

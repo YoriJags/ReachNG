@@ -324,6 +324,16 @@
   .action-body .action-desc  { font-size: 11px; color: #444; line-height: 1.4; }
   .action-body .action-cta   { font-size: 10px; color: #ff5c00; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 6px; font-weight: 600; }
 
+  /* ── Sector chip checkboxes ── */
+  .sector-chip {
+    display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+    padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    border: 1px solid #1a4a1a; color: #555; background: #0a0a0a;
+    transition: all 0.15s ease; user-select: none;
+  }
+  .sector-chip:has(input:checked) { border-color: #00e5a0; color: #00e5a0; background: #0d1a0d; }
+  .sector-chip input { display: none; }
+
   /* ── SOP hint ── */
   .sop-box {
     background: #0d0d0d; border: 1px solid #1a1a1a; border-left: 2px solid #222;
@@ -651,12 +661,23 @@
 
   <!-- Find Clients quick-launch -->
   <div style="background:linear-gradient(135deg,#0d1a0d,#0a1200);border:1px solid #1a4a1a;border-left:4px solid #00e5a0;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#00e5a0;margin-bottom:4px;">Find Paying Clients for ReachNG</div>
-        <div style="font-size:12px;color:#666;max-width:520px;">Discovers real estate agents, recruitment firms, law firms, event companies &amp; more across Lagos — and sends each a personalised pitch for ReachNG's service. Review every message before it sends.</div>
-      </div>
+    <div style="font-size:13px;font-weight:700;color:#00e5a0;margin-bottom:6px;">Find Paying Clients for ReachNG</div>
+    <div style="font-size:12px;color:#666;margin-bottom:14px;">Pick which sectors to target — ReachNG discovers businesses in those sectors and drafts a personalised pitch for each. Review every message before it sends.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;" id="sector-checkboxes">
+      <label class="sector-chip"><input type="checkbox" value="real_estate" checked> Real Estate</label>
+      <label class="sector-chip"><input type="checkbox" value="recruitment" checked> Recruitment</label>
+      <label class="sector-chip"><input type="checkbox" value="legal"> Legal / Law Firms</label>
+      <label class="sector-chip"><input type="checkbox" value="events" checked> Events</label>
+      <label class="sector-chip"><input type="checkbox" value="insurance"> Insurance</label>
+      <label class="sector-chip"><input type="checkbox" value="marketing"> Digital Marketing</label>
+      <label class="sector-chip"><input type="checkbox" value="training"> Training / L&amp;D</label>
+      <label class="sector-chip"><input type="checkbox" value="consulting"> Consulting</label>
+      <label class="sector-chip"><input type="checkbox" value="logistics"> Logistics</label>
+      <label class="sector-chip"><input type="checkbox" value="accounting"> Accounting / Finance</label>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
       <button class="btn btn-approve" onclick="launchAgencySales()" style="background:#00e5a0;color:#000;font-weight:700;white-space:nowrap;min-width:160px;">Find Clients Now</button>
+      <span style="font-size:11px;color:#555;">Only selected sectors will be searched</span>
     </div>
     <div id="agency-sales-result" style="margin-top:10px;display:none;font-size:12px;color:#00e5a0;"></div>
   </div>
@@ -1571,16 +1592,25 @@ async function skipAll()    { await postJSON("/api/v1/approvals/skip-all");    r
 async function launchAgencySales() {
   const btn = document.querySelector('[onclick="launchAgencySales()"]');
   const res = document.getElementById("agency-sales-result");
+  const sectors = [...document.querySelectorAll('#sector-checkboxes input:checked')].map(el => el.value);
+  if (!sectors.length) {
+    res.innerHTML = `<span style="color:#ff4444;">Select at least one sector to target.</span>`;
+    res.style.display = "block";
+    return;
+  }
   btn.textContent = "Finding clients…"; btn.disabled = true;
+  res.style.display = "none";
   try {
     const result = await postJSON("/api/v1/campaigns/run", {
       vertical: "agency_sales",
       max_contacts: 30,
       dry_run: false,
-      hitl_mode: true,  // Always HITL — review every message before it sends
+      hitl_mode: true,
       cities: ["Lagos"],
+      target_sectors: sectors,
     });
-    res.innerHTML = `Messages drafted for <b>${result.queued_for_approval || 0}</b> potential clients — review them in the <b>Approvals</b> tab before sending.`;
+    const queued = result.queued_for_approval || 0;
+    res.innerHTML = `Drafted messages for <b>${queued}</b> potential clients across <b>${sectors.length}</b> sector(s) — review them in the <b>Approvals</b> tab before sending.`;
     res.style.display = "block";
   } catch (err) {
     res.innerHTML = `<span style="color:#ff4444;">Error: ${err.message}</span>`;
