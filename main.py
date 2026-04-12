@@ -237,7 +237,8 @@ async def rich_health():
                     json={"q_organization_name": "test", "page": 1, "per_page": 1},
                     headers={"x-api-key": settings.apollo_api_key, "Content-Type": "application/json"},
                 )
-                result["apollo"] = "ok" if r.status_code in (200, 422) else "error"
+                # 200 = success, 422 = valid key bad params, 403 = valid key plan-limited
+                result["apollo"] = "ok" if r.status_code in (200, 422, 403) else "error"
     except Exception:
         result["apollo"] = "error"
 
