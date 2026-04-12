@@ -86,7 +86,7 @@ Deduplication: by phone + email across all three sources before inserting to DB.
 
 ## Google Maps Status
 
-As of 2026-04-04: billing not yet linked to GCP project `reachng-492121`. Nigerian cards rejected by Google. Workaround: use sister's UK card or get added as Billing Account Administrator on a UK GCP account. Apollo org search is active as primary discovery in the interim.
+As of 2026-04-12: **ACTIVE**. Billing confirmed working — `/debug/maps` returns `status: OK` with 20 results. All 3 discovery sources (Maps, Apollo, Social) are live.
 
 **Debug endpoints** (Basic Auth required):
 - `GET /debug/maps` — raw Google Places API response

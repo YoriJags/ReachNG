@@ -54,7 +54,7 @@ Run Campaign → Discover leads → Enrich (score + categorise)
 ## What's NOT Done Yet
 
 - **First live campaign run** — only dry runs done so far. Overview will show 0 until you run live.
-- **Google Maps billing** — Nigerian card rejected by Google. Need a UK card to activate Places API. Apollo is the primary discovery in the meantime.
+- **Google Maps billing** — Active as of 2026-04-12. All 3 discovery sources live.
 - **Client scaling** — currently using one Unipile account. Each paying client needs their own WhatsApp number + Unipile account (~$10–20/month, passed to client).
 
 ---
