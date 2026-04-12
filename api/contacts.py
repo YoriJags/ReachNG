@@ -4,10 +4,12 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Query
 from fastapi.responses import StreamingResponse
 from bson import ObjectId
+import httpx
 from database import get_contacts, get_replies
 from tools import mark_replied, mark_converted, mark_opted_out, get_pipeline_stats
 from tools.memory import Status
 from tools.reply_router import process_replies
+from config import get_settings
 
 router = APIRouter(prefix="/contacts", tags=["Contacts"])
 
@@ -153,6 +155,107 @@ async def sync_replies(background_tasks: BackgroundTasks):
     """Manually trigger a reply poll — don't wait for the scheduler."""
     background_tasks.add_task(process_replies)
     return {"message": "Reply sync started"}
+
+
+@router.get("/discovery-health")
+async def discovery_health():
+    """
+    Returns lead source breakdown (maps/apollo/social counts) +
+    live API status for each discovery source.
+    """
+    settings = get_settings()
+    db = get_contacts()
+
+    # ── Lead counts by source ──────────────────────────────────────────────────
+    pipeline = [
+        {"$group": {"_id": "$source", "count": {"$sum": 1}}}
+    ]
+    source_counts = {row["_id"]: row["count"] for row in db.aggregate(pipeline) if row["_id"]}
+    maps_count   = source_counts.get("maps", 0)
+    apollo_count = source_counts.get("apollo", 0)
+    social_count = source_counts.get("social", 0)
+    unknown_count = sum(v for k, v in source_counts.items() if k not in ("maps", "apollo", "social"))
+
+    # ── Google Maps API ping ───────────────────────────────────────────────────
+    maps_status = "unknown"
+    maps_error  = None
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            resp = await client.get(
+                "https://maps.googleapis.com/maps/api/place/textsearch/json",
+                params={"query": "business Lagos", "key": settings.google_maps_api_key, "region": "ng"},
+            )
+            data = resp.json()
+            api_status = data.get("status", "")
+            if api_status == "OK" or api_status == "ZERO_RESULTS":
+                maps_status = "ok"
+            elif api_status in ("REQUEST_DENIED", "INVALID_REQUEST"):
+                maps_status = "error"
+                maps_error  = data.get("error_message") or api_status
+            else:
+                maps_status = "warn"
+                maps_error  = api_status
+    except Exception as e:
+        maps_status = "error"
+        maps_error  = str(e)
+
+    # ── Apollo API ping ────────────────────────────────────────────────────────
+    apollo_status = "unknown"
+    apollo_error  = None
+    apollo_key = getattr(settings, "apollo_api_key", None)
+    if not apollo_key:
+        apollo_status = "missing"
+        apollo_error  = "APOLLO_API_KEY not set"
+    else:
+        try:
+            async with httpx.AsyncClient(timeout=8.0) as client:
+                resp = await client.post(
+                    "https://api.apollo.io/v1/mixed_companies/search",
+                    headers={"Content-Type": "application/json", "X-Api-Key": apollo_key},
+                    json={"q_organization_name": "test", "page": 1, "per_page": 1},
+                )
+                if resp.status_code == 200:
+                    apollo_status = "ok"
+                elif resp.status_code == 401:
+                    apollo_status = "error"
+                    apollo_error  = "Invalid API key"
+                else:
+                    apollo_status = "warn"
+                    apollo_error  = f"HTTP {resp.status_code}"
+        except Exception as e:
+            apollo_status = "error"
+            apollo_error  = str(e)
+
+    # ── Social (Apify) ping ────────────────────────────────────────────────────
+    social_status = "unknown"
+    social_error  = None
+    apify_token = getattr(settings, "apify_api_token", None)
+    if not apify_token:
+        social_status = "missing"
+        social_error  = "APIFY_API_TOKEN not set"
+    else:
+        try:
+            async with httpx.AsyncClient(timeout=8.0) as client:
+                resp = await client.get(
+                    "https://api.apify.com/v2/acts/clockworks~tiktok-scraper",
+                    params={"token": apify_token},
+                )
+                social_status = "ok" if resp.status_code == 200 else "warn"
+                if resp.status_code != 200:
+                    social_error = f"HTTP {resp.status_code}"
+        except Exception as e:
+            social_status = "error"
+            social_error  = str(e)
+
+    return {
+        "sources": {
+            "maps":   {"count": maps_count,   "status": maps_status,   "error": maps_error},
+            "apollo": {"count": apollo_count, "status": apollo_status, "error": apollo_error},
+            "social": {"count": social_count, "status": social_status, "error": social_error},
+        },
+        "unknown_source_count": unknown_count,
+        "total": maps_count + apollo_count + social_count + unknown_count,
+    }
 
 
 def _validate_id(contact_id: str):
