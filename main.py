@@ -200,7 +200,7 @@ async def debug_apollo():
         return {"error": "APOLLO_API_KEY not set in environment"}
     async with httpx.AsyncClient(timeout=20.0) as client:
         resp = await client.post(
-            "https://api.apollo.io/v1/mixed_people/search",
+            "https://api.apollo.io/v1/mixed_companies/search",
             headers={"Content-Type": "application/json", "Cache-Control": "no-cache", "X-Api-Key": api_key},
             json={
                 "q_keywords": "real estate property development",
