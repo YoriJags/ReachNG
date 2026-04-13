@@ -1418,6 +1418,33 @@
   <button class="quick-fab" id="quick-fab" onclick="toggleQuickMenu()" title="Quick actions">⚡</button>
 </div>
 
+<!-- Invoice modal -->
+<div class="modal-overlay" id="invoice-modal" onclick="if(event.target===this)closeInvoiceModal()">
+  <div class="modal-box" style="max-width:420px;">
+    <h3 style="color:#e8e8e8;font-size:16px;margin-bottom:6px;">Generate Invoice</h3>
+    <p style="font-size:12px;color:#888;margin-bottom:20px;">Select the billing month for <strong id="inv-modal-client" style="color:#ff5500;"></strong></p>
+
+    <div style="margin-bottom:16px;">
+      <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#888;font-weight:600;display:block;margin-bottom:8px;">Billing Month</label>
+      <input type="month" id="inv-month-picker"
+        style="width:100%;background:#0e1218;border:1px solid #2a3340;border-radius:7px;color:#e8e8e8;font-size:14px;padding:10px 12px;font-family:inherit;"
+      />
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#aaa;cursor:pointer;">
+        <input type="checkbox" id="inv-vat" style="accent-color:#ff5500;" />
+        Include VAT (7.5%)
+      </label>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-skip" onclick="closeInvoiceModal()">Cancel</button>
+      <button class="btn btn-approve" style="background:#ff5500;" onclick="generateInvoice()">Open Invoice</button>
+    </div>
+  </div>
+</div>
+
 <!-- Edit modal -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal-box">
@@ -1629,10 +1656,27 @@ async function quickRunCampaign(name, vertical) {
 
 function openInvoice(encodedName) {
   const name = decodeURIComponent(encodedName);
+  // Set default month to current month
   const now = new Date();
   const month = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
-  // Opens invoice in a new tab — use browser Print → Save as PDF
-  window.open(`/api/v1/clients/${encodeURIComponent(name)}/invoice?month=${month}`, "_blank");
+  document.getElementById("inv-modal-client").textContent = name;
+  document.getElementById("inv-month-picker").value = month;
+  document.getElementById("inv-vat").checked = false;
+  document.getElementById("invoice-modal").dataset.client = name;
+  document.getElementById("invoice-modal").classList.add("open");
+}
+
+function closeInvoiceModal() {
+  document.getElementById("invoice-modal").classList.remove("open");
+}
+
+function generateInvoice() {
+  const name   = document.getElementById("invoice-modal").dataset.client;
+  const month  = document.getElementById("inv-month-picker").value;
+  const vat    = document.getElementById("inv-vat").checked;
+  if (!month) { alert("Please select a billing month."); return; }
+  closeInvoiceModal();
+  window.open(`/api/v1/clients/${encodeURIComponent(name)}/invoice?month=${month}&include_vat=${vat}`, "_blank");
 }
 
 // ── Approval actions ──────────────────────────────────────────────────────────
