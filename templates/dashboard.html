@@ -578,8 +578,8 @@
   <button class="product-pill" data-product="school_fees" onclick="switchProduct('school_fees', this)">
     <span class="product-pill-dot" style="background:#00b4d8;"></span> School Fees
   </button>
-  <button class="product-pill pill-add" onclick="alert('More products coming soon.')">
-    + Add Product
+  <button class="product-pill" data-product="digital_associates" onclick="switchProduct('digital_associates', this)">
+    <span class="product-pill-dot" style="background:#a78bfa;"></span> Digital Associates
   </button>
 </div>
 
@@ -593,6 +593,13 @@
   <button class="tab-btn" onclick="switchTab('replies', this)">Replies</button>
   <button class="tab-btn" onclick="switchTab('invoices', this)">Invoices</button>
   <button class="tab-btn" onclick="switchTab('tools', this)">Tools</button>
+</nav>
+
+<!-- ── Digital Associates Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="digital_associates" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('da_overview', this)">Overview</button>
+  <button class="tab-btn" onclick="switchTab('da_reviews', this)">Reviews</button>
+  <button class="tab-btn" onclick="switchTab('da_upload', this)">Upload Contract</button>
 </nav>
 
 <!-- ── School Fees Tab Nav ── -->
@@ -1502,6 +1509,154 @@
   </table>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- DIGITAL ASSOCIATES PANELS                                                -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- ── DA Overview ─────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-da_overview" style="display:none;">
+  <div class="summary-bar">
+    <div class="stat-card blue" style="border-top-color:#a78bfa;">
+      <div class="label">Total Reviews</div>
+      <div class="value" id="da-stat-total" style="color:#a78bfa;">—</div>
+    </div>
+    <div class="stat-card fire">
+      <div class="label">High / Critical</div>
+      <div class="value" id="da-stat-risky">—</div>
+    </div>
+    <div class="stat-card green">
+      <div class="label">This Week</div>
+      <div class="value" id="da-stat-week">—</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="label">Firms Served</div>
+      <div class="value" id="da-stat-firms">—</div>
+    </div>
+  </div>
+
+  <p class="section-title" style="margin-top:28px;">Recent Reviews</p>
+  <table class="table" id="da-recent-table">
+    <thead><tr>
+      <th>Firm</th><th>Document</th><th>Risk</th><th>Date</th><th></th>
+    </tr></thead>
+    <tbody id="da-recent-tbody">
+      <tr><td colspan="5" class="empty">Loading…</td></tr>
+    </tbody>
+  </table>
+
+  <p class="section-title" style="margin-top:28px;">Quick Actions</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn btn-approve" style="background:#a78bfa;border-color:#a78bfa;" onclick="daSwitchTab('da_upload')">+ Upload Contract</button>
+    <button class="btn btn-approve" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;" onclick="daSwitchTab('da_reviews')">View All Reviews</button>
+    <a href="/legal/portal" target="_blank" class="btn btn-approve" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;text-decoration:none;display:inline-flex;align-items:center;">↗ Public Portal</a>
+  </div>
+</div>
+
+<!-- ── DA Reviews ───────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-da_reviews" style="display:none;">
+  <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
+    <input id="da-filter-firm" placeholder="Filter by firm name…"
+      style="background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:9px 14px;color:#e8e8e8;font-size:13px;font-family:inherit;width:260px;outline:none;"
+      oninput="daLoadReviews()" />
+    <button class="btn btn-approve" style="background:#a78bfa;border-color:#a78bfa;" onclick="daSwitchTab('da_upload')">+ New Review</button>
+  </div>
+
+  <table class="table" id="da-reviews-table">
+    <thead><tr>
+      <th>Firm</th><th>Document</th><th>Risk</th><th>Red Flags</th><th>Date</th><th></th>
+    </tr></thead>
+    <tbody id="da-reviews-tbody">
+      <tr><td colspan="6" class="empty">Loading…</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Memo drawer -->
+  <div id="da-memo-drawer" style="display:none;margin-top:24px;background:#0e1218;border:1px solid #2a2a3a;border-radius:12px;padding:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:13px;font-weight:600;color:#a78bfa;letter-spacing:0.5px;">REVIEW MEMO</span>
+      <div style="display:flex;gap:8px;">
+        <button onclick="daCopyMemo()" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;">📋 Copy</button>
+        <button onclick="daDownloadMemo()" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;">⬇ Download</button>
+        <button onclick="document.getElementById('da-memo-drawer').style.display='none'" style="background:none;border:none;color:#555;cursor:pointer;font-size:16px;padding:0 4px;">✕</button>
+      </div>
+    </div>
+    <pre id="da-memo-content" style="white-space:pre-wrap;font-family:'Georgia',serif;font-size:13px;line-height:1.8;color:#d0d8e8;max-height:520px;overflow-y:auto;"></pre>
+  </div>
+</div>
+
+<!-- ── DA Upload ─────────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-da_upload" style="display:none;">
+  <div style="max-width:640px;">
+    <p class="section-title" style="margin-top:0;">Upload Contract PDF</p>
+
+    <div class="form-card" style="background:#0e1218;border:1px solid #1e2530;border-radius:12px;padding:28px;">
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:6px;">Firm Name</label>
+        <input id="da-upload-firm" placeholder="e.g. Banwo & Ighodalo" style="width:100%;background:#0a0c10;border:1px solid #1e2530;border-radius:8px;padding:10px 14px;color:#e8e8e8;font-size:14px;font-family:inherit;outline:none;" />
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <label style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:6px;">Contract PDF</label>
+        <div id="da-drop-area"
+          style="border:2px dashed #2a3a4a;border-radius:10px;padding:36px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:#080c10;"
+          onclick="document.getElementById('da-file-input').click()"
+          ondragover="event.preventDefault();this.style.borderColor='#a78bfa';this.style.background='#130d1a';"
+          ondragleave="this.style.borderColor='#2a3a4a';this.style.background='#080c10';"
+          ondrop="daHandleDrop(event)">
+          <div style="font-size:32px;margin-bottom:10px;">📄</div>
+          <div style="font-size:14px;color:#6080a0;"><strong style="color:#a0b0c0;">Click to upload</strong> or drag and drop</div>
+          <div style="font-size:11px;color:#3a4a5a;margin-top:4px;">PDF only · Max 20MB</div>
+          <div id="da-file-name" style="display:none;font-size:13px;color:#a78bfa;font-weight:600;margin-top:8px;"></div>
+        </div>
+        <input type="file" id="da-file-input" accept=".pdf" style="display:none;" onchange="daHandleFileSelect(this)" />
+      </div>
+
+      <button id="da-submit-btn" class="btn btn-approve" style="width:100%;background:#a78bfa;border-color:#a78bfa;padding:13px;font-size:14px;" onclick="daSubmitUpload()" disabled>
+        Review Contract →
+      </button>
+
+      <div id="da-upload-progress" style="display:none;text-align:center;padding:20px 0;">
+        <div style="width:36px;height:36px;border:3px solid #1e2530;border-top-color:#a78bfa;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+        <div id="da-progress-text" style="font-size:13px;color:#6080a0;">Extracting clauses…</div>
+      </div>
+
+      <div id="da-upload-error" style="display:none;background:#1a0808;border:1px solid #3a1010;border-radius:8px;padding:12px 16px;color:#ff6b6b;font-size:13px;margin-top:12px;"></div>
+    </div>
+
+    <!-- Upload result -->
+    <div id="da-upload-result" style="display:none;margin-top:20px;">
+      <div id="da-result-banner" style="border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+        <span id="da-result-emoji" style="font-size:22px;"></span>
+        <div>
+          <div id="da-result-label" style="font-size:14px;font-weight:600;"></div>
+          <div id="da-result-summary" style="font-size:12px;color:#888;margin-top:2px;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="flex:1;background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:12px 16px;min-width:100px;text-align:center;">
+          <div id="da-r-clauses" style="font-size:22px;font-weight:700;color:#a78bfa;">—</div>
+          <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Clauses</div>
+        </div>
+        <div style="flex:1;background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:12px 16px;min-width:100px;text-align:center;">
+          <div id="da-r-flags" style="font-size:22px;font-weight:700;color:#ff5c00;">—</div>
+          <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Red Flags</div>
+        </div>
+        <div style="flex:1;background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:12px 16px;min-width:100px;text-align:center;">
+          <div style="font-size:22px;font-weight:700;color:#00e5a0;">&lt;60s</div>
+          <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Review Time</div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Review Memo</p>
+      <pre id="da-result-memo" style="background:#0a0c10;border:1px solid #1e2530;border-radius:10px;padding:20px;white-space:pre-wrap;font-family:'Georgia',serif;font-size:13px;line-height:1.8;color:#c8d8e8;max-height:480px;overflow-y:auto;"></pre>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+        <button onclick="daCopyUploadMemo()" style="flex:1;background:#1a1a2a;color:#c0c8e8;border:1px solid #2a2a4a;border-radius:8px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📋 Copy Memo</button>
+        <button onclick="daDownloadUploadMemo()" style="flex:1;background:#1a1a2a;color:#c0c8e8;border:1px solid #2a2a4a;border-radius:8px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">⬇ Download .txt</button>
+        <button onclick="daResetUpload()" style="flex:1;background:#1a1a2a;color:#c0c8e8;border:1px solid #2a2a4a;border-radius:8px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">← New Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── Setup Wizard Modal ── -->
 <div class="wizard-overlay" id="wizard-overlay">
   <div class="wizard-box">
@@ -1683,6 +1838,9 @@ function switchProduct(product, pill) {
     sfPopulateSchoolSelects();
     sfCheckClaimsBadge();
   }
+  if (product === "digital_associates") {
+    daLoadOverview();
+  }
 }
 
 function switchTab(name, btn) {
@@ -1704,6 +1862,8 @@ function switchTab(name, btn) {
   if (name === "tower")       loadControlTower();
   if (name === "sf_students") sfLoadStudentsTable();
   if (name === "sf_claims")   sfLoadClaims();
+  if (name === "da_overview") daLoadOverview();
+  if (name === "da_reviews")  daLoadReviews();
 }
 
 function sfSwitchTab(name) {
@@ -3493,6 +3653,226 @@ async function runSystemCheck() {
 
 // Run onboarding check on load
 initOnboarding();
+
+// ── Digital Associates JS ────────────────────────────────────────────────────
+
+const DA_RISK = {
+  low:      { emoji: "🟢", label: "Low Risk",      bg: "#0a1a10", border: "#00a651", color: "#00e5a0" },
+  medium:   { emoji: "🟡", label: "Medium Risk",   bg: "#1a1500", border: "#f5c842", color: "#f5c842" },
+  high:     { emoji: "🔴", label: "High Risk",     bg: "#1a0808", border: "#e53e3e", color: "#ff6b6b" },
+  critical: { emoji: "🚨", label: "Critical Risk", bg: "#1a0404", border: "#c53030", color: "#ff4444" },
+};
+
+let _daAllReviews = [];
+let _daActiveMemo = "";
+let _daActiveFile = "";
+let _daUploadMemo = "";
+let _daUploadFile = "";
+let _daSelectedFile = null;
+
+function daSwitchTab(name) {
+  const nav = document.querySelector('.product-tabs[data-product="digital_associates"]');
+  if (!nav) return;
+  const btn = nav.querySelector(`button[onclick*="${name}"]`);
+  switchTab(name, btn);
+}
+
+async function daLoadOverview() {
+  try {
+    const reviews = await fetch("/legal/reviews?limit=50").then(r => r.json());
+    _daAllReviews = reviews;
+
+    document.getElementById("da-stat-total").textContent = reviews.length;
+
+    const risky = reviews.filter(r => ["high","critical"].includes(r.overall_risk)).length;
+    document.getElementById("da-stat-risky").textContent = risky;
+
+    const cutoff = new Date(Date.now() - 7 * 86400000).toISOString();
+    const thisWeek = reviews.filter(r => r.created_at > cutoff).length;
+    document.getElementById("da-stat-week").textContent = thisWeek;
+
+    const firms = new Set(reviews.map(r => r.firm_name).filter(Boolean)).size;
+    document.getElementById("da-stat-firms").textContent = firms;
+
+    const recent = reviews.slice(0, 5);
+    const tbody = document.getElementById("da-recent-tbody");
+    if (!recent.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">No reviews yet — upload your first contract</td></tr>';
+      return;
+    }
+    tbody.innerHTML = recent.map(r => daReviewRow(r, 5)).join("");
+  } catch(e) {
+    document.getElementById("da-stat-total").textContent = "—";
+  }
+}
+
+async function daLoadReviews() {
+  const firm = document.getElementById("da-filter-firm")?.value?.trim() || "";
+  const url = "/legal/reviews?limit=50" + (firm ? "&firm_name=" + encodeURIComponent(firm) : "");
+  try {
+    const reviews = await fetch(url).then(r => r.json());
+    const tbody = document.getElementById("da-reviews-tbody");
+    if (!reviews.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">No reviews found</td></tr>';
+      return;
+    }
+    tbody.innerHTML = reviews.map(r => daReviewRow(r, 6)).join("");
+  } catch(e) {
+    document.getElementById("da-reviews-tbody").innerHTML = '<tr><td colspan="6" class="empty">Failed to load</td></tr>';
+  }
+}
+
+function daReviewRow(r, cols) {
+  const cfg = DA_RISK[r.overall_risk] || DA_RISK.low;
+  const date = r.created_at ? new Date(r.created_at).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"2-digit" }) : "—";
+  const riskBadge = `<span style="background:${cfg.bg};border:1px solid ${cfg.border};color:${cfg.color};border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;">${cfg.emoji} ${(r.overall_risk||"").toUpperCase()}</span>`;
+  const flagCount = cols === 6 ? `<td>${(r.red_flags||[]).length || "—"}</td>` : "";
+  return `<tr>
+    <td>${r.firm_name || "—"}</td>
+    <td style="color:#8099b0;font-size:12px;">${r.filename || "—"}</td>
+    <td>${riskBadge}</td>
+    ${flagCount}
+    <td style="color:#5080a0;">${date}</td>
+    <td><button onclick="daViewMemo('${r.id}')" style="background:#1a1a2a;color:#a78bfa;border:1px solid #2a2a4a;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;">View →</button></td>
+  </tr>`;
+}
+
+async function daViewMemo(reviewId) {
+  try {
+    const data = await fetch("/legal/reviews/" + reviewId).then(r => r.json());
+    _daActiveMemo = data.memo || "";
+    _daActiveFile = data.filename || "review";
+    document.getElementById("da-memo-content").textContent = _daActiveMemo;
+    const drawer = document.getElementById("da-memo-drawer");
+    drawer.style.display = "block";
+    drawer.scrollIntoView({ behavior: "smooth" });
+  } catch(e) { alert("Failed to load review."); }
+}
+
+function daCopyMemo() {
+  navigator.clipboard.writeText(_daActiveMemo);
+}
+
+function daDownloadMemo() {
+  const blob = new Blob([_daActiveMemo], { type: "text/plain" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = _daActiveFile.replace(".pdf","") + "_memo.txt";
+  a.click();
+}
+
+// ── Upload ────────────────────────────────────────────────────────────────────
+
+function daHandleFileSelect(input) {
+  if (input.files && input.files[0]) daSetFile(input.files[0]);
+}
+
+function daHandleDrop(e) {
+  e.preventDefault();
+  const area = document.getElementById("da-drop-area");
+  area.style.borderColor = "#2a3a4a"; area.style.background = "#080c10";
+  const f = e.dataTransfer.files[0];
+  if (f && f.name.toLowerCase().endsWith(".pdf")) daSetFile(f);
+}
+
+function daSetFile(f) {
+  _daSelectedFile = f;
+  const fn = document.getElementById("da-file-name");
+  fn.style.display = "block";
+  fn.textContent = "✓ " + f.name + " (" + (f.size/1024).toFixed(0) + " KB)";
+  document.getElementById("da-drop-area").style.borderColor = "#a78bfa";
+  document.getElementById("da-submit-btn").disabled = false;
+}
+
+async function daSubmitUpload() {
+  if (!_daSelectedFile) return;
+  const btn = document.getElementById("da-submit-btn");
+  const progress = document.getElementById("da-upload-progress");
+  const errBox = document.getElementById("da-upload-error");
+  const resultBox = document.getElementById("da-upload-result");
+
+  btn.style.display = "none";
+  progress.style.display = "block";
+  errBox.style.display = "none";
+  resultBox.style.display = "none";
+
+  const steps = ["Extracting text from PDF…","Identifying clauses…","Analysing risk language…","Generating review memo…"];
+  let step = 0;
+  const ticker = setInterval(() => {
+    step = (step + 1) % steps.length;
+    document.getElementById("da-progress-text").textContent = steps[step];
+  }, 4000);
+
+  try {
+    const form = new FormData();
+    form.append("file", _daSelectedFile);
+    form.append("firm_name", document.getElementById("da-upload-firm").value.trim());
+
+    const r = await fetch("/legal/review", { method: "POST", body: form });
+    clearInterval(ticker);
+
+    if (!r.ok) { const e = await r.json(); throw new Error(e.detail || "Review failed"); }
+    const data = await r.json();
+    daShowUploadResult(data);
+
+  } catch(e) {
+    clearInterval(ticker);
+    progress.style.display = "none";
+    btn.style.display = "block";
+    btn.disabled = false;
+    errBox.style.display = "block";
+    errBox.textContent = "Error: " + e.message;
+  }
+}
+
+function daShowUploadResult(data) {
+  document.getElementById("da-upload-progress").style.display = "none";
+
+  const risk = (data.overall_risk || "low").toLowerCase();
+  const cfg = DA_RISK[risk] || DA_RISK.low;
+
+  const banner = document.getElementById("da-result-banner");
+  banner.style.background = cfg.bg;
+  banner.style.border = "1px solid " + cfg.border;
+  document.getElementById("da-result-emoji").textContent = cfg.emoji;
+  document.getElementById("da-result-label").textContent = cfg.label + " — " + (data.filename || "");
+  document.getElementById("da-result-label").style.color = cfg.color;
+  document.getElementById("da-result-summary").textContent = data.overall_summary || "";
+
+  const clauses = Object.keys(data.clauses||{}).filter(k=>!["overall_risk","overall_summary","red_flags","parse_error"].includes(k));
+  const found = clauses.filter(k => data.clauses[k]?.found).length;
+  document.getElementById("da-r-clauses").textContent = found;
+  document.getElementById("da-r-flags").textContent = (data.red_flags||[]).length;
+
+  _daUploadMemo = data.memo || "";
+  _daUploadFile = data.filename || "review";
+  document.getElementById("da-result-memo").textContent = _daUploadMemo;
+  document.getElementById("da-upload-result").style.display = "block";
+  document.getElementById("da-upload-result").scrollIntoView({ behavior: "smooth" });
+}
+
+function daCopyUploadMemo() { navigator.clipboard.writeText(_daUploadMemo); }
+
+function daDownloadUploadMemo() {
+  const blob = new Blob([_daUploadMemo], { type: "text/plain" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = _daUploadFile.replace(".pdf","") + "_memo.txt";
+  a.click();
+}
+
+function daResetUpload() {
+  _daSelectedFile = null;
+  document.getElementById("da-file-input").value = "";
+  document.getElementById("da-file-name").style.display = "none";
+  document.getElementById("da-drop-area").style.borderColor = "#2a3a4a";
+  document.getElementById("da-submit-btn").disabled = true;
+  document.getElementById("da-submit-btn").style.display = "block";
+  document.getElementById("da-upload-result").style.display = "none";
+  document.getElementById("da-upload-firm").value = "";
+  document.getElementById("da-upload-error").style.display = "none";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 </script>
 </body>
 </html>
