@@ -1603,7 +1603,10 @@ async function refreshRoster() {
         <td>${statusBadge}</td>
         <td style="color:#444;font-size:12px;">${lastRun}</td>
         <td>${portalUrl ? `<button class="copy-link-btn" onclick="navigator.clipboard.writeText('${portalUrl}').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',1500)})">Copy link</button>` : '<span style="color:#222;font-size:11px;">None</span>'}</td>
-        <td><button class="btn btn-approve" style="font-size:11px;padding:4px 10px;" onclick="quickRunCampaign('${c.name}','${c.vertical||'real_estate'}')">Run</button></td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-approve" style="font-size:11px;padding:4px 10px;" onclick="quickRunCampaign('${c.name}','${c.vertical||'real_estate'}')">Run</button>
+          <button class="btn" style="font-size:11px;padding:4px 10px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="openInvoice('${encodeURIComponent(c.name)}')">Invoice</button>
+        </td>
       </tr>`;
     }).join("");
   } catch(e) {
@@ -1622,6 +1625,14 @@ async function quickRunCampaign(name, vertical) {
   } catch(e) {
     alert("Error: " + e.message);
   }
+}
+
+function openInvoice(encodedName) {
+  const name = decodeURIComponent(encodedName);
+  const now = new Date();
+  const month = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
+  // Opens invoice in a new tab — use browser Print → Save as PDF
+  window.open(`/api/v1/clients/${encodeURIComponent(name)}/invoice?month=${month}`, "_blank");
 }
 
 // ── Approval actions ──────────────────────────────────────────────────────────

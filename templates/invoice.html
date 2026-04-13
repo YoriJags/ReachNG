@@ -328,10 +328,10 @@
         <div class="party-label">From</div>
         <div class="party-name">ReachNG</div>
         <div class="party-detail">
-          AI Outreach Services<br>
-          Lagos, Nigeria<br>
-          hello@reachng.co<br>
-          +234 (0) 900 000 0000
+          AI Outreach Services · Lagos, Nigeria<br>
+          {{ invoice.bank_name or "Providus Bank" }}<br>
+          Yoriajagun08@gmail.com<br>
+          +234 81 4212 5827
         </div>
       </div>
       <div>
@@ -431,15 +431,15 @@
       <div class="payment-grid">
         <div>
           <div class="pay-row-lbl">Bank</div>
-          <div class="pay-row-val">{{ invoice.bank_name or "Guaranty Trust Bank" }}</div>
+          <div class="pay-row-val">{{ invoice.bank_name or "Providus Bank" }}</div>
         </div>
         <div>
           <div class="pay-row-lbl">Account Number</div>
-          <div class="pay-row-val">{{ invoice.account_number or "—" }}</div>
+          <div class="pay-row-val">{{ invoice.account_number or "6508125346" }}</div>
         </div>
         <div>
           <div class="pay-row-lbl">Account Name</div>
-          <div class="pay-row-val">{{ invoice.account_name or "ReachNG Technologies" }}</div>
+          <div class="pay-row-val">{{ invoice.account_name or "Ajagun Oluwaseun Oluyori" }}</div>
         </div>
         <div>
           <div class="pay-row-lbl">Reference</div>
@@ -455,7 +455,7 @@
     <div class="footer-brand">Reach<span>NG</span></div>
     <div class="footer-note">
       Thank you for choosing ReachNG<br>
-      Questions? hello@reachng.co
+      Questions? Yoriajagun08@gmail.com · +234 81 4212 5827
     </div>
   </div>
 
