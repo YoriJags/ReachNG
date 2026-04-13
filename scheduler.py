@@ -57,30 +57,30 @@ async def _reply_poll():
 
 
 async def _invoice_reminder_run():
-    """Daily invoice collection — sends WhatsApp reminders for overdue invoices."""
+    """Daily invoice collection — queues WhatsApp reminders for overdue invoices into HITL."""
     from tools.invoices import get_due_reminders, record_reminder_sent, REMINDER_SEQUENCE
     from agent import generate_invoice_reminder
-    from tools.outreach import send_whatsapp
+    from tools.hitl import queue_draft
+    from database import get_db
+    from bson import ObjectId
     from datetime import datetime, timezone
 
     log.info("invoice_reminder_run_start")
     reminders = get_due_reminders()
-    sent = 0
+    queued = 0
     errors = 0
 
     for invoice in reminders:
-        # Determine which tone/stage to use based on current status
         stages = [s["stage"] for s in REMINDER_SEQUENCE]
         current_status = invoice.get("status", "pending")
 
-        # Find the next stage in sequence
         if current_status == "pending":
             next_stage = REMINDER_SEQUENCE[0]
         else:
             try:
                 idx = stages.index(current_status)
                 if idx + 1 >= len(REMINDER_SEQUENCE):
-                    continue  # Completed sequence
+                    continue
                 next_stage = REMINDER_SEQUENCE[idx + 1]
             except ValueError:
                 continue
@@ -99,22 +99,27 @@ async def _invoice_reminder_run():
                 tone=next_stage["tone"],
                 reminder_count=invoice.get("reminder_count", 0),
             )
-            result = await send_whatsapp(phone=invoice["debtor_phone"], message=message)
-            if result.get("success", True):
-                record_reminder_sent(invoice["id"], next_stage["stage"])
-                sent += 1
-                log.info("invoice_reminder_sent",
-                    debtor=invoice["debtor_name"],
-                    stage=next_stage["stage"],
-                    amount=invoice["amount_ngn"],
-                )
-            else:
-                errors += 1
+            # Queue for HITL approval — do not send directly
+            queue_draft(
+                contact_id=str(invoice.get("debtor_id") or ObjectId()),
+                contact_name=invoice["debtor_name"],
+                vertical="invoices",
+                channel="whatsapp",
+                message=message,
+                phone=invoice.get("debtor_phone"),
+                source="invoice",
+            )
+            queued += 1
+            log.info("invoice_reminder_queued",
+                debtor=invoice["debtor_name"],
+                stage=next_stage["stage"],
+                amount=invoice["amount_ngn"],
+            )
         except Exception as e:
-            log.error("invoice_reminder_failed", invoice_id=invoice["id"], error=str(e))
+            log.error("invoice_reminder_failed", invoice_id=invoice.get("id"), error=str(e))
             errors += 1
 
-    log.info("invoice_reminder_run_done", sent=sent, errors=errors)
+    log.info("invoice_reminder_run_done", queued=queued, errors=errors)
 
 
 async def _system_sweep():
