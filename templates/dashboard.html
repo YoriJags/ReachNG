@@ -304,6 +304,71 @@
   .trending-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
   .trending-pill { background: #0e1e3a; color: #555; font-size: 11px; padding: 4px 10px; border-radius: 10px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+  /* ── Control Tower ── */
+  .ct-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+  .ct-title { font-size:20px; font-weight:700; color:#e8e8e8; }
+  .ct-subtitle { font-size:12px; color:#555; margin-top:2px; }
+
+  .ct-kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:28px; }
+  .ct-kpi { background:#0e1218; border:1px solid #1e2530; border-radius:10px; padding:18px 20px; }
+  .ct-kpi-val { font-size:28px; font-weight:800; line-height:1; margin-bottom:4px; }
+  .ct-kpi-lbl { font-size:10px; text-transform:uppercase; letter-spacing:0.12em; color:#555; font-weight:600; }
+  .ct-kpi.green .ct-kpi-val  { color:#00e5a0; }
+  .ct-kpi.orange .ct-kpi-val { color:#ff5500; }
+  .ct-kpi.amber .ct-kpi-val  { color:#f5c842; }
+  .ct-kpi.red .ct-kpi-val    { color:#ff4444; }
+  .ct-kpi.blue .ct-kpi-val   { color:#4488ff; }
+  .ct-kpi.muted .ct-kpi-val  { color:#888; }
+
+  .ct-section { margin-bottom:32px; }
+  .ct-section-title { font-size:11px; text-transform:uppercase; letter-spacing:0.14em; color:#555; font-weight:700; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #1a1f28; }
+
+  .ct-client-grid { display:flex; flex-direction:column; gap:10px; }
+  .ct-client-row {
+    background:#0e1218; border:1px solid #1e2530; border-radius:10px;
+    padding:14px 18px; display:grid;
+    grid-template-columns: 200px 90px 90px 1fr 120px 140px 100px;
+    align-items:center; gap:12px;
+    transition:border-color 0.15s;
+  }
+  .ct-client-row:hover { border-color:#2a3a4a; }
+  .ct-client-name { font-weight:700; font-size:14px; color:#e8e8e8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ct-client-vertical { font-size:11px; color:#555; margin-top:2px; }
+
+  .pay-badge { display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; padding:3px 10px; border-radius:20px; }
+  .pay-trial    { background:#1a2030; color:#6699cc; }
+  .pay-active   { background:#0a2a1a; color:#00e5a0; }
+  .pay-overdue  { background:#2a1a00; color:#f5c842; }
+  .pay-churned  { background:#2a0a0a; color:#ff4444; }
+
+  .ct-funnel { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+  .ct-funnel-step { text-align:center; min-width:44px; }
+  .ct-funnel-val { font-size:15px; font-weight:700; color:#e8e8e8; }
+  .ct-funnel-lbl { font-size:9px; color:#444; text-transform:uppercase; letter-spacing:0.08em; margin-top:1px; }
+  .ct-funnel-arrow { color:#333; font-size:12px; }
+  .ct-funnel-step.won .ct-funnel-val { color:#00e5a0; }
+
+  .ct-usage-bar { height:4px; background:#1a1f28; border-radius:2px; margin-top:6px; overflow:hidden; }
+  .ct-usage-fill { height:100%; background:#ff5500; border-radius:2px; transition:width 0.4s; }
+  .ct-usage-fill.safe { background:#00e5a0; }
+  .ct-usage-fill.warn { background:#f5c842; }
+
+  .ct-actions { display:flex; gap:6px; flex-wrap:wrap; }
+  .ct-btn { font-size:10px; font-weight:600; padding:5px 10px; border:1px solid #2a3340; background:#111; color:#aaa; border-radius:6px; cursor:pointer; white-space:nowrap; transition:all 0.15s; }
+  .ct-btn:hover { background:#1e2530; color:#e8e8e8; }
+  .ct-btn.primary { background:#ff5500; border-color:#ff5500; color:#fff; }
+  .ct-btn.primary:hover { background:#cc4400; }
+
+  .ct-overdue-alert { background:#1a0e00; border:1px solid #3a2a00; border-radius:8px; padding:12px 16px; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+  .ct-overdue-dot { width:8px; height:8px; background:#f5c842; border-radius:50%; flex-shrink:0; box-shadow:0 0 6px #f5c84280; }
+  .ct-overdue-text { font-size:12px; color:#c9a030; }
+  .ct-overdue-text strong { color:#f5c842; }
+
+  @media(max-width:900px) {
+    .ct-client-row { grid-template-columns:1fr 80px; }
+    .ct-client-row > *:not(:first-child):not(:last-child):not(:nth-child(2)) { display:none; }
+  }
+
   /* ── Edit modal ── */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
@@ -507,6 +572,7 @@
 <!-- ── Outreach Tab Nav ── -->
 <nav class="tab-nav product-tabs" data-product="outreach">
   <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+  <button class="tab-btn" onclick="switchTab('tower', this)">Control Tower</button>
   <button class="tab-btn" onclick="switchTab('campaigns', this)">Campaigns</button>
   <button class="tab-btn" onclick="switchTab('clients', this)">Clients</button>
   <button class="tab-btn" onclick="switchTab('approvals', this)">Approvals <span class="tab-badge" id="tab-badge-approvals"></span></button>
@@ -674,6 +740,88 @@
   </div>
 
   <div id="last-updated"></div>
+</div>
+
+<!-- ── Control Tower ──────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-tower">
+
+  <div class="ct-header">
+    <div>
+      <div class="ct-title">Control Tower</div>
+      <div class="ct-subtitle">Client lifecycle, revenue, and pipeline — all in one view</div>
+    </div>
+    <button class="btn btn-approve" style="font-size:12px;padding:8px 16px;" onclick="loadControlTower()">Refresh</button>
+  </div>
+
+  <!-- Overdue alert (hidden if none) -->
+  <div class="ct-overdue-alert" id="ct-overdue-alert" style="display:none;">
+    <div class="ct-overdue-dot"></div>
+    <div class="ct-overdue-text"><strong id="ct-overdue-names"></strong> — payment overdue. Update their status to avoid service disruption.</div>
+  </div>
+
+  <!-- Revenue KPIs -->
+  <div class="ct-section">
+    <div class="ct-section-title">Revenue</div>
+    <div class="ct-kpi-row">
+      <div class="ct-kpi green">
+        <div class="ct-kpi-val" id="ct-mrr">—</div>
+        <div class="ct-kpi-lbl">Monthly Revenue (MRR)</div>
+      </div>
+      <div class="ct-kpi orange">
+        <div class="ct-kpi-val" id="ct-active">—</div>
+        <div class="ct-kpi-lbl">Active Paying Clients</div>
+      </div>
+      <div class="ct-kpi blue">
+        <div class="ct-kpi-val" id="ct-trial">—</div>
+        <div class="ct-kpi-lbl">On Trial</div>
+      </div>
+      <div class="ct-kpi amber">
+        <div class="ct-kpi-val" id="ct-overdue-count">—</div>
+        <div class="ct-kpi-lbl">Overdue</div>
+      </div>
+      <div class="ct-kpi muted">
+        <div class="ct-kpi-val" id="ct-churned">—</div>
+        <div class="ct-kpi-lbl">Churned</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client roster -->
+  <div class="ct-section">
+    <div class="ct-section-title">Client Roster</div>
+
+    <!-- Column headers -->
+    <div style="display:grid;grid-template-columns:200px 90px 90px 1fr 120px 140px 100px;gap:12px;padding:0 18px 8px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#444;font-weight:600;">
+      <span>Client</span>
+      <span>Plan</span>
+      <span>Status</span>
+      <span>Pipeline</span>
+      <span>Usage</span>
+      <span>Deals Closed</span>
+      <span>Actions</span>
+    </div>
+
+    <div class="ct-client-grid" id="ct-client-grid">
+      <div style="color:#333;font-size:13px;padding:24px;text-align:center;">Loading…</div>
+    </div>
+  </div>
+
+  <!-- System health strip -->
+  <div class="ct-section">
+    <div class="ct-section-title">System Health <span id="ct-sweep-time" style="color:#333;font-weight:400;text-transform:none;letter-spacing:0;"></span></div>
+    <div class="ct-kpi-row" id="ct-health-grid">
+      <div class="ct-kpi muted"><div class="ct-kpi-val" id="ct-h-mongodb">—</div><div class="ct-kpi-lbl">MongoDB</div></div>
+      <div class="ct-kpi muted"><div class="ct-kpi-val" id="ct-h-maps">—</div><div class="ct-kpi-lbl">Google Maps</div></div>
+      <div class="ct-kpi muted"><div class="ct-kpi-val" id="ct-h-apollo">—</div><div class="ct-kpi-lbl">Apollo</div></div>
+      <div class="ct-kpi muted"><div class="ct-kpi-val" id="ct-h-apify">—</div><div class="ct-kpi-lbl">Apify</div></div>
+      <div class="ct-kpi muted"><div class="ct-kpi-val" id="ct-h-meta">—</div><div class="ct-kpi-lbl">Meta WhatsApp</div></div>
+      <div class="ct-kpi muted"><div class="ct-kpi-val" id="ct-h-quota">—</div><div class="ct-kpi-lbl">Daily Quota</div></div>
+    </div>
+    <div style="margin-top:8px;">
+      <button class="ct-btn" onclick="runTowerSweep()">Run Health Sweep Now</button>
+    </div>
+  </div>
+
 </div>
 
 <!-- ── Campaigns ───────────────────────────────────────────────────────────────── -->
@@ -1409,6 +1557,7 @@
     <button class="quick-action-btn" onclick="switchTabByName('replies')"><span class="q-dot" style="background:#ff5c00;box-shadow:0 0 6px #ff5c0060;"></span> Check Hot Leads</button>
     <button class="quick-action-btn" onclick="switchTabByName('campaigns')"><span class="q-dot" style="background:#c084fc;box-shadow:0 0 6px #c084fc60;"></span> Run Campaign</button>
     <button class="quick-action-btn" onclick="switchTabByName('approvals')"><span class="q-dot" style="background:#f5c842;box-shadow:0 0 6px #f5c84260;"></span> Review Drafts</button>
+    <button class="quick-action-btn" onclick="switchTabByName('tower')"><span class="q-dot" style="background:#ff5500;box-shadow:0 0 6px #ff550060;"></span> Control Tower</button>
     <button class="quick-action-btn" onclick="switchTabByName('clients')"><span class="q-dot" style="background:#4488ff;box-shadow:0 0 6px #4488ff60;"></span> Onboard Client</button>
     <button class="quick-action-btn" onclick="switchTabByName('invoices')"><span class="q-dot" style="background:#ff7a30;"></span> Send Invoice</button>
     <button class="quick-action-btn" onclick="quickExportAll()"><span class="q-dot" style="background:#5599ff;"></span> Export Contacts</button>
@@ -1517,6 +1666,7 @@ function switchTab(name, btn) {
   if (btn) btn.classList.add("active");
 
   // Auto-load data for tabs that need it
+  if (name === "tower")       loadControlTower();
   if (name === "sf_students") sfLoadStudentsTable();
   if (name === "sf_claims")   sfLoadClaims();
 }
@@ -1897,6 +2047,157 @@ function renderResult(result, vertical, dryRun) {
 }
 
 // ── Main refresh ──────────────────────────────────────────────────────────────
+
+// ── Control Tower ────────────────────────────────────────────────────────────
+
+async function loadControlTower() {
+  try {
+    const [summary, clients] = await Promise.all([
+      fetchJSON("/api/v1/clients/summary"),
+      fetchJSON("/api/v1/clients/"),
+    ]);
+
+    // Revenue KPIs
+    document.getElementById("ct-mrr").textContent         = fmtNgn(summary.mrr_ngn || 0);
+    document.getElementById("ct-active").textContent      = summary.total_active || 0;
+    document.getElementById("ct-trial").textContent       = summary.total_trial || 0;
+    document.getElementById("ct-overdue-count").textContent = summary.total_overdue || 0;
+    document.getElementById("ct-churned").textContent     = summary.total_churned || 0;
+
+    // Overdue alert
+    const overdueAlert = document.getElementById("ct-overdue-alert");
+    if (summary.overdue_clients && summary.overdue_clients.length) {
+      document.getElementById("ct-overdue-names").textContent = summary.overdue_clients.join(", ");
+      overdueAlert.style.display = "flex";
+    } else {
+      overdueAlert.style.display = "none";
+    }
+
+    // Client roster — fetch stats per client in parallel (cap at 20 to avoid hammering)
+    const statsResults = await Promise.allSettled(
+      clients.slice(0, 20).map(c => fetchJSON(`/api/v1/clients/${encodeURIComponent(c.name)}/stats`))
+    );
+    const statsByName = {};
+    statsResults.forEach((r, i) => {
+      if (r.status === "fulfilled") statsByName[clients[i].name] = r.value;
+    });
+
+    const grid = document.getElementById("ct-client-grid");
+    if (!clients.length) {
+      grid.innerHTML = '<div style="color:#333;font-size:13px;padding:24px;text-align:center;">No clients yet. Add one in the Clients tab.</div>';
+    } else {
+      grid.innerHTML = clients.map(c => {
+        const s = statsByName[c.name] || {};
+        const leads = s.leads || {};
+        const payStatus = s.payment_status || c.payment_status || "trial";
+        const plan = s.plan || c.plan || "starter";
+        const usagePct = s.usage_pct || 0;
+        const usageClass = usagePct >= 90 ? "warn" : usagePct >= 70 ? "warn" : "safe";
+        const msgMonth = s.messages_this_month || 0;
+        const msgLimit = s.monthly_limit || 200;
+        const dealsWon = leads.closed_won || 0;
+
+        const payClass = { trial:"pay-trial", active:"pay-active", overdue:"pay-overdue", churned:"pay-churned" }[payStatus] || "pay-trial";
+        const planLabel = { starter:"Starter", growth:"Growth", agency:"Agency" }[plan] || plan;
+
+        return `<div class="ct-client-row">
+          <div>
+            <div class="ct-client-name">${c.name}</div>
+            <div class="ct-client-vertical">${(c.vertical||"").replace(/_/g," ").replace(/\b\w/g,x=>x.toUpperCase())} · ${c.city||c.cities?.[0]||"Lagos"}</div>
+          </div>
+          <div><span class="plan-badge plan-${plan}">${planLabel}</span></div>
+          <div><span class="pay-badge ${payClass}">${payStatus}</span></div>
+          <div>
+            <div class="ct-funnel">
+              <div class="ct-funnel-step"><div class="ct-funnel-val">${leads.total||0}</div><div class="ct-funnel-lbl">Found</div></div>
+              <div class="ct-funnel-arrow">›</div>
+              <div class="ct-funnel-step"><div class="ct-funnel-val">${leads.contacted||0}</div><div class="ct-funnel-lbl">Sent</div></div>
+              <div class="ct-funnel-arrow">›</div>
+              <div class="ct-funnel-step"><div class="ct-funnel-val">${leads.replied||0}</div><div class="ct-funnel-lbl">Replied</div></div>
+              <div class="ct-funnel-arrow">›</div>
+              <div class="ct-funnel-step won"><div class="ct-funnel-val">${leads.converted||0}</div><div class="ct-funnel-lbl">Hot</div></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:#aaa;">${msgMonth}<span style="color:#444;">/${msgLimit === 9999 ? "∞" : msgLimit}</span></div>
+            <div class="ct-usage-bar"><div class="ct-usage-fill ${usageClass}" style="width:${Math.min(usagePct,100)}%"></div></div>
+          </div>
+          <div>
+            <div style="font-size:20px;font-weight:800;color:${dealsWon > 0 ? "#00e5a0" : "#333"};">${dealsWon}</div>
+            <div style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.08em;">deals won</div>
+          </div>
+          <div class="ct-actions">
+            <button class="ct-btn primary" onclick="quickRunCampaign('${c.name}','${c.vertical||"real_estate"}')">Run</button>
+            <button class="ct-btn" onclick="openInvoice('${encodeURIComponent(c.name)}')">Invoice</button>
+            <button class="ct-btn" onclick="ctUpdatePayment('${c.name}','${payStatus}')">Status</button>
+          </div>
+        </div>`;
+      }).join("");
+    }
+
+    // Health sweep
+    await runTowerSweep();
+
+  } catch(e) {
+    console.error("Control Tower load failed:", e);
+  }
+}
+
+async function runTowerSweep() {
+  try {
+    const sweep = await postJSON("/api/v1/system/sweep", {});
+    const checks = sweep.checks || {};
+    const statusIcon = { ok:"✅", warn:"⚠️", fail:"❌" };
+
+    const setCheck = (id, key) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const c = checks[key] || {};
+      const icon = statusIcon[c.status] || "—";
+      el.textContent = icon;
+      const card = el.closest(".ct-kpi");
+      if (card) {
+        card.classList.remove("green","amber","red","muted");
+        card.classList.add(c.status === "ok" ? "green" : c.status === "warn" ? "amber" : "red");
+      }
+    };
+    setCheck("ct-h-mongodb", "mongodb");
+    setCheck("ct-h-maps",    "google_maps");
+    setCheck("ct-h-apollo",  "apollo");
+    setCheck("ct-h-apify",   "apify");
+    setCheck("ct-h-meta",    "meta_whatsapp");
+
+    const quota = checks.daily_quota || {};
+    const qEl = document.getElementById("ct-h-quota");
+    if (qEl) {
+      qEl.textContent = quota.detail || "—";
+      const card = qEl.closest(".ct-kpi");
+      if (card) {
+        card.classList.remove("green","amber","red","muted");
+        card.classList.add(quota.status === "ok" ? "green" : quota.status === "warn" ? "amber" : "red");
+      }
+    }
+
+    const now = new Date().toLocaleTimeString("en-NG", { hour:"2-digit", minute:"2-digit" });
+    const sweepTime = document.getElementById("ct-sweep-time");
+    if (sweepTime) sweepTime.textContent = `· Last checked ${now}`;
+
+  } catch(e) {
+    console.error("Sweep failed:", e);
+  }
+}
+
+async function ctUpdatePayment(name, currentStatus) {
+  const statuses = ["trial","active","overdue","churned"];
+  const next = statuses[(statuses.indexOf(currentStatus) + 1) % statuses.length];
+  if (!confirm(`Update ${name} from "${currentStatus}" → "${next}"?`)) return;
+  try {
+    await postJSON(`/api/v1/clients/${encodeURIComponent(name)}/payment`, { payment_status: next });
+    loadControlTower();
+  } catch(e) {
+    alert("Error: " + e.message);
+  }
+}
 
 async function refresh() {
   try {
