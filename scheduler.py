@@ -117,6 +117,18 @@ async def _invoice_reminder_run():
     log.info("invoice_reminder_run_done", sent=sent, errors=errors)
 
 
+async def _system_sweep():
+    """Daily system sweep — checks all integrations and pipeline health at 7am."""
+    from tools.system_sweep import run_and_notify
+    log.info("system_sweep_start")
+    try:
+        report = await run_and_notify()
+        log.info("system_sweep_done", overall=report["overall"],
+                 failed=report["failed"], warned=report["warned"])
+    except Exception as e:
+        log.error("system_sweep_failed", error=str(e))
+
+
 async def _morning_brief():
     """Compile overnight stats and send WhatsApp brief to owner at 8am Lagos time."""
     log.info("morning_brief_start")
@@ -130,6 +142,15 @@ async def _morning_brief():
 
 def setup_scheduler():
     """Register all jobs and return configured scheduler."""
+
+    # System sweep: every day at 7am Lagos time (before morning brief)
+    scheduler.add_job(
+        _system_sweep,
+        CronTrigger(hour=7, minute=0, timezone="Africa/Lagos"),
+        id="system_sweep",
+        replace_existing=True,
+        misfire_grace_time=300,
+    )
 
     # Morning brief: every day at 8am Lagos time
     scheduler.add_job(

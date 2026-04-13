@@ -280,6 +280,13 @@ async def rich_health():
     return result
 
 
+@app.post("/api/v1/system/sweep", dependencies=[Depends(require_auth)])
+async def trigger_system_sweep():
+    """Run a full system health sweep on demand. Returns structured report."""
+    from tools.system_sweep import run_sweep
+    return await run_sweep()
+
+
 @app.get("/debug/apollo", dependencies=[Depends(require_auth)])
 async def debug_apollo():
     """Hit Apollo API directly and return the raw response for diagnostics."""

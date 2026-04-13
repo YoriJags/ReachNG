@@ -65,7 +65,7 @@ async def upsert_client(payload: ClientUpsert):
     clients = get_clients()
 
     result = clients.update_one(
-        {"name": {"$regex": f"^{payload.name}$", "$options": "i"}},
+        {"name": {"$regex": f"^{re.escape(payload.name)}$", "$options": "i"}},
         {
             "$set": {
                 "name": payload.name,

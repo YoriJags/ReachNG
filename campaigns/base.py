@@ -133,6 +133,43 @@ class BaseCampaign:
         if cities:
             log.info("multi_city_discovery", cities=cities, maps=len(maps_leads), apollo=len(apollo_leads))
 
+        # ── Auto-expand to nearby cities if local pool is thin ─────────────────
+        # Threshold: if we found fewer than CITY_EXPAND_THRESHOLD * max_new_contacts
+        # unique leads, the local pool is running low — expand to nearby cities.
+        total_found = len(maps_leads) + len(apollo_leads) + len(social_leads)
+        expand_threshold = max(3, int(max_new_contacts * settings.city_expand_threshold))
+        primary_city = (client_city or settings.default_city).split(",")[0].strip()
+
+        if total_found < expand_threshold and not cities:
+            from tools.discovery import get_expansion_cities
+            expansion_cities = get_expansion_cities(primary_city, max_expansions=2)
+            if expansion_cities:
+                log.info("city_pool_thin_expanding",
+                         primary_city=primary_city,
+                         found=total_found,
+                         threshold=expand_threshold,
+                         expanding_to=expansion_cities)
+                expand_tasks = []
+                for ecity in expansion_cities:
+                    expand_tasks.append(discover_businesses(
+                        vertical=self.vertical, max_results=per_city_quota,
+                        query_override=query_override, city_override=ecity,
+                        target_sectors=target_sectors,
+                    ))
+                    expand_tasks.append(discover_apollo_leads(
+                        vertical=self.vertical, max_results=per_city_apollo, city_override=ecity,
+                    ))
+                expand_results = await asyncio.gather(*expand_tasks, return_exceptions=True)
+                for i, ecity in enumerate(expansion_cities):
+                    r_m = expand_results[i * 2]
+                    r_a = expand_results[i * 2 + 1]
+                    if not isinstance(r_m, Exception):
+                        maps_leads.extend(r_m)
+                    if not isinstance(r_a, Exception):
+                        apollo_leads.extend(r_a)
+                log.info("city_expansion_done",
+                         maps_total=len(maps_leads), apollo_total=len(apollo_leads))
+
         # Deduplicate across sources by phone + email
         seen_phones: set[str] = set()
         seen_emails: set[str] = set()
@@ -176,8 +213,8 @@ class BaseCampaign:
                 log.info("daily_limit_reached", sent=sent)
                 break
 
-            # Step 3: Skip if already contacted (check before writing)
-            if has_been_contacted(biz["place_id"]):
+            # Step 3: Skip if already contacted — scoped to client in agency mode
+            if has_been_contacted(biz["place_id"], client_name=client_name):
                 skipped_contacted += 1
                 continue
 

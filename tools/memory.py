@@ -108,9 +108,16 @@ def upsert_contact(
     if platform:
         doc["platform"] = platform
 
+    # Compound filter: scoped to client in agency mode, global otherwise.
+    # This allows multiple clients to independently contact the same business
+    # without the lead pool being exhausted across clients.
+    filter_key: dict = {"place_id": place_id}
+    if client_name:
+        filter_key["client_name"] = client_name
+
     try:
         result = contacts.update_one(
-            {"place_id": place_id},
+            filter_key,
             {
                 "$set": doc,
                 "$setOnInsert": {
@@ -125,7 +132,7 @@ def upsert_contact(
     except Exception as exc:
         # Sparse index not yet applied on running instance — fall back to find
         if "DuplicateKeyError" in type(exc).__name__ or "E11000" in str(exc):
-            contact = contacts.find_one({"place_id": place_id}, {"_id": 1})
+            contact = contacts.find_one(filter_key, {"_id": 1})
             if contact:
                 return str(contact["_id"])
             # email collision from a different place_id — skip silently
@@ -135,19 +142,40 @@ def upsert_contact(
     if result.upserted_id:
         return str(result.upserted_id)
 
-    contact = contacts.find_one({"place_id": place_id}, {"_id": 1})
+    contact = contacts.find_one(filter_key, {"_id": 1})
     return str(contact["_id"])
 
 
-def has_been_contacted(place_id: str) -> bool:
-    """True if we've already reached out to this contact."""
-    contact = get_contacts().find_one(
-        {"place_id": place_id},
-        {"status": 1, "outreach_count": 1}
-    )
+def has_been_contacted(place_id: str, client_name: Optional[str] = None) -> bool:
+    """True if we've already reached out to this contact.
+
+    When client_name is provided (agency mode), dedup is scoped to that client —
+    so multiple clients can independently contact the same business without collision.
+    When no client_name is given, falls back to global dedup (general campaigns).
+
+    Lead refresh: contacts last reached more than LEAD_REFRESH_DAYS ago (default 90)
+    are treated as fresh again — except opted_out and converted which are permanent.
+    """
+    query = {"place_id": place_id}
+    if client_name:
+        query["client_name"] = client_name
+    contact = get_contacts().find_one(query, {"status": 1, "last_contacted_at": 1})
     if not contact:
         return False
-    return contact.get("status") != Status.NOT_CONTACTED
+    status = contact.get("status")
+    # Permanent exclusions — never re-contact
+    if status in (Status.OPTED_OUT, Status.CONVERTED):
+        return True
+    if status == Status.NOT_CONTACTED:
+        return False
+    # Stale lead refresh — re-qualify if last contacted > LEAD_REFRESH_DAYS ago
+    last_contacted = contact.get("last_contacted_at")
+    if last_contacted:
+        settings = get_settings()
+        cutoff = datetime.now(timezone.utc) - timedelta(days=settings.lead_refresh_days)
+        if last_contacted < cutoff:
+            return False  # Eligible for fresh outreach
+    return True
 
 
 def get_daily_send_count() -> int:
@@ -235,9 +263,13 @@ def get_followup_candidates(vertical: Optional[str] = None) -> list[dict]:
     return list(get_contacts().find(query).limit(20))
 
 
-def get_pipeline_stats(vertical: Optional[str] = None) -> dict:
+def get_pipeline_stats(vertical: Optional[str] = None, client_name: Optional[str] = None) -> dict:
     """Summary counts per status + source/platform breakdown for the dashboard."""
-    match = {"vertical": vertical} if vertical else {}
+    match: dict = {}
+    if vertical:
+        match["vertical"] = vertical
+    if client_name:
+        match["client_name"] = client_name
     contacts = get_contacts()
 
     status_rows = list(contacts.aggregate([

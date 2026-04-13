@@ -6,11 +6,12 @@ Shows their contacts, outreach stats, and ROI.
 import re
 import secrets
 from datetime import datetime, timezone
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from bson import ObjectId
 from database import get_contacts, get_outreach_log, get_db
 from tools.roi import get_roi_summary
+from auth import require_auth as _require_admin_auth
 
 router = APIRouter(prefix="/portal", tags=["Portal"])
 
@@ -48,8 +49,8 @@ def _get_client_by_token(token: str) -> dict | None:
 # ─── API endpoints ────────────────────────────────────────────────────────────
 
 @router.post("/generate/{client_name}")
-async def generate_portal_link(client_name: str):
-    """Generate (or return existing) portal token for a client."""
+async def generate_portal_link(client_name: str, _: str = Depends(_require_admin_auth)):
+    """Generate (or return existing) portal token for a client. Requires Basic Auth."""
     try:
         token = ensure_client_token(client_name)
     except ValueError as e:
@@ -84,9 +85,9 @@ async def get_portal_data(token: str):
             if hasattr(c.get(f), "isoformat"):
                 c[f] = c[f].isoformat()
 
-    # Status counts
+    # Status counts — scoped to this client only
     from tools.memory import get_pipeline_stats
-    stats = get_pipeline_stats(vertical=vertical)
+    stats = get_pipeline_stats(vertical=vertical, client_name=client_name)
 
     # ROI
     roi = get_roi_summary(days=30, client_name=client_name)

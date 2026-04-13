@@ -19,10 +19,13 @@ def require_auth(credentials: HTTPBasicCredentials = Depends(security)) -> str:
     expected_user = getattr(settings, "dashboard_user", None)
     expected_pass = getattr(settings, "dashboard_pass", None)
 
-    # If credentials not configured, skip auth (dev only)
+    # If credentials not configured, block all access — misconfigured deployment
     if not expected_user or not expected_pass:
-        log.warning("dashboard_auth_disabled", reason="DASHBOARD_USER/DASHBOARD_PASS not set")
-        return "anonymous"
+        log.error("dashboard_auth_misconfigured", reason="DASHBOARD_USER/DASHBOARD_PASS not set")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Authentication not configured. Set DASHBOARD_USER and DASHBOARD_PASS.",
+        )
 
     user_ok = secrets.compare_digest(
         credentials.username.encode("utf-8"),

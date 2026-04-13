@@ -12,6 +12,40 @@ log = structlog.get_logger()
 
 PLACES_BASE = "https://maps.googleapis.com/maps/api/place"
 
+# ─── Nearby city expansion map ────────────────────────────────────────────────
+# When local pool runs thin, campaigns auto-expand to these cities.
+# Ordered by proximity / business density.
+NEARBY_CITIES: dict[str, list[str]] = {
+    "Lagos":          ["Abuja", "Port Harcourt", "Ibadan", "Benin City"],
+    "Abuja":          ["Lagos", "Kaduna", "Kano", "Jos"],
+    "Port Harcourt":  ["Lagos", "Warri", "Calabar", "Uyo"],
+    "Ibadan":         ["Lagos", "Abeokuta", "Osogbo", "Ilorin"],
+    "Kano":           ["Kaduna", "Abuja", "Zaria", "Katsina"],
+    "Benin City":     ["Lagos", "Warri", "Asaba", "Port Harcourt"],
+    "Kaduna":         ["Abuja", "Kano", "Zaria", "Jos"],
+    "Enugu":          ["Onitsha", "Owerri", "Abuja", "Port Harcourt"],
+    "Onitsha":        ["Enugu", "Asaba", "Owerri", "Lagos"],
+    "Warri":          ["Benin City", "Port Harcourt", "Asaba", "Lagos"],
+    "Calabar":        ["Port Harcourt", "Uyo", "Enugu", "Lagos"],
+    "Uyo":            ["Calabar", "Port Harcourt", "Lagos"],
+    "Owerri":         ["Enugu", "Port Harcourt", "Onitsha", "Lagos"],
+    "Abeokuta":       ["Lagos", "Ibadan", "Ilorin"],
+    "Ilorin":         ["Ibadan", "Lagos", "Abuja", "Osogbo"],
+    "Jos":            ["Abuja", "Kaduna", "Bauchi"],
+    "London, UK":     ["Birmingham, UK", "Manchester, UK", "Bristol, UK"],
+    "Nairobi":        ["Mombasa", "Kampala", "Dar es Salaam"],
+    "Accra":          ["Kumasi", "Lagos", "Abidjan"],
+    "Dubai":          ["Abu Dhabi", "Sharjah"],
+}
+
+
+def get_expansion_cities(primary_city: str, max_expansions: int = 2) -> list[str]:
+    """Return nearby cities to expand into when the local pool runs thin."""
+    for key, neighbours in NEARBY_CITIES.items():
+        if key.lower() in primary_city.lower() or primary_city.lower() in key.lower():
+            return neighbours[:max_expansions]
+    return []
+
 # ─── Vertical search configs ──────────────────────────────────────────────────
 
 # Queries use {city} placeholder — substituted at runtime with client city (default: Lagos)

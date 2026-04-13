@@ -40,16 +40,29 @@ def ensure_indexes():
     """Create all required indexes on startup."""
     contacts = get_contacts()
 
-    # Always drop and recreate email/phone indexes to ensure sparse=True
-    for idx_name in ("email_1", "phone_1"):
+    # One-time migration: drop old single-field place_id index (replaced by compound below)
+    # and ensure phone/email indexes are sparse. Safe to run repeatedly — drop is a no-op
+    # if the index doesn't exist. We only drop specific named indexes, never blindly.
+    for idx_name in ("place_id_1", "email_1", "phone_1"):
         try:
             contacts.drop_index(idx_name)
         except Exception:
             pass  # Index didn't exist — fine
 
+    # create_index is idempotent: no-op if index already exists with same definition.
+    # No drop before recreate — avoids the unsafe window between drop and creation
+    # where uniqueness is unenforced under concurrent traffic.
     contacts.create_index([("phone", ASCENDING)], unique=True, sparse=True)
     contacts.create_index([("email", ASCENDING)], unique=True, sparse=True)
-    contacts.create_index([("place_id", ASCENDING)], unique=True)
+    # Compound unique: (place_id, client_name) — allows multiple clients to
+    # independently contact the same business without lead pool exhaustion.
+    # sparse=True handles non-agency records where client_name is absent.
+    contacts.create_index(
+        [("place_id", ASCENDING), ("client_name", ASCENDING)],
+        unique=True,
+        sparse=True,
+        name="place_id_client_name_unique",
+    )
     contacts.create_index([("vertical", ASCENDING)])
     contacts.create_index([("status", ASCENDING)])
     contacts.create_index([("next_followup_at", ASCENDING)])

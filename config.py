@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     daily_send_limit: int = Field(default=50, env="DAILY_SEND_LIMIT")
     followup_delay_hours: int = Field(default=48, env="FOLLOWUP_DELAY_HOURS")
     max_followup_attempts: int = Field(default=2, env="MAX_FOLLOWUP_ATTEMPTS")
+    lead_refresh_days: int = Field(default=90, env="LEAD_REFRESH_DAYS")
+    city_expand_threshold: float = Field(default=0.4, env="CITY_EXPAND_THRESHOLD")
 
     # Apollo.io B2B discovery
     apollo_api_key: str | None = Field(default=None, env="APOLLO_API_KEY")
@@ -56,8 +58,8 @@ class Settings(BaseSettings):
     # Gemini Flash (cheap extraction — PDF parsing, data scraping)
     gemini_api_key: str | None = Field(default=None, env="GEMINI_API_KEY")
 
-    # WhatsApp inbound webhook verify token (Meta handshake)
-    webhook_verify_token: str = Field(default="reachng-webhook", env="WEBHOOK_VERIFY_TOKEN")
+    # WhatsApp inbound webhook verify token (Meta handshake) — set WEBHOOK_VERIFY_TOKEN in env
+    webhook_verify_token: str | None = Field(default=None, env="WEBHOOK_VERIFY_TOKEN")
 
     # PostHog analytics
     posthog_api_key: str | None = Field(default=None, env="POSTHOG_API_KEY")
