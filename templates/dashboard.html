@@ -9,7 +9,7 @@
 
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #0a0a0a;
+    background: #080c10;
     color: #e8e8e8;
     min-height: 100vh;
   }
@@ -20,11 +20,12 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 28px;
-    border-bottom: 1px solid #1a1a1a;
+    border-bottom: 1px solid #1e2530;
     position: sticky;
     top: 0;
     z-index: 100;
-    background: #0a0a0a;
+    background: #080c10;
+    backdrop-filter: blur(8px);
   }
 
   .logo { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; color: #f0f0f0; }
@@ -35,8 +36,8 @@
   .health-pills { display: flex; gap: 8px; align-items: center; }
   .health-pill {
     display: flex; align-items: center; gap: 5px;
-    font-size: 11px; color: #555;
-    background: #111; border: 1px solid #1e1e1e;
+    font-size: 11px; color: #6080a0;
+    background: #0e1218; border: 1px solid #1e2530;
     border-radius: 20px; padding: 3px 10px;
   }
   .health-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; }
@@ -62,7 +63,7 @@
 
   .tab-btn {
     font-size: 12px; font-weight: 500;
-    color: #444; background: none; border: none;
+    color: #4a6070; background: none; border: none;
     padding: 12px 16px;
     cursor: pointer;
     border-bottom: 2px solid transparent;
@@ -71,8 +72,8 @@
     letter-spacing: 0.2px;
     display: flex; align-items: center; gap: 6px;
   }
-  .tab-btn:hover { color: #888; }
-  .tab-btn.active { color: #f0f0f0; border-bottom-color: #ff5c00; }
+  .tab-btn:hover { color: #90b0cc; }
+  .tab-btn.active { color: #f0f8ff; border-bottom-color: #ff5c00; }
 
   .tab-badge {
     background: #ff5c00; color: #fff;
@@ -89,7 +90,7 @@
 
   /* ── Section title ── */
   .section-title {
-    font-size: 10px; color: #333; text-transform: uppercase;
+    font-size: 10px; color: #5080a0; text-transform: uppercase;
     letter-spacing: 1px; margin-bottom: 14px; margin-top: 32px;
     display: flex; align-items: center; gap: 10px;
   }
@@ -103,14 +104,20 @@
     margin-bottom: 0;
   }
   .stat-card {
-    background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 16px 18px;
+    background: #0e1218; border: 1px solid #1e2530; border-radius: 12px; padding: 16px 18px;
+    transition: border-color 0.2s;
   }
-  .stat-card .label { font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .stat-card:hover { border-color: #2a3a4a; }
+  .stat-card .label { font-size: 10px; color: #4a6070; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
   .stat-card .value { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .stat-card.fire .value  { color: #ff5c00; }
-  .stat-card.green .value { color: #00e5a0; }
+  .stat-card.fire  { border-top: 2px solid #ff5c00; }
+  .stat-card.green { border-top: 2px solid #00e5a0; }
+  .stat-card.amber { border-top: 2px solid #f5c842; }
+  .stat-card.blue  { border-top: 2px solid #4488ff; }
+  .stat-card.fire .value  { color: #ff7a30; }
+  .stat-card.green .value { color: #00e5a0; text-shadow: 0 0 20px #00e5a030; }
   .stat-card.amber .value { color: #f5c842; }
-  .stat-card.blue .value  { color: #4488ff; }
+  .stat-card.blue .value  { color: #5599ff; }
 
   /* ── Daily limit bar ── */
   .limit-bar-wrap { margin-top: 16px; }
@@ -142,12 +149,13 @@
 
   /* ── Verticals ── */
   .verticals { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
-  .vertical-card { background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 18px; }
-  .vertical-card h3 { font-size: 12px; font-weight: 600; margin-bottom: 14px; color: #bbb; }
-  .v-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #141414; font-size: 12px; }
+  .vertical-card { background: #0e1218; border: 1px solid #1e2530; border-radius: 10px; padding: 18px; transition: border-color 0.2s; }
+  .vertical-card:hover { border-color: #2a3a4a; }
+  .vertical-card h3 { font-size: 12px; font-weight: 600; margin-bottom: 14px; color: #90b0cc; }
+  .v-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #141c24; font-size: 12px; }
   .v-row:last-child { border-bottom: none; }
-  .v-row .lbl { color: #444; }
-  .v-row .val { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .v-row .lbl { color: #4a6070; }
+  .v-row .val { font-weight: 600; font-variant-numeric: tabular-nums; color: #c0d0e0; }
   .val.replied   { color: #f5c842; }
   .val.converted { color: #00e5a0; }
   .val.contacted { color: #4488ff; }
@@ -207,11 +215,11 @@
 
   /* ── Approvals ── */
   .approvals-list { display: flex; flex-direction: column; gap: 10px; }
-  .approval-card { background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 16px 18px; }
+  .approval-card { background: #0e1218; border: 1px solid #1e2530; border-left: 3px solid #ff5c00; border-radius: 10px; padding: 16px 18px; }
   .approval-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .approval-name { font-weight: 600; font-size: 14px; }
-  .approval-meta { font-size: 11px; color: #333; margin-bottom: 8px; }
-  .approval-message { font-size: 13px; color: #ccc; line-height: 1.6; background: #0d0d0d; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; white-space: pre-wrap; }
+  .approval-name { font-weight: 600; font-size: 14px; color: #f0f8ff; }
+  .approval-meta { font-size: 11px; color: #4a6070; margin-bottom: 8px; }
+  .approval-message { font-size: 13px; color: #c8d8e8; line-height: 1.6; background: #060a0e; border: 1px solid #1a2530; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; white-space: pre-wrap; }
   .approval-actions { display: flex; gap: 8px; flex-wrap: wrap; }
   .approve-all-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
   .approve-count { font-size: 13px; color: #444; }
@@ -223,21 +231,21 @@
 
   /* ── Replies ── */
   .replies-list { display: flex; flex-direction: column; gap: 10px; }
-  .reply-card { background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 16px 18px; }
+  .reply-card { background: #0e1218; border: 1px solid #1e2530; border-radius: 10px; padding: 16px 18px; }
   .reply-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .reply-name { font-weight: 600; font-size: 14px; }
+  .reply-name { font-weight: 600; font-size: 14px; color: #f0f8ff; }
   .intent-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .intent-interested { background: #0e2e1e; color: #00e5a0; }
-  .intent-not_now    { background: #2e2800; color: #f5c842; }
-  .intent-opted_out  { background: #2e0e0e; color: #ff4444; }
-  .intent-referral   { background: #0e1e3a; color: #4488ff; }
-  .intent-question   { background: #1e0e3a; color: #c084fc; }
-  .intent-unknown    { background: #1a1a1a; color: #333; }
-  .reply-meta { font-size: 11px; color: #333; margin-bottom: 6px; }
-  .reply-summary { font-size: 13px; color: #999; line-height: 1.5; }
-  .reply-card.hot { border-color: #1a3a1a; border-left: 3px solid #00e5a0; }
-  .reply-card.warm { border-color: #1a1a00; border-left: 3px solid #f5c842; }
-  .reply-card.cold { opacity: 0.55; }
+  .intent-interested { background: #0a2018; color: #00e5a0; border: 1px solid #00e5a030; }
+  .intent-not_now    { background: #201e08; color: #f5c842; border: 1px solid #f5c84230; }
+  .intent-opted_out  { background: #200808; color: #ff6666; border: 1px solid #ff444420; }
+  .intent-referral   { background: #081830; color: #5599ff; border: 1px solid #4488ff30; }
+  .intent-question   { background: #180830; color: #c084fc; border: 1px solid #c084fc30; }
+  .intent-unknown    { background: #141414; color: #444; border: 1px solid #222; }
+  .reply-meta { font-size: 11px; color: #4a6070; margin-bottom: 6px; }
+  .reply-summary { font-size: 13px; color: #a0b8c8; line-height: 1.5; }
+  .reply-card.hot  { border-color: #1a3a2a; border-left: 3px solid #00e5a0; background: #0a1510; }
+  .reply-card.warm { border-color: #2a2a10; border-left: 3px solid #f5c842; background: #0f100a; }
+  .reply-card.cold { opacity: 0.5; }
 
   .priority-divider {
     font-size: 10px; color: #222; text-transform: uppercase; letter-spacing: 1px;
@@ -246,16 +254,18 @@
   .priority-divider::after { content: ""; flex: 1; height: 1px; background: #1a1a1a; }
 
   /* ── Forms ── */
-  .form-card { background: #111; border: 1px solid #1a1a1a; border-radius: 10px; padding: 20px; }
+  .form-card { background: #0e1218; border: 1px solid #1e2530; border-radius: 12px; padding: 20px; }
   .form-card .row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
   .form-card .row:last-child { margin-bottom: 0; }
   .form-card input, .form-card select, .form-card textarea {
-    background: #0a0a0a; border: 1px solid #1e1e1e; border-radius: 7px;
-    color: #e8e8e8; font-size: 13px; padding: 9px 12px;
+    background: #080c10; border: 1px solid #1e2530; border-radius: 7px;
+    color: #dde8f0; font-size: 13px; padding: 9px 12px;
     font-family: inherit; flex: 1; min-width: 140px;
-    transition: border-color 0.15s;
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .form-card input:focus, .form-card select:focus, .form-card textarea:focus { outline: none; border-color: #ff5c00; }
+  .form-card input:focus, .form-card select:focus, .form-card textarea:focus {
+    outline: none; border-color: #ff5c00; box-shadow: 0 0 0 2px #ff5c0015;
+  }
   .form-card textarea { resize: vertical; min-height: 100px; }
   .step-label { font-size: 10px; color: #ff5c00; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
   .form-divider { border: none; border-top: 1px solid #1a1a1a; margin: 18px 0; }
@@ -343,14 +353,14 @@
 
   /* ── SOP hint ── */
   .sop-box {
-    background: #0d0d0d; border: 1px solid #1a1a1a; border-left: 2px solid #222;
+    background: #0a0f18; border: 1px solid #1e2a3a; border-left: 2px solid #4488ff;
     border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
   }
-  .sop-box .sop-title { font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-  .sop-step { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 6px; font-size: 12px; color: #444; line-height: 1.5; }
+  .sop-box .sop-title { font-size: 10px; color: #4488ff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .sop-step { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 6px; font-size: 12px; color: #6080a0; line-height: 1.5; }
   .sop-step:last-child { margin-bottom: 0; }
-  .sop-num { background: #1a1a1a; color: #555; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-  .sop-step b { color: #666; }
+  .sop-num { background: #0e1e30; color: #4488ff; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .sop-step b { color: #90b0d0; }
 
   /* ── Floating quick-actions ── */
   .quick-panel {
@@ -370,12 +380,13 @@
   }
   .quick-menu.open { display: flex; }
   .quick-action-btn {
-    background: #1a1a1a; border: 1px solid #2a2a2a; color: #ccc;
+    background: #0e1520; border: 1px solid #1e2a38; color: #90b0cc;
     border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 500;
-    cursor: pointer; white-space: nowrap; transition: background 0.15s;
+    cursor: pointer; white-space: nowrap; transition: all 0.15s;
+    backdrop-filter: blur(4px);
     display: flex; align-items: center; gap: 8px;
   }
-  .quick-action-btn:hover { background: #222; color: #fff; }
+  .quick-action-btn:hover { background: #1a2a3a; color: #e8f4ff; border-color: #2a4060; }
   .quick-action-btn .q-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
   /* ── Onboarding ── */
@@ -1393,11 +1404,16 @@
 <!-- Floating quick-actions -->
 <div class="quick-panel">
   <div class="quick-menu" id="quick-menu">
-    <button class="quick-action-btn" onclick="quickApproveAll()"><span class="q-dot" style="background:#00e5a0;"></span> Approve All Drafts</button>
-    <button class="quick-action-btn" onclick="quickRunMorningBrief()"><span class="q-dot" style="background:#f5c842;"></span> Send Morning Brief</button>
-    <button class="quick-action-btn" onclick="quickExportAll()"><span class="q-dot" style="background:#4488ff;"></span> Export All Contacts</button>
-    <button class="quick-action-btn" onclick="switchTabByName('replies')"><span class="q-dot" style="background:#ff5c00;"></span> Check Hot Leads</button>
-    <button class="quick-action-btn" onclick="switchTabByName('campaigns')"><span class="q-dot" style="background:#c084fc;"></span> Run Campaign</button>
+    <div style="font-size:9px;color:#4a6070;text-transform:uppercase;letter-spacing:1px;padding:2px 4px;text-align:right;">Quick Actions</div>
+    <button class="quick-action-btn" onclick="quickApproveAll()"><span class="q-dot" style="background:#00e5a0;box-shadow:0 0 6px #00e5a060;"></span> Approve All Drafts</button>
+    <button class="quick-action-btn" onclick="switchTabByName('replies')"><span class="q-dot" style="background:#ff5c00;box-shadow:0 0 6px #ff5c0060;"></span> Check Hot Leads</button>
+    <button class="quick-action-btn" onclick="switchTabByName('campaigns')"><span class="q-dot" style="background:#c084fc;box-shadow:0 0 6px #c084fc60;"></span> Run Campaign</button>
+    <button class="quick-action-btn" onclick="switchTabByName('approvals')"><span class="q-dot" style="background:#f5c842;box-shadow:0 0 6px #f5c84260;"></span> Review Drafts</button>
+    <button class="quick-action-btn" onclick="switchTabByName('clients')"><span class="q-dot" style="background:#4488ff;box-shadow:0 0 6px #4488ff60;"></span> Onboard Client</button>
+    <button class="quick-action-btn" onclick="switchTabByName('invoices')"><span class="q-dot" style="background:#ff7a30;"></span> Send Invoice</button>
+    <button class="quick-action-btn" onclick="quickExportAll()"><span class="q-dot" style="background:#5599ff;"></span> Export Contacts</button>
+    <button class="quick-action-btn" onclick="quickRunMorningBrief()"><span class="q-dot" style="background:#888;"></span> Morning Brief</button>
+    <button class="quick-action-btn" onclick="clearLogs()"><span class="q-dot" style="background:#333;"></span> Clear Logs</button>
   </div>
   <button class="quick-fab" id="quick-fab" onclick="toggleQuickMenu()" title="Quick actions">⚡</button>
 </div>
