@@ -370,6 +370,12 @@ class BaseCampaign:
             "daily_total_sent": get_daily_send_count(),
             "dry_run": dry_run,
             "hitl_mode": hitl_mode,
+            "discovery": {
+                "maps":   len(maps_leads),
+                "apollo": len(apollo_leads),
+                "social": len(social_leads),
+                "total_after_dedup": len(businesses),
+            },
         }
         log.info("campaign_complete", **summary)
         return summary
