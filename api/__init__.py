@@ -16,6 +16,7 @@ from .b2c import router as b2c_router
 from .invoice_chaser import router as invoice_chaser_router
 from .school_fees import router as school_fees_router
 from .webhooks import router as webhooks_router
+from .plans import router as plans_router
 
 __all__ = [
     "campaigns_router", "contacts_router", "clients_router",
@@ -23,5 +24,5 @@ __all__ = [
     "roi_router", "social_router", "hooks_router",
     "portal_router", "ab_router", "referrals_router", "competitors_router",
     "invoices_router", "b2c_router", "invoice_chaser_router",
-    "school_fees_router", "webhooks_router",
+    "school_fees_router", "webhooks_router", "plans_router",
 ]

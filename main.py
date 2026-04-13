@@ -26,7 +26,8 @@ from posthog import Posthog
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
-from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router, webhooks_router
+from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router
+from api.plans import seed_plans_if_empty
 from auth import require_auth
 from mcp_server import mcp
 from config import get_settings
@@ -79,6 +80,7 @@ async def lifespan(app: FastAPI):
     try:
         ensure_indexes()
         ensure_data_indexes()
+        seed_plans_if_empty()
     except Exception as exc:
         raise SystemExit(
             f"[ReachNG] Cannot connect to MongoDB.\n"
@@ -172,6 +174,7 @@ app.include_router(invoices_router,    prefix="/api/v1", **_auth)
 app.include_router(b2c_router,            prefix="/api/v1", **_auth)
 app.include_router(invoice_chaser_router, prefix="/api/v1", **_auth)
 app.include_router(school_fees_router,    prefix="/api/v1", **_auth)
+app.include_router(plans_router,          prefix="/api/v1", **_auth)
 app.include_router(webhooks_router,       prefix="/api/v1")  # No Basic Auth — Unipile posts freely
 app.include_router(portal_router)        # Portal uses token auth — no Basic Auth
 app.include_router(dashboard_router, **_auth)

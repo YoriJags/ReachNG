@@ -16,11 +16,13 @@ router = APIRouter(prefix="/clients", tags=["Clients"])
 PaymentStatus = Literal["trial", "active", "overdue", "churned"]
 PlanTier = Literal["starter", "growth", "agency"]
 
-PLAN_LIMITS: dict[str, int] = {
-    "starter": 200,
-    "growth":  500,
-    "agency":  9999,  # effectively unlimited
-}
+def _get_plan_limit(plan_key: str) -> int:
+    """Fetch message limit from DB plans collection. Falls back to hardcoded defaults."""
+    try:
+        from api.plans import get_plan_limit
+        return get_plan_limit(plan_key)
+    except Exception:
+        return {"starter": 200, "growth": 500, "agency": 9999}.get(plan_key, 200)
 
 
 def get_clients():
@@ -142,7 +144,7 @@ async def client_stats(name: str):
     closed         = contacts_col.count_documents({"client_name": name, "closed_by_client": True})
     messages_month = get_monthly_message_count(name)
     plan           = client.get("plan", "starter")
-    limit          = PLAN_LIMITS.get(plan, 200)
+    limit          = _get_plan_limit(plan)
 
     return {
         "client": name,
@@ -284,7 +286,7 @@ async def generate_invoice(
     messages_sent  = get_monthly_message_count(client["name"])
     plan           = client.get("plan", "starter")
     monthly_fee    = client.get("monthly_fee_ngn", 0) or 0
-    plan_limit     = PLAN_LIMITS.get(plan, 200)
+    plan_limit     = _get_plan_limit(plan)
 
     from database import get_contacts
     contacts_col = get_contacts()

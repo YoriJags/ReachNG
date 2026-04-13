@@ -359,6 +359,20 @@
   .ct-btn.primary { background:#ff5500; border-color:#ff5500; color:#fff; }
   .ct-btn.primary:hover { background:#cc4400; }
 
+  /* Plan cards */
+  .plan-card { background:#0e1218; border:1px solid #1e2530; border-radius:10px; padding:20px; position:relative; }
+  .plan-card-accent { height:4px; border-radius:4px 4px 0 0; position:absolute; top:0; left:0; right:0; }
+  .plan-card-name { font-size:16px; font-weight:800; color:#e8e8e8; margin-top:10px; margin-bottom:4px; }
+  .plan-card-key { font-size:10px; text-transform:uppercase; letter-spacing:0.12em; color:#444; font-weight:600; margin-bottom:14px; }
+  .plan-card-field { margin-bottom:10px; }
+  .plan-card-label { font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:#555; font-weight:600; margin-bottom:4px; }
+  .plan-card-input { width:100%; background:#060a10; border:1px solid #1e2530; border-radius:6px; color:#e8e8e8; font-size:13px; font-weight:600; padding:8px 10px; outline:none; }
+  .plan-card-input:focus { border-color:#ff5500; }
+  .plan-card-desc { width:100%; background:#060a10; border:1px solid #1e2530; border-radius:6px; color:#aaa; font-size:12px; padding:8px 10px; outline:none; resize:none; height:56px; }
+  .plan-card-desc:focus { border-color:#ff5500; }
+  .plan-card-actions { display:flex; gap:8px; margin-top:14px; }
+  .plan-inactive { opacity:0.45; }
+
   .ct-overdue-alert { background:#1a0e00; border:1px solid #3a2a00; border-radius:8px; padding:12px 16px; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
   .ct-overdue-dot { width:8px; height:8px; background:#f5c842; border-radius:50%; flex-shrink:0; box-shadow:0 0 6px #f5c84280; }
   .ct-overdue-text { font-size:12px; color:#c9a030; }
@@ -802,6 +816,17 @@
     </div>
 
     <div class="ct-client-grid" id="ct-client-grid">
+      <div style="color:#333;font-size:13px;padding:24px;text-align:center;">Loading…</div>
+    </div>
+  </div>
+
+  <!-- Plan Packages -->
+  <div class="ct-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="ct-section-title" style="margin-bottom:0;">Plan Packages</div>
+      <button class="ct-btn" onclick="openAddPlanModal()">+ New Plan</button>
+    </div>
+    <div id="ct-plans-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;">
       <div style="color:#333;font-size:13px;padding:24px;text-align:center;">Loading…</div>
     </div>
   </div>
@@ -2058,6 +2083,7 @@ async function loadControlTower() {
       fetchJSON("/api/v1/clients/summary"),
       fetchJSON("/api/v1/clients/"),
     ]);
+    loadPlans();
 
     // Revenue KPIs
     document.getElementById("ct-mrr").textContent         = fmtNgn(summary.mrr_ngn || 0);
@@ -2143,6 +2169,144 @@ async function loadControlTower() {
   } catch(e) {
     console.error("Control Tower load failed:", e);
   }
+}
+
+// ── Plan management ───────────────────────────────────────────────────────────
+
+let _plansCache = [];
+
+async function loadPlans() {
+  try {
+    const plans = await fetchJSON("/api/v1/plans/");
+    _plansCache = plans;
+    renderPlanCards(plans);
+  } catch(e) {
+    document.getElementById("ct-plans-grid").innerHTML =
+      `<div style="color:#555;font-size:12px;padding:20px;">Failed to load plans</div>`;
+  }
+}
+
+function renderPlanCards(plans) {
+  const grid = document.getElementById("ct-plans-grid");
+  if (!plans.length) {
+    grid.innerHTML = `<div style="color:#333;font-size:13px;padding:24px;text-align:center;">No plans configured.</div>`;
+    return;
+  }
+  grid.innerHTML = plans.map(p => {
+    const limitDisplay = p.message_limit >= 9999 ? "Unlimited" : p.message_limit;
+    const color = p.color || "#888";
+    return `
+    <div class="plan-card${p.active ? "" : " plan-inactive"}" id="plan-card-${p.key}">
+      <div class="plan-card-accent" style="background:${color};"></div>
+      <div class="plan-card-name" id="plan-name-${p.key}">${p.name}</div>
+      <div class="plan-card-key">${p.key}</div>
+
+      <div class="plan-card-field">
+        <div class="plan-card-label">Display Name</div>
+        <input class="plan-card-input" id="plan-inp-name-${p.key}" value="${p.name}" placeholder="Plan name">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="plan-card-field">
+          <div class="plan-card-label">Msg Limit / Month</div>
+          <input class="plan-card-input" id="plan-inp-limit-${p.key}" type="number" value="${p.message_limit}" placeholder="500">
+        </div>
+        <div class="plan-card-field">
+          <div class="plan-card-label">Default Fee (₦)</div>
+          <input class="plan-card-input" id="plan-inp-fee-${p.key}" type="number" value="${p.default_fee_ngn}" placeholder="120000">
+        </div>
+      </div>
+      <div class="plan-card-field">
+        <div class="plan-card-label">Accent Colour</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="color" value="${color}" id="plan-inp-color-${p.key}"
+            style="width:36px;height:28px;border:none;background:none;cursor:pointer;padding:0;"
+            oninput="document.querySelector('#plan-card-${p.key} .plan-card-accent').style.background=this.value">
+          <input class="plan-card-input" id="plan-inp-colorhex-${p.key}" value="${color}" placeholder="#ff5500"
+            style="font-family:monospace;font-size:12px;"
+            oninput="document.getElementById('plan-inp-color-${p.key}').value=this.value;document.querySelector('#plan-card-${p.key} .plan-card-accent').style.background=this.value">
+        </div>
+      </div>
+      <div class="plan-card-field">
+        <div class="plan-card-label">Description</div>
+        <textarea class="plan-card-desc" id="plan-inp-desc-${p.key}" placeholder="Short description shown on invoices and portal">${p.description || ""}</textarea>
+      </div>
+      <div class="plan-card-actions">
+        <button class="ct-btn primary" style="flex:1;" onclick="savePlan('${p.key}')">Save</button>
+        <button class="ct-btn" onclick="togglePlanActive('${p.key}',${p.active})">${p.active ? "Deactivate" : "Activate"}</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function savePlan(key) {
+  const name        = document.getElementById(`plan-inp-name-${key}`).value.trim();
+  const limit       = parseInt(document.getElementById(`plan-inp-limit-${key}`).value) || 200;
+  const fee         = parseInt(document.getElementById(`plan-inp-fee-${key}`).value) || 0;
+  const desc        = document.getElementById(`plan-inp-desc-${key}`).value.trim();
+  const colorHex    = document.getElementById(`plan-inp-colorhex-${key}`).value.trim() ||
+                      document.getElementById(`plan-inp-color-${key}`).value;
+  if (!name) { alert("Plan name cannot be empty"); return; }
+  try {
+    await patchJSON(`/api/v1/plans/${key}`, {
+      name, message_limit: limit, default_fee_ngn: fee, description: desc, color: colorHex
+    });
+    document.getElementById(`plan-name-${key}`).textContent = name;
+    document.querySelector(`#plan-card-${key} .plan-card-accent`).style.background = colorHex;
+    showToast(`${name} plan saved`);
+  } catch(e) {
+    alert("Failed to save plan: " + e.message);
+  }
+}
+
+async function togglePlanActive(key, currentlyActive) {
+  try {
+    await patchJSON(`/api/v1/plans/${key}`, { active: !currentlyActive });
+    await loadPlans();
+  } catch(e) {
+    alert("Failed to update plan");
+  }
+}
+
+let _addPlanModal = null;
+
+function openAddPlanModal() {
+  const key = prompt("Plan key (unique slug, e.g. 'enterprise'):");
+  if (!key || !/^[a-z0-9_]+$/.test(key)) {
+    if (key !== null) alert("Key must be lowercase letters, numbers, or underscores only.");
+    return;
+  }
+  if (_plansCache.find(p => p.key === key)) {
+    alert(`A plan with key '${key}' already exists. Edit it in the cards above.`);
+    return;
+  }
+  const name = prompt("Display name (e.g. 'Enterprise'):", key.charAt(0).toUpperCase() + key.slice(1));
+  if (!name) return;
+  const limit = parseInt(prompt("Message limit per month (9999 for unlimited):", "1000")) || 1000;
+  const fee   = parseInt(prompt("Default monthly fee (₦):", "200000")) || 200000;
+  createPlan(key, { name, message_limit: limit, default_fee_ngn: fee, description: "", color: "#8844ff", active: true });
+}
+
+async function createPlan(key, payload) {
+  try {
+    await postJSON(`/api/v1/plans/?key=${encodeURIComponent(key)}`, payload);
+    showToast(`${payload.name} plan created`);
+    await loadPlans();
+  } catch(e) {
+    alert("Failed to create plan: " + e.message);
+  }
+}
+
+function showToast(msg) {
+  let t = document.getElementById("ct-toast");
+  if (!t) {
+    t = document.createElement("div");
+    t.id = "ct-toast";
+    t.style.cssText = "position:fixed;bottom:28px;right:28px;background:#ff5500;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity 0.2s;";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = "1";
+  setTimeout(() => { t.style.opacity = "0"; }, 2500);
 }
 
 async function runTowerSweep() {
