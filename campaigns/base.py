@@ -85,14 +85,17 @@ class BaseCampaign:
         errors = 0
 
         # Step 1: Discover — Google Maps + Apollo + Social (run in parallel, optionally across multiple cities)
-        maps_quota   = max(10, max_new_contacts // 3)
-        apollo_quota = max(10, max_new_contacts // 3)
-        social_quota = max_new_contacts - maps_quota - apollo_quota
+        # Fetch 2x max_new_contacts per source so filters have candidates to work with,
+        # but keep a sensible floor of 5 to avoid empty discovery on small runs.
+        fetch_quota  = max(5, max_new_contacts * 2)
+        maps_quota   = max(5, fetch_quota // 3)
+        apollo_quota = max(5, fetch_quota // 3)
+        social_quota = fetch_quota - maps_quota - apollo_quota
 
         # Multi-city: run Maps + Apollo per city in parallel, then flatten
         target_cities = cities if cities else ([client_city] if client_city else [None])
-        per_city_quota = max(5, maps_quota // len(target_cities))
-        per_city_apollo = max(5, apollo_quota // len(target_cities))
+        per_city_quota = max(3, maps_quota // len(target_cities))
+        per_city_apollo = max(3, apollo_quota // len(target_cities))
 
         city_tasks = []
         for city in target_cities:
@@ -164,6 +167,10 @@ class BaseCampaign:
         log.info("discovery_done", vertical=self.vertical, maps=len(maps_leads), apollo=len(apollo_leads), social=len(social_leads), total_deduped=len(businesses))
 
         for biz in businesses:
+            # Hard cap — stop once we've sent/queued/dry-run'd enough
+            if (sent + queued) >= max_new_contacts:
+                break
+
             # Step 2: Daily limit check
             if is_daily_limit_reached():
                 log.info("daily_limit_reached", sent=sent)
