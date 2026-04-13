@@ -6,6 +6,20 @@ import structlog
 import uvicorn
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, Request
+from tools.log_buffer import buffer_processor
+
+# Configure structlog to capture logs into the dashboard buffer
+structlog.configure(
+    processors=[
+        structlog.stdlib.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        buffer_processor,
+        structlog.dev.ConsoleRenderer(),
+    ],
+    wrapper_class=structlog.BoundLogger,
+    context_class=dict,
+    logger_factory=structlog.PrintLoggerFactory(),
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from posthog import Posthog
@@ -186,6 +200,20 @@ async def health():
     except Exception:
         db_ok = False
     return {"status": "ok" if db_ok else "degraded", "db": db_ok}
+
+
+@app.get("/api/v1/logs/recent", dependencies=[Depends(require_auth)])
+async def recent_logs(limit: int = 100):
+    """Return recent backend log entries for the dashboard live log panel."""
+    from tools.log_buffer import get_recent
+    return get_recent(limit=min(limit, 200))
+
+
+@app.delete("/api/v1/logs/clear", dependencies=[Depends(require_auth)])
+async def clear_logs():
+    from tools.log_buffer import clear
+    clear()
+    return {"cleared": True}
 
 
 @app.get("/api/v1/health", dependencies=[Depends(require_auth)])
