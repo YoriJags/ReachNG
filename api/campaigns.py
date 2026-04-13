@@ -33,8 +33,9 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
 
     campaign = CAMPAIGN_REGISTRY[body.vertical]()
 
-    # Run in background for large batches — but NOT for HITL (we need the queued count back)
-    if body.max_contacts > 10 and not body.dry_run and not body.hitl_mode:
+    # Only go background for very large batches (>30) on live non-HITL runs
+    # Smaller runs wait and return the full result including discovery breakdown
+    if body.max_contacts > 30 and not body.dry_run and not body.hitl_mode:
         background_tasks.add_task(
             campaign.run,
             max_new_contacts=body.max_contacts,
@@ -46,7 +47,12 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
             target_sectors=body.target_sectors or None,
             min_rating=body.min_rating,
         )
-        return {"status": "started", "vertical": body.vertical, "message": "Campaign running in background"}
+        return {
+            "status": "started",
+            "vertical": body.vertical,
+            "message": f"Large campaign ({body.max_contacts} contacts) running in background. Check Live Logs for progress.",
+            "discovery": {},
+        }
 
     result = await campaign.run(
         max_new_contacts=body.max_contacts,
