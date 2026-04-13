@@ -84,13 +84,15 @@ class BaseCampaign:
         skipped_no_channel = 0
         errors = 0
 
-        # Step 1: Discover — Google Maps + Apollo + Social (run in parallel, optionally across multiple cities)
+        # Step 1: Discover — Google Maps + Apollo + Social + Signal Intelligence (run in parallel)
         # Fetch 2x max_new_contacts per source so filters have candidates to work with,
         # but keep a sensible floor of 5 to avoid empty discovery on small runs.
-        fetch_quota  = max(5, max_new_contacts * 2)
-        maps_quota   = max(5, fetch_quota // 3)
-        apollo_quota = max(5, fetch_quota // 3)
-        social_quota = fetch_quota - maps_quota - apollo_quota
+        from tools.signal_intelligence import discover_signal_leads
+        fetch_quota   = max(5, max_new_contacts * 2)
+        maps_quota    = max(5, fetch_quota // 4)
+        apollo_quota  = max(5, fetch_quota // 4)
+        social_quota  = max(5, fetch_quota // 4)
+        signal_quota  = fetch_quota - maps_quota - apollo_quota - social_quota
 
         # Multi-city: run Maps + Apollo per city in parallel, then flatten
         target_cities = cities if cities else ([client_city] if client_city else [None])
@@ -108,11 +110,12 @@ class BaseCampaign:
                 vertical=self.vertical, max_results=per_city_apollo, city_override=city,
             ))
         city_tasks.append(discover_social_leads(vertical=self.vertical, max_results=social_quota))
+        city_tasks.append(discover_signal_leads(vertical=self.vertical, max_results=signal_quota))
 
         all_results = await asyncio.gather(*city_tasks, return_exceptions=True)
 
-        maps_leads, apollo_leads, social_leads = [], [], []
-        # Results interleaved: [maps_city1, apollo_city1, maps_city2, apollo_city2, ..., social]
+        maps_leads, apollo_leads, social_leads, signal_leads = [], [], [], []
+        # Results interleaved: [maps_city1, apollo_city1, maps_city2, apollo_city2, ..., social, signal]
         for i, city in enumerate(target_cities):
             r_maps   = all_results[i * 2]
             r_apollo = all_results[i * 2 + 1]
@@ -124,11 +127,16 @@ class BaseCampaign:
                 log.error("apollo_discovery_failed", city=city, error=str(r_apollo))
             else:
                 apollo_leads.extend(r_apollo)
-        r_social = all_results[-1]
+        r_social = all_results[-2]
+        r_signal = all_results[-1]
         if isinstance(r_social, Exception):
             log.error("social_discovery_failed", error=str(r_social))
         else:
             social_leads = r_social
+        if isinstance(r_signal, Exception):
+            log.error("signal_discovery_failed", error=str(r_signal))
+        else:
+            signal_leads = r_signal
 
         if cities:
             log.info("multi_city_discovery", cities=cities, maps=len(maps_leads), apollo=len(apollo_leads))
@@ -187,6 +195,7 @@ class BaseCampaign:
             return False
 
         # Sort: temperature DESC (hot first), then lead_score DESC within same temp
+        # Signal leads come first as they carry the strongest purchase intent
         from tools.scoring import score_contact
         def _sort_key(b: dict) -> tuple:
             temp = b.get("lead_temperature", 0)
@@ -199,14 +208,14 @@ class BaseCampaign:
             )
             return (temp, score)
 
-        all_leads = social_leads + apollo_leads + maps_leads
+        all_leads = signal_leads + social_leads + apollo_leads + maps_leads
         all_leads.sort(key=_sort_key, reverse=True)
         businesses = [b for b in all_leads if not _is_duplicate(b)]
 
         hot_count  = sum(1 for b in businesses if b.get("lead_temperature", 0) == 2)
         warm_count = sum(1 for b in businesses if b.get("lead_temperature", 0) == 1)
         log.info("discovery_done", vertical=self.vertical, maps=len(maps_leads),
-                 apollo=len(apollo_leads), social=len(social_leads),
+                 apollo=len(apollo_leads), social=len(social_leads), signal=len(signal_leads),
                  total_deduped=len(businesses), hot=hot_count, warm=warm_count)
 
         for biz in businesses:
@@ -214,9 +223,10 @@ class BaseCampaign:
             if (sent + queued) >= max_new_contacts:
                 break
 
-            # Step 2: Daily limit check
-            if is_daily_limit_reached():
-                log.info("daily_limit_reached", sent=sent)
+            # Step 2: Daily limit check (per-client override if set, else global)
+            client_limit = _client_doc.get("daily_send_limit") if _client_doc else None
+            if is_daily_limit_reached(client_limit=client_limit):
+                log.info("daily_limit_reached", sent=sent, limit=client_limit or "global")
                 break
 
             # Step 3: Skip if already contacted — scoped to client in agency mode
@@ -434,7 +444,7 @@ class BaseCampaign:
         errors = 0
 
         for contact in candidates:
-            if is_daily_limit_reached():
+            if is_daily_limit_reached(client_limit=None):
                 break
 
             attempt = contact.get("outreach_count", 1) + 1

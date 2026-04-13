@@ -175,17 +175,27 @@ async def contact_closed_won(contact_id: str, body: CloseDealBody):
 
 @router.get("/replies")
 async def list_replies(limit: int = 50, channel: str | None = None):
-    """Recent inbound replies — matched and unmatched."""
+    """Recent inbound replies — hot leads (interested) sorted to top, then by recency."""
+    from pymongo import DESCENDING
     query = {}
     if channel:
         query["channel"] = channel
 
+    # Sort: interested first (hot leads), then by recency
     replies = list(
         get_replies()
         .find(query)
-        .sort("received_at", -1)
+        .sort([
+            ("intent_interested", DESCENDING),  # virtual sort field — fallback to addFields
+            ("received_at", DESCENDING),
+        ])
         .limit(limit)
     )
+    if not replies:
+        return []
+
+    # If MongoDB sort on missing field returns nothing, fall back and re-sort in Python
+    replies.sort(key=lambda r: (0 if r.get("intent") == "interested" else 1, -(r.get("received_at") or datetime.min).timestamp() if hasattr(r.get("received_at"), "timestamp") else 0))
     return [_serialise(r) for r in replies]
 
 
@@ -213,7 +223,8 @@ async def discovery_health():
     maps_count   = source_counts.get("maps", 0)
     apollo_count = source_counts.get("apollo", 0)
     social_count = source_counts.get("social", 0)
-    unknown_count = sum(v for k, v in source_counts.items() if k not in ("maps", "apollo", "social"))
+    signal_count = source_counts.get("signal", 0)
+    unknown_count = sum(v for k, v in source_counts.items() if k not in ("maps", "apollo", "social", "signal"))
 
     # ── Google Maps API ping ───────────────────────────────────────────────────
     maps_status = "unknown"
@@ -286,14 +297,28 @@ async def discovery_health():
             social_status = "error"
             social_error  = str(e)
 
+    # Signal Intelligence status — check which tokens are configured
+    signal_status = "ok" if any([
+        settings.fb_ads_access_token,
+        settings.twitter_bearer_token,
+        settings.apify_api_token,
+        settings.apollo_api_key,
+    ]) else "missing"
+    signal_platforms = []
+    if settings.fb_ads_access_token:  signal_platforms.append("fb_ads")
+    if settings.twitter_bearer_token: signal_platforms.append("twitter")
+    if settings.apify_api_token:      signal_platforms.append("ig/tiktok")
+    if settings.apollo_api_key:       signal_platforms.append("linkedin")
+
     return {
         "sources": {
             "maps":   {"count": maps_count,   "status": maps_status,   "error": maps_error},
             "apollo": {"count": apollo_count, "status": apollo_status, "error": apollo_error},
             "social": {"count": social_count, "status": social_status, "error": social_error},
+            "signal": {"count": signal_count, "status": signal_status, "platforms": signal_platforms},
         },
         "unknown_source_count": unknown_count,
-        "total": maps_count + apollo_count + social_count + unknown_count,
+        "total": maps_count + apollo_count + social_count + signal_count + unknown_count,
     }
 
 

@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     apify_api_token: str | None = Field(default=None, env="APIFY_API_TOKEN")
     twitter_bearer_token: str | None = Field(default=None, env="TWITTER_BEARER_TOKEN")
 
+    # Facebook Ads Library — long-lived user access token from developers.facebook.com
+    # Without this, fb_ads discovery is silently skipped.
+    fb_ads_access_token: str | None = Field(default=None, env="FB_ADS_ACCESS_TOKEN")
+
     # Owner notifications
     owner_whatsapp: str | None = Field(default=None, env="OWNER_WHATSAPP")
     slack_webhook_url: str | None = Field(default=None, env="SLACK_WEBHOOK_URL")
