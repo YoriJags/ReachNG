@@ -62,6 +62,7 @@ def upsert_contact(
     category: Optional[str] = None,
     client_name: Optional[str] = None,
     source: Optional[str] = None,
+    platform: Optional[str] = None,
 ) -> str:
     """Insert or update a contact. Returns the contact _id as string."""
     contacts = get_contacts()
@@ -104,6 +105,8 @@ def upsert_contact(
         doc["client_name"] = client_name
     if source:
         doc["source"] = source
+    if platform:
+        doc["platform"] = platform
 
     try:
         result = contacts.update_one(
@@ -233,13 +236,29 @@ def get_followup_candidates(vertical: Optional[str] = None) -> list[dict]:
 
 
 def get_pipeline_stats(vertical: Optional[str] = None) -> dict:
-    """Summary counts per status for the dashboard."""
+    """Summary counts per status + source/platform breakdown for the dashboard."""
     match = {"vertical": vertical} if vertical else {}
-    pipeline = [
+    contacts = get_contacts()
+
+    status_rows = list(contacts.aggregate([
         {"$match": match},
         {"$group": {"_id": "$status", "count": {"$sum": 1}}},
-    ]
-    rows = list(get_contacts().aggregate(pipeline))
-    stats = {row["_id"]: row["count"] for row in rows}
+    ]))
+    stats = {row["_id"]: row["count"] for row in status_rows}
+
+    # Source breakdown: maps / apollo / social
+    source_rows = list(contacts.aggregate([
+        {"$match": match},
+        {"$group": {"_id": "$source", "count": {"$sum": 1}}},
+    ]))
+    stats["by_source"] = {(row["_id"] or "unknown"): row["count"] for row in source_rows}
+
+    # Platform breakdown for social leads: instagram / tiktok / twitter / facebook
+    platform_rows = list(contacts.aggregate([
+        {"$match": {**match, "source": "social"}},
+        {"$group": {"_id": "$platform", "count": {"$sum": 1}}},
+    ]))
+    stats["by_platform"] = {(row["_id"] or "unknown"): row["count"] for row in platform_rows}
+
     stats["daily_sent"] = get_daily_send_count()
     return stats
