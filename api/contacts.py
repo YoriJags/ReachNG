@@ -3,6 +3,7 @@ import io
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Query
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 from bson import ObjectId
 import httpx
 from database import get_contacts, get_replies
@@ -144,6 +145,30 @@ async def contact_opted_out(contact_id: str):
     _require_contact(contact_id)
     mark_opted_out(contact_id)
     return {"success": True, "status": Status.OPTED_OUT}
+
+
+class CloseDealBody(BaseModel):
+    deal_value_ngn: int = 0
+    notes: str = ""
+
+
+@router.patch("/{contact_id}/closed-won")
+async def contact_closed_won(contact_id: str, body: CloseDealBody):
+    """Mark a lead as closed/won by the client. Records deal value for ROI tracking."""
+    _validate_id(contact_id)
+    _require_contact(contact_id)
+    now = datetime.now(timezone.utc)
+    get_contacts().update_one(
+        {"_id": ObjectId(contact_id)},
+        {"$set": {
+            "closed_by_client": True,
+            "closed_at": now,
+            "deal_value_ngn": body.deal_value_ngn,
+            "closed_notes": body.notes,
+            "status": Status.CONVERTED,
+        }},
+    )
+    return {"success": True, "status": "closed_won", "deal_value_ngn": body.deal_value_ngn}
 
 
 @router.get("/replies")
