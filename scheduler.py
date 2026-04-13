@@ -27,7 +27,7 @@ async def _nightly_outreach():
             break
         try:
             campaign = CampaignClass()
-            result = await campaign.run(max_new_contacts=20, dry_run=False)
+            result = await campaign.run(max_new_contacts=20, dry_run=False, hitl_mode=True)
             log.info("nightly_vertical_done", vertical=vertical, result=result)
         except Exception as e:
             log.error("nightly_vertical_failed", vertical=vertical, error=str(e))
@@ -40,7 +40,7 @@ async def _followup_run():
     for vertical, CampaignClass in CAMPAIGN_REGISTRY.items():
         try:
             campaign = CampaignClass()
-            result = await campaign.run_followups(dry_run=False)
+            result = await campaign.run_followups(dry_run=False, hitl_mode=True)
             log.info("followup_vertical_done", vertical=vertical, result=result)
         except Exception as e:
             log.error("followup_vertical_failed", vertical=vertical, error=str(e))
