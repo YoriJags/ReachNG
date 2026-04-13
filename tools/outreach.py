@@ -359,6 +359,46 @@ async def send_linkedin_message(recipient_id: str, message: str) -> dict:
         return {"success": False, "error": str(e)}
 
 
+# ─── Facebook Messenger — Unipile ────────────────────────────────────────────
+
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=8))
+async def send_facebook_message(recipient_id: str, message: str) -> dict:
+    """
+    Send a Facebook Messenger message via Unipile.
+    recipient_id: Facebook user ID.
+    Requires: UNIPILE_DSN + UNIPILE_API_KEY + UNIPILE_FACEBOOK_ACCOUNT_ID.
+    """
+    settings = get_settings()
+    dsn     = settings.unipile_dsn
+    api_key = settings.unipile_api_key
+    fb_acct = getattr(settings, "unipile_facebook_account_id", None)
+
+    if not (dsn and api_key and fb_acct):
+        log.error("unipile_facebook_credentials_missing")
+        return {"success": False, "error": "Unipile Facebook not configured"}
+
+    payload = {
+        "account_id":    fb_acct,
+        "attendees_ids": [recipient_id],
+        "text":          message,
+    }
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            resp = await client.post(
+                f"https://{dsn}/api/v1/chats",
+                headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
+                json=payload,
+            )
+            resp.raise_for_status()
+            data   = resp.json()
+            msg_id = data.get("id", "fb-msg")
+            log.info("facebook_message_sent", recipient=recipient_id, message_id=msg_id)
+            return {"success": True, "message_id": msg_id, "provider": "unipile_facebook"}
+    except Exception as e:
+        log.error("facebook_message_failed", recipient=recipient_id, error=str(e))
+        return {"success": False, "error": str(e)}
+
+
 # ─── Legacy stubs — keep call sites working ──────────────────────────────────
 
 async def get_recent_replies(account_id: str, limit: int = 50) -> list[dict]:
