@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     unipile_dsn: str | None = Field(default=None, env="UNIPILE_DSN")
     unipile_whatsapp_account_id: str | None = Field(default=None, env="UNIPILE_WHATSAPP_ACCOUNT_ID")
     unipile_email_account_id: str | None = Field(default=None, env="UNIPILE_EMAIL_ACCOUNT_ID")
+    unipile_instagram_account_id: str | None = Field(default=None, env="UNIPILE_INSTAGRAM_ACCOUNT_ID")
+    unipile_linkedin_account_id: str | None = Field(default=None, env="UNIPILE_LINKEDIN_ACCOUNT_ID")
 
     # MongoDB
     mongodb_uri: str = Field(..., env="MONGODB_URI")
