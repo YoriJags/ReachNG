@@ -63,6 +63,8 @@ def upsert_contact(
     client_name: Optional[str] = None,
     source: Optional[str] = None,
     platform: Optional[str] = None,
+    lead_temperature: int = 0,   # 0=cold · 1=warm · 2=hot
+    temperature_reason: Optional[str] = None,
 ) -> str:
     """Insert or update a contact. Returns the contact _id as string."""
     contacts = get_contacts()
@@ -107,6 +109,10 @@ def upsert_contact(
         doc["source"] = source
     if platform:
         doc["platform"] = platform
+    if lead_temperature:
+        doc["lead_temperature"] = lead_temperature
+    if temperature_reason:
+        doc["temperature_reason"] = temperature_reason
 
     # Compound filter: scoped to client in agency mode, global otherwise.
     # This allows multiple clients to independently contact the same business
@@ -293,4 +299,63 @@ def get_pipeline_stats(vertical: Optional[str] = None, client_name: Optional[str
     stats["by_platform"] = {(row["_id"] or "unknown"): row["count"] for row in platform_rows}
 
     stats["daily_sent"] = get_daily_send_count()
+
+    # Temperature breakdown: cold / warm / hot
+    temp_rows = list(contacts.aggregate([
+        {"$match": match},
+        {"$group": {"_id": "$lead_temperature", "count": {"$sum": 1}}},
+    ]))
+    temp_map = {row["_id"]: row["count"] for row in temp_rows}
+    stats["hot_leads"]  = temp_map.get(2, 0)
+    stats["warm_leads"] = temp_map.get(1, 0)
+
     return stats
+
+
+# ─── Temperature helpers ──────────────────────────────────────────────────────
+
+# Trigger phrases that flag a lead as HOT — business is in active growth mode
+HOT_SIGNALS = [
+    "we are hiring", "we're hiring", "now hiring", "hiring now",
+    "just launched", "just opened", "grand opening", "new branch",
+    "expansion", "expanding", "new location", "second location",
+    "seeking investment", "fundraising", "just raised", "series a", "series b",
+    "new partnership", "announcing", "excited to share",
+    "looking for clients", "looking for customers", "seeking clients",
+]
+
+# Trigger phrases that flag a lead as WARM — some signal of activity
+WARM_SIGNALS = [
+    "new project", "new service", "new product", "we are growing",
+    "celebrating", "milestone", "anniversary", "award",
+    "recently opened", "now available", "coming soon",
+]
+
+
+def score_temperature(text: str) -> tuple[int, Optional[str]]:
+    """
+    Score raw text (social bio, post, description) for purchase/growth signals.
+    Returns (temperature: int, reason: str | None)
+    0=cold · 1=warm · 2=hot
+    """
+    if not text:
+        return 0, None
+    lower = text.lower()
+    for phrase in HOT_SIGNALS:
+        if phrase in lower:
+            return 2, phrase
+    for phrase in WARM_SIGNALS:
+        if phrase in lower:
+            return 1, phrase
+    return 0, None
+
+
+def set_lead_temperature(contact_id: str, temperature: int, reason: Optional[str] = None):
+    """Update the temperature on an existing contact."""
+    update: dict = {"lead_temperature": temperature}
+    if reason:
+        update["temperature_reason"] = reason
+    get_contacts().update_one(
+        {"_id": ObjectId(contact_id)},
+        {"$set": update},
+    )

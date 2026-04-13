@@ -186,22 +186,28 @@ class BaseCampaign:
                 seen_emails.add(email)
             return False
 
-        # Social leads first (warmest), then Apollo (B2B verified), then Maps
+        # Sort: temperature DESC (hot first), then lead_score DESC within same temp
         from tools.scoring import score_contact
-        def _score(b: dict) -> int:
-            return score_contact(
+        def _sort_key(b: dict) -> tuple:
+            temp = b.get("lead_temperature", 0)
+            score = score_contact(
                 vertical=self.vertical,
                 rating=b.get("rating"),
                 has_phone=bool(b.get("phone")),
                 has_website=bool(b.get("website")),
                 category=b.get("category"),
             )
-        social_sorted = sorted(social_leads, key=_score, reverse=True)
-        apollo_sorted = sorted(apollo_leads, key=_score, reverse=True)
-        maps_sorted   = sorted(maps_leads,   key=_score, reverse=True)
+            return (temp, score)
 
-        businesses = [b for b in social_sorted + apollo_sorted + maps_sorted if not _is_duplicate(b)]
-        log.info("discovery_done", vertical=self.vertical, maps=len(maps_leads), apollo=len(apollo_leads), social=len(social_leads), total_deduped=len(businesses))
+        all_leads = social_leads + apollo_leads + maps_leads
+        all_leads.sort(key=_sort_key, reverse=True)
+        businesses = [b for b in all_leads if not _is_duplicate(b)]
+
+        hot_count  = sum(1 for b in businesses if b.get("lead_temperature", 0) == 2)
+        warm_count = sum(1 for b in businesses if b.get("lead_temperature", 0) == 1)
+        log.info("discovery_done", vertical=self.vertical, maps=len(maps_leads),
+                 apollo=len(apollo_leads), social=len(social_leads),
+                 total_deduped=len(businesses), hot=hot_count, warm=warm_count)
 
         for biz in businesses:
             # Hard cap — stop once we've sent/queued/dry-run'd enough
@@ -301,6 +307,8 @@ class BaseCampaign:
                 client_name=client_name,
                 source=biz.get("source", "maps"),
                 platform=biz.get("platform"),
+                lead_temperature=biz.get("lead_temperature", 0),
+                temperature_reason=biz.get("temperature_reason"),
             )
 
             # Step 7a: HITL mode — queue for human approval instead of sending

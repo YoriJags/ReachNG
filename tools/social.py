@@ -541,6 +541,8 @@ async def discover_social_leads(
 
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
+    from tools.memory import score_temperature
+
     seen_ids = set()
     leads    = []
     for r in results:
@@ -551,7 +553,19 @@ async def discover_social_leads(
             pid = lead["place_id"]
             if pid not in seen_ids:
                 seen_ids.add(pid)
+                # Score temperature from bio + any post text attached to the lead
+                bio_text = lead.get("bio", "") or lead.get("description", "") or ""
+                post_text = lead.get("post_text", "") or ""
+                temp, reason = score_temperature(bio_text + " " + post_text)
+                # Social leads are at least warm by nature — they self-identified
+                if temp == 0:
+                    temp, reason = 1, "social_self_identified"
+                lead["lead_temperature"] = temp
+                lead["temperature_reason"] = reason
                 leads.append(lead)
 
-    log.info("social_discovery_total", vertical=vertical, total=len(leads))
+    hot_count  = sum(1 for l in leads if l.get("lead_temperature", 0) == 2)
+    warm_count = sum(1 for l in leads if l.get("lead_temperature", 0) == 1)
+    log.info("social_discovery_total", vertical=vertical, total=len(leads),
+             hot=hot_count, warm=warm_count)
     return leads[:max_results]

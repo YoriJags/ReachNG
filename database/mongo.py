@@ -66,6 +66,8 @@ def ensure_indexes():
     contacts.create_index([("vertical", ASCENDING)])
     contacts.create_index([("status", ASCENDING)])
     contacts.create_index([("next_followup_at", ASCENDING)])
+    contacts.create_index([("lead_temperature", ASCENDING)])
+    contacts.create_index([("client_name", ASCENDING)])
 
     log = get_outreach_log()
     log.create_index([("contact_id", ASCENDING)])

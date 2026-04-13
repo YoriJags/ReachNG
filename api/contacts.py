@@ -119,6 +119,8 @@ async def pipeline_summary():
         "converted":  all_raw.get("converted", 0),
         "opted_out":  all_raw.get("opted_out", 0),
         "daily_sent": all_raw.get("daily_sent", 0),
+        "hot_leads":  all_raw.get("hot_leads", 0),
+        "warm_leads": all_raw.get("warm_leads", 0),
     }
     return summary
 

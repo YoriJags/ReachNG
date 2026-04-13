@@ -797,6 +797,14 @@
         <div class="ct-kpi-val" id="ct-churned">—</div>
         <div class="ct-kpi-lbl">Churned</div>
       </div>
+      <div class="ct-kpi" style="border-color:#ff2200;">
+        <div class="ct-kpi-val" id="ct-hot-leads" style="color:#ff4422;">—</div>
+        <div class="ct-kpi-lbl">Hot Leads</div>
+      </div>
+      <div class="ct-kpi" style="border-color:#f5c842;">
+        <div class="ct-kpi-val" id="ct-warm-leads" style="color:#f5c842;">—</div>
+        <div class="ct-kpi-lbl">Warm Leads</div>
+      </div>
     </div>
   </div>
 
@@ -2091,6 +2099,14 @@ async function loadControlTower() {
     document.getElementById("ct-trial").textContent       = summary.total_trial || 0;
     document.getElementById("ct-overdue-count").textContent = summary.total_overdue || 0;
     document.getElementById("ct-churned").textContent     = summary.total_churned || 0;
+
+    // Hot / warm lead counts from aggregate pipeline
+    try {
+      const pipeline = await fetchJSON("/api/v1/contacts/pipeline");
+      const all = pipeline.all || {};
+      document.getElementById("ct-hot-leads").textContent  = all.hot_leads  || 0;
+      document.getElementById("ct-warm-leads").textContent = all.warm_leads || 0;
+    } catch(e) { /* non-critical */ }
 
     // Overdue alert
     const overdueAlert = document.getElementById("ct-overdue-alert");

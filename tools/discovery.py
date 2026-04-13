@@ -257,6 +257,12 @@ async def discover_businesses(
             if not phone and not details.get("website"):
                 continue
 
+            # Temperature signal: few total ratings → recently listed → warm lead
+            user_ratings = details.get("user_ratings_total") or place.get("user_ratings_total") or 0
+            temp, temp_reason = 0, None
+            if user_ratings < 10:
+                temp, temp_reason = 1, "recently_listed_on_maps"
+
             results.append({
                 "place_id": place_id,
                 "name": place.get("name", ""),
@@ -267,6 +273,8 @@ async def discover_businesses(
                 "address": details.get("formatted_address") or place.get("formatted_address"),
                 "rating": details.get("rating") or place.get("rating"),
                 "category": _extract_category(place),
+                "lead_temperature": temp,
+                "temperature_reason": temp_reason,
             })
 
     log.info("discovery_complete", vertical=vertical, count=len(results))
