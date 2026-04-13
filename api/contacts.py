@@ -1,6 +1,6 @@
 import csv
 import io
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -176,26 +176,25 @@ async def contact_closed_won(contact_id: str, body: CloseDealBody):
 @router.get("/replies")
 async def list_replies(limit: int = 50, channel: str | None = None):
     """Recent inbound replies — hot leads (interested) sorted to top, then by recency."""
-    from pymongo import DESCENDING
     query = {}
     if channel:
         query["channel"] = channel
 
-    # Sort: interested first (hot leads), then by recency
     replies = list(
         get_replies()
         .find(query)
-        .sort([
-            ("intent_interested", DESCENDING),  # virtual sort field — fallback to addFields
-            ("received_at", DESCENDING),
-        ])
+        .sort("received_at", -1)
         .limit(limit)
     )
     if not replies:
         return []
 
-    # If MongoDB sort on missing field returns nothing, fall back and re-sort in Python
-    replies.sort(key=lambda r: (0 if r.get("intent") == "interested" else 1, -(r.get("received_at") or datetime.min).timestamp() if hasattr(r.get("received_at"), "timestamp") else 0))
+    # Sort in Python: interested first, then by recency
+    epoch = datetime(1970, 1, 1, tzinfo=timezone.utc)
+    replies.sort(key=lambda r: (
+        0 if r.get("intent") == "interested" else 1,
+        -(r["received_at"].replace(tzinfo=timezone.utc) if r.get("received_at") and r["received_at"].tzinfo is None else r.get("received_at") or epoch).timestamp(),
+    ))
     return [_serialise(r) for r in replies]
 
 
