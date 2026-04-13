@@ -78,6 +78,42 @@ def _intent_emoji(intent: str) -> str:
     return {"interested": "🔥", "not_now": "⏳", "opted_out": "🚫", "referral": "🤝", "question": "❓"}.get(intent, "💬")
 
 
+def _generate_action_items(replies: dict, approvals: int, pipeline: dict) -> str:
+    """Ask Claude Haiku for 3 concrete actions based on today's data."""
+    try:
+        import anthropic
+        from config import get_settings
+        settings = get_settings()
+        client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+
+        interested = replies["by_intent"].get("interested", 0)
+        total_replies = replies["total"]
+        pipeline_summary = ", ".join(
+            f"{v}: {s['contacted']} sent / {s['replied']} replied"
+            for v, s in list(pipeline.items())[:3]
+        ) or "No activity yet"
+
+        prompt = (
+            f"You are the AI advisor for ReachNG, a Nigerian B2B outreach platform. "
+            f"Based on today's data, give exactly 3 short, specific action items the owner should do today.\n\n"
+            f"Data:\n"
+            f"- Overnight replies: {total_replies} total, {interested} marked Interested\n"
+            f"- Drafts awaiting approval: {approvals}\n"
+            f"- Pipeline: {pipeline_summary}\n\n"
+            f"Format: numbered list, one line each, under 12 words per item. Be direct and specific."
+        )
+
+        msg = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=120,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return msg.content[0].text.strip()
+    except Exception as e:
+        log.warning("brief_action_items_failed", error=str(e))
+        return ""
+
+
 def compile_morning_brief() -> str:
     """Build the full morning brief message string."""
     now_lagos = datetime.now(timezone.utc) + timedelta(hours=1)
@@ -126,6 +162,10 @@ def compile_morning_brief() -> str:
         if approvals else "✅ Approval queue is clear"
     )
 
+    # ── AI action items ──
+    action_items = _generate_action_items(replies, approvals, pipeline)
+    action_block = f"\n\n🎯 *TODAY'S 3 ACTIONS*\n{action_items}" if action_items else ""
+
     brief = f"""🌅 *ReachNG Morning Brief*
 {day_str}
 
@@ -139,7 +179,7 @@ def compile_morning_brief() -> str:
 • Sent: {roi.get('messages_sent', 0)} messages | AI cost: {_fmt_ngn(roi.get('api_cost_ngn', 0))}
 
 ⚡ *PIPELINE*
-{chr(10).join(pipeline_lines) if pipeline_lines else "  No contacts yet — run a campaign to get started"}
+{chr(10).join(pipeline_lines) if pipeline_lines else "  No contacts yet — run a campaign to get started"}{action_block}
 
 🔔 Next campaign run tonight at 10pm
 → Open dashboard to approve drafts"""

@@ -76,6 +76,7 @@ class ClientUpsert(BaseModel):
     email_account_id: Optional[str] = None
     meta_phone_number_id: Optional[str] = None
     meta_access_token: Optional[str] = None
+    daily_send_limit: Optional[int] = None   # Overrides global DAILY_SEND_LIMIT for this client
 
 
 class PaymentUpdate(BaseModel):
@@ -204,6 +205,8 @@ async def upsert_client(payload: ClientUpsert):
         set_doc["paid_until"] = payload.paid_until
     if payload.onboarded_at:
         set_doc["onboarded_at"] = payload.onboarded_at
+    if payload.daily_send_limit is not None:
+        set_doc["daily_send_limit"] = payload.daily_send_limit
 
     result = clients.update_one(
         {"name": {"$regex": f"^{re.escape(payload.name)}$", "$options": "i"}},

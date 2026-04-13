@@ -192,9 +192,11 @@ def get_daily_send_count() -> int:
     return get_outreach_log().count_documents({"sent_at": {"$gte": start_of_day}})
 
 
-def is_daily_limit_reached() -> bool:
+def is_daily_limit_reached(client_limit: int | None = None) -> bool:
+    """Check if daily send limit is reached. Uses per-client limit if provided, else global config."""
     settings = get_settings()
-    return get_daily_send_count() >= settings.daily_send_limit
+    limit = client_limit if client_limit is not None else settings.daily_send_limit
+    return get_daily_send_count() >= limit
 
 
 def record_outreach(
