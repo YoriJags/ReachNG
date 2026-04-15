@@ -102,13 +102,14 @@ def seed_plans_if_empty():
     col = get_plans_col()
     now = datetime.now(timezone.utc)
     for p in DEFAULT_PLANS:
-        insert_doc = {k: v for k, v in p.items()}
-        insert_doc["created_at"] = now
-        insert_doc["updated_at"] = now
+        # $setOnInsert: fields that only get written on first insert
+        # Excludes product + updated_at because $set also touches those (no path conflict)
+        insert_only = {k: v for k, v in p.items() if k not in ("product", "updated_at")}
+        insert_only["created_at"] = now
         col.update_one(
             {"key": p["key"]},
             {
-                "$setOnInsert": insert_doc,
+                "$setOnInsert": insert_only,
                 "$set": {"product": p["product"], "updated_at": now},
             },
             upsert=True,

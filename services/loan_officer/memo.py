@@ -53,6 +53,7 @@ def generate_memo(app: dict, score: dict, mfb_name: str = "MFB") -> str:
     decision  = score.get("decision", "Decline")
     band_fg, band_bg   = _BAND_COLORS.get(band, ("#374151", "#f3f4f6"))
     dec_color = _DECISION_COLORS.get(decision, "#374151")
+    band_label = {"A": "Excellent", "B": "Good", "C": "Elevated", "D": "High Risk"}.get(band, "")
 
     computed  = score.get("computed", {})
     factors   = score.get("factors", {})
@@ -138,9 +139,7 @@ def generate_memo(app: dict, score: dict, mfb_name: str = "MFB") -> str:
       <div style="flex:1;min-width:140px;background:{band_bg};border:1px solid {band_fg}33;border-radius:8px;padding:16px 20px;text-align:center;">
         <div style="font-size:11px;color:{band_fg};text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Risk Band</div>
         <div style="font-size:48px;font-weight:800;color:{band_fg};line-height:1.1;">{band}</div>
-        <div style="font-size:12px;color:{band_fg};opacity:.8;">
-          {{"A":"Excellent","B":"Good","C":"Elevated","D":"High Risk"}}.get("{band}","")
-        </div>
+        <div style="font-size:12px;color:{band_fg};opacity:.8;">{band_label}</div>
       </div>
       <div style="flex:2;min-width:200px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;">
         <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Decision</div>
