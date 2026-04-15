@@ -59,6 +59,24 @@ def generate_outreach_message(
 
     enrichment_block = f"\n{enrichment_context}" if enrichment_context else ""
 
+    channel_guide = (
+        "WHATSAPP RULES:\n"
+        "- Casual, warm, direct. Voice-message energy — like a founder texting a peer.\n"
+        "- Max 4 short sentences. No bullet points, no headers, no formal sign-off.\n"
+        "- Start with the business name or a quick observation. Skip pleasantries.\n"
+        "- End with a single low-pressure question or a soft CTA.\n"
+        "- Return plain text only. No subject line."
+        if channel == "whatsapp" else
+        "EMAIL RULES:\n"
+        "- Professional but warm. Think well-written cold email, not a newsletter.\n"
+        "- Subject line: punchy, specific, < 50 chars — NO clickbait.\n"
+        "- Opening line: a genuine, specific observation about their business (1 sentence).\n"
+        "- Body: 2-3 sentences max explaining the value. No bullet lists.\n"
+        "- Closing: one clear CTA — a question or a link to book a call.\n"
+        "- Sign off with 'Best,' and leave a placeholder name.\n"
+        "- Return JSON with keys 'subject' and 'message' (message = full email body, plain text)."
+    )
+
     user_prompt = f"""
 Write a {channel} outreach message for the following business.
 
@@ -67,13 +85,10 @@ Location: {location_hint or address or "Lagos"}
 Category: {category or "Not specified"}
 Google rating: {rating or "Unknown"}
 Website: {website or "None found"}
-Channel: {channel}
 {enrichment_block}
 {followup_note}
 
-Return ONLY:
-- For WhatsApp: the message text (max 4 sentences, no subject line)
-- For Email: JSON with keys "subject" and "message" (max 6 sentence body)
+{channel_guide}
 
 If website intelligence is provided above, reference at least one specific detail in the message.
 No explanations. No preamble. Just the message.
