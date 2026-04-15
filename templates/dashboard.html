@@ -221,6 +221,17 @@
   .approval-meta { font-size: 11px; color: #4a6070; margin-bottom: 8px; }
   .approval-message { font-size: 13px; color: #c8d8e8; line-height: 1.6; background: #060a0e; border: 1px solid #1a2530; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; white-space: pre-wrap; }
   .approval-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .action-btn {
+    font-size: 12px; font-weight: 600; padding: 6px 16px;
+    border-radius: 6px; border: none; cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    letter-spacing: 0.3px;
+  }
+  .action-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .action-btn:active { transform: translateY(0); }
+  .action-btn.approve { background: #00c47a; color: #000; }
+  .action-btn.edit    { background: #1e3a5a; color: #7ab8f5; border: 1px solid #2a5070; }
+  .action-btn.skip    { background: #1a1a1a; color: #555; border: 1px solid #2a2a2a; }
   .sort-btn { font-size: 11px; padding: 4px 10px; border-radius: 6px; border: 1px solid #2a3340; background: #0e1218; color: #555; cursor: pointer; font-family: inherit; transition: all .15s; }
   .sort-btn:hover { color: #aaa; border-color: #3a4450; }
   .sort-btn.sort-active { background: #1a2535; color: #ff5c00; border-color: #ff5c0060; font-weight: 600; }
