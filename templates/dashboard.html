@@ -1108,6 +1108,11 @@
         <option value="national">National — ₦200k/mo · Multi-state · All verticals</option>
         <option value="international">International — Custom · Cross-border campaigns</option>
       </select>
+      <select id="ob-product" style="flex:1;" title="Which ReachNG product is this client using?">
+        <option value="reachng">ReachNG — Outreach</option>
+        <option value="digital_associates">Digital Associates — Contract Review</option>
+        <option value="loan_officer">AI Loan Officer — Credit Scoring</option>
+      </select>
       <input id="ob-city" placeholder="City (default: Lagos)" style="flex:1;" />
       <input id="ob-cities" placeholder="Multi-city: Lagos, Abuja, PH (optional)" style="flex:1;" title="Comma-separated cities for national-tier clients" />
     </div>
@@ -2091,12 +2096,17 @@ async function refreshRoster() {
       const waProvider = (c.whatsapp_provider || "unipile") === "meta"
         ? '<span style="background:#1877f2;color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;">Meta</span>'
         : '<span style="background:#25d366;color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;">Unipile</span>';
+      // Product badge
+      const productColors = {reachng:"#ff5c00",digital_associates:"#6366f1",loan_officer:"#00c47a"};
+      const productLabels = {reachng:"ReachNG",digital_associates:"Digital Associates",loan_officer:"Loan Officer"};
+      const prod = c.product || "reachng";
+      const productBadge = `<span style="background:${productColors[prod]||"#555"}22;color:${productColors[prod]||"#aaa"};border:1px solid ${productColors[prod]||"#555"}44;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;">${productLabels[prod]||prod}</span>`;
       // Active status badge
       const statusBadge = c.active !== false
         ? '<span style="background:#e8f5e9;color:#2e7d32;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;">Active</span>'
         : '<span style="background:#fce4ec;color:#c62828;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;">Inactive</span>';
       return `<tr>
-        <td style="font-weight:600;">${c.name}</td>
+        <td style="font-weight:600;">${c.name}<br>${productBadge}</td>
         <td style="color:#555;font-size:12px;">${(c.vertical||"").replace(/_/g," ").replace(/\b\w/g,x=>x.toUpperCase())}</td>
         <td style="color:#555;font-size:12px;">${territory}</td>
         <td><span class="plan-badge ${planClass}">${planLabel}</span></td>
@@ -2447,10 +2457,14 @@ async function loadControlTower() {
         const payClass = { trial:"pay-trial", active:"pay-active", overdue:"pay-overdue", churned:"pay-churned" }[payStatus] || "pay-trial";
         const planLabel = { starter:"Starter", growth:"Growth", agency:"Agency" }[plan] || plan;
 
+        const ctProdColors = {reachng:"#ff5c00",digital_associates:"#6366f1",loan_officer:"#00c47a"};
+        const ctProdLabels = {reachng:"ReachNG",digital_associates:"Digital Assoc.",loan_officer:"Loan Officer"};
+        const ctProd = c.product || "reachng";
+        const ctProdBadge = `<span style="font-size:10px;color:${ctProdColors[ctProd]||"#aaa"};font-weight:600;">${ctProdLabels[ctProd]||ctProd}</span>`;
         return `<div class="ct-client-row">
           <div>
             <div class="ct-client-name">${c.name}</div>
-            <div class="ct-client-vertical">${(c.vertical||"").replace(/_/g," ").replace(/\b\w/g,x=>x.toUpperCase())} · ${c.city||c.cities?.[0]||"Lagos"}</div>
+            <div class="ct-client-vertical">${ctProdBadge} · ${(c.vertical||"").replace(/_/g," ").replace(/\b\w/g,x=>x.toUpperCase())} · ${c.city||c.cities?.[0]||"Lagos"}</div>
           </div>
           <div><span class="plan-badge plan-${plan}">${planLabel}</span></div>
           <div><span class="pay-badge ${payClass}">${payStatus}</span></div>
@@ -3100,6 +3114,7 @@ async function createClient() {
   const vertical   = document.getElementById("ob-vertical").value;
   const channel    = document.getElementById("ob-channel").value;
   const plan       = document.getElementById("ob-plan").value;
+  const product    = document.getElementById("ob-product").value;
   const city       = document.getElementById("ob-city").value.trim();
   const citiesRaw  = document.getElementById("ob-cities").value.trim();
   const cities     = citiesRaw ? citiesRaw.split(",").map(c => c.trim()).filter(Boolean) : [];
@@ -3119,7 +3134,7 @@ async function createClient() {
   try {
     const data = await postJSON("/api/v1/clients/", {
       name, vertical, brief, preferred_channel: channel, active: true,
-      plan: plan || null, city: city || null, cities,
+      plan: plan || null, product: product || "reachng", city: city || null, cities,
       whatsapp_provider: provider,
       whatsapp_account_id: waAcct || null,
       email_account_id: emailAcct || null,

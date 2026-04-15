@@ -89,7 +89,7 @@ def get_pending(vertical: str | None = None, limit: int = 50) -> list[dict]:
     return list(
         get_approvals()
         .find(query)
-        .sort("created_at", 1)  # oldest first
+        .sort("created_at", -1)  # newest first
         .limit(limit)
     )
 
