@@ -581,6 +581,9 @@
   <button class="product-pill" data-product="digital_associates" onclick="switchProduct('digital_associates', this)">
     <span class="product-pill-dot" style="background:#a78bfa;"></span> Digital Associates
   </button>
+  <button class="product-pill" data-product="loan_officer" onclick="switchProduct('loan_officer', this)">
+    <span class="product-pill-dot" style="background:#16a34a;"></span> Loan Officer
+  </button>
 </div>
 
 <!-- ── Outreach Tab Nav ── -->
@@ -600,6 +603,12 @@
   <button class="tab-btn active" onclick="switchTab('da_overview', this)">Overview</button>
   <button class="tab-btn" onclick="switchTab('da_reviews', this)">Reviews</button>
   <button class="tab-btn" onclick="switchTab('da_upload', this)">Upload Contract</button>
+</nav>
+
+<!-- ── AI Loan Officer Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="loan_officer" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('lo_queue', this)">Application Queue</button>
+  <button class="tab-btn" onclick="switchTab('lo_stats', this)">Stats</button>
 </nav>
 
 <!-- ── School Fees Tab Nav ── -->
@@ -786,7 +795,7 @@
     <div class="ct-kpi-row">
       <div class="ct-kpi green">
         <div class="ct-kpi-val" id="ct-mrr">—</div>
-        <div class="ct-kpi-lbl">Monthly Revenue (MRR)</div>
+        <div class="ct-kpi-lbl">Total MRR</div>
       </div>
       <div class="ct-kpi orange">
         <div class="ct-kpi-val" id="ct-active">—</div>
@@ -811,6 +820,28 @@
       <div class="ct-kpi" style="border-color:#f5c842;">
         <div class="ct-kpi-val" id="ct-warm-leads" style="color:#f5c842;">—</div>
         <div class="ct-kpi-lbl">Warm Leads</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MRR by Product Line -->
+  <div class="ct-section">
+    <div class="ct-section-title">MRR by Product Line</div>
+    <div class="ct-kpi-row">
+      <div class="ct-kpi" style="border-color:#f5c842;">
+        <div class="ct-kpi-val" id="ct-mrr-reachng" style="color:#f5c842;">—</div>
+        <div class="ct-kpi-lbl">ReachNG Outreach</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px;" id="ct-mrr-reachng-count"></div>
+      </div>
+      <div class="ct-kpi" style="border-color:#6366f1;">
+        <div class="ct-kpi-val" id="ct-mrr-legal" style="color:#6366f1;">—</div>
+        <div class="ct-kpi-lbl">Digital Associates</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px;" id="ct-mrr-legal-count"></div>
+      </div>
+      <div class="ct-kpi" style="border-color:#16a34a;">
+        <div class="ct-kpi-val" id="ct-mrr-loan" style="color:#16a34a;">—</div>
+        <div class="ct-kpi-lbl">AI Loan Officer</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px;" id="ct-mrr-loan-count"></div>
       </div>
     </div>
   </div>
@@ -1657,6 +1688,100 @@
   </div>
 </div>
 
+<!-- ── AI Loan Officer: Application Queue ─────────────────────────────────── -->
+<div class="tab-panel" id="tab-lo_queue" style="display:none;">
+  <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
+    <select id="lo-filter-decision"
+      style="background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:9px 14px;color:#e8e8e8;font-size:13px;font-family:inherit;outline:none;"
+      onchange="loLoadQueue()">
+      <option value="">All Decisions</option>
+      <option value="Approve">Approve</option>
+      <option value="Refer">Refer</option>
+      <option value="Decline">Decline</option>
+    </select>
+    <select id="lo-filter-status"
+      style="background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:9px 14px;color:#e8e8e8;font-size:13px;font-family:inherit;outline:none;"
+      onchange="loLoadQueue()">
+      <option value="">All Statuses</option>
+      <option value="approved">Approved</option>
+      <option value="pending_review">Pending Review</option>
+      <option value="declined">Declined</option>
+      <option value="disbursed">Disbursed</option>
+    </select>
+    <button class="btn btn-approve" style="background:#16a34a;border-color:#16a34a;" onclick="window.open('/loan/portal','_blank')">+ New Application</button>
+    <a href="/loan/portal" target="_blank" class="btn btn-approve" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;text-decoration:none;display:inline-flex;align-items:center;">↗ Applicant Portal</a>
+  </div>
+
+  <!-- Stats strip -->
+  <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;" id="lo-stats-strip">
+    <div style="flex:1;min-width:100px;background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:12px 16px;text-align:center;">
+      <div id="lo-count-total" style="font-size:22px;font-weight:700;color:#e8e8e8;">—</div>
+      <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Total</div>
+    </div>
+    <div style="flex:1;min-width:100px;background:#0e1218;border:1px solid #16a34a33;border-radius:8px;padding:12px 16px;text-align:center;">
+      <div id="lo-count-approve" style="font-size:22px;font-weight:700;color:#16a34a;">—</div>
+      <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Approve</div>
+    </div>
+    <div style="flex:1;min-width:100px;background:#0e1218;border:1px solid #d9770633;border-radius:8px;padding:12px 16px;text-align:center;">
+      <div id="lo-count-refer" style="font-size:22px;font-weight:700;color:#d97706;">—</div>
+      <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Refer</div>
+    </div>
+    <div style="flex:1;min-width:100px;background:#0e1218;border:1px solid #dc262633;border-radius:8px;padding:12px 16px;text-align:center;">
+      <div id="lo-count-decline" style="font-size:22px;font-weight:700;color:#dc2626;">—</div>
+      <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Decline</div>
+    </div>
+    <div style="flex:1;min-width:100px;background:#0e1218;border:1px solid #2563eb33;border-radius:8px;padding:12px 16px;text-align:center;">
+      <div id="lo-count-pending" style="font-size:22px;font-weight:700;color:#2563eb;">—</div>
+      <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Pending Review</div>
+    </div>
+  </div>
+
+  <table class="table" id="lo-queue-table">
+    <thead>
+      <tr>
+        <th>Applicant</th><th>Amount</th><th>Band</th><th>Decision</th><th>DTI</th><th>Status</th><th>Date</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="lo-queue-body">
+      <tr><td colspan="8" style="text-align:center;color:#333;padding:24px;">Loading…</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Override modal -->
+  <div id="lo-override-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#0e1218;border:1px solid #1e2530;border-radius:12px;padding:28px;width:420px;max-width:90vw;">
+      <div style="font-size:15px;font-weight:600;color:#e8e8e8;margin-bottom:16px;">Officer Override</div>
+      <input type="hidden" id="lo-override-id">
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">New Decision</label>
+        <select id="lo-override-decision" style="width:100%;background:#080c10;border:1px solid #1e2530;border-radius:8px;padding:10px 14px;color:#e8e8e8;font-size:14px;font-family:inherit;outline:none;">
+          <option value="Approve">Approve</option>
+          <option value="Refer">Refer</option>
+          <option value="Decline">Decline</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">Officer Name</label>
+        <input id="lo-override-officer" placeholder="Your name" style="width:100%;background:#080c10;border:1px solid #1e2530;border-radius:8px;padding:10px 14px;color:#e8e8e8;font-size:14px;font-family:inherit;outline:none;">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">Reason for Override</label>
+        <textarea id="lo-override-reason" rows="3" style="width:100%;background:#080c10;border:1px solid #1e2530;border-radius:8px;padding:10px 14px;color:#e8e8e8;font-size:14px;font-family:inherit;outline:none;resize:vertical;"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="loSubmitOverride()" style="flex:1;background:#16a34a;color:white;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Confirm Override</button>
+        <button onclick="document.getElementById('lo-override-modal').style.display='none'" style="flex:1;background:#1a1a1a;color:#888;border:1px solid #2a2a2a;border-radius:8px;padding:11px;font-size:14px;cursor:pointer;font-family:inherit;">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── AI Loan Officer: Stats ──────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-lo_stats" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Loan Officer Stats</p>
+  <div id="lo-stats-body" style="color:#5080a0;font-size:13px;">Loading…</div>
+</div>
+
 <!-- ── Setup Wizard Modal ── -->
 <div class="wizard-overlay" id="wizard-overlay">
   <div class="wizard-box">
@@ -1841,6 +1966,9 @@ function switchProduct(product, pill) {
   if (product === "digital_associates") {
     daLoadOverview();
   }
+  if (product === "loan_officer") {
+    loLoadQueue();
+  }
 }
 
 function switchTab(name, btn) {
@@ -1864,6 +1992,7 @@ function switchTab(name, btn) {
   if (name === "sf_claims")   sfLoadClaims();
   if (name === "da_overview") daLoadOverview();
   if (name === "da_reviews")  daLoadReviews();
+  if (name === "lo_queue")    loLoadQueue();
 }
 
 function sfSwitchTab(name) {
@@ -2253,6 +2382,20 @@ async function loadControlTower() {
     ]);
     loadPlans();
 
+    // Product MRR (non-blocking)
+    fetchJSON("/api/v1/plans/product-mrr").then(mrr => {
+      const fmtKpi = (v) => v ? fmtNgn(v) : "₦0";
+      const r = mrr.reachng             || {};
+      const l = mrr.digital_associates  || {};
+      const lo = mrr.loan_officer       || {};
+      document.getElementById("ct-mrr-reachng").textContent = fmtKpi(r.mrr_ngn);
+      document.getElementById("ct-mrr-reachng-count").textContent = r.clients ? `${r.clients} client${r.clients>1?"s":""}` : "";
+      document.getElementById("ct-mrr-legal").textContent = fmtKpi(l.mrr_ngn);
+      document.getElementById("ct-mrr-legal-count").textContent = l.clients ? `${l.clients} client${l.clients>1?"s":""}` : "";
+      document.getElementById("ct-mrr-loan").textContent = fmtKpi(lo.mrr_ngn);
+      document.getElementById("ct-mrr-loan-count").textContent = lo.clients ? `${lo.clients} client${lo.clients>1?"s":""}` : "";
+    }).catch(()=>{});
+
     // Revenue KPIs
     document.getElementById("ct-mrr").textContent         = fmtNgn(summary.mrr_ngn || 0);
     document.getElementById("ct-active").textContent      = summary.total_active || 0;
@@ -2368,15 +2511,28 @@ function renderPlanCards(plans) {
     grid.innerHTML = `<div style="color:#333;font-size:13px;padding:24px;text-align:center;">No plans configured.</div>`;
     return;
   }
-  grid.innerHTML = plans.map(p => {
-    const limitDisplay = p.message_limit >= 9999 ? "Unlimited" : p.message_limit;
+
+  const PRODUCT_LABELS = {
+    reachng:             { label: "ReachNG — Outreach", color: "#f5c842" },
+    digital_associates:  { label: "Digital Associates — Contract Review", color: "#6366f1" },
+    loan_officer:        { label: "AI Loan Officer — Credit Scoring", color: "#16a34a" },
+  };
+
+  // Group by product
+  const groups = {};
+  for (const p of plans) {
+    const prod = p.product || "reachng";
+    if (!groups[prod]) groups[prod] = [];
+    groups[prod].push(p);
+  }
+
+  const buildCard = (p) => {
     const color = p.color || "#888";
     return `
     <div class="plan-card${p.active ? "" : " plan-inactive"}" id="plan-card-${p.key}">
       <div class="plan-card-accent" style="background:${color};"></div>
       <div class="plan-card-name" id="plan-name-${p.key}">${p.name}</div>
       <div class="plan-card-key">${p.key}</div>
-
       <div class="plan-card-field">
         <div class="plan-card-label">Display Name</div>
         <input class="plan-card-input" id="plan-inp-name-${p.key}" value="${p.name}" placeholder="Plan name">
@@ -2411,7 +2567,20 @@ function renderPlanCards(plans) {
         <button class="ct-btn" onclick="togglePlanActive('${p.key}',${p.active})">${p.active ? "Deactivate" : "Activate"}</button>
       </div>
     </div>`;
-  }).join("");
+  };
+
+  // Render with product headers
+  let html = "";
+  const productOrder = ["reachng", "digital_associates", "loan_officer", ...Object.keys(groups).filter(k => !["reachng","digital_associates","loan_officer"].includes(k))];
+  for (const prod of productOrder) {
+    if (!groups[prod]) continue;
+    const meta = PRODUCT_LABELS[prod] || { label: prod, color: "#888" };
+    html += `<div style="grid-column:1/-1;margin-top:8px;margin-bottom:4px;">
+      <span style="font-size:11px;font-weight:700;color:${meta.color};text-transform:uppercase;letter-spacing:.08em;">${meta.label}</span>
+    </div>`;
+    html += groups[prod].map(buildCard).join("");
+  }
+  grid.innerHTML = html;
 }
 
 async function savePlan(key) {
@@ -3872,6 +4041,91 @@ function daResetUpload() {
   document.getElementById("da-upload-firm").value = "";
   document.getElementById("da-upload-error").style.display = "none";
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ── AI Loan Officer JS ────────────────────────────────────────────────────────
+
+async function loLoadQueue() {
+  const decision = document.getElementById("lo-filter-decision").value;
+  const status   = document.getElementById("lo-filter-status").value;
+  let url = "/loan/applications?limit=100";
+  if (decision) url += `&decision=${encodeURIComponent(decision)}`;
+  if (status)   url += `&status=${encodeURIComponent(status)}`;
+
+  try {
+    const [data, stats] = await Promise.all([
+      fetchJSON(url),
+      fetchJSON("/loan/stats"),
+    ]);
+
+    // Stats strip
+    document.getElementById("lo-count-total").textContent   = stats.total   || 0;
+    document.getElementById("lo-count-approve").textContent = stats.approve  || 0;
+    document.getElementById("lo-count-refer").textContent   = stats.refer    || 0;
+    document.getElementById("lo-count-decline").textContent = stats.decline  || 0;
+    document.getElementById("lo-count-pending").textContent = stats.pending_review || 0;
+
+    const apps = data.applications || [];
+    const tbody = document.getElementById("lo-queue-body");
+    if (!apps.length) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#333;padding:24px;">No applications yet. <a href="/loan/portal" target="_blank" style="color:#16a34a;">Open applicant portal →</a></td></tr>`;
+      return;
+    }
+
+    const BAND_COLORS = {A:"#16a34a",B:"#2563eb",C:"#d97706",D:"#dc2626"};
+    const DEC_COLORS  = {Approve:"#16a34a",Refer:"#d97706",Decline:"#dc2626"};
+    const STATUS_LABELS = {approved:"Approved",pending_review:"Pending Review",declined:"Declined",disbursed:"Disbursed"};
+
+    tbody.innerHTML = apps.map(a => {
+      const app = a.application || {};
+      const band = a.risk_band || "—";
+      const dec  = a.officer_override || a.decision || "—";
+      const dti  = (a.computed || {}).dti_pct;
+      const date = a.created_at ? new Date(a.created_at).toLocaleDateString("en-GB",{day:"2-digit",month:"short"}) : "—";
+      const overrideNote = a.officer_override ? ` <span style="font-size:10px;color:#d97706;">(overridden)</span>` : "";
+      return `<tr>
+        <td>${app.applicant_name || "—"}<br><span style="font-size:11px;color:#5080a0;">${app.occupation||""}</span></td>
+        <td>₦${(app.loan_amount_ngn||0).toLocaleString()}</td>
+        <td><span style="font-size:18px;font-weight:800;color:${BAND_COLORS[band]||"#888"}">${band}</span></td>
+        <td style="color:${DEC_COLORS[dec]||"#888"};font-weight:600;">${dec}${overrideNote}</td>
+        <td>${dti != null ? dti+"%" : "—"}</td>
+        <td><span style="font-size:11px;color:#94a3b8;">${STATUS_LABELS[a.status]||a.status||"—"}</span></td>
+        <td style="font-size:11px;color:#5080a0;">${date}</td>
+        <td>
+          <button onclick="loViewMemo('${a._id}')" style="background:#1a1a2a;color:#a0b0e0;border:1px solid #2a2a4a;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;margin-right:4px;">Memo</button>
+          <button onclick="loOpenOverride('${a._id}')" style="background:#1a0808;color:#d97706;border:1px solid #3a1010;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;">Override</button>
+        </td>
+      </tr>`;
+    }).join("");
+  } catch(e) {
+    document.getElementById("lo-queue-body").innerHTML = `<tr><td colspan="8" style="color:#dc2626;padding:16px;">${e.message}</td></tr>`;
+  }
+}
+
+function loViewMemo(id) {
+  window.open(`/loan/applications/${id}/memo`, "_blank");
+}
+
+function loOpenOverride(id) {
+  document.getElementById("lo-override-id").value = id;
+  document.getElementById("lo-override-reason").value = "";
+  document.getElementById("lo-override-modal").style.display = "flex";
+}
+
+async function loSubmitOverride() {
+  const id       = document.getElementById("lo-override-id").value;
+  const decision = document.getElementById("lo-override-decision").value;
+  const officer  = document.getElementById("lo-override-officer").value.trim();
+  const reason   = document.getElementById("lo-override-reason").value.trim();
+  if (!officer || !reason) { alert("Please enter your name and a reason."); return; }
+  try {
+    await postJSON(`/loan/applications/${id}/override`, { decision, reason, officer_name: officer });
+    document.getElementById("lo-override-modal").style.display = "none";
+    showToast("Override saved");
+    loLoadQueue();
+  } catch(e) {
+    alert("Override failed: " + e.message);
+  }
 }
 </script>
 </body>

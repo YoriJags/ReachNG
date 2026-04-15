@@ -26,7 +26,7 @@ from posthog import Posthog
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
-from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router, legal_review_router
+from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router, legal_review_router, loan_officer_router
 from api.plans import seed_plans_if_empty
 from auth import require_auth
 from mcp_server import mcp
@@ -109,6 +109,8 @@ async def lifespan(app: FastAPI):
     ensure_school_fees_indexes()
     from services.legal_review.store import ensure_legal_indexes
     ensure_legal_indexes()
+    from services.loan_officer.store import ensure_indexes as ensure_loan_indexes
+    ensure_loan_indexes()
     scheduler = setup_scheduler()
     scheduler.start()
     log.info("scheduler_started", jobs=[job.id for job in scheduler.get_jobs()])
@@ -180,6 +182,7 @@ app.include_router(plans_router,          prefix="/api/v1", **_auth)
 app.include_router(webhooks_router,       prefix="/api/v1")  # No Basic Auth — Unipile posts freely
 app.include_router(portal_router)        # Portal uses token auth — no Basic Auth
 app.include_router(legal_review_router)  # /legal/... — public demo (no Basic Auth)
+app.include_router(loan_officer_router)  # /loan/portal public; /loan/apply + management require Basic Auth
 app.include_router(dashboard_router, **_auth)
 
 # Mount MCP server — exposes tools to Claude

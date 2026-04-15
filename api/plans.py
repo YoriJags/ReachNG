@@ -13,9 +13,11 @@ router = APIRouter(prefix="/plans", tags=["Plans"])
 
 # ── Default seed data ─────────────────────────────────────────────────────────
 DEFAULT_PLANS = [
+    # ── ReachNG (outreach) plans ──────────────────────────────────────────────
     {
         "key":               "starter",
         "name":              "Starter",
+        "product":           "reachng",
         "message_limit":     200,
         "default_fee_ngn":   50000,
         "description":       "Great for small businesses just getting started with outreach.",
@@ -25,6 +27,7 @@ DEFAULT_PLANS = [
     {
         "key":               "growth",
         "name":              "Growth",
+        "product":           "reachng",
         "message_limit":     500,
         "default_fee_ngn":   120000,
         "description":       "For businesses scaling their pipeline aggressively.",
@@ -34,10 +37,53 @@ DEFAULT_PLANS = [
     {
         "key":               "agency",
         "name":              "Agency",
+        "product":           "reachng",
         "message_limit":     9999,
         "default_fee_ngn":   250000,
         "description":       "Unlimited outreach for high-volume operators.",
         "color":             "#ff5500",
+        "active":            True,
+    },
+    # ── Digital Associates (AI contract review) plans ─────────────────────────
+    {
+        "key":               "legal_essential",
+        "name":              "Legal Essential",
+        "product":           "digital_associates",
+        "message_limit":     9999,  # not message-based — review volume
+        "default_fee_ngn":   75000,
+        "description":       "Up to 20 contract reviews/month. Nigerian law grounded.",
+        "color":             "#0ea5e9",
+        "active":            True,
+    },
+    {
+        "key":               "legal_firm",
+        "name":              "Legal Firm",
+        "product":           "digital_associates",
+        "message_limit":     9999,
+        "default_fee_ngn":   150000,
+        "description":       "Unlimited reviews. Multi-user access. Priority support.",
+        "color":             "#6366f1",
+        "active":            True,
+    },
+    # ── AI Loan Officer plans ─────────────────────────────────────────────────
+    {
+        "key":               "loan_branch",
+        "name":              "Branch Plan",
+        "product":           "loan_officer",
+        "message_limit":     9999,
+        "default_fee_ngn":   150000,
+        "description":       "Up to 100 scored applications/month per branch. Ideal for single-branch MFBs.",
+        "color":             "#16a34a",
+        "active":            True,
+    },
+    {
+        "key":               "loan_enterprise",
+        "name":              "Enterprise Plan",
+        "product":           "loan_officer",
+        "message_limit":     9999,
+        "default_fee_ngn":   350000,
+        "description":       "Unlimited applications. Multi-branch dashboard. Dedicated support.",
+        "color":             "#15803d",
         "active":            True,
     },
 ]
@@ -48,16 +94,30 @@ def get_plans_col():
 
 
 def seed_plans_if_empty():
-    """Called at startup — inserts defaults only if collection is empty."""
+    """
+    Called at startup — upserts all default plans.
+    $setOnInsert inserts full doc on first run; $set only touches `product` + `updated_at`
+    so manual edits to name/fee/color are preserved on subsequent restarts.
+    """
     col = get_plans_col()
-    if col.count_documents({}) == 0:
-        now = datetime.now(timezone.utc)
-        for p in DEFAULT_PLANS:
-            col.update_one(
-                {"key": p["key"]},
-                {"$setOnInsert": {**p, "created_at": now, "updated_at": now}},
-                upsert=True,
-            )
+    now = datetime.now(timezone.utc)
+    for p in DEFAULT_PLANS:
+        insert_doc = {k: v for k, v in p.items()}
+        insert_doc["created_at"] = now
+        insert_doc["updated_at"] = now
+        col.update_one(
+            {"key": p["key"]},
+            {
+                "$setOnInsert": insert_doc,
+                "$set": {"product": p["product"], "updated_at": now},
+            },
+            upsert=True,
+        )
+    # Backfill product field for plans that predate this field
+    col.update_many(
+        {"product": {"$exists": False}},
+        {"$set": {"product": "reachng"}},
+    )
 
 
 def get_plan_limit(plan_key: str) -> int:
@@ -88,6 +148,7 @@ def _serialise(doc: dict) -> dict:
 
 class PlanUpsert(BaseModel):
     name:             str
+    product:          Optional[str] = "reachng"   # "reachng" | "digital_associates" | "loan_officer"
     message_limit:    int = Field(ge=1)
     default_fee_ngn:  int = Field(ge=0)
     description:      Optional[str] = ""
@@ -97,6 +158,7 @@ class PlanUpsert(BaseModel):
 
 class PlanUpdate(BaseModel):
     name:             Optional[str] = None
+    product:          Optional[str] = None
     message_limit:    Optional[int] = Field(default=None, ge=1)
     default_fee_ngn:  Optional[int] = Field(default=None, ge=0)
     description:      Optional[str] = None
@@ -125,6 +187,7 @@ async def create_plan(key: str, payload: PlanUpsert):
     doc = {
         "key": key,
         "name": payload.name,
+        "product": payload.product or "reachng",
         "message_limit": payload.message_limit,
         "default_fee_ngn": payload.default_fee_ngn,
         "description": payload.description,
@@ -154,11 +217,40 @@ async def update_plan(key: str, payload: PlanUpdate):
         update["color"] = payload.color
     if payload.active is not None:
         update["active"] = payload.active
+    if payload.product is not None:
+        update["product"] = payload.product
 
     result = col.update_one({"key": key}, {"$set": update})
     if result.matched_count == 0:
         raise HTTPException(404, f"Plan '{key}' not found")
     return {"success": True, "key": key}
+
+
+@router.get("/product-mrr")
+async def product_mrr():
+    """
+    Returns MRR broken down by product line.
+    Sums monthly_fee_ngn for active clients, grouped by their `product` field.
+    """
+    from database import get_db
+    clients_col = get_db()["clients"]
+    pipeline = [
+        {"$match": {"payment_status": "active", "active": True}},
+        {"$group": {
+            "_id": "$product",
+            "mrr": {"$sum": {"$ifNull": ["$monthly_fee_ngn", 0]}},
+            "count": {"$sum": 1},
+        }},
+    ]
+    rows = list(clients_col.aggregate(pipeline))
+    result = {}
+    total = 0
+    for r in rows:
+        product = r["_id"] or "reachng"
+        result[product] = {"mrr_ngn": r["mrr"], "clients": r["count"]}
+        total += r["mrr"]
+    result["total_mrr_ngn"] = total
+    return result
 
 
 @router.delete("/{key}")
