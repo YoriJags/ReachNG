@@ -44,24 +44,14 @@ DEFAULT_PLANS = [
         "color":             "#ff5500",
         "active":            True,
     },
-    # ── Digital Associates (AI contract review) plans ─────────────────────────
+    # ── Digital Associates (AI contract review) — single product plan ───────────
     {
-        "key":               "legal_essential",
-        "name":              "Legal Essential",
-        "product":           "digital_associates",
-        "message_limit":     9999,  # not message-based — review volume
-        "default_fee_ngn":   75000,
-        "description":       "Up to 20 contract reviews/month. Nigerian law grounded.",
-        "color":             "#0ea5e9",
-        "active":            True,
-    },
-    {
-        "key":               "legal_firm",
-        "name":              "Legal Firm",
+        "key":               "digital_associates",
+        "name":              "Digital Associates",
         "product":           "digital_associates",
         "message_limit":     9999,
         "default_fee_ngn":   150000,
-        "description":       "Unlimited reviews. Multi-user access. Priority support.",
+        "description":       "AI contract review for Nigerian law firms. Unlimited reviews, CBN/CAMA/NDPR grounded.",
         "color":             "#6366f1",
         "active":            True,
     },
