@@ -1,36 +1,27 @@
 # ReachNG — Project Context
 
-AI-powered outreach machine for Lagos businesses. Finds leads, writes personalized WhatsApp messages, tracks replies, converts to clients.
+Nigerian SME SaaS. **Current focus: land first Lagos paying client.** Product has been narrowed to two active suites:
+
+- **EstateOS** — Real Estate (Rent Roll, KYC, PoF, Lawyer Bundle, chase sequences)
+- **TalentOS** — HR (Payroll, Policy Bot, Leave, Attendance)
+
+7 other suites exist in code but are hidden from UI. Do not work on them unless explicitly asked.
+
+The original SDR/outreach product (Google Maps + Apollo + Unipile WhatsApp discovery) still exists and still runs — it's the acquisition funnel feeding EstateOS/TalentOS demos. Don't rip it out.
 
 ---
 
 ## Stack
 
-- **Runtime**: Python 3.12, FastAPI, Uvicorn
-- **Database**: MongoDB (via pymongo)
-- **AI**: Anthropic Claude (claude-sonnet) for message generation
-- **Messaging**: Unipile API (WhatsApp delivery, per-client accounts)
-- **Scheduler**: APScheduler (campaign runs, follow-ups)
+- **Runtime**: Python 3.12, FastAPI, Uvicorn, Jinja2
+- **DB**: MongoDB Atlas (pymongo). Collection families: `estate_*`, `hr_*`, `clients`, `leads`, `campaigns`, `drafts`
+- **LLM**: Claude Haiku 4.5 (`claude-haiku-4-5-20251001`) for drafts; Sonnet/Opus only for complex reasoning
+- **Messaging**: Unipile (WhatsApp, per-client account IDs)
+- **Scheduler**: APScheduler CronTrigger, timezone `Africa/Lagos`
 - **Deployment**: Railway (auto-deploy from GitHub `main`)
-- **Logging**: structlog
+- **Logging**: structlog — NEVER log PII (phone, email, names)
 
----
-
-## Verticals
-
-`real_estate` | `recruitment` | `events` | `fintech` | `legal` | `logistics`
-
----
-
-## Discovery Pipeline (Triple Source)
-
-Campaigns fire 3 parallel discovery tasks, results merged and deduplicated:
-
-1. **Google Maps** (`tools/discovery.py`) — Places Text Search API, finds SMEs by vertical + city
-2. **Apollo.io** (`tools/apollo_discovery.py`) — B2B org search (free plan uses `/mixed_companies/search`; upgrade to `/mixed_people/search` at $49/mo for decision-maker contacts + emails)
-3. **Social** (`tools/social.py`) — social media leads
-
-Deduplication: by phone + email across all three sources before inserting to DB.
+Do not suggest Node/TypeScript/pnpm/Next.js — wrong stack.
 
 ---
 
@@ -38,88 +29,107 @@ Deduplication: by phone + email across all three sources before inserting to DB.
 
 | File | Purpose |
 |------|---------|
-| `main.py` | FastAPI app, routes, health + debug endpoints |
-| `config.py` | Pydantic settings (env vars) |
-| `campaigns/base.py` | `BaseCampaign` — discovery → enrich → generate → send loop |
-| `tools/discovery.py` | Google Maps Places API discovery |
-| `tools/apollo_discovery.py` | Apollo.io org/people discovery |
-| `tools/social.py` | Social media lead discovery |
+| `main.py` | FastAPI app, route registration, lifespan (index ensures), health + debug |
+| `config.py` | Pydantic settings |
+| `auth.py` | HTTP Basic Auth + portal-token auth |
+| `scheduler.py` | APScheduler jobs (rent period open, rent chase, payroll reminders, invoice chaser, fleet escalation) |
+| `templates/dashboard.html` | Master admin SPA (all suites as tabs) |
+| `templates/portal.html` | Client portal SPA |
+| `api/rent_roll.py` | EstateOS rent roll + chase routes |
+| `api/payroll.py` | TalentOS payroll + payslip routes |
+| `api/hr_suite.py` | HR leave, attendance, policy bot |
+| `api/dashboard.py` | Admin dashboard backend |
+| `api/portal.py` | Client portal backend |
+| `services/estate/rent_roll.py` | Unit/tenant/ledger logic, chase staging |
+| `services/hr_suite/payroll.py` | PAYE, CRA, payslip compute + HTML render |
+| `tools/hitl.py` | `queue_draft()` — ALL outbound messages route through here |
+| `tools/discovery.py` | Google Maps Places discovery (SDR funnel) |
+| `tools/apollo_discovery.py` | Apollo.io discovery (SDR funnel) |
 | `tools/messaging.py` | Unipile WhatsApp send |
-| `tools/hitl.py` | Human-in-the-loop approval flow |
-| `api/portal.py` | Client portal (`/portal/{token}`) + demo portal (`/portal/demo`) |
-| `api/dashboard.py` | Master dashboard (Basic Auth protected) |
-| `auth.py` | HTTP Basic Auth via `secrets.compare_digest` |
-| `scheduler.py` | APScheduler campaign + follow-up jobs |
 
 ---
 
-## Environment Variables (Railway)
+## Domain Rules (Don't Get These Wrong)
 
-| Variable | Purpose |
-|----------|---------|
-| `GOOGLE_MAPS_API_KEY` | Google Places API key |
-| `APOLLO_API_KEY` | Apollo.io API key (`IXBRtXYo...`) |
-| `ANTHROPIC_API_KEY` | Claude API |
-| `UNIPILE_API_KEY` | WhatsApp delivery |
-| `MONGODB_URI` | MongoDB connection string |
-| `DASHBOARD_USER` | Master dashboard username |
-| `DASHBOARD_PASS` | Master dashboard password |
+### Nigerian Payroll
+- PAYE bands: 7 / 11 / 15 / 19 / 21 / 24 %
+- CRA = max(₦200,000, 1% × gross) + 20% × gross (annual)
+- PENCOM = 8% employee, 10% employer, on (basic + housing + transport)
+- NHF = 2.5% × basic, only if `nhf_enrolled == True`
+
+### Rent Chase Escalation
+- **friendly** 1-6 days — warm, assumes oversight
+- **firm** 7-13 days — direct, references amount + date
+- **serious** 14-29 days — consequences, mention quit notice possibility
+- **warning** 30-59 days — formal, explicit quit notice threat, **Lagos Tenancy Law**
+- **final** 60+ days — formal quit notice, 7-day ultimatum
+
+Period opening must be idempotent — unique compound index on `(unit_id, period)`.
+
+### Multi-Tenant Isolation (P0)
+Every `/estate/*` and `/hr/*` route must scope by tenant (`landlord_company` or portal token). Leakage between landlords/companies is a P0 bug.
+
+---
+
+## HITL Rule (Non-Negotiable)
+
+All outbound drafts (rent chase, invoice reminder, SDR message, anything) route through `tools/hitl.py::queue_draft()`. Never send directly from a service or route. The human approves in the dashboard before anything leaves Unipile.
 
 ---
 
 ## Auth Model
 
-- **Master dashboard** (`/dashboard`): HTTP Basic Auth — `DASHBOARD_USER` / `DASHBOARD_PASS`
-- **Client portal** (`/portal/{token}`): token-gated, one token per client
-- **Demo portal** (`/portal/demo`): public, no auth — for pitch deck / investor demos
-- **API routes** (`/api/v1/*`): Basic Auth required
+- **Admin dashboard** `/admin/*` — session-based, Basic Auth wrapper
+- **Client portal** `/portal/{token}` — token-gated per client
+- **Demo portal** `/portal/demo` — public, no auth (pitch deck / investor demos only)
+- **API** `/api/v1/*` — Basic Auth
 
 ---
 
-## Multi-Client Architecture
+## Environment Variables (Railway)
 
-- Each client has their own Unipile WhatsApp account ID → messages sent from their number
-- City-aware discovery: client's city replaces default city in all queries
-- Client records stored in MongoDB `clients` collection
+`ANTHROPIC_API_KEY`, `MONGODB_URI`, `UNIPILE_API_KEY`, `GOOGLE_MAPS_API_KEY`, `APOLLO_API_KEY`, `DASHBOARD_USER`, `DASHBOARD_PASS`
 
----
-
-## Google Maps Status
-
-As of 2026-04-12: **ACTIVE**. Billing confirmed working — `/debug/maps` returns `status: OK` with 20 results. All 3 discovery sources (Maps, Apollo, Social) are live.
-
-**Debug endpoints** (Basic Auth required):
-- `GET /debug/maps` — raw Google Places API response
-- `GET /debug/apollo` — raw Apollo API response
+Never hardcode — always via `config.get_settings()`.
 
 ---
 
-## Next Build: Deep Personalization Engine
+## Code Standards
 
-`tools/enrichment.py` — crawl each business's website before Claude writes outreach.
-
-Stack:
-- `httpx` to fetch website HTML (or Firecrawl if JS-heavy)
-- Extract: about page, services, team names, recent news
-- Combine with Google reviews + Apollo data
-- Feed into Claude prompt → hyper-personalized message per business
-
-No Instagram scraping (ToS violation). Website crawling is legal.
+- Keep files under ~500 lines
+- Type-hint all public APIs; Pydantic models on routes
+- Validate input at boundaries
+- Async on I/O paths; exponential backoff on external calls (Unipile, Google, Apollo)
+- No `.then()` chains — use `await`
+- No PII in structlog output
 
 ---
 
-## Pitch & Demo
+## Workflow
 
-- Pitch deck: `pitch/pitch-deck.html`
-- Demo portal link: `https://reachng-production.up.railway.app/portal/demo`
-- Pre-seed ask: $50K–$200K
-- City partner model for international expansion (equity + territory rights)
+1. Plan first for 3+ step tasks
+2. Verify before done — curl the route, open the tab, inspect Mongo
+3. Root-cause, don't patch — no `--no-verify`, no temp fixes
+4. Update `PLAN.md` checkboxes if present
+
+---
+
+## Memory Entries to Check First
+
+- `project_reachng_suite_catalog.md` — 12 suites / 89 features master list
+- `project_reachng_delivery_plan.md` — current delivery roadmap
+- `project_reachng_control_tower_plan.md` — 5-phase build plan
+- `project_reachng_onboarding_sop.md` — 8-step client onboarding
+- `project_reachng_build_sequence.md` — admin backend UI → client portal UI
+- `project_reachng_stack_obtainability.md` — green/yellow/red per new stack
+- `project_gemini_ideas_source.md` — full Gemini idea funnel, read before adding features
 
 ---
 
 ## Key Decisions
 
-- **Apollo free plan**: org search only (no emails). Upgrade at $49/mo for people search.
-- **No livestream rating** (VIIBE feature — not ReachNG)
-- **No Instagram scraping** — brittle + ToS violation
-- **Per-client WhatsApp** — each client's messages come from their own number via Unipile
+- Apollo free plan = org search only; $49/mo unlocks people search + emails
+- No Instagram scraping (brittle + ToS)
+- Per-client WhatsApp via Unipile — messages come from the client's own number
+- EstateOS + TalentOS are the only two suites shown in UI right now
+- Livestream rating belongs to Viibe, not ReachNG

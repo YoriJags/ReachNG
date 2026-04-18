@@ -15,13 +15,15 @@ Routes:
   POST /estate/lawyer-bundle        — generate lawyer handover memo
   GET  /estate/overview             — dashboard KPIs
 """
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from datetime import datetime, timezone
 from database.mongo import get_db
+import base64, io, zipfile
 from services.estate.engine import (
     get_neighborhood_scorecard, answer_property_question,
-    assess_proof_of_funds, extract_kyc_data,
+    assess_proof_of_funds, extract_kyc_data, extract_kyc_from_image,
     assess_tenant_background, generate_lawyer_bundle_summary,
 )
 from bson import ObjectId
@@ -66,6 +68,7 @@ class ConciergeAsk(BaseModel):
 
 class PofAssess(BaseModel):
     property_id: str = ""
+    agent_company: str = ""
     property_price_ngn: float
     pof_description: str
     buyer_name: str = ""
@@ -77,6 +80,15 @@ class KycExtract(BaseModel):
     party_name: str
     document_type: str
     document_text: str
+
+
+class KycImageExtract(BaseModel):
+    property_id: str = ""
+    agent_company: str = ""
+    party_name: str
+    document_type: str
+    image_base64: str
+    media_type: str = "image/jpeg"
 
 
 class BackgroundCheck(BaseModel):
@@ -92,6 +104,7 @@ class BackgroundCheck(BaseModel):
 
 
 class LawyerBundle(BaseModel):
+    agent_company: str = ""
     property_address: str
     buyer_name: str
     seller_name: str
@@ -103,16 +116,15 @@ class LawyerBundle(BaseModel):
 # ── Overview ───────────────────────────────────────────────────────────────────
 
 @router.get("/overview")
-def estate_overview():
-    props = _col("estate_properties").count_documents({})
-    checks = _col("estate_background_checks").count_documents({})
-    kyc_docs = _col("estate_kyc_records").count_documents({})
-    pof_proceed = _col("estate_pof_assessments").count_documents({"verdict": "PROCEED"})
+def estate_overview(agent_company: str = Query(default="")):
+    scope = {"agent_company": agent_company} if agent_company else {}
+    pof_scope = dict(scope, **{"verdict": "PROCEED"})
     return {
-        "total_listings": props,
-        "background_checks": checks,
-        "kyc_documents": kyc_docs,
-        "pof_approved": pof_proceed,
+        "total_listings":     _col("estate_properties").count_documents(scope),
+        "background_checks":  _col("estate_background_checks").count_documents(scope),
+        "kyc_documents":      _col("estate_kyc_records").count_documents(scope),
+        "pof_approved":       _col("estate_pof_assessments").count_documents(pof_scope),
+        "agent_company":      agent_company,
     }
 
 
@@ -181,7 +193,8 @@ def estate_pof_assess(req: PofAssess):
 
 @router.get("/pof")
 def estate_pof_list(agent_company: str = Query(default="")):
-    docs = list(_col("estate_pof_assessments").find().sort("created_at", -1).limit(50))
+    q = {"agent_company": agent_company} if agent_company else {}
+    docs = list(_col("estate_pof_assessments").find(q).sort("created_at", -1).limit(50))
     return {"assessments": [_str_id(d) for d in docs]}
 
 
@@ -201,9 +214,29 @@ def estate_kyc_extract(req: KycExtract):
     return {"kyc_id": str(inserted.inserted_id), "extracted": extracted, "party_name": req.party_name}
 
 
+@router.post("/kyc/extract-image", status_code=201)
+def estate_kyc_extract_image(req: KycImageExtract):
+    extracted = extract_kyc_from_image(req.document_type, req.image_base64, req.media_type)
+    doc = {
+        "property_id": req.property_id,
+        "agent_company": req.agent_company,
+        "party_name": req.party_name,
+        "document_type": req.document_type,
+        "source": "vision",
+        "extracted_data": extracted,
+        "created_at": datetime.now(timezone.utc),
+    }
+    inserted = _col("estate_kyc_records").insert_one(doc)
+    return {"kyc_id": str(inserted.inserted_id), "extracted": extracted, "party_name": req.party_name}
+
+
 @router.get("/kyc")
-def estate_kyc_list(property_id: str = Query(default="")):
-    q = {"property_id": property_id} if property_id else {}
+def estate_kyc_list(property_id: str = Query(default=""), agent_company: str = Query(default="")):
+    q = {}
+    if property_id:
+        q["property_id"] = property_id
+    if agent_company:
+        q["agent_company"] = agent_company
     docs = list(_col("estate_kyc_records").find(q).sort("created_at", -1).limit(100))
     return {"records": [_str_id(d) for d in docs]}
 
@@ -243,6 +276,66 @@ def estate_lawyer_bundle(req: LawyerBundle):
 
 
 @router.get("/lawyer-bundle")
-def estate_lawyer_bundle_list():
-    docs = list(_col("estate_lawyer_bundles").find().sort("created_at", -1).limit(50))
+def estate_lawyer_bundle_list(agent_company: str = Query(default="")):
+    q = {"agent_company": agent_company} if agent_company else {}
+    docs = list(_col("estate_lawyer_bundles").find(q, {"attachments.data": 0}).sort("created_at", -1).limit(50))
     return {"bundles": [_str_id(d) for d in docs]}
+
+
+class BundleAttachment(BaseModel):
+    bundle_id: str
+    filename: str
+    content_base64: str
+    media_type: str = "application/octet-stream"
+
+
+@router.post("/lawyer-bundle/attach", status_code=201)
+def estate_lawyer_bundle_attach(req: BundleAttachment):
+    attachment = {
+        "filename":     req.filename,
+        "media_type":   req.media_type,
+        "data":         req.content_base64,
+        "uploaded_at":  datetime.now(timezone.utc),
+    }
+    result = _col("estate_lawyer_bundles").update_one(
+        {"_id": ObjectId(req.bundle_id)},
+        {"$push": {"attachments": attachment}},
+    )
+    if result.matched_count == 0:
+        raise HTTPException(404, "Bundle not found")
+    return {"bundle_id": req.bundle_id, "filename": req.filename, "status": "attached"}
+
+
+@router.get("/lawyer-bundle/{bundle_id}/zip")
+def estate_lawyer_bundle_zip(bundle_id: str):
+    bundle = _col("estate_lawyer_bundles").find_one({"_id": ObjectId(bundle_id)})
+    if not bundle:
+        raise HTTPException(404, "Bundle not found")
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        memo_text = (
+            f"LAWYER HANDOVER MEMO\n"
+            f"Property: {bundle.get('property_address', '')}\n"
+            f"Buyer: {bundle.get('buyer_name', '')}\n"
+            f"Seller: {bundle.get('seller_name', '')}\n"
+            f"Agreed Price: NGN {bundle.get('agreed_price_ngn', 0):,.0f}\n"
+            f"Generated: {bundle.get('created_at', '').isoformat() if hasattr(bundle.get('created_at', ''), 'isoformat') else bundle.get('created_at', '')}\n\n"
+            f"{bundle.get('memo', '')}\n"
+        )
+        zf.writestr("00_handover_memo.txt", memo_text)
+        for i, att in enumerate(bundle.get("attachments", []), 1):
+            try:
+                data = base64.b64decode(att["data"])
+                zf.writestr(f"{i:02d}_{att['filename']}", data)
+            except Exception:
+                continue
+
+    buf.seek(0)
+    address_slug = (bundle.get("property_address") or "bundle").replace(" ", "_").replace(",", "")[:40]
+    filename = f"lawyer_bundle_{address_slug}.zip"
+    return StreamingResponse(
+        buf,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

@@ -632,40 +632,37 @@
     <span class="sidebar-dot" style="background:#6366f1;"></span> TalentOS
   </div>
 
+  <!-- Hidden for launch focus — RE + HR only. Code preserved, sidebar entries disabled.
   <span class="sidebar-label">Lending</span>
   <div class="sidebar-item" data-product="lend_os" style="--suite-accent:#16a34a" onclick="switchProduct('lend_os', this)">
     <span class="sidebar-dot" style="background:#16a34a;"></span> LendOS
   </div>
-
   <span class="sidebar-label">Business</span>
   <div class="sidebar-item" data-product="biz_os" style="--suite-accent:#ef4444" onclick="switchProduct('biz_os', this)">
     <span class="sidebar-dot" style="background:#ef4444;"></span> BizOS
   </div>
-
   <span class="sidebar-label">Education</span>
   <div class="sidebar-item" data-product="school_os" style="--suite-accent:#00b4d8" onclick="switchProduct('school_os', this)">
     <span class="sidebar-dot" style="background:#00b4d8;"></span> SchoolOS
   </div>
-
   <span class="sidebar-label">Legal</span>
   <div class="sidebar-item" data-product="legal_os" style="--suite-accent:#a78bfa" onclick="switchProduct('legal_os', this)">
     <span class="sidebar-dot" style="background:#a78bfa;"></span> LegalOS
   </div>
-
   <span class="sidebar-label">Construction</span>
   <div class="sidebar-item" data-product="build_os" style="--suite-accent:#f97316" onclick="switchProduct('build_os', this)">
     <span class="sidebar-dot" style="background:#f97316;"></span> BuildOS
   </div>
-
   <span class="sidebar-label">Fleet &amp; Logistics</span>
   <div class="sidebar-item" data-product="fleet_os" style="--suite-accent:#84cc16" onclick="switchProduct('fleet_os', this)">
     <span class="sidebar-dot" style="background:#84cc16;"></span> FleetOS
   </div>
-
   <span class="sidebar-label">Verification</span>
   <div class="sidebar-item" data-product="trust_os" style="--suite-accent:#ec4899" onclick="switchProduct('trust_os', this)">
     <span class="sidebar-dot" style="background:#ec4899;"></span> TrustOS
   </div>
+  -->
+
 
 </aside>
 <div class="main-content" id="main-content">
@@ -676,9 +673,10 @@
   <button class="tab-btn" onclick="switchTab('tower', this)">Control Tower</button>
   <button class="tab-btn" onclick="switchTab('campaigns', this)">Campaigns</button>
   <button class="tab-btn" onclick="switchTab('clients', this)">Clients</button>
-  <button class="tab-btn" onclick="switchTab('approvals', this)">Approvals <span class="tab-badge" id="tab-badge-approvals"></span></button>
+  <button class="tab-btn" onclick="switchTab('approvals', this)">Message Queue <span class="tab-badge" id="tab-badge-approvals"></span></button>
   <button class="tab-btn" onclick="switchTab('replies', this)">Replies</button>
   <button class="tab-btn" onclick="switchTab('invoices', this)">Invoices</button>
+  <button class="tab-btn" onclick="switchTab('pipeline', this)">Pipeline</button>
   <button class="tab-btn" onclick="switchTab('tools', this)">Tools</button>
 </nav>
 
@@ -725,12 +723,6 @@
   <button class="tab-btn" onclick="switchTab('dc_add', this)">Add Case</button>
 </nav>
 
-<!-- ── FX Lock (sub-nav — now inside LendOS, kept for direct access) ── -->
-<nav class="tab-nav product-tabs" data-product="fx_lock" style="display:none;">
-  <button class="tab-btn active" onclick="switchTab('fxl_monitor', this)">Rate Monitor</button>
-  <button class="tab-btn" onclick="switchTab('fxl_quotes', this)">Protected Quotes</button>
-  <button class="tab-btn" onclick="switchTab('fxl_settings', this)">Alert Settings</button>
-</nav>
 
 <!-- ── HR Suite Tab Nav ── -->
 <nav class="tab-nav product-tabs" data-product="talent_os" style="display:none;">
@@ -746,6 +738,7 @@
   <button class="tab-btn" onclick="switchTab('hr_fxsalary', this); fxsLoadDashboard();">FX Salary</button>
   <button class="tab-btn" onclick="switchTab('hr_probation', this); hrLoadProbationUpcoming();">Probation</button>
   <button class="tab-btn" onclick="switchTab('hr_policy', this);">Policy Bot</button>
+  <button class="tab-btn" onclick="switchTab('hr_payroll', this); prLoadAll();">Payroll</button>
 </nav>
 
 <!-- ── EstateOS Tab Nav ── -->
@@ -757,15 +750,10 @@
   <button class="tab-btn" onclick="switchTab('est_pof', this); estLoadPof();">Proof of Funds</button>
   <button class="tab-btn" onclick="switchTab('est_kyc', this); estLoadKyc();">KYC Vault</button>
   <button class="tab-btn" onclick="switchTab('est_background', this); estLoadBackground();">Background Check</button>
-  <button class="tab-btn" onclick="switchTab('est_lawyer', this);">Lawyer Bundle</button>
+  <button class="tab-btn" onclick="switchTab('est_lawyer', this); estReloadBundleList();">Lawyer Bundle</button>
+  <button class="tab-btn" onclick="switchTab('est_rent', this); rrLoadAll();">Rent Roll</button>
 </nav>
 
-<!-- ── Market Credit (sub-nav — now inside LendOS) ── -->
-<nav class="tab-nav product-tabs" data-product="market_credit" style="display:none;">
-  <button class="tab-btn active" onclick="switchTab('mc_queue', this)">Application Queue</button>
-  <button class="tab-btn" onclick="switchTab('mc_profiles', this)">Scored Profiles</button>
-  <button class="tab-btn" onclick="switchTab('mc_submit', this)">New Application</button>
-</nav>
 
 
 <!-- ── TrustOS Tab Nav ── -->
@@ -785,10 +773,15 @@
 </nav>
 
 
-<!-- ── FleetOS Tab Nav (Fuel Reprice + Float Optimizer) ── -->
+<!-- ── FleetOS Tab Nav (Dispatcher + Fuel Reprice + Float Optimizer) ── -->
 <nav class="tab-nav product-tabs" data-product="fleet_os" style="display:none;">
+  <span class="tab-section-label">Dispatcher</span>
+  <button class="tab-btn active" onclick="switchTab('fd_incidents', this); fdLoadIncidents();">Incidents</button>
+  <button class="tab-btn" onclick="switchTab('fd_log', this)">Log Breakdown</button>
+  <button class="tab-btn" onclick="switchTab('fd_trucks', this); fdLoadTrucks();">Trucks</button>
+  <div class="tab-divider"></div>
   <span class="tab-section-label">Fuel Reprice</span>
-  <button class="tab-btn active" onclick="switchTab('fr_routes', this)">Routes</button>
+  <button class="tab-btn" onclick="switchTab('fr_routes', this)">Routes</button>
   <button class="tab-btn" onclick="switchTab('fr_alerts', this)">Alerts</button>
   <button class="tab-btn" onclick="switchTab('fr_letters', this)">Letters</button>
   <div class="tab-divider"></div>
@@ -1079,7 +1072,7 @@
     <div class="sop-title">Campaign SOP — Do this every weekday morning</div>
     <div class="sop-step"><span class="sop-num">1</span><span>Select a <b>vertical</b> and run a <b>dry run</b> first. Confirm lead count looks reasonable (5–30 leads).</span></div>
     <div class="sop-step"><span class="sop-num">2</span><span>Uncheck <b>Dry run</b> and run live. Max 30 contacts per vertical per day to stay under limits.</span></div>
-    <div class="sop-step"><span class="sop-num">3</span><span>Check the <b>Approvals</b> tab — review any HITL drafts before they go out.</span></div>
+    <div class="sop-step"><span class="sop-num">3</span><span>Check the <b>Message Queue</b> tab — review any collection drafts (invoice, debt, rent) before they go out.</span></div>
     <div class="sop-step"><span class="sop-num">4</span><span>Check <b>Replies</b> tab after 2 hours — respond to all <b>Interested</b> leads same day.</span></div>
   </div>
 
@@ -1228,8 +1221,8 @@
     <div class="sop-step"><span class="sop-num">2</span><span><b>Set their plan &amp; billing</b> — choose Starter (₦50k/mo · 200 msgs), Growth (₦120k/mo · 500 msgs), or Agency (₦250k/mo · unlimited). Enter their monthly fee in the form. Payment status starts as <b>Trial</b> — flip to <b>Active</b> once they pay. Track in Control Tower tab.</span></div>
     <div class="sop-step"><span class="sop-num">3</span><span><b>Create client record</b> — fill all fields: name, vertical, city, plan, monthly fee, Unipile Account ID. <b>Brief is the most important field</b> — who they are, what they sell, their tone, their target customer. The more detail, the better the AI-generated messages.</span></div>
     <div class="sop-step"><span class="sop-num">4</span><span><b>Generate portal link</b> → send to client on WhatsApp. Say: <i>"Here's your live dashboard — you can see every contact we reach out to, all replies, and your ROI in real time."</i></span></div>
-    <div class="sop-step"><span class="sop-num">5</span><span><b>Run dry run first</b> — Campaigns tab → select their vertical → enter client name → check Dry Run → Run. Share the preview leads with the client for approval before going live.</span></div>
-    <div class="sop-step"><span class="sop-num">6</span><span><b>Go live</b> — uncheck Dry Run, check "Review before send", max 10 contacts first batch. Approve drafts in Approvals tab. After quality confirms, scale to 20–30 per run. Nightly scheduler takes over at 10pm automatically.</span></div>
+    <div class="sop-step"><span class="sop-num">5</span><span><b>Pick their suites</b> — which of the 12 revenue products do they need? Invoice Chaser and Debt Collector are the default starters (every Lagos SME has overdue money on the street). Layer Fleet Dispatcher, School Fees, or MarketOS where it fits their business.</span></div>
+    <div class="sop-step"><span class="sop-num">6</span><span><b>Load their data</b> — upload outstanding invoices, debt cases, trucks, or student roster via the suite tabs. The schedulers take over: invoice chase at 9am, debt collector at 9:30am, fleet escalation hourly, market alerts 3× daily. All drafts land in <b>Message Queue</b> for your tap-to-send.</span></div>
     <div class="sop-step"><span class="sop-num">7</span><span><b>Month-end billing</b> — Control Tower tab → find client → click <b>Invoice</b> → select month → Open Invoice → Print to PDF → send to client. Update payment status to Active once paid, Overdue if 7+ days late.</span></div>
   </div>
 
@@ -1358,11 +1351,12 @@
 <div class="tab-panel" id="tab-approvals">
 
   <div class="sop-box">
-    <div class="sop-title">Approvals SOP — Check twice daily (9am and 3pm)</div>
-    <div class="sop-step"><span class="sop-num">1</span><span>Read each draft carefully. Check the tone matches the client brief and the vertical.</span></div>
-    <div class="sop-step"><span class="sop-num">2</span><span>Click <b>Edit</b> to tweak wording if needed — then Save & Send. Never send a message you wouldn't send yourself.</span></div>
-    <div class="sop-step"><span class="sop-num">3</span><span>Click <b>Approve & Send</b> when happy. Click <b>Skip</b> only if the contact is clearly wrong-fit.</span></div>
-    <div class="sop-step"><span class="sop-num">4</span><span>Use <b>Approve All</b> only when you've already reviewed all drafts in the list.</span></div>
+    <div class="sop-title">Message Queue SOP — Money-in-motion. Review twice daily (9:30am and 3pm)</div>
+    <div class="sop-step"><span class="sop-num">1</span><span>Every draft here represents a <b>collection action</b> — invoice chase, debt recovery, rent reminder, school fees, fleet approval. Read the amount, the recipient, and the tone.</span></div>
+    <div class="sop-step"><span class="sop-num">2</span><span><b>Check the source badge</b> on each card. Invoice, Debt, Fleet, etc. — the expected tone differs per suite. Debt at Day 30 is firm; an invoice at Day 3 is gentle.</span></div>
+    <div class="sop-step"><span class="sop-num">3</span><span>Click <b>Edit</b> to tweak wording — add context, soften, or sharpen. Save & Send. Never send a message you wouldn't send yourself.</span></div>
+    <div class="sop-step"><span class="sop-num">4</span><span>Click <b>Send</b> when satisfied. Click <b>Skip</b> to drop a draft (debtor already paid, wrong recipient, duplicate).</span></div>
+    <div class="sop-step"><span class="sop-num">5</span><span>Use <b>Approve All</b> only after you've eyeballed every card. One click = many WhatsApps sent — there is no undo.</span></div>
   </div>
 
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
@@ -1419,6 +1413,20 @@
   <div class="replies-list" id="replies-list">
     <div class="empty">Loading…</div>
   </div>
+</div>
+
+<!-- ── Pipeline ──────────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-pipeline">
+
+  <div class="sop-box">
+    <div class="sop-title">Sales Pipeline — Full Prospect View</div>
+    <div class="sop-body">Every contact you've discovered, sorted by stage. Move them through by clicking actions in Replies. Click any card to open WhatsApp.</div>
+  </div>
+
+  <div id="pipeline-kanban" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:16px;align-items:flex-start;">
+    <div style="color:#333;font-size:12px;padding:20px;">Loading pipeline…</div>
+  </div>
+
 </div>
 
 <!-- ── Invoices ───────────────────────────────────────────────────────────────── -->
@@ -2555,8 +2563,12 @@
         <option value="Bank Statement">Bank Statement</option>
         <option value="Company Registration">CAC Certificate</option>
       </select>
-      <textarea class="form-input" id="est-kyc-text" rows="6" placeholder="Paste document text / OCR output here, or describe the document contents clearly (name, NIN number, address, dates, etc.)"></textarea>
-      <button class="btn btn-approve" onclick="estExtractKyc()">Extract & Store in Vault</button>
+      <textarea class="form-input" id="est-kyc-text" rows="4" placeholder="Option A — paste document text / OCR output, or describe the document contents"></textarea>
+      <button class="btn btn-approve" onclick="estExtractKyc()">Extract from Text</button>
+      <div style="border-top:1px solid #1a1a1a;margin:6px 0;"></div>
+      <p style="color:#aaa;font-size:12px;margin:0;">Option B — upload the document image (Claude Vision)</p>
+      <input type="file" id="est-kyc-image" accept="image/jpeg,image/png,image/webp" class="form-input" style="padding:6px;">
+      <button class="btn btn-approve" style="background:#6366f1;" onclick="estExtractKycImage()">Extract from Image</button>
       <div id="est-kyc-result" style="font-size:12px;color:#555;white-space:pre-wrap;"></div>
     </div>
     <div>
@@ -2602,7 +2614,150 @@
     <textarea class="form-input" id="est-law-summary" rows="4" placeholder="Negotiation summary (how deal was agreed, any conditions, timeline, etc.)"></textarea>
     <button class="btn btn-approve" onclick="estGenerateLawyerBundle()">Generate Lawyer Handover Memo</button>
     <div id="est-law-result" style="font-size:13px;color:#aaa;white-space:pre-wrap;margin-top:8px;"></div>
+
+    <div style="border-top:1px solid #1a1a1a;margin-top:16px;padding-top:12px;">
+      <p class="section-title" style="font-size:13px;margin:0 0 8px;">Attach Documents & Download Zip</p>
+      <p style="color:#666;font-size:11px;margin:0 0 8px;">Generate the memo first, then select that bundle below, attach files (C of O, KYC, PoF, receipts), and download the full zip for the lawyer.</p>
+      <select class="form-input" id="est-law-bundle-select"><option value="">Load memo above → select it here…</option></select>
+      <input type="file" id="est-law-files" multiple class="form-input" style="padding:6px;margin-top:6px;">
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <button class="btn btn-approve" style="background:#6366f1;" onclick="estAttachBundleFiles()">Attach Selected Files</button>
+        <button class="btn btn-approve" style="background:#16a34a;" onclick="estDownloadBundleZip()">Download Zip</button>
+        <button class="btn btn-cancel" onclick="estReloadBundleList()">Refresh</button>
+      </div>
+      <div id="est-law-attach-result" style="font-size:12px;color:#888;margin-top:6px;"></div>
+    </div>
   </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     RENT ROLL PANEL (EstateOS)
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-est_rent" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Rent Roll & Auto-Chase</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Track every unit, tenant, and rent cycle. Scheduler opens monthly charges on the 1st; Claude drafts escalating WhatsApp reminders (friendly → firm → serious → warning → quit notice). All drafts land in Message Queue for your approval.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="rr-kpi-units">—</div><div class="ct-kpi-lbl">Total Units</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="rr-kpi-occupied" style="color:#16a34a;">—</div><div class="ct-kpi-lbl">Occupied</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="rr-kpi-vacancy" style="color:#f59e0b;">—</div><div class="ct-kpi-lbl">Vacancy %</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="rr-kpi-collected" style="color:#6366f1;">—</div><div class="ct-kpi-lbl">Collected (Month)</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="rr-kpi-outstanding" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Outstanding (₦)</div></div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <input class="form-input" id="rr-filter-company" placeholder="Filter by landlord company" style="max-width:280px;">
+    <button class="btn btn-skip" onclick="rrLoadAll()">Refresh</button>
+    <button class="btn btn-approve" onclick="rrRunChase()">Run Chase Now</button>
+    <input class="form-input" id="rr-period" placeholder="YYYY-MM" style="max-width:140px;">
+    <button class="btn btn-skip" onclick="rrOpenPeriod()">Open Charges for Period</button>
+  </div>
+  <div id="rr-action-result" style="font-size:12px;color:#aaa;margin-bottom:16px;"></div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
+      <p class="section-title" style="margin-top:0;font-size:13px;">Add Unit</p>
+      <div style="display:grid;gap:8px;">
+        <input class="form-input" id="rr-unit-company" placeholder="Landlord / agency">
+        <input class="form-input" id="rr-unit-address" placeholder="Unit address">
+        <input class="form-input" id="rr-unit-label" placeholder="Unit label (e.g. Flat 2B) — optional">
+        <input class="form-input" id="rr-unit-rent" type="number" placeholder="Monthly rent (₦)">
+        <select class="form-input" id="rr-unit-type">
+          <option value="residential">Residential</option>
+          <option value="commercial">Commercial</option>
+        </select>
+        <p style="margin:8px 0 2px;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.04em;">Landlord payment details (auto-included in chase messages — we never touch the money)</p>
+        <input class="form-input" id="rr-unit-bank" placeholder="Landlord bank name (e.g. GTB)">
+        <input class="form-input" id="rr-unit-acct-no" placeholder="Landlord account number">
+        <input class="form-input" id="rr-unit-acct-name" placeholder="Landlord account name">
+        <input class="form-input" id="rr-unit-landlord-phone" placeholder="Landlord WhatsApp (for tenant-paid notifications)">
+        <button class="btn btn-approve" onclick="rrAddUnit()">Add Unit</button>
+      </div>
+    </div>
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
+      <p class="section-title" style="margin-top:0;font-size:13px;">Assign Tenant</p>
+      <div style="display:grid;gap:8px;">
+        <select class="form-input" id="rr-tenant-unit"><option value="">Select unit…</option></select>
+        <input class="form-input" id="rr-tenant-name" placeholder="Tenant full name">
+        <input class="form-input" id="rr-tenant-phone" placeholder="WhatsApp (+234…)">
+        <input class="form-input" id="rr-tenant-email" placeholder="Email (optional)">
+        <input class="form-input" id="rr-tenant-start" type="date" placeholder="Lease start">
+        <input class="form-input" id="rr-tenant-months" type="number" placeholder="Lease months (default 12)">
+        <input class="form-input" id="rr-tenant-due" type="number" placeholder="Rent due day of month (1-28)">
+        <button class="btn btn-approve" onclick="rrAssignTenant()">Assign Tenant</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-title" style="font-size:13px;">Overdue Charges</p>
+  <div style="overflow-x:auto;"><table class="data-table" id="rr-overdue-table">
+    <thead><tr><th>Tenant</th><th>Unit</th><th>Period</th><th>Amount (₦)</th><th>Days Late</th><th>Stage</th><th>Chases</th><th>Action</th></tr></thead>
+    <tbody id="rr-overdue-body"><tr><td colspan="8" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
+  </table></div>
+
+  <p class="section-title" style="font-size:13px;margin-top:24px;">Units</p>
+  <div id="rr-units-body" style="color:#555;font-size:12px;">Loading…</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PAYROLL PANEL (TalentOS)
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-hr_payroll" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Payroll — Nigerian PAYE Compliant</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Full monthly payroll with PAYE (7/11/15/19/21/24% bands), Consolidated Relief Allowance, PENCOM (8% employee), and NHF (2.5%). Generates compliant payslips printable to PDF via browser.</p>
+
+  <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+    <input class="form-input" id="pr-filter-company" placeholder="Company name" style="max-width:280px;">
+    <button class="btn btn-skip" onclick="prLoadAll()">Refresh</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
+      <p class="section-title" style="margin-top:0;font-size:13px;">Add / Update Staff</p>
+      <div style="display:grid;gap:8px;">
+        <input class="form-input" id="pr-staff-company" placeholder="Company">
+        <input class="form-input" id="pr-staff-name" placeholder="Staff full name">
+        <input class="form-input" id="pr-staff-basic" type="number" placeholder="Basic salary (₦ / month)">
+        <input class="form-input" id="pr-staff-housing" type="number" placeholder="Housing allowance (₦)">
+        <input class="form-input" id="pr-staff-transport" type="number" placeholder="Transport allowance (₦)">
+        <input class="form-input" id="pr-staff-other" type="number" placeholder="Other allowances (₦)">
+        <label style="color:#aaa;font-size:12px;display:flex;align-items:center;gap:6px;"><input type="checkbox" id="pr-staff-nhf"> NHF enrolled (2.5% of basic)</label>
+        <input class="form-input" id="pr-staff-bank" placeholder="Bank name">
+        <input class="form-input" id="pr-staff-acct" placeholder="Account number">
+        <input class="form-input" id="pr-staff-phone" placeholder="Phone">
+        <input class="form-input" id="pr-staff-email" placeholder="Email">
+        <button class="btn btn-approve" onclick="prUpsertStaff()">Save Staff</button>
+        <div id="pr-staff-result" style="font-size:11px;color:#aaa;"></div>
+      </div>
+    </div>
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
+      <p class="section-title" style="margin-top:0;font-size:13px;">Run Payroll</p>
+      <div style="display:grid;gap:8px;">
+        <input class="form-input" id="pr-run-company" placeholder="Company">
+        <input class="form-input" id="pr-run-period" placeholder="Period (YYYY-MM)">
+        <input class="form-input" id="pr-run-note" placeholder="Note (optional)">
+        <button class="btn btn-approve" onclick="prRunPayroll()">Run Payroll for Period</button>
+        <div id="pr-run-result" style="font-size:11px;color:#aaa;white-space:pre-wrap;"></div>
+      </div>
+      <p class="section-title" style="font-size:13px;margin-top:20px;">Quick PAYE Estimate</p>
+      <div style="display:grid;gap:8px;">
+        <input class="form-input" id="pr-est-basic" type="number" placeholder="Basic (₦)">
+        <input class="form-input" id="pr-est-housing" type="number" placeholder="Housing (₦)">
+        <input class="form-input" id="pr-est-transport" type="number" placeholder="Transport (₦)">
+        <button class="btn btn-skip" onclick="prEstimate()">Estimate Net Pay</button>
+        <div id="pr-est-result" style="font-size:11px;color:#aaa;white-space:pre-wrap;"></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-title" style="font-size:13px;">Staff Roster</p>
+  <div style="overflow-x:auto;"><table class="data-table" id="pr-staff-table">
+    <thead><tr><th>Name</th><th>Basic</th><th>Allowances</th><th>Bank</th><th>Action</th></tr></thead>
+    <tbody id="pr-staff-body"><tr><td colspan="5" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
+  </table></div>
+
+  <p class="section-title" style="font-size:13px;margin-top:24px;">Recent Runs</p>
+  <div id="pr-runs-body" style="color:#555;font-size:12px;">Loading…</div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════════
@@ -2853,6 +3008,74 @@
   <div id="fo-recommendations-body" style="color:#555;font-size:13px;">Loading recommendations…</div>
 </div>
 
+<!-- ── Fleet Dispatcher: Incidents ────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-fd_incidents" style="display:none;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <p class="section-title" style="margin:0;">Active Breakdown Incidents</p>
+    <button class="btn btn-approve" style="background:#84cc16;border-color:#84cc16;font-size:12px;padding:7px 14px;" onclick="fdLoadIncidents()">Refresh</button>
+  </div>
+  <div id="fd-incidents-list" style="color:#555;font-size:13px;">Loading…</div>
+</div>
+
+<!-- ── Fleet Dispatcher: Log Breakdown ────────────────────────────────────── -->
+<div class="tab-panel" id="tab-fd_log" style="display:none;">
+  <div class="sop-box">
+    <div class="sop-title">Log a Breakdown — Claude analyses in under 3 seconds</div>
+    <div class="sop-body">Enter the driver's message and Claude will assess the request, recommend an approval amount, and draft the WhatsApp replies to driver and client.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+    <div>
+      <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Truck Plate</label>
+      <input id="fd-plate" placeholder="e.g. LAG-432-GH" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:9px;font-size:13px;">
+    </div>
+    <div>
+      <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Driver Name</label>
+      <input id="fd-driver" placeholder="e.g. Emeka" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:9px;font-size:13px;">
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+    <div>
+      <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Location</label>
+      <input id="fd-location" placeholder="e.g. Sagamu, Ogun State" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:9px;font-size:13px;">
+    </div>
+    <div>
+      <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Amount Requested (₦)</label>
+      <input id="fd-amount" type="number" placeholder="e.g. 50000" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:9px;font-size:13px;">
+    </div>
+  </div>
+  <div style="margin-bottom:14px;">
+    <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Driver's Message (paste from WhatsApp)</label>
+    <textarea id="fd-message" rows="4" placeholder="Oga the truck broke down in Sagamu. Engine stopped. We need ₦50k for the mechanic..." style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:9px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
+  </div>
+
+  <button id="fd-analyse-btn" class="btn btn-approve" style="background:#84cc16;border-color:#84cc16;padding:10px 24px;font-size:13px;" onclick="fdAnalyseBreakdown()">Analyse Breakdown →</button>
+
+  <div id="fd-result" style="display:none;margin-top:20px;"></div>
+</div>
+
+<!-- ── Fleet Dispatcher: Trucks ────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-fd_trucks" style="display:none;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <p class="section-title" style="margin:0;">Fleet Registry</p>
+    <button class="btn btn-approve" style="background:#84cc16;border-color:#84cc16;font-size:12px;padding:7px 14px;" onclick="fdShowAddTruck()">+ Add Truck</button>
+  </div>
+  <div id="fd-add-truck" style="display:none;background:#080d14;border:1px solid #0e1a26;border-radius:8px;padding:16px;margin-bottom:16px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+      <input id="fd-t-plate" placeholder="Plate (e.g. ABJ-241-GH)" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
+      <input id="fd-t-driver" placeholder="Driver Name" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
+      <input id="fd-t-client" placeholder="Client / Route" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+      <input id="fd-t-make" placeholder="Make (e.g. Scania)" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
+      <input id="fd-t-model" placeholder="Model" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
+      <input id="fd-t-km" type="number" placeholder="Current KM" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
+    </div>
+    <button class="btn btn-approve" style="background:#84cc16;border-color:#84cc16;font-size:12px;" onclick="fdRegisterTruck()">Save Truck</button>
+  </div>
+  <div id="fd-trucks-list" style="color:#555;font-size:13px;">Loading fleet…</div>
+</div>
+
 <!-- ── Setup Wizard Modal ── -->
 <div class="wizard-overlay" id="wizard-overlay">
   <div class="wizard-box">
@@ -2942,7 +3165,7 @@
     <button class="quick-action-btn" onclick="quickApproveAll()"><span class="q-dot" style="background:#00e5a0;box-shadow:0 0 6px #00e5a060;"></span> Approve All Drafts</button>
     <button class="quick-action-btn" onclick="switchTabByName('replies')"><span class="q-dot" style="background:#ff5c00;box-shadow:0 0 6px #ff5c0060;"></span> Check Hot Leads</button>
     <button class="quick-action-btn" onclick="switchTabByName('campaigns')"><span class="q-dot" style="background:#c084fc;box-shadow:0 0 6px #c084fc60;"></span> Run Campaign</button>
-    <button class="quick-action-btn" onclick="switchTabByName('approvals')"><span class="q-dot" style="background:#f5c842;box-shadow:0 0 6px #f5c84260;"></span> Review Drafts</button>
+    <button class="quick-action-btn" onclick="switchTabByName('approvals')"><span class="q-dot" style="background:#f5c842;box-shadow:0 0 6px #f5c84260;"></span> Message Queue</button>
     <button class="quick-action-btn" onclick="switchTabByName('tower')"><span class="q-dot" style="background:#ff5500;box-shadow:0 0 6px #ff550060;"></span> Control Tower</button>
     <button class="quick-action-btn" onclick="switchTabByName('clients')"><span class="q-dot" style="background:#4488ff;box-shadow:0 0 6px #4488ff60;"></span> Onboard Client</button>
     <button class="quick-action-btn" onclick="switchTabByName('invoices')"><span class="q-dot" style="background:#ff7a30;"></span> Send Invoice</button>
@@ -3046,6 +3269,22 @@ function sortReplies(replies) {
 
 // ── Standalone render functions (used by sort buttons + refresh) ──────────────
 
+const SOURCE_LABELS = {
+  invoice:        "Invoice Chaser",
+  debt_case:      "Debt Collector",
+  rent:           "Rent Collector",
+  school_fees:    "School Fees",
+  fleet:          "Fleet Dispatcher",
+  loan:           "Loan Officer",
+  market:         "MarketOS",
+  maps:           "Lead Outreach",
+  social:         "Social Outreach",
+};
+function sourceLabel(a) {
+  const src = a.source || a.vertical || "";
+  return SOURCE_LABELS[src] || (src ? src.replace(/_/g," ").replace(/\b\w/g, c=>c.toUpperCase()) : "—");
+}
+
 function renderApprovals(approvals) {
   const list = document.getElementById("approvals-list");
   if (!list) return;
@@ -3082,7 +3321,7 @@ function renderApprovals(approvals) {
         <span class="approval-name">${a.contact_name || "Unknown"}</span>
         <span style="font-size:11px;color:#4a6070;">${channel}${sourceBadge}${profileLink}</span>
       </div>
-      <div class="approval-meta">${a.vertical || ""} &nbsp;·&nbsp; ${created}</div>
+      <div class="approval-meta">${sourceLabel(a)} &nbsp;·&nbsp; ${created}</div>
       ${postCtx}
       ${subject}
       <div class="approval-message">${msg}</div>
@@ -3167,7 +3406,7 @@ function _replyCardHtml(r, INTENT_CLASS) {
       <div class="reply-meta">${r.channel ? r.channel.toUpperCase() : ""} &nbsp;·&nbsp; ${r.vertical || ""} &nbsp;·&nbsp; ${time}</div>
       <div class="reply-summary">${r.summary || r.text || ""}</div>
       ${cid ? `<div style="display:flex;gap:8px;margin-top:8px;">
-        <button onclick="markContactStatus('${cid}','converted')" style="font-size:11px;padding:3px 10px;background:#00e5a020;border:1px solid #00e5a040;color:#00e5a0;border-radius:6px;cursor:pointer;">Became Client</button>
+        <button onclick="openOnboardModal('${cid}', '${(r.contact_name || r.sender || '').replace(/'/g,"\\'")}', '${r.vertical || ''}')" style="font-size:11px;padding:3px 10px;background:#00e5a020;border:1px solid #00e5a040;color:#00e5a0;border-radius:6px;cursor:pointer;font-weight:600;">Became Client ›</button>
         <button onclick="markContactStatus('${cid}','replied')" style="font-size:11px;padding:3px 10px;background:#1e1e1e;border:1px solid #333;color:#888;border-radius:6px;cursor:pointer;">Mark Replied</button>
         <button onclick="markContactStatus('${cid}','opted-out')" style="font-size:11px;padding:3px 10px;background:#1e1e1e;border:1px solid #333;color:#555;border-radius:6px;cursor:pointer;">Not Interested</button>
       </div>` : ""}
@@ -3200,27 +3439,20 @@ function switchProduct(product, pill) {
   }
 
   // Load data for new product
-  if (product === "school_fees") {
+  if (product === "school_os") {
     sfLoadOverview();
     sfLoadSchoolsTable();
     sfPopulateSchoolSelects();
     sfCheckClaimsBadge();
   }
-  if (product === "digital_associates") {
-    daLoadOverview();
-  }
-  if (product === "loan_officer") {
-    loLoadQueue();
-  }
-  if (product === "debt_collector") { dcLoadOverview(); }
-  if (product === "fx_lock") { fxlLoadMonitor(); }
-  if (product === "hr_suite") { hrLoadOverview(); }
-  if (product === "market_credit") { mcLoadQueue(); }
-  if (product === "product_auth") { paLoadHistory(); }
-  if (product === "material_check") { mchLoadResults(); }
-  if (product === "fuel_reprice") { frLoadRoutes(); }
-  if (product === "float_optimizer") { foLoadDashboard(); }
-  if (product === "estate_os") { estLoadOverview(); }
+  if (product === "legal_os")   { daLoadOverview(); }
+  if (product === "lend_os")    { loLoadQueue(); mcLoadQueue(); fxlLoadMonitor(); }
+  if (product === "biz_os")     { dcLoadOverview(); }
+  if (product === "talent_os")  { hrLoadOverview(); }
+  if (product === "trust_os")   { paLoadHistory(); }
+  if (product === "build_os")   { mchLoadResults(); }
+  if (product === "fleet_os")   { fdLoadIncidents(); frLoadRoutes(); foLoadDashboard(); }
+  if (product === "estate_os")  { estLoadOverview(); }
 }
 
 function switchTab(name, btn) {
@@ -3245,10 +3477,11 @@ function switchTab(name, btn) {
   if (name === "da_overview") daLoadOverview();
   if (name === "da_reviews")  daLoadReviews();
   if (name === "lo_queue")    loLoadQueue();
+  if (name === "pipeline")    loadPipeline();
 }
 
 function sfSwitchTab(name) {
-  const nav = document.querySelector('.product-tabs[data-product="school_fees"]');
+  const nav = document.querySelector('.product-tabs[data-product="school_os"]');
   if (!nav) return;
   const btn = nav.querySelector(`button[onclick*="${name}"]`);
   switchTab(name, btn);
@@ -4438,13 +4671,11 @@ async function quickApproveAll() {
   catch(e) { alert("Error: " + e.message); }
 }
 
-async function quickRunMorningBrief() {
+function quickRunMorningBrief() {
   document.getElementById("quick-menu").classList.remove("open");
   document.getElementById("quick-fab").textContent = "⚡";
-  try {
-    await fetch("/api/v1/contacts/morning-brief", { method: "POST", credentials: "include" });
-    alert("Morning brief sent to your WhatsApp.");
-  } catch(e) { alert("Error: " + e.message); }
+  switchTabByName("overview");
+  fullRefresh();
 }
 
 function quickExportAll() {
@@ -4991,7 +5222,7 @@ let _daUploadFile = "";
 let _daSelectedFile = null;
 
 function daSwitchTab(name) {
-  const nav = document.querySelector('.product-tabs[data-product="digital_associates"]');
+  const nav = document.querySelector('.product-tabs[data-product="legal_os"]');
   if (!nav) return;
   const btn = nav.querySelector(`button[onclick*="${name}"]`);
   switchTab(name, btn);
@@ -5922,7 +6153,7 @@ async function frGenerateLetter(routeId) {
   const d = await r.json();
   document.getElementById('fr-letters-body').style.color='#aaa';
   document.getElementById('fr-letters-body').textContent = d.letter_text ?? 'Letter generated.';
-  switchTab('fr_letters', document.querySelector('.product-tabs[data-product="fuel_reprice"] .tab-btn:last-child'));
+  switchTab('fr_letters', document.querySelector('.product-tabs[data-product="fleet_os"] .tab-btn:last-child'));
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -5969,6 +6200,168 @@ async function foAddAgent() {
     el.style.color='#16a34a'; el.textContent=`${body.agent_name} added. Float optimization active.`;
     foLoadDashboard();
   } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// FLEET DISPATCHER
+// ══════════════════════════════════════════════════════════════════════════
+async function fdLoadIncidents() {
+  const el = document.getElementById('fd-incidents-list');
+  if (!el) return;
+  el.innerHTML = '<span style="color:#555;">Loading...</span>';
+  try {
+    const r = await fetch('/api/v1/fleet/incidents', {headers: authHeaders()});
+    const d = await r.json();
+    const incidents = d.incidents ?? [];
+    if (!incidents.length) { el.innerHTML = '<span style="color:#444;">No incidents logged yet.</span>'; return; }
+    el.innerHTML = incidents.map(inc => {
+      const ca = inc.claude_assessment ?? {};
+      const legit = ca.legitimacy ?? 'unknown';
+      const legitColor = legit === 'high' ? '#16a34a' : legit === 'medium' ? '#f59e0b' : '#ef4444';
+      const statusColor = inc.status === 'resolved' ? '#555' : inc.status === 'approved' ? '#16a34a' : '#f59e0b';
+      const recAmt = ca.recommended_amount_ngn ?? 0;
+      return `<div style="background:#0e1218;border:1px solid #1e2530;border-radius:10px;padding:14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+          <div>
+            <div style="font-weight:600;color:#e0e0e0;">${escHtml(inc.truck_plate ?? '—')} · ${escHtml(inc.driver_name ?? '—')}</div>
+            <div style="font-size:11px;color:#555;margin-top:2px;">${escHtml(inc.location ?? '—')} · ${inc.created_at ? new Date(inc.created_at).toLocaleString() : '—'}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+            <span style="font-size:11px;padding:3px 8px;border-radius:12px;background:#1e2530;color:${statusColor};">${inc.status}</span>
+            ${inc.status === 'pending' ? `<button onclick="fdApproveIncident('${inc.id}', ${recAmt})" style="font-size:11px;padding:4px 10px;background:#16a34a;border:none;border-radius:6px;color:#fff;cursor:pointer;">Approve</button>` : ''}
+            ${inc.status !== 'resolved' ? `<button onclick="fdResolveIncident('${inc.id}')" style="font-size:11px;padding:4px 10px;background:#334155;border:none;border-radius:6px;color:#aaa;cursor:pointer;">Resolve</button>` : ''}
+          </div>
+        </div>
+        ${ca.issue_summary ? `<div style="margin-top:10px;font-size:12px;color:#aaa;border-top:1px solid #1e2530;padding-top:10px;">
+          <div><span style="color:#555;">Summary:</span> ${escHtml(ca.issue_summary)}</div>
+          <div style="margin-top:4px;display:flex;gap:16px;">
+            <span>Legitimacy: <span style="color:${legitColor};font-weight:600;">${legit}</span></span>
+            <span>ETA impact: <span style="color:#f59e0b;">${ca.eta_impact_hours ?? 0}h</span></span>
+            <span>Recommended: <span style="color:#10b981;">₦${recAmt.toLocaleString()}</span></span>
+          </div>
+          ${ca.draft_approval_message ? `<div style="margin-top:8px;background:#080c10;border-radius:6px;padding:8px;font-size:11px;color:#6080a0;">${escHtml(ca.draft_approval_message)}</div>` : ''}
+        </div>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = '<span style="color:#ef4444;">Failed to load incidents.</span>'; }
+}
+
+async function fdApproveIncident(id, amount) {
+  try {
+    await fetch(`/api/v1/fleet/incidents/${id}/approve`, {
+      method: 'PATCH',
+      headers: {...authHeaders(), 'Content-Type': 'application/json'},
+      body: JSON.stringify({amount_ngn: amount}),
+    });
+    fdLoadIncidents();
+  } catch(e) {}
+}
+
+async function fdResolveIncident(id) {
+  try {
+    await fetch(`/api/v1/fleet/incidents/${id}/resolve`, {
+      method: 'PATCH',
+      headers: {...authHeaders(), 'Content-Type': 'application/json'},
+      body: JSON.stringify({note: ''}),
+    });
+    fdLoadIncidents();
+  } catch(e) {}
+}
+
+async function fdAnalyseBreakdown() {
+  const plate    = document.getElementById('fd-plate').value.trim();
+  const driver   = document.getElementById('fd-driver').value.trim();
+  const location = document.getElementById('fd-location').value.trim();
+  const message  = document.getElementById('fd-message').value.trim();
+  const amount   = parseInt(document.getElementById('fd-amount').value) || 0;
+  if (!plate || !driver || !message) {
+    alert('Plate, driver name and message are required.'); return;
+  }
+  const btn = document.getElementById('fd-analyse-btn');
+  const el  = document.getElementById('fd-result');
+  btn.disabled = true; btn.textContent = 'Analysing…';
+  el.style.display = 'none'; el.innerHTML = '';
+  try {
+    const r = await fetch('/api/v1/fleet/incidents', {
+      method: 'POST',
+      headers: {...authHeaders(), 'Content-Type': 'application/json'},
+      body: JSON.stringify({truck_plate: plate, driver_name: driver, location, message, amount_requested_ngn: amount}),
+    });
+    const d = await r.json();
+    const a = d.assessment ?? {};
+    const legitColor = a.legitimacy === 'high' ? '#16a34a' : a.legitimacy === 'medium' ? '#f59e0b' : '#ef4444';
+    el.style.display = 'block';
+    el.innerHTML = `<div style="background:#080c10;border:1px solid #1e2530;border-radius:10px;padding:14px;font-size:13px;">
+      <div style="color:#e0e0e0;font-weight:600;margin-bottom:8px;">Claude Assessment</div>
+      <div style="color:#aaa;margin-bottom:6px;">${escHtml(a.issue_summary ?? '')}</div>
+      <div style="display:flex;gap:16px;font-size:12px;flex-wrap:wrap;margin-bottom:10px;">
+        <span>Legitimacy: <span style="color:${legitColor};font-weight:600;">${a.legitimacy ?? '—'}</span></span>
+        <span>Action: <span style="color:#6366f1;">${a.recommended_action ?? '—'}</span></span>
+        <span>ETA impact: <span style="color:#f59e0b;">${a.eta_impact_hours ?? 0}h</span></span>
+        <span>Amount: <span style="color:#10b981;">₦${(a.recommended_amount_ngn ?? 0).toLocaleString()}</span></span>
+      </div>
+      ${a.draft_approval_message ? `<div style="border-top:1px solid #1e2530;padding-top:10px;">
+        <div style="font-size:11px;color:#555;margin-bottom:4px;">Draft to driver:</div>
+        <div style="background:#0e1218;border-radius:6px;padding:8px;color:#ccc;font-size:12px;">${escHtml(a.draft_approval_message)}</div>
+      </div>` : ''}
+      ${a.draft_eta_update ? `<div style="margin-top:8px;">
+        <div style="font-size:11px;color:#555;margin-bottom:4px;">Draft to client:</div>
+        <div style="background:#0e1218;border-radius:6px;padding:8px;color:#ccc;font-size:12px;">${escHtml(a.draft_eta_update)}</div>
+      </div>` : ''}
+      <div style="margin-top:12px;">
+        <button onclick="fdApproveIncident('${d.incident_id}', ${a.recommended_amount_ngn ?? 0})" style="background:#16a34a;border:none;border-radius:6px;padding:8px 18px;color:#fff;cursor:pointer;font-size:12px;margin-right:8px;">Approve & Send</button>
+        <button onclick="fdLoadIncidents(); switchTab('fd_incidents', document.querySelector('.product-tabs[data-product=\\'fleet_os\\'] .tab-btn'))" style="background:#334155;border:none;border-radius:6px;padding:8px 16px;color:#aaa;cursor:pointer;font-size:12px;">View All Incidents</button>
+      </div>
+    </div>`;
+    ['fd-plate','fd-driver','fd-location','fd-amount','fd-message'].forEach(id => { document.getElementById(id).value = ''; });
+  } catch(e) { el.style.display='block'; el.innerHTML = `<span style="color:#ef4444;">Error: ${e.message}</span>`; }
+  btn.disabled = false; btn.textContent = 'Analyse Breakdown →';
+}
+
+async function fdLoadTrucks() {
+  const el = document.getElementById('fd-trucks-list');
+  if (!el) return;
+  el.innerHTML = '<span style="color:#555;">Loading fleet…</span>';
+  try {
+    const r = await fetch('/api/v1/fleet/trucks', {headers: authHeaders()});
+    const d = await r.json();
+    const trucks = d.trucks ?? [];
+    if (!trucks.length) { el.innerHTML = '<span style="color:#444;">No trucks registered yet.</span>'; return; }
+    el.innerHTML = trucks.map(t => `<div style="background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;gap:20px;font-size:12px;align-items:center;">
+      <span style="font-weight:600;color:#e0e0e0;min-width:110px;">${escHtml(t.plate)}</span>
+      <span style="color:#aaa;">${escHtml(t.driver_name)}</span>
+      <span style="color:#555;">${escHtml(t.driver_phone ?? '—')}</span>
+      <span style="color:#6366f1;">${escHtml(t.route ?? '—')}</span>
+      <span style="color:#84cc16;">${escHtml(t.make ?? '')} ${escHtml(t.model ?? '')}</span>
+    </div>`).join('');
+  } catch(e) { el.innerHTML = '<span style="color:#ef4444;">Failed to load.</span>'; }
+}
+
+function fdShowAddTruck() {
+  const f = document.getElementById('fd-add-truck');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+async function fdRegisterTruck() {
+  const body = {
+    plate:       document.getElementById('fd-t-plate').value.trim(),
+    driver_name: document.getElementById('fd-t-driver').value.trim(),
+    route:       document.getElementById('fd-t-client').value.trim(),
+    make:        document.getElementById('fd-t-make').value.trim(),
+    model:       document.getElementById('fd-t-model').value.trim(),
+    current_km:  parseFloat(document.getElementById('fd-t-km').value) || 0,
+  };
+  if (!body.plate || !body.driver_name) { alert('Plate and driver name required.'); return; }
+  try {
+    await fetch('/api/v1/fleet/trucks', {
+      method: 'POST',
+      headers: {...authHeaders(), 'Content-Type': 'application/json'},
+      body: JSON.stringify(body),
+    });
+    fdShowAddTruck();
+    fdLoadTrucks();
+    ['fd-t-plate','fd-t-driver','fd-t-client','fd-t-make','fd-t-model','fd-t-km'].forEach(id => { document.getElementById(id).value = ''; });
+  } catch(e) { alert('Error: ' + e.message); }
 }
 
 // ESTATEOS — REAL ESTATE VETTING
@@ -6138,6 +6531,31 @@ async function estExtractKyc() {
     estLoadKyc();
   } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
 }
+async function estExtractKycImage() {
+  const el = document.getElementById('est-kyc-result');
+  const party = document.getElementById('est-kyc-party').value;
+  const docType = document.getElementById('est-kyc-doc-type').value;
+  const file = document.getElementById('est-kyc-image').files[0];
+  if (!party || !docType || !file) { el.style.color='#ef4444'; el.textContent='Pick party, document type, and an image.'; return; }
+  el.textContent = 'Uploading + extracting via Claude Vision…'; el.style.color = '#555';
+  try {
+    const dataUrl = await new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result);
+      fr.onerror = rej;
+      fr.readAsDataURL(file);
+    });
+    const base64 = dataUrl.split(',')[1] || '';
+    const mediaType = file.type || 'image/jpeg';
+    const body = { party_name: party, document_type: docType, image_base64: base64, media_type: mediaType };
+    const r = await fetch('/estate/kyc/extract-image', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    const ext = d.extracted ?? {};
+    el.style.color = '#16a34a';
+    el.textContent = `Vision extracted & stored.\nName: ${ext.full_name||'—'} | Doc#: ${ext.document_number||'—'}\nDOB: ${ext.date_of_birth||'—'} | Expiry: ${ext.expiry_date||'—'}\nAuthenticity: ${ext.overall_authenticity||'—'}\nFlags: ${(ext.verification_flags||[]).join(', ')||'none'}`;
+    estLoadKyc();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
 
 async function estLoadBackground() {
   try {
@@ -6190,8 +6608,563 @@ async function estGenerateLawyerBundle() {
     const r = await fetch('/estate/lawyer-bundle', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
     const d = await r.json();
     el.style.color = '#aaa'; el.textContent = d.memo;
+    if (d.bundle_id) {
+      window._lastBundleId = d.bundle_id;
+      estReloadBundleList(d.bundle_id);
+    }
   } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
 }
+
+async function estReloadBundleList(selectId) {
+  const sel = document.getElementById('est-law-bundle-select');
+  if (!sel) return;
+  try {
+    const r = await fetch('/estate/lawyer-bundle', {headers: authHeaders()});
+    const d = await r.json();
+    const opts = (d.bundles || []).map(b => {
+      const att = (b.attachments || []).length;
+      const label = `${b.property_address || '(no address)'} — ${b.buyer_name || '?'} [${att} files]`;
+      return `<option value="${b._id}">${label}</option>`;
+    });
+    sel.innerHTML = '<option value="">Select a bundle…</option>' + opts.join('');
+    if (selectId) sel.value = selectId;
+  } catch(e) {}
+}
+
+async function estAttachBundleFiles() {
+  const sel = document.getElementById('est-law-bundle-select');
+  const files = document.getElementById('est-law-files').files;
+  const el = document.getElementById('est-law-attach-result');
+  if (!sel.value) { el.style.color='#ef4444'; el.textContent='Pick a bundle first.'; return; }
+  if (!files.length) { el.style.color='#ef4444'; el.textContent='Pick at least one file.'; return; }
+  el.style.color='#888'; el.textContent = `Uploading ${files.length} file(s)…`;
+  let ok = 0, fail = 0;
+  for (const f of files) {
+    try {
+      const dataUrl = await new Promise((res, rej) => {
+        const fr = new FileReader();
+        fr.onload = () => res(fr.result); fr.onerror = rej;
+        fr.readAsDataURL(f);
+      });
+      const base64 = dataUrl.split(',')[1] || '';
+      const body = { bundle_id: sel.value, filename: f.name, content_base64: base64, media_type: f.type || 'application/octet-stream' };
+      const r = await fetch('/estate/lawyer-bundle/attach', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+      if (r.ok) ok++; else fail++;
+    } catch(e) { fail++; }
+  }
+  el.style.color = fail ? '#f59e0b' : '#16a34a';
+  el.textContent = `Attached ${ok}/${ok+fail} file(s).`;
+  estReloadBundleList(sel.value);
+}
+
+function estDownloadBundleZip() {
+  const sel = document.getElementById('est-law-bundle-select');
+  const el = document.getElementById('est-law-attach-result');
+  if (!sel.value) { el.style.color='#ef4444'; el.textContent='Pick a bundle first.'; return; }
+  const url = `/estate/lawyer-bundle/${sel.value}/zip`;
+  const h = authHeaders();
+  fetch(url, {headers: h}).then(async r => {
+    if (!r.ok) { el.style.color='#ef4444'; el.textContent='Download failed.'; return; }
+    const blob = await r.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'lawyer_bundle.zip';
+    document.body.appendChild(a); a.click(); a.remove();
+    el.style.color='#16a34a'; el.textContent='Zip downloaded.';
+  }).catch(e => { el.style.color='#ef4444'; el.textContent='Error: '+e.message; });
+}
+
+// ── RENT ROLL (EstateOS) ──────────────────────────────────────────────────
+function rrCompany() { return document.getElementById('rr-filter-company').value.trim(); }
+
+async function rrLoadAll() {
+  await Promise.all([rrLoadOverview(), rrLoadUnits(), rrLoadOverdue()]);
+}
+
+async function rrLoadOverview() {
+  try {
+    const q = rrCompany() ? `?landlord_company=${encodeURIComponent(rrCompany())}` : '';
+    const r = await fetch('/estate/rent/overview'+q, {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('rr-kpi-units').textContent = d.total_units ?? 0;
+    document.getElementById('rr-kpi-occupied').textContent = d.occupied ?? 0;
+    document.getElementById('rr-kpi-vacancy').textContent = (d.vacancy_rate ?? 0) + '%';
+    document.getElementById('rr-kpi-collected').textContent = '₦' + Math.round(d.collected_this_month||0).toLocaleString();
+    document.getElementById('rr-kpi-outstanding').textContent = '₦' + Math.round(d.outstanding_overdue||0).toLocaleString();
+  } catch(e) {}
+}
+
+async function rrLoadUnits() {
+  try {
+    const q = rrCompany() ? `?landlord_company=${encodeURIComponent(rrCompany())}` : '';
+    const r = await fetch('/estate/rent/units'+q, {headers: authHeaders()});
+    const d = await r.json();
+    const units = d.units || [];
+    const sel = document.getElementById('rr-tenant-unit');
+    sel.innerHTML = '<option value="">Select unit…</option>' + units.map(u =>
+      `<option value="${u._id}">${u.address}${u.unit_label?' — '+u.unit_label:''}</option>`).join('');
+    document.getElementById('rr-units-body').innerHTML = units.map(u =>
+      `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a;display:flex;justify-content:space-between;">
+        <span style="color:#e0e0e0;">${u.address}${u.unit_label?' — '+u.unit_label:''}</span>
+        <span style="color:#6366f1;">₦${(u.monthly_rent_ngn||0).toLocaleString()}/mo</span>
+      </div>`).join('') || '<span style="color:#444;">No units yet</span>';
+  } catch(e) {}
+}
+
+async function rrLoadOverdue() {
+  try {
+    const q = rrCompany() ? `?landlord_company=${encodeURIComponent(rrCompany())}` : '';
+    const r = await fetch('/estate/rent/overdue'+q, {headers: authHeaders()});
+    const d = await r.json();
+    const rows = (d.overdue || []).map(c => {
+      const stageColor = {friendly:'#16a34a', firm:'#f59e0b', serious:'#d97706', warning:'#ef4444', final:'#b91c1c'}[c.stage?.tone] || '#555';
+      return `<tr>
+        <td>${c.tenant?.name||'—'}</td>
+        <td>${c.unit?.address||'—'}${c.unit?.unit_label?' · '+c.unit.unit_label:''}</td>
+        <td>${c.period}</td>
+        <td>₦${(c.amount_ngn||0).toLocaleString()}</td>
+        <td>${c.days_overdue}</td>
+        <td style="color:${stageColor};font-weight:600;">${c.stage?.label||'—'}</td>
+        <td>${c.chase_count||0}</td>
+        <td><button class="btn btn-skip" style="padding:4px 10px;font-size:11px;" onclick="rrMarkPaid('${c._id}')">Mark Paid</button></td>
+      </tr>`;
+    }).join('');
+    document.getElementById('rr-overdue-body').innerHTML = rows || '<tr><td colspan="8" style="color:#444;text-align:center;">No overdue rent</td></tr>';
+  } catch(e) {}
+}
+
+async function rrAddUnit() {
+  const body = {
+    landlord_company: document.getElementById('rr-unit-company').value,
+    address: document.getElementById('rr-unit-address').value,
+    unit_label: document.getElementById('rr-unit-label').value,
+    monthly_rent_ngn: parseFloat(document.getElementById('rr-unit-rent').value) || 0,
+    property_type: document.getElementById('rr-unit-type').value,
+    landlord_bank_name:      document.getElementById('rr-unit-bank').value,
+    landlord_account_number: document.getElementById('rr-unit-acct-no').value,
+    landlord_account_name:   document.getElementById('rr-unit-acct-name').value,
+    landlord_phone:          document.getElementById('rr-unit-landlord-phone').value,
+  };
+  const el = document.getElementById('rr-action-result');
+  try {
+    const r = await fetch('/estate/rent/units', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#16a34a'; el.textContent = 'Unit added: ' + d.address;
+    rrLoadAll();
+  } catch(e) { el.style.color='#ef4444'; el.textContent = 'Error: '+e.message; }
+}
+
+async function rrAssignTenant() {
+  const body = {
+    unit_id: document.getElementById('rr-tenant-unit').value,
+    tenant_name: document.getElementById('rr-tenant-name').value,
+    tenant_phone: document.getElementById('rr-tenant-phone').value,
+    tenant_email: document.getElementById('rr-tenant-email').value,
+    lease_start: document.getElementById('rr-tenant-start').value,
+    lease_months: parseInt(document.getElementById('rr-tenant-months').value) || 12,
+    rent_due_day: parseInt(document.getElementById('rr-tenant-due').value) || 1,
+  };
+  const el = document.getElementById('rr-action-result');
+  try {
+    const r = await fetch('/estate/rent/tenants', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#16a34a'; el.textContent = 'Tenant assigned: ' + d.tenant_name;
+    rrLoadAll();
+  } catch(e) { el.style.color='#ef4444'; el.textContent = 'Error: '+e.message; }
+}
+
+async function rrOpenPeriod() {
+  const period = document.getElementById('rr-period').value.trim();
+  if (!/^\d{4}-\d{2}$/.test(period)) { alert('Enter period as YYYY-MM'); return; }
+  const el = document.getElementById('rr-action-result');
+  try {
+    const r = await fetch('/estate/rent/period/open', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify({period})});
+    const d = await r.json();
+    el.style.color = '#16a34a'; el.textContent = `Opened ${d.charges_opened} charges for ${d.period}`;
+    rrLoadOverdue();
+  } catch(e) { el.style.color='#ef4444'; el.textContent = 'Error: '+e.message; }
+}
+
+async function rrRunChase() {
+  const el = document.getElementById('rr-action-result');
+  el.style.color = '#aaa'; el.textContent = 'Generating chase drafts…';
+  try {
+    const q = rrCompany() ? `?landlord_company=${encodeURIComponent(rrCompany())}` : '';
+    const r = await fetch('/estate/rent/chase/run'+q, {method:'POST', headers: authHeaders()});
+    const d = await r.json();
+    el.style.color = '#16a34a'; el.textContent = `Chase run: ${d.queued} drafts queued (${d.overdue_found} overdue, ${d.errors} errors). Check Message Queue.`;
+    rrLoadOverdue();
+  } catch(e) { el.style.color='#ef4444'; el.textContent = 'Error: '+e.message; }
+}
+
+async function rrMarkPaid(chargeId) {
+  if (!confirm('Mark this charge as paid?')) return;
+  try {
+    await fetch(`/estate/rent/charge/${chargeId}/paid`, {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify({})});
+    rrLoadAll();
+  } catch(e) { alert('Error: '+e.message); }
+}
+
+// ── PAYROLL (TalentOS) ────────────────────────────────────────────────────
+function prCompany() { return document.getElementById('pr-filter-company').value.trim(); }
+
+async function prLoadAll() {
+  await Promise.all([prLoadStaff(), prLoadRuns()]);
+}
+
+async function prLoadStaff() {
+  try {
+    const q = prCompany() ? `?company=${encodeURIComponent(prCompany())}` : '';
+    const r = await fetch('/hr/payroll/staff'+q, {headers: authHeaders()});
+    const d = await r.json();
+    const rows = (d.staff || []).map(s =>
+      `<tr>
+        <td>${s.staff_name}</td>
+        <td>₦${(s.basic||0).toLocaleString()}</td>
+        <td>₦${((s.housing||0)+(s.transport||0)+(s.other_allowances||0)).toLocaleString()}</td>
+        <td>${s.bank_name||'—'} ${s.account_number||''}</td>
+        <td><button class="btn btn-skip" style="padding:4px 10px;font-size:11px;" onclick="prRemoveStaff('${s._id}')">Remove</button></td>
+      </tr>`).join('');
+    document.getElementById('pr-staff-body').innerHTML = rows || '<tr><td colspan="5" style="color:#444;text-align:center;">No staff on roster</td></tr>';
+  } catch(e) {}
+}
+
+async function prLoadRuns() {
+  try {
+    const q = prCompany() ? `?company=${encodeURIComponent(prCompany())}` : '';
+    const r = await fetch('/hr/payroll/runs'+q, {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('pr-runs-body').innerHTML = (d.runs || []).map(run =>
+      `<div style="padding:10px 0;border-bottom:1px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="color:#e0e0e0;font-weight:600;">${run.company} — ${run.period}</div>
+          <div style="color:#555;font-size:11px;">${run.staff_count||0} staff · Gross ₦${Math.round(run.total_gross||0).toLocaleString()} · Net ₦${Math.round(run.total_net||0).toLocaleString()} · PAYE ₦${Math.round(run.total_paye||0).toLocaleString()}</div>
+        </div>
+        <button class="btn btn-skip" style="padding:4px 10px;font-size:11px;" onclick="prShowSlips('${run._id}')">View Slips</button>
+      </div>`).join('') || '<span style="color:#444;">No payroll runs yet</span>';
+  } catch(e) {}
+}
+
+async function prShowSlips(runId) {
+  try {
+    const r = await fetch(`/hr/payroll/runs/${runId}/slips`, {headers: authHeaders()});
+    const d = await r.json();
+    const box = document.getElementById('pr-runs-body');
+    const list = (d.slips || []).map(s =>
+      `<div style="padding:6px 0;display:flex;justify-content:space-between;">
+        <span style="color:#aaa;">${s.staff_name} — Net ₦${Math.round(s.net_pay||0).toLocaleString()}</span>
+        <a href="/hr/payroll/slip/${s._id}/html" target="_blank" style="color:#6366f1;font-size:11px;">Open Payslip →</a>
+      </div>`).join('');
+    box.innerHTML = `<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;padding:12px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#e0e0e0;font-weight:600;">Payslips</span><button class="btn btn-skip" style="padding:2px 8px;font-size:10px;" onclick="prLoadRuns()">Back</button></div>
+      ${list || '<span style="color:#444;">No slips</span>'}
+    </div>`;
+  } catch(e) {}
+}
+
+async function prUpsertStaff() {
+  const body = {
+    company: document.getElementById('pr-staff-company').value,
+    staff_name: document.getElementById('pr-staff-name').value,
+    basic: parseFloat(document.getElementById('pr-staff-basic').value) || 0,
+    housing: parseFloat(document.getElementById('pr-staff-housing').value) || 0,
+    transport: parseFloat(document.getElementById('pr-staff-transport').value) || 0,
+    other_allowances: parseFloat(document.getElementById('pr-staff-other').value) || 0,
+    nhf_enrolled: document.getElementById('pr-staff-nhf').checked,
+    bank_name: document.getElementById('pr-staff-bank').value,
+    account_number: document.getElementById('pr-staff-acct').value,
+    phone: document.getElementById('pr-staff-phone').value,
+    email: document.getElementById('pr-staff-email').value,
+  };
+  const el = document.getElementById('pr-staff-result');
+  try {
+    const r = await fetch('/hr/payroll/staff', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#16a34a'; el.textContent = 'Saved: ' + d.staff_name;
+    prLoadStaff();
+  } catch(e) { el.style.color='#ef4444'; el.textContent = 'Error: '+e.message; }
+}
+
+async function prRemoveStaff(staffId) {
+  if (!confirm('Remove this staff from payroll roster?')) return;
+  try {
+    await fetch(`/hr/payroll/staff/${staffId}`, {method:'DELETE', headers: authHeaders()});
+    prLoadStaff();
+  } catch(e) { alert('Error: '+e.message); }
+}
+
+async function prRunPayroll() {
+  const body = {
+    company: document.getElementById('pr-run-company').value,
+    period: document.getElementById('pr-run-period').value,
+    note: document.getElementById('pr-run-note').value,
+  };
+  if (!/^\d{4}-\d{2}$/.test(body.period)) { alert('Period must be YYYY-MM'); return; }
+  const el = document.getElementById('pr-run-result');
+  el.style.color = '#aaa'; el.textContent = 'Running payroll…';
+  try {
+    const r = await fetch('/hr/payroll/run', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || 'Failed');
+    el.style.color = '#16a34a';
+    el.textContent = `Run complete. ${d.staff_count} staff · Gross ₦${Math.round(d.total_gross).toLocaleString()} · PAYE ₦${Math.round(d.total_paye).toLocaleString()} · Net ₦${Math.round(d.total_net).toLocaleString()}`;
+    prLoadRuns();
+  } catch(e) { el.style.color='#ef4444'; el.textContent = 'Error: '+e.message; }
+}
+
+async function prEstimate() {
+  const body = {
+    basic: parseFloat(document.getElementById('pr-est-basic').value) || 0,
+    housing: parseFloat(document.getElementById('pr-est-housing').value) || 0,
+    transport: parseFloat(document.getElementById('pr-est-transport').value) || 0,
+  };
+  const el = document.getElementById('pr-est-result');
+  try {
+    const r = await fetch('/hr/paye/estimate', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#aaa';
+    el.textContent = `Gross: ₦${Math.round(d.gross_monthly).toLocaleString()}\nPAYE: ₦${Math.round(d.paye_monthly).toLocaleString()}\nPENCOM: ₦${Math.round(d.pencom_monthly).toLocaleString()}\nNet: ₦${Math.round(d.net_pay).toLocaleString()}`;
+  } catch(e) { el.style.color='#ef4444'; el.textContent = 'Error: '+e.message; }
+}
 </script>
+
+<!-- ── Onboard Modal ─────────────────────────────────────────────────────────── -->
+<div id="onboard-modal" style="display:none;position:fixed;inset:0;background:#000c;z-index:9000;align-items:center;justify-content:center;">
+  <div style="background:#0d1520;border:1px solid #1e3040;border-radius:12px;padding:32px;width:480px;max-width:95vw;">
+    <div style="font-size:16px;font-weight:700;color:#d8eaf8;margin-bottom:4px;">Onboard as Client</div>
+    <div style="font-size:12px;color:#4a6070;margin-bottom:24px;">Creates a client record and generates their portal link.</div>
+
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;color:#4a6070;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.8px;">Business</div>
+      <div id="ob-client-name" style="font-size:14px;font-weight:600;color:#d8eaf8;"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div>
+        <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Plan</label>
+        <select id="ob-plan" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
+          <option value="starter">Starter</option>
+          <option value="growth">Growth</option>
+          <option value="agency">Agency</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Monthly Fee (₦)</label>
+        <input id="ob-fee" type="number" placeholder="e.g. 50000" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px;">
+      <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Suite / Vertical</label>
+      <select id="ob-suite" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
+        <option value="">Use contact's vertical</option>
+        <option value="real_estate">EstateOS</option>
+        <option value="recruitment">TalentOS</option>
+        <option value="fintech">LendOS</option>
+        <option value="legal">LegalOS</option>
+        <option value="logistics">FleetOS</option>
+        <option value="events">EventOS</option>
+        <option value="agriculture">MarketOS</option>
+      </select>
+    </div>
+
+    <!-- Result area — shows portal link after onboard -->
+    <div id="ob-result" style="display:none;background:#050d0a;border:1px solid #00e5a030;border-radius:8px;padding:16px;margin-bottom:20px;">
+      <div style="font-size:11px;color:#00e5a0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Client Created — Portal Ready</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <div id="ob-portal-link" style="font-size:12px;color:#7090a8;background:#080c10;border:1px solid #1e3040;border-radius:4px;padding:6px 10px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+        <button onclick="copyPortalLink()" style="font-size:11px;padding:6px 12px;background:#1e3040;border:none;color:#d8eaf8;border-radius:6px;cursor:pointer;white-space:nowrap;">Copy Link</button>
+      </div>
+      <div style="font-size:11px;color:#4a6070;margin-bottom:6px;">WhatsApp message (copy to send):</div>
+      <textarea id="ob-wa-text" rows="5" readonly style="width:100%;background:#080c10;border:1px solid #1e3040;color:#7090a8;border-radius:4px;padding:8px;font-size:11px;resize:none;font-family:inherit;"></textarea>
+      <button onclick="copyWaText()" style="margin-top:8px;font-size:11px;padding:5px 12px;background:#1e3040;border:none;color:#d8eaf8;border-radius:6px;cursor:pointer;">Copy WhatsApp Message</button>
+
+      <!-- Paystack payment link -->
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid #0e1a26;">
+        <div style="font-size:11px;color:#4a6070;margin-bottom:8px;">Generate payment link to collect the monthly fee:</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <input id="ob-pay-email" type="email" placeholder="Client email (for receipt)" style="flex:1;min-width:160px;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:7px 10px;font-size:12px;">
+          <button id="ob-pay-btn" onclick="generatePaymentLink()" style="font-size:11px;padding:7px 14px;background:#16a34a;border:none;color:#fff;border-radius:6px;cursor:pointer;white-space:nowrap;font-weight:600;">Get Payment Link</button>
+        </div>
+        <div id="ob-pay-result" style="display:none;margin-top:8px;display:flex;align-items:center;gap:8px;">
+          <div id="ob-pay-link" style="font-size:12px;color:#00e5a0;background:#080c10;border:1px solid #16a34a30;border-radius:4px;padding:6px 10px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+          <button onclick="copyPayLink()" style="font-size:11px;padding:6px 12px;background:#1e3040;border:none;color:#d8eaf8;border-radius:6px;cursor:pointer;white-space:nowrap;">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeOnboardModal()" style="font-size:12px;padding:8px 18px;background:none;border:1px solid #1e3040;color:#4a6070;border-radius:6px;cursor:pointer;">Cancel</button>
+      <button id="ob-confirm-btn" onclick="confirmOnboard()" style="font-size:12px;padding:8px 20px;background:#ff5c00;border:none;color:#fff;border-radius:6px;cursor:pointer;font-weight:600;">Create Client & Get Portal Link</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Onboard Modal ──────────────────────────────────────────────────────────────
+let _onboardContactId = null;
+
+function openOnboardModal(contactId, contactName, vertical) {
+  _onboardContactId = contactId;
+  document.getElementById("ob-client-name").textContent = contactName || "Unknown";
+  if (vertical) {
+    const suiteEl = document.getElementById("ob-suite");
+    for (const opt of suiteEl.options) {
+      if (opt.value === vertical) { suiteEl.value = vertical; break; }
+    }
+  }
+  document.getElementById("ob-result").style.display = "none";
+  document.getElementById("ob-confirm-btn").style.display = "inline-block";
+  document.getElementById("ob-modal-portal-url") && (document.getElementById("ob-modal-portal-url").textContent = "");
+  const modal = document.getElementById("onboard-modal");
+  modal.style.display = "flex";
+}
+
+function closeOnboardModal() {
+  document.getElementById("onboard-modal").style.display = "none";
+  _onboardContactId = null;
+  document.getElementById("ob-result").style.display = "none";
+  document.getElementById("ob-confirm-btn").textContent = "Create Client & Get Portal Link";
+  document.getElementById("ob-confirm-btn").disabled = false;
+}
+
+async function confirmOnboard() {
+  if (!_onboardContactId) return;
+  const btn = document.getElementById("ob-confirm-btn");
+  btn.textContent = "Creating…";
+  btn.disabled = true;
+
+  const plan = document.getElementById("ob-plan").value;
+  const fee  = parseInt(document.getElementById("ob-fee").value) || null;
+  const suite = document.getElementById("ob-suite").value || null;
+
+  try {
+    const res = await fetch(`/api/v1/contacts/${_onboardContactId}/onboard`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ plan, monthly_fee_ngn: fee, suite }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    const baseUrl = window.location.origin;
+    const fullUrl = baseUrl + data.portal_url;
+    const waText = data.whatsapp_text.replace("{BASE_URL}", baseUrl);
+
+    document.getElementById("ob-portal-link").textContent = fullUrl;
+    document.getElementById("ob-portal-link").dataset.url = fullUrl;
+    document.getElementById("ob-wa-text").value = waText;
+    document.getElementById("ob-result").style.display = "block";
+    btn.style.display = "none";
+    refresh();
+  } catch(e) {
+    btn.textContent = "Error — Retry";
+    btn.disabled = false;
+    alert("Onboard failed: " + e.message);
+  }
+}
+
+function copyPortalLink() {
+  const url = document.getElementById("ob-portal-link").dataset.url || document.getElementById("ob-portal-link").textContent;
+  navigator.clipboard.writeText(url).then(() => { alert("Portal link copied!"); });
+}
+function copyWaText() {
+  navigator.clipboard.writeText(document.getElementById("ob-wa-text").value).then(() => { alert("Message copied!"); });
+}
+async function generatePaymentLink() {
+  const btn   = document.getElementById("ob-pay-btn");
+  const email = document.getElementById("ob-pay-email").value.trim();
+  const fee   = parseInt(document.getElementById("ob-fee").value) || 0;
+  const name  = document.getElementById("ob-client-name").textContent.trim();
+  const plan  = document.getElementById("ob-plan").value;
+
+  if (!email) { alert("Enter client email first."); return; }
+  if (!fee)   { alert("Enter monthly fee above first."); return; }
+
+  btn.textContent = "Generating…"; btn.disabled = true;
+  try {
+    const data = await fetch("/api/v1/paystack/initialize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ client_name: name, email, amount_ngn: fee, plan_label: `${plan.charAt(0).toUpperCase()+plan.slice(1)} Plan — Monthly` }),
+    }).then(r => r.json());
+
+    const linkEl = document.getElementById("ob-pay-link");
+    linkEl.textContent = data.payment_url;
+    linkEl.dataset.url = data.payment_url;
+    document.getElementById("ob-pay-result").style.display = "flex";
+  } catch(e) {
+    alert("Payment link error: " + e.message);
+  } finally {
+    btn.textContent = "Get Payment Link"; btn.disabled = false;
+  }
+}
+function copyPayLink() {
+  const url = document.getElementById("ob-pay-link").dataset.url || document.getElementById("ob-pay-link").textContent;
+  navigator.clipboard.writeText(url).then(() => { alert("Payment link copied!"); });
+}
+
+// Close on backdrop click
+document.getElementById("onboard-modal").addEventListener("click", function(e) {
+  if (e.target === this) closeOnboardModal();
+});
+
+// ── Pipeline Kanban ────────────────────────────────────────────────────────────
+const PIPELINE_COLS = [
+  { status: "new",        label: "Not Contacted", color: "#445566",  wonFlag: false },
+  { status: "contacted",  label: "Contacted",     color: "#4488ff",  wonFlag: false },
+  { status: "replied",    label: "Replied",       color: "#f5c842",  wonFlag: false },
+  { status: "converted",  label: "Hot Lead",      color: "#00e5a0",  wonFlag: false },
+  { status: "won",        label: "Won / Client",  color: "#ff5c00",  wonFlag: true  },
+];
+
+async function loadPipeline() {
+  const el = document.getElementById("pipeline-kanban");
+  el.innerHTML = '<div style="color:#333;font-size:12px;padding:20px;">Loading…</div>';
+  try {
+    const contacts = await fetch("/api/v1/contacts/?limit=500", { credentials: "include" }).then(r => r.json());
+    const grouped = { new: [], contacted: [], replied: [], converted: [], won: [] };
+
+    contacts.forEach(c => {
+      if (c.closed_by_client) { grouped.won.push(c); return; }
+      const s = c.status || "new";
+      if (grouped[s]) grouped[s].push(c);
+    });
+
+    el.innerHTML = PIPELINE_COLS.map(col => {
+      const cards = grouped[col.status] || [];
+      const cardHtml = cards.length === 0
+        ? `<div style="color:#1e3040;font-size:11px;text-align:center;padding:16px;">Empty</div>`
+        : cards.map(c => `
+          <div style="background:#0a1520;border:1px solid #1e2530;border-radius:6px;padding:10px 12px;margin-bottom:8px;cursor:pointer;"
+               onclick="${c.phone ? `window.open('https://wa.me/${c.phone.replace(/[^0-9]/g,'')}','_blank')` : ''}">
+            <div style="font-size:12px;font-weight:600;color:#c0d0e0;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(c.name || "—")}</div>
+            <div style="font-size:10px;color:#4a6070;">${escHtml(c.category || c.vertical || "")} ${c.rating ? "· ★" + c.rating : ""}</div>
+            ${col.wonFlag && c.deal_value_ngn ? `<div style="font-size:10px;color:#ff5c00;margin-top:2px;">₦${Number(c.deal_value_ngn).toLocaleString()}</div>` : ""}
+            ${!col.wonFlag && c.lead_score ? `<div style="font-size:10px;color:#ff5c00;margin-top:2px;">Score ${c.lead_score}</div>` : ""}
+          </div>`).join("");
+
+      return `
+        <div style="min-width:200px;flex:1;background:#080d14;border:1px solid #0e1a26;border-radius:8px;padding:12px;${col.wonFlag ? 'border-color:#ff5c0030;' : ''}">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:${col.color};flex-shrink:0;"></div>
+            <div style="font-size:11px;font-weight:700;color:${col.color};text-transform:uppercase;letter-spacing:0.8px;">${col.label}</div>
+            <div style="font-size:10px;color:#2e4458;margin-left:auto;">${cards.length}</div>
+          </div>
+          ${cardHtml}
+        </div>`;
+    }).join("");
+  } catch(e) {
+    el.innerHTML = `<div style="color:#ef4444;font-size:12px;padding:20px;">Failed to load pipeline: ${e.message}</div>`;
+  }
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+</script>
+
 </body>
 </html>

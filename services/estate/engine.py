@@ -177,13 +177,7 @@ Extract all available fields. For any field not clearly visible, output null.
 Be precise — this data goes into a legal vault."""
 
 
-def extract_kyc_data(document_type: str, document_text_or_description: str) -> dict:
-    prompt = f"""DOCUMENT TYPE: {document_type}
-
-DOCUMENT CONTENT / DESCRIPTION:
-{document_text_or_description[:3000]}
-
-Extract the following fields as JSON:
+_KYC_FIELDS = """Extract as JSON:
 - full_name
 - date_of_birth
 - document_number (NIN / passport number / account number)
@@ -191,11 +185,13 @@ Extract the following fields as JSON:
 - expiry_date (if applicable)
 - address (if on document)
 - issuing_authority
-- verification_flags (list any suspicious elements)
+- verification_flags (list any suspicious elements — doctored fonts, mismatched photos, missing security features)
 - overall_authenticity: LIKELY_GENUINE / SUSPICIOUS / CANNOT_DETERMINE
 
 Return ONLY valid JSON, no commentary."""
-    raw = _claude(prompt, system=_KYC_SYSTEM, max_tokens=500)
+
+
+def _parse_kyc_json(raw: str) -> dict:
     import json
     try:
         start = raw.find("{")
@@ -203,6 +199,36 @@ Return ONLY valid JSON, no commentary."""
         return json.loads(raw[start:end])
     except Exception:
         return {"raw_extraction": raw, "parse_error": True}
+
+
+def extract_kyc_data(document_type: str, document_text_or_description: str) -> dict:
+    """Text-only extraction — legacy path for typed-in document descriptions."""
+    prompt = f"""DOCUMENT TYPE: {document_type}
+
+DOCUMENT CONTENT / DESCRIPTION:
+{document_text_or_description[:3000]}
+
+{_KYC_FIELDS}"""
+    raw = _claude(prompt, system=_KYC_SYSTEM, max_tokens=500)
+    return _parse_kyc_json(raw)
+
+
+def extract_kyc_from_image(document_type: str, image_base64: str, media_type: str = "image/jpeg") -> dict:
+    """Claude Vision extraction — accepts base64-encoded image (JPEG/PNG/WEBP/PDF-as-image)."""
+    client = anthropic.Anthropic(api_key=get_settings().anthropic_api_key)
+    resp = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=700,
+        system=_KYC_SYSTEM,
+        messages=[{
+            "role": "user",
+            "content": [
+                {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": image_base64}},
+                {"type": "text", "text": f"DOCUMENT TYPE: {document_type}\n\n{_KYC_FIELDS}"},
+            ],
+        }],
+    )
+    return _parse_kyc_json(resp.content[0].text.strip())
 
 
 # ── Tenant Background Check ────────────────────────────────────────────────────

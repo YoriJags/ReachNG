@@ -119,6 +119,65 @@ async def _handle_message(sender_phone: str, message_body: str, source: str | No
         "bursar_notified": False,
     }
 
+    # ── Try to link to Rent Roll tenant ───────────────────────────────────────
+    tenant = _db()["estate_tenants"].find_one({
+        "phone": sender_phone,
+        "status": "active",
+    })
+    if tenant:
+        log_doc["linked_product"] = "rent_roll"
+        log_doc["linked_tenant_id"] = str(tenant["_id"])
+        try:
+            from bson import ObjectId
+            from agent.brain import handle_payment_reply
+
+            open_charge = _db()["estate_rent_ledger"].find_one(
+                {"tenant_id": str(tenant["_id"]), "status": "open"},
+                sort=[("due_date", 1)],
+            )
+            if open_charge:
+                unit = _db()["estate_units"].find_one({"_id": ObjectId(open_charge["unit_id"])})
+                result = handle_payment_reply(
+                    reply_text=message_body,
+                    debtor_name=tenant.get("tenant_name", "Tenant"),
+                    amount_ngn=open_charge.get("amount_ngn", 0),
+                    due_date=open_charge.get("due_date", ""),
+                    product="rent_roll",
+                )
+                log_doc["intent"] = result.get("intent")
+                log_doc["claimed_paid"] = result.get("claimed_paid", False)
+                if result.get("claimed_paid"):
+                    _db()["estate_rent_ledger"].update_one(
+                        {"_id": open_charge["_id"]},
+                        {"$set": {"claimed_paid": True, "claim_received_at": now}},
+                    )
+                auto_reply = result.get("auto_reply", "")
+                if auto_reply:
+                    try:
+                        await send_whatsapp_for_client(phone=sender_phone, message=auto_reply)
+                        log_doc["auto_reply_sent"] = True
+                    except Exception as e:
+                        log.warning("auto_reply_failed", error=str(e))
+                landlord_phone = (unit or {}).get("landlord_phone", "")
+                if landlord_phone and result.get("notify_bursar"):
+                    try:
+                        await send_whatsapp_for_client(
+                            phone=landlord_phone,
+                            message=f"[ReachNG] {result['notify_bursar']}",
+                        )
+                        log_doc["bursar_notified"] = True
+                    except Exception as e:
+                        log.warning("landlord_notify_failed", error=str(e))
+        except Exception as e:
+            log.error("rent_roll_reply_processing_failed", error=str(e), phone=sender_phone)
+            log_doc["processing_error"] = str(e)
+
+        try:
+            _db()["inbound_messages"].insert_one(log_doc)
+        except Exception:
+            pass
+        return
+
     # ── Try to link to School Fees student ────────────────────────────────────
     student = _db()["sf_students"].find_one({
         "parent_phone": sender_phone,

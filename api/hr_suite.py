@@ -66,6 +66,18 @@ class LeaveRequest(BaseModel):
     reason: str = ""
 
 
+class LeaveDecision(BaseModel):
+    decided_by: str = ""
+    note: str = ""
+
+
+class ClockIn(BaseModel):
+    company: str = ""
+    staff_name: str
+    method: str = "manual"   # manual | whatsapp | geo | qr
+    location: str = ""
+
+
 class BenchmarkRequest(BaseModel):
     role: str
     sector: str = ""
@@ -124,8 +136,9 @@ def hr_create_screener(req: ScreenerCreate):
 
 
 @router.get("/screener")
-def hr_list_screenings():
-    docs = list(_col("hr_screenings").find().sort("created_at", -1).limit(50))
+def hr_list_screenings(company: str = Query(default="")):
+    q = {"company": company} if company else {}
+    docs = list(_col("hr_screenings").find(q).sort("created_at", -1).limit(50))
     for d in docs:
         d["_id"] = str(d["_id"])
     return {"campaigns": docs}
@@ -144,12 +157,16 @@ def hr_add_attendance_staff(req: AttendanceStaff):
 
 
 @router.get("/attendance")
-def hr_attendance_today():
+def hr_attendance_today(company: str = Query(default="")):
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
-    records = list(_col("hr_attendance_log").find({"date": {"$gte": today_start}}).sort("clock_in", 1))
+    q = {"date": {"$gte": today_start}}
+    if company:
+        q["company"] = company
+    records = list(_col("hr_attendance_log").find(q).sort("clock_in", 1))
     for r in records:
         r["_id"] = str(r["_id"])
-    staff_count = _col("hr_attendance_staff").count_documents({})
+    staff_q = {"company": company} if company else {}
+    staff_count = _col("hr_attendance_staff").count_documents(staff_q)
     return {"date": date.today().isoformat(), "present": len(records),
             "total_registered": staff_count, "records": records}
 
@@ -174,6 +191,82 @@ def hr_leave_pending(company: str = Query(default="")):
     return {"pending": docs, "count": len(docs)}
 
 
+@router.get("/leave")
+def hr_leave_all(company: str = Query(default=""), status: str = Query(default="")):
+    q = {}
+    if company: q["company"] = company
+    if status:  q["status"]  = status
+    docs = list(_col("hr_leave_requests").find(q).sort("created_at", -1).limit(100))
+    for d in docs:
+        d["_id"] = str(d["_id"])
+    return {"requests": docs, "count": len(docs)}
+
+
+@router.post("/leave/{request_id}/approve")
+def hr_leave_approve(request_id: str, body: LeaveDecision):
+    from bson import ObjectId
+    _col("hr_leave_requests").update_one(
+        {"_id": ObjectId(request_id)},
+        {"$set": {"status": "approved", "decided_by": body.decided_by,
+                  "decision_note": body.note, "decided_at": datetime.now(timezone.utc)}},
+    )
+    return {"request_id": request_id, "status": "approved"}
+
+
+@router.post("/leave/{request_id}/decline")
+def hr_leave_decline(request_id: str, body: LeaveDecision):
+    from bson import ObjectId
+    _col("hr_leave_requests").update_one(
+        {"_id": ObjectId(request_id)},
+        {"$set": {"status": "declined", "decided_by": body.decided_by,
+                  "decision_note": body.note, "decided_at": datetime.now(timezone.utc)}},
+    )
+    return {"request_id": request_id, "status": "declined"}
+
+
+# ── Attendance Clock-In ────────────────────────────────────────────────────────
+
+@router.post("/attendance/clockin", status_code=201)
+def hr_clock_in(req: ClockIn):
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    existing = _col("hr_attendance_log").find_one({
+        "company": req.company, "staff_name": req.staff_name,
+        "date": {"$gte": today_start},
+    })
+    if existing:
+        return {"status": "already_clocked_in", "clock_in": existing["clock_in"].isoformat()}
+
+    staff_profile = _col("hr_attendance_staff").find_one({
+        "company": req.company, "name": req.staff_name,
+    })
+    expected_start = staff_profile.get("work_start", "08:00") if staff_profile else "08:00"
+    try:
+        eh, em = [int(x) for x in expected_start.split(":")]
+        expected_dt = today_start.replace(hour=eh, minute=em)
+        late_minutes = max(0, int((now - expected_dt).total_seconds() / 60))
+    except Exception:
+        late_minutes = 0
+
+    doc = {
+        "company":    req.company,
+        "staff_name": req.staff_name,
+        "method":     req.method,
+        "location":   req.location,
+        "clock_in":   now,
+        "date":       today_start,
+        "late_minutes": late_minutes,
+        "status":     "late" if late_minutes > 15 else "on_time",
+    }
+    inserted = _col("hr_attendance_log").insert_one(doc)
+    return {
+        "log_id":       str(inserted.inserted_id),
+        "clock_in":     now.isoformat(),
+        "late_minutes": late_minutes,
+        "status":       doc["status"],
+    }
+
+
 # ── Salary Benchmarking ────────────────────────────────────────────────────────
 
 @router.post("/benchmark", status_code=201)
@@ -185,8 +278,9 @@ def hr_benchmark(req: BenchmarkRequest):
 
 
 @router.get("/benchmark")
-def hr_list_benchmarks():
-    docs = list(_col("hr_benchmarks").find().sort("created_at", -1).limit(30))
+def hr_list_benchmarks(company: str = Query(default="")):
+    q = {"company": company} if company else {}
+    docs = list(_col("hr_benchmarks").find(q).sort("created_at", -1).limit(30))
     for d in docs:
         d["_id"] = str(d["_id"])
     return {"benchmarks": docs}
