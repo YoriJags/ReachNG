@@ -157,6 +157,11 @@ tr:last-child td { border-bottom: none; }
     <div class="nav-item" data-panel="policy" onclick="show('policy',this)">
       <span class="nav-dot"></span> Policy Oracle
     </div>
+
+    <div class="nav-section">Support</div>
+    <div class="nav-item" data-panel="guide" onclick="show('guide',this)">
+      <span class="nav-dot"></span> Getting Started
+    </div>
   </nav>
 
   <main class="main">
@@ -492,6 +497,98 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
+    <!-- GETTING STARTED / HELP -->
+    <div id="panel-guide" class="panel">
+      <div class="page-title">Getting Started</div>
+      <div class="page-sub">TalentOS · Tool guide for HR managers and employers</div>
+
+      <div class="card">
+        <div style="background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.25);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px">
+          <div style="font-size:13px;color:var(--green);font-weight:600;margin-bottom:4px">Your HR suite is active.</div>
+          <div style="font-size:12px;color:var(--muted)">All tools are scoped to your company — staff records, leave requests, and benchmarks are private to your account.</div>
+        </div>
+
+        <div class="card-title">What each tool does</div>
+        <div style="display:grid;gap:16px">
+
+          <div style="border-left:2px solid var(--green);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Job Screener</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Enter a role, sector, location, and key requirements. The AI generates 5 WhatsApp-ready screening questions tailored to the role — including one practical skills test question. Use this to filter candidates before investing time in interviews. Nigerian context is built in: questions probe for real competency, not just CV claims.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--orange);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Attendance</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Register staff with their name, phone, role, and expected work hours. Once registered, staff can clock in/out via WhatsApp (if Unipile is connected) or you can log attendance manually. The daily view shows present vs registered count and attendance rate — visible every morning as your daily HR pulse.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--gold);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Leave Manager</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Log leave requests (annual, sick, maternity, emergency, etc.) with dates and reason. Pending requests appear in a queue where you can approve or reject with one click. Approved/rejected status is tracked against each staff member. Use this to replace spreadsheets and WhatsApp group chaos.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--blue);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Probation Tracker</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Add a new hire's start date and probation duration (default 3 months). The system calculates their confirmation date and shows upcoming confirmations due within the next 30 days — colour-coded by urgency (red = within 7 days). Never accidentally confirm or miss confirming a staff member again.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--green);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Salary Benchmark</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Enter a role, sector, location, years of experience, and company size. The AI returns current Lagos market salary rates (min / mid / max per month) with context on what drives the range — sourced from Jobberman, LinkedIn Nigeria, and recruiter intelligence. Use this before making an offer, running a performance review, or budgeting headcount.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--gold);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">PENCOM</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Enroll staff with their basic salary, PFA name, and RSA PIN. The system calculates the required monthly contributions automatically: employee contributes 8% of basic, employer contributes 10% — total 18%. The remittance summary shows enrolled count, overdue remittances, and the total liability for the current month. Nigerian law compliance, automated.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--orange);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Offboarding</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">When a staff member is leaving, enter their name, role, last day, reason, and assets held. The AI generates a full, role-specific offboarding checklist — broken into Day 1 / Before Last Day / Last Day / Post-Departure — with owners (HR, IT, Finance, Manager) assigned to each item. Covers IT access revocation, asset return, final pay calculations, PENCOM final remittance, and reference letter handling.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--green);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Policy Oracle</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Upload your staff handbook or HR policy document (paste the text). Once uploaded, any staff member's HR question can be answered instantly — "How many days annual leave do I have?", "Can I claim transport allowance?", "What's the exit interview process?" — with answers drawn directly from your actual policy. No more forwarding WhatsApp messages to HR at midnight.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Recommended setup sequence</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--green);font-family:var(--font-mono)">01</div>
+            <div style="font-size:12px;margin-top:6px;color:var(--muted)">Upload <strong style="color:var(--text)">Policy</strong> handbook</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--orange);font-family:var(--font-mono)">02</div>
+            <div style="font-size:12px;margin-top:6px;color:var(--muted)">Register all staff in <strong style="color:var(--text)">Attendance</strong></div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--gold);font-family:var(--font-mono)">03</div>
+            <div style="font-size:12px;margin-top:6px;color:var(--muted)">Enroll staff in <strong style="color:var(--text)">PENCOM</strong></div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--blue);font-family:var(--font-mono)">04</div>
+            <div style="font-size:12px;margin-top:6px;color:var(--muted)">Add probationers to <strong style="color:var(--text)">Probation Tracker</strong></div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--green);font-family:var(--font-mono)">05</div>
+            <div style="font-size:12px;margin-top:6px;color:var(--muted)">Run <strong style="color:var(--text)">Salary Benchmark</strong> at review time</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(0,229,160,0.25)">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--green)">PENCOM rate:</strong> 8% employee + 10% employer = 18% of basic salary (Nigerian law).<br>
+          <strong style="color:var(--green)">AI tools:</strong> Screener, Benchmark, Offboarding, and Policy Oracle are powered by Claude (Anthropic). Apply HR judgment before acting on outputs.<br>
+          <strong style="color:var(--green)">Support:</strong> Contact your ReachNG account manager for any portal access issues.
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -672,10 +769,10 @@ async function addProbation() {
 async function loadBenchmarks() {
   const d = await get('/benchmark');
   const rows = (d.benchmarks || []).map(b =>
-    `<tr><td>${b.role}</td><td style="color:var(--muted)">${b.location}</td><td style="color:var(--gold)">₦${fmt(b.market_min || 0)} – ₦${fmt(b.market_max || 0)}</td></tr>`
+    `<tr><td>${b.role}</td><td style="color:var(--muted)">${b.location || 'Lagos'}</td><td style="color:var(--muted)">${b.years_exp || '—'} yrs exp</td><td style="color:var(--gold);font-size:11px;max-width:300px;white-space:normal">${(b.benchmark_text || '').slice(0, 120)}…</td></tr>`
   ).join('');
   document.getElementById('bm-list').innerHTML = rows
-    ? `<table><thead><tr><th>Role</th><th>Location</th><th>Market Range</th></tr></thead><tbody>${rows}</tbody></table>`
+    ? `<table><thead><tr><th>Role</th><th>Location</th><th>Experience</th><th>Benchmark (preview)</th></tr></thead><tbody>${rows}</tbody></table>`
     : '<p style="color:var(--muted);font-size:13px;">No benchmarks run yet.</p>';
 }
 
@@ -689,9 +786,10 @@ async function runBenchmark() {
     years_exp: document.getElementById('bm-exp').value,
     company_size: document.getElementById('bm-size').value,
   });
-  showResult('bm-result', `<div style="font-size:13px;line-height:1.7">${d.analysis || d.benchmark || JSON.stringify(d, null, 2)}</div>`);
+  showResult('bm-result', `<div style="font-size:13px;line-height:1.7">${d.benchmark_text || d.analysis || JSON.stringify(d, null, 2)}</div>`);
   loadBenchmarks();
 }
+
 
 // ── PENCOM ──
 async function loadPencom() {

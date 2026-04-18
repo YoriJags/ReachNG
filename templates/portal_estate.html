@@ -168,6 +168,11 @@ tr:last-child td { border-bottom: none; }
     <div class="nav-item" data-panel="lawyer" onclick="show('lawyer',this)">
       <span class="nav-dot"></span> Lawyer Bundle
     </div>
+
+    <div class="nav-section">Support</div>
+    <div class="nav-item" data-panel="guide" onclick="show('guide',this)">
+      <span class="nav-dot"></span> Getting Started
+    </div>
   </nav>
 
   <main class="main">
@@ -461,6 +466,96 @@ tr:last-child td { border-bottom: none; }
           <button class="btn btn-primary" onclick="generateBundle()">Generate Memo</button>
         </div>
         <div id="lb-result" class="result"></div>
+      </div>
+    </div>
+
+    <!-- GETTING STARTED / HELP -->
+    <div id="panel-guide" class="panel">
+      <div class="page-title">Getting Started</div>
+      <div class="page-sub">EstateOS · Tool guide for estate agents</div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+          <div style="background:rgba(255,92,0,0.1);border:1px solid rgba(255,92,0,0.3);border-radius:var(--radius);padding:12px 16px;flex:1">
+            <div style="font-size:13px;color:var(--orange);font-weight:600;margin-bottom:4px">Your portal is ready.</div>
+            <div style="font-size:12px;color:var(--muted)">All tools below connect directly to your client account. Data is scoped to your company — no cross-client visibility.</div>
+          </div>
+        </div>
+
+        <div class="card-title">What each tool does</div>
+
+        <div style="display:grid;gap:16px">
+
+          <div style="border-left:2px solid var(--orange);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">My Properties</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Add property listings with address, type, price, title type, and amenities. All listings are linked to your account and accessible for the Concierge tool. Use this as your live listing register.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--gold);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Neighborhood Score</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Enter any Lagos address and get an AI-generated score (0–100) covering: flood risk (based on known Lagos flood-prone zones), commute time to Victoria Island / Ikoyi / Ikeja at 8am peak traffic, and nearby amenity density (hospitals, schools, banks, supermarkets within 1.5km). Use this before listing to set the right price or before recommending a property to a buyer.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--green);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Property Concierge</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Select one of your listings, then type a buyer's question. The AI reads your property details (address, price, title, description, amenities) and answers in the voice of a Lagos estate agent. Use this to quickly answer buyer FAQs — C of O questions, generator included?, flooding history, etc. — without needing to be physically present.</div>
+          </div>
+
+          <div style="border-left:2px solid #ff4444;padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Proof of Funds</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Before committing to a physical viewing, screen the buyer. Paste what they've submitted (bank statement summary, asset description, or their own words). The AI assesses: Can they actually afford the property? Are there authenticity red flags (round numbers only, no transaction history, suspicious formatting)? Returns PROCEED / REQUEST MORE INFO / DECLINE with a brief rationale. Protects your time.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--gold);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">KYC Vault</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Paste any identity document text or description (NIN slip, international passport, utility bill, CAC certificate). The AI extracts structured data — full name, document number, issue/expiry dates, address, issuing authority — and flags any authenticity concerns. All extracted records are stored securely and linked to the party name. Use this to build your compliance vault before contract exchange.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--orange);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Background Check</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">For landlords screening tenants before signing a lease. Enter the tenant's occupation, employer, income, rent amount, previous landlord feedback, and guarantor info. The AI calculates the rent-to-income ratio (recommended max: 33%) and gives a risk rating (LOW / MEDIUM / HIGH) plus a recommendation (APPROVE / APPROVE WITH CONDITIONS / DECLINE) with specific flags for the Nigerian rental context.</div>
+          </div>
+
+          <div style="border-left:2px solid var(--green);padding-left:16px">
+            <div style="font-weight:600;margin-bottom:4px">Lawyer Bundle</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">When a deal is agreed, generate a formal handover memo for the closing lawyer. Enter both parties' names, agreed price, documents collected, and a brief negotiation summary. The AI produces a structured legal memo covering: transaction parties and roles, property details, document checklist, outstanding items before contract exchange, conditions for the deed, and next steps — all in Nigerian property law context (Land Use Act, Governor's Consent, C of O).</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Recommended workflow</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--orange);font-family:var(--font-mono)">01</div>
+            <div style="font-size:12px;margin-top:6px;color:var(--muted)">Add listing to <strong style="color:var(--text)">My Properties</strong></div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--gold);font-family:var(--font-mono)">02</div>
+            <div style="font-size:12px;margin-top:6px;color:var(--muted)">Run <strong style="color:var(--text)">Neighborhood Score</strong> to set pricing</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--green);font-family:var(--font-mono)">03</div>
+            <div style="font-size:12px;margin-top:6px;color:var(--muted)">Screen buyer with <strong style="color:var(--text)">Proof of Funds</strong></div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--orange);font-family:var(--font-mono)">04</div>
+            <div style="font-size:12px;margin-top:6px;color:var(--muted)">Vault IDs in <strong style="color:var(--text)">KYC Vault</strong></div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;text-align:center">
+            <div style="font-size:20px;font-weight:700;color:var(--gold);font-family:var(--font-mono)">05</div>
+            <div style="font-size:12px;margin-top:6px;color:var(--muted)">Generate <strong style="color:var(--text)">Lawyer Bundle</strong> at deal close</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(255,92,0,0.3)">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--orange)">Support:</strong> Contact your ReachNG account manager for assistance.<br>
+          <strong style="color:var(--orange)">Data:</strong> All records are stored securely and scoped to your company only.<br>
+          <strong style="color:var(--orange)">AI:</strong> All AI tools use Claude (Anthropic). Results are AI-generated — always apply professional judgment before acting.
+        </div>
       </div>
     </div>
 
