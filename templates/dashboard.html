@@ -550,22 +550,35 @@
   .wizard-check-status.fail { color: #ff4444; }
   .wizard-check-status.checking { color: #f5c842; }
 
-  /* ── Product Switcher ── */
+  /* ── Suite Switcher ── */
   .product-switcher {
-    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-    padding: 10px 28px 0;
-    background: #0a0a0a;
+    display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+    padding: 14px 28px 0;
+    background: #080c10;
+    border-bottom: 1px solid #141a22;
+  }
+  .suite-group-label {
+    font-size: 9px; color: #2a3a4a; text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 0 8px 0 4px; align-self: center; user-select: none;
+  }
+  .suite-divider {
+    width: 1px; height: 20px; background: #1e2530; margin: 0 6px; align-self: center; flex-shrink: 0;
   }
   .product-pill {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
     padding: 5px 14px; border-radius: 20px;
     border: 1px solid #1e1e1e; background: #111; color: #555;
     cursor: pointer; transition: all 0.15s; white-space: nowrap;
   }
-  .product-pill:hover { color: #aaa; border-color: #333; }
-  .product-pill.active { background: #1a1a1a; color: #f0f0f0; border-color: #2a2a2a; }
-  .product-pill-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .product-pill:hover { color: #c0d0e0; border-color: #2a3a4a; background: #0e1420; }
+  .product-pill.active { background: #111820; color: #f0f8ff; border-color: #ff5c00; box-shadow: 0 0 0 1px #ff5c0020; }
+  .product-pill-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 6px currentColor; }
+  .tab-section-label {
+    font-size: 9px; color: #2a4060; text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 0 6px; align-self: center; user-select: none; white-space: nowrap;
+  }
+  .tab-divider { width: 1px; height: 18px; background: #1e2530; margin: 0 4px; align-self: center; flex-shrink: 0; }
   .pill-add { color: #333; border-style: dashed; }
   .pill-add:hover { color: #555; }
 </style>
@@ -584,46 +597,56 @@
   </div>
 </header>
 
-<!-- ── Product Switcher ── -->
+<!-- ── Suite Switcher ── -->
 <div class="product-switcher" id="product-switcher">
+  <span class="suite-group-label">Outreach</span>
   <button class="product-pill active" data-product="outreach" onclick="switchProduct('outreach', this)">
-    <span class="product-pill-dot" style="background:#ff5c00;"></span> Outreach
+    <span class="product-pill-dot" style="background:#ff5c00;color:#ff5c00;"></span> Outreach
   </button>
-  <button class="product-pill" data-product="school_fees" onclick="switchProduct('school_fees', this)">
-    <span class="product-pill-dot" style="background:#00b4d8;"></span> School Fees
-  </button>
-  <button class="product-pill" data-product="digital_associates" onclick="switchProduct('digital_associates', this)">
-    <span class="product-pill-dot" style="background:#a78bfa;"></span> Digital Associates
-  </button>
-  <button class="product-pill" data-product="loan_officer" onclick="switchProduct('loan_officer', this)">
-    <span class="product-pill-dot" style="background:#16a34a;"></span> Loan Officer
-  </button>
-  <button class="product-pill" data-product="debt_collector" onclick="switchProduct('debt_collector', this)">
-    <span class="product-pill-dot" style="background:#ef4444;"></span> Debt Collector
-  </button>
-  <button class="product-pill" data-product="fx_lock" onclick="switchProduct('fx_lock', this)">
-    <span class="product-pill-dot" style="background:#f59e0b;"></span> FX Lock
-  </button>
-  <button class="product-pill" data-product="hr_suite" onclick="switchProduct('hr_suite', this)">
-    <span class="product-pill-dot" style="background:#6366f1;"></span> HR Suite
-  </button>
-  <button class="product-pill" data-product="market_credit" onclick="switchProduct('market_credit', this)">
-    <span class="product-pill-dot" style="background:#14b8a6;"></span> Market Credit
-  </button>
-  <button class="product-pill" data-product="product_auth" onclick="switchProduct('product_auth', this)">
-    <span class="product-pill-dot" style="background:#ec4899;"></span> Product Auth
-  </button>
-  <button class="product-pill" data-product="material_check" onclick="switchProduct('material_check', this)">
-    <span class="product-pill-dot" style="background:#f97316;"></span> Material Check
-  </button>
-  <button class="product-pill" data-product="fuel_reprice" onclick="switchProduct('fuel_reprice', this)">
-    <span class="product-pill-dot" style="background:#84cc16;"></span> Fuel Reprice
-  </button>
-  <button class="product-pill" data-product="float_optimizer" onclick="switchProduct('float_optimizer', this)">
-    <span class="product-pill-dot" style="background:#10b981;"></span> Float Optimizer
-  </button>
+  <div class="suite-divider"></div>
+  <span class="suite-group-label">Real Estate</span>
   <button class="product-pill" data-product="estate_os" onclick="switchProduct('estate_os', this)">
-    <span class="product-pill-dot" style="background:#f59e0b;"></span> EstateOS
+    <span class="product-pill-dot" style="background:#f5c842;color:#f5c842;"></span> EstateOS
+  </button>
+  <div class="suite-divider"></div>
+  <span class="suite-group-label">HR &amp; Talent</span>
+  <button class="product-pill" data-product="talent_os" onclick="switchProduct('talent_os', this)">
+    <span class="product-pill-dot" style="background:#6366f1;color:#6366f1;"></span> TalentOS
+  </button>
+  <div class="suite-divider"></div>
+  <span class="suite-group-label">Lending</span>
+  <button class="product-pill" data-product="lend_os" onclick="switchProduct('lend_os', this)">
+    <span class="product-pill-dot" style="background:#16a34a;color:#16a34a;"></span> LendOS
+  </button>
+  <div class="suite-divider"></div>
+  <span class="suite-group-label">Business</span>
+  <button class="product-pill" data-product="biz_os" onclick="switchProduct('biz_os', this)">
+    <span class="product-pill-dot" style="background:#ef4444;color:#ef4444;"></span> BizOS
+  </button>
+  <div class="suite-divider"></div>
+  <span class="suite-group-label">Education</span>
+  <button class="product-pill" data-product="school_os" onclick="switchProduct('school_os', this)">
+    <span class="product-pill-dot" style="background:#00b4d8;color:#00b4d8;"></span> SchoolOS
+  </button>
+  <div class="suite-divider"></div>
+  <span class="suite-group-label">Legal</span>
+  <button class="product-pill" data-product="legal_os" onclick="switchProduct('legal_os', this)">
+    <span class="product-pill-dot" style="background:#a78bfa;color:#a78bfa;"></span> LegalOS
+  </button>
+  <div class="suite-divider"></div>
+  <span class="suite-group-label">Construction</span>
+  <button class="product-pill" data-product="build_os" onclick="switchProduct('build_os', this)">
+    <span class="product-pill-dot" style="background:#f97316;color:#f97316;"></span> BuildOS
+  </button>
+  <div class="suite-divider"></div>
+  <span class="suite-group-label">Fleet &amp; Logistics</span>
+  <button class="product-pill" data-product="fleet_os" onclick="switchProduct('fleet_os', this)">
+    <span class="product-pill-dot" style="background:#84cc16;color:#84cc16;"></span> FleetOS
+  </button>
+  <div class="suite-divider"></div>
+  <span class="suite-group-label">Verification</span>
+  <button class="product-pill" data-product="trust_os" onclick="switchProduct('trust_os', this)">
+    <span class="product-pill-dot" style="background:#ec4899;color:#ec4899;"></span> TrustOS
   </button>
 </div>
 
@@ -639,21 +662,33 @@
   <button class="tab-btn" onclick="switchTab('tools', this)">Tools</button>
 </nav>
 
-<!-- ── Digital Associates Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="digital_associates" style="display:none;">
+<!-- ── LegalOS Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="legal_os" style="display:none;">
+  <span class="tab-section-label">Digital Associates</span>
   <button class="tab-btn active" onclick="switchTab('da_overview', this)">Overview</button>
   <button class="tab-btn" onclick="switchTab('da_reviews', this)">Reviews</button>
   <button class="tab-btn" onclick="switchTab('da_upload', this)">Upload Contract</button>
 </nav>
 
-<!-- ── AI Loan Officer Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="loan_officer" style="display:none;">
-  <button class="tab-btn active" onclick="switchTab('lo_queue', this)">Application Queue</button>
+<!-- ── LendOS Tab Nav (Loan Officer + Market Credit + FX Lock) ── -->
+<nav class="tab-nav product-tabs" data-product="lend_os" style="display:none;">
+  <span class="tab-section-label">Loan Officer</span>
+  <button class="tab-btn active" onclick="switchTab('lo_queue', this)">Queue</button>
   <button class="tab-btn" onclick="switchTab('lo_stats', this)">Stats</button>
+  <div class="tab-divider"></div>
+  <span class="tab-section-label">Market Credit</span>
+  <button class="tab-btn" onclick="switchTab('mc_queue', this)">Queue</button>
+  <button class="tab-btn" onclick="switchTab('mc_profiles', this)">Profiles</button>
+  <button class="tab-btn" onclick="switchTab('mc_submit', this)">New Application</button>
+  <div class="tab-divider"></div>
+  <span class="tab-section-label">FX Lock</span>
+  <button class="tab-btn" onclick="switchTab('fxl_monitor', this)">Rate Monitor</button>
+  <button class="tab-btn" onclick="switchTab('fxl_quotes', this)">Quotes</button>
+  <button class="tab-btn" onclick="switchTab('fxl_settings', this)">Alert Settings</button>
 </nav>
 
-<!-- ── School Fees Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="school_fees" style="display:none;">
+<!-- ── SchoolOS Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="school_os" style="display:none;">
   <button class="tab-btn active" onclick="switchTab('sf_overview', this)">Overview</button>
   <button class="tab-btn" onclick="switchTab('sf_schools', this)">Schools</button>
   <button class="tab-btn" onclick="switchTab('sf_students', this)">Students</button>
@@ -662,14 +697,15 @@
   <button class="tab-btn" id="sf-claims-tab-btn" onclick="switchTab('sf_claims', this)">Claims <span id="sf-claims-badge" style="background:#ff5c00;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:4px;display:none;">0</span></button>
 </nav>
 
-<!-- ── Debt Collector Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="debt_collector" style="display:none;">
+<!-- ── BizOS Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="biz_os" style="display:none;">
+  <span class="tab-section-label">Debt Collector</span>
   <button class="tab-btn active" onclick="switchTab('dc_overview', this)">Overview</button>
   <button class="tab-btn" onclick="switchTab('dc_cases', this)">Active Cases</button>
   <button class="tab-btn" onclick="switchTab('dc_add', this)">Add Case</button>
 </nav>
 
-<!-- ── FX Lock Tab Nav ── -->
+<!-- ── FX Lock (sub-nav — now inside LendOS, kept for direct access) ── -->
 <nav class="tab-nav product-tabs" data-product="fx_lock" style="display:none;">
   <button class="tab-btn active" onclick="switchTab('fxl_monitor', this)">Rate Monitor</button>
   <button class="tab-btn" onclick="switchTab('fxl_quotes', this)">Protected Quotes</button>
@@ -677,7 +713,7 @@
 </nav>
 
 <!-- ── HR Suite Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="hr_suite" style="display:none;">
+<nav class="tab-nav product-tabs" data-product="talent_os" style="display:none;">
   <button class="tab-btn active" onclick="switchTab('hr_overview', this); hrLoadOverview();">Overview</button>
   <button class="tab-btn" onclick="switchTab('hr_screener', this); hrLoadScreenings();">Job Screener</button>
   <button class="tab-btn" onclick="switchTab('hr_attendance', this); hrLoadAttendanceToday();">Attendance</button>
@@ -704,7 +740,7 @@
   <button class="tab-btn" onclick="switchTab('est_lawyer', this);">Lawyer Bundle</button>
 </nav>
 
-<!-- ── Market Credit Tab Nav ── -->
+<!-- ── Market Credit (sub-nav — now inside LendOS) ── -->
 <nav class="tab-nav product-tabs" data-product="market_credit" style="display:none;">
   <button class="tab-btn active" onclick="switchTab('mc_queue', this)">Application Queue</button>
   <button class="tab-btn" onclick="switchTab('mc_profiles', this)">Scored Profiles</button>
@@ -712,31 +748,32 @@
 </nav>
 
 
-<!-- ── Product Auth Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="product_auth" style="display:none;">
+<!-- ── TrustOS Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="trust_os" style="display:none;">
+  <span class="tab-section-label">Product Auth</span>
   <button class="tab-btn active" onclick="switchTab('pa_scan', this)">New Scan</button>
   <button class="tab-btn" onclick="switchTab('pa_history', this)">Scan History</button>
   <button class="tab-btn" onclick="switchTab('pa_flagged', this)">Flagged Products</button>
 </nav>
 
-<!-- ── Material Check Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="material_check" style="display:none;">
+<!-- ── BuildOS Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="build_os" style="display:none;">
+  <span class="tab-section-label">Material Check</span>
   <button class="tab-btn active" onclick="switchTab('mch_submit', this)">New Check</button>
   <button class="tab-btn" onclick="switchTab('mch_results', this)">Results</button>
   <button class="tab-btn" onclick="switchTab('mch_blacklist', this)">Supplier Blacklist</button>
 </nav>
 
 
-<!-- ── Fuel Reprice Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="fuel_reprice" style="display:none;">
+<!-- ── FleetOS Tab Nav (Fuel Reprice + Float Optimizer) ── -->
+<nav class="tab-nav product-tabs" data-product="fleet_os" style="display:none;">
+  <span class="tab-section-label">Fuel Reprice</span>
   <button class="tab-btn active" onclick="switchTab('fr_routes', this)">Routes</button>
-  <button class="tab-btn" onclick="switchTab('fr_alerts', this)">Reprice Alerts</button>
-  <button class="tab-btn" onclick="switchTab('fr_letters', this)">Generated Letters</button>
-</nav>
-
-<!-- ── Float Optimizer Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="float_optimizer" style="display:none;">
-  <button class="tab-btn active" onclick="switchTab('fo_dashboard', this)">Dashboard</button>
+  <button class="tab-btn" onclick="switchTab('fr_alerts', this)">Alerts</button>
+  <button class="tab-btn" onclick="switchTab('fr_letters', this)">Letters</button>
+  <div class="tab-divider"></div>
+  <span class="tab-section-label">Float Optimizer</span>
+  <button class="tab-btn" onclick="switchTab('fo_dashboard', this)">Dashboard</button>
   <button class="tab-btn" onclick="switchTab('fo_agents', this)">Agents</button>
   <button class="tab-btn" onclick="switchTab('fo_recommendations', this)">Recommendations</button>
 </nav>

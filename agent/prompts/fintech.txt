@@ -1,44 +1,51 @@
-## Vertical: Fintech & Lending
+## Vertical: Fintech & Lending — LendOS
 
 ### Who you're reaching
-Microfinance banks, digital lenders, credit companies, and fintech startups in Lagos. They process loan applications, run KYC checks, and manage repayment — most of it manually or with basic spreadsheets. Mid-sized firms (10–100 staff) with real operational pain are the best targets.
+Microfinance banks, digital lenders, cooperatives, fintechs, and credit companies in Lagos. They process loan applications, run KYC checks, assess creditworthiness, and manage repayment — mostly manually or with basic spreadsheets.
 
 ### Their pain
-Speed is money in lending. A loan officer manually reviewing 50 applications a day is the bottleneck between revenue and missed deals. KYC checks are slow, error-prone, and staff-dependent. Risk scoring relies on gut feel and basic rules, not data. Every hour of manual processing is a competitor opportunity.
+Speed is money in lending. A loan officer manually reviewing 50 applications per day is the bottleneck between revenue and missed deals. Market women and informal traders have no credit scores — yet they are creditworthy. FX volatility means invoice values shift between agreement and payment. Every hour of manual processing is a competitor opportunity.
 
-### What ReachNG offers them
-A "Digital Loan Officer" — an AI agent that ingests applications (via form, WhatsApp, or spreadsheet), runs structured risk assessment using their own criteria, flags anomalies, outputs a decision report, and escalates edge cases to human review. Never sleeps. Processes 1,000 applications per hour. No HR issues. No fuel allowance.
+### What ReachNG sells them — LendOS (₦100K–₦500K/month)
 
-### This is a high-ticket vertical
-- Setup fee: ₦2.5M–₦5M depending on complexity
-- Monthly retainer: ₦300k–₦500k
-- ROI framing: one loan officer costs ₦350k/mo in salary + overhead. The agent costs ₦300k/mo and handles 10x the volume with 99% consistency.
+LendOS is an AI-powered lending operating system. It replaces manual loan processing, informal credit assessment, and FX risk management with automated intelligence.
 
-### Email message template (personalise fully, this is a guide only)
+**AI Loan Officer** — Ingests applications via form, WhatsApp, or spreadsheet. Runs structured risk assessment, flags anomalies, and outputs a decision report. Processes 1,000 applications per hour. Never sleeps. Zero HR overhead.
+
+**Market Woman Credit Profiler** — Assesses creditworthiness for informal traders who have no credit bureau score. Analyses stability, cashflow patterns, association membership, references, and loan-to-sales ratio. Opens a new lending market most MFBs can't access.
+
+**FX Rate Invoice Lock** — For clients billing in USD/GBP/EUR. Locks the naira equivalent at today's parallel rate with an 8% premium buffer. Sends an alert if the rate moves past the threshold before payment arrives. Prevents FX losses on long-cycle invoices.
+
+**Cooperative Loan Manager** — Manages the full loan lifecycle for cooperatives: application, approval, disbursement, repayment tracking, and reminders via WhatsApp.
+
+**Behavioral Credit Scorer** — Builds a proprietary credit score using the lender's own repayment history data. More accurate than bureau scores for informal sector clients.
+
+### Email message template (personalise fully)
 ---
-Subject: Your loan processing team — replaced for ₦300k/month
+Subject: Process 1,000 loan applications per hour — [Company Name]
 
 Hi [Name],
 
-I noticed [Company Name] is processing loan applications manually. In Lagos's current lending environment, speed to decision is the difference between a disbursed loan and a lost customer.
+I noticed [Company Name] is processing applications manually. In Lagos's current lending environment, speed to decision is the difference between a disbursed loan and a lost customer.
 
-I build AI-powered "Digital Loan Officers" for Lagos fintechs — they ingest applications, run risk scoring, flag anomalies, and output structured decisions. No HR overhead. No errors. Processes 1,000 applications per hour.
+LendOS gives you an AI Loan Officer, a Market Woman Credit Profiler, and an FX Invoice Lock — together, they automate the full credit workflow and open informal lending markets your competitors can't reach.
 
-I'm onboarding 2 lenders this quarter for a pilot deployment. Worth a 20-minute conversation?
+Running a pilot for 2 lenders this quarter. Worth a 20-minute call?
 ---
 
 ### WhatsApp message template
 ---
-Hi [Name], I saw [Company Name] on [Platform] — looks like you're processing applications manually.
+Hi [Name], I saw [Company Name] is in the lending space. Manual application review at scale must be a serious bottleneck.
 
-I build "Digital Loan Officers" for Lagos fintechs — AI agents that handle application review, KYC cross-checks, and risk scoring automatically. One client replaced a 4-person team with a single agent running 24/7.
+LendOS automates your full loan process — from application intake and credit profiling to FX invoice locks and repayment tracking. We also built a Credit Profiler specifically for informal traders with no bureau score — a market most MFBs leave on the table.
 
 Running a free assessment for 2 firms this month. Interested?
 ---
 
 ### Key signals that make a lead strong
-- Active lending or fintech company (not just a payment processor)
-- Hiring for operations, loan officers, or data entry roles on LinkedIn/Jobberman (signals manual pain)
-- 10–100 employees — small enough to move fast, big enough to afford it
-- Located in VI, Lekki, Ikeja GRA — where credible Lagos fintechs cluster
-- Has a website with an application form (signals volume of applications)
+- Active MFB, cooperative, or fintech (not just a payment processor)
+- Hiring for operations or loan officer roles on LinkedIn/Jobberman (signals manual pain)
+- 10–100 employees — moves fast, has budget
+- Located in VI, Lekki, Surulere, Ikeja — where credible Lagos lenders operate
+- Has a website with an application form (signals application volume)
+- Services market women, traders, or informal sector (Market Woman Credit Profiler is a strong differentiator)

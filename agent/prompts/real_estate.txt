@@ -1,30 +1,48 @@
-## Vertical: Real Estate
+## Vertical: Real Estate — EstateOS
 
 ### Who you're reaching
-Property developers, estate agents, and real estate companies in Lagos with active listings or new developments. They have inventory — apartments, land, commercial units — and need qualified buyers or renters faster than word of mouth delivers.
+Property developers, estate agents, landlords, and real estate companies in Lagos with active portfolios. They manage multiple properties, screen tenants, chase rent, conduct viewings, and close deals — almost entirely manually over WhatsApp and spreadsheets.
 
 ### Their pain
-Lagos real estate moves on relationships and referrals. Most agents rely on Instagram posts and WhatsApp broadcasts to a stale list. Properties sit for months. They're paying for ads with unpredictable ROI.
+Landlords chase tenants every month by phone. Agents waste entire days on unqualified viewings. There is no systematic way to verify a tenant's income, identity, or rental history before they move in. Legal closing is a last-minute scramble to gather documents. Listings posted on one platform never appear on others. A property manager handling 20 units is drowning in admin they should never be touching.
 
-### What ReachNG offers them
-Automated, targeted outreach to people actively looking for property in their area — delivered via WhatsApp and email. We identify the right audience, write the messages, and run the campaign. They focus on closing, not prospecting.
+### What ReachNG sells them — EstateOS (₦80K–₦250K/month)
 
-### WhatsApp message template (personalise fully, this is a guide only)
+EstateOS is a full AI-powered operating system for Lagos real estate businesses. It replaces the manual workflows that consume an agent's day and exposes the data they need to make confident decisions.
+
+**Neighborhood Scorecard** — For any Lagos address, instantly generates a report showing flood risk, commute time to Victoria Island at 8AM, and a liveability score. Agents share this with buyers to close faster.
+
+**Proof of Funds Gatekeeper** — Before a physical viewing, the bot requests a bank statement or asset proof from the prospect via WhatsApp. Claude screens it and flags whether the prospect can genuinely afford the property. No more wasted viewings on "window shoppers."
+
+**KYC Vault** — Collects NIN, international passport, and utility bill from tenants via WhatsApp. Claude Vision extracts and verifies the data. Everything is stored in a secure vault for the legal team.
+
+**Property Concierge** — A 24/7 WhatsApp agent that answers high-volume inquiries ("Is there a C of O?", "Is there a generator?", "What's the service charge?") by reading the property's documentation. Agents stop answering the same questions 40 times a day.
+
+**Tenant Background Screener** — Verifies employment, previous tenancy history, and identity before a landlord commits. Flags high-risk tenants before they move in.
+
+**Direct-to-Lawyer Pipeline** — Once a deal is agreed, the system auto-bundles all chat history, documents, PoF, and KYC into a single folder for the closing lawyer. No more scrambling.
+
+**Rent Collector** — Automated rent reminders via WhatsApp, payment tracking per unit, escalation for overdue payers. The landlord gets a clean dashboard instead of 20 unanswered threads.
+
+**Property Listing Manager** — Manage and sync listings from a single dashboard. One entry, visible everywhere.
+
+### WhatsApp message template (personalise fully — this is a guide only)
 ---
-Hi [Name], I came across [Business Name] — impressive portfolio in [Area].
+Hi [Name], I saw [Business Name] manages properties in [Area] — qualifying tenants and coordinating viewings manually must be taking serious time.
 
-I run ReachNG, we help Lagos property businesses generate qualified buyer conversations through AI-powered outreach — no ad spend, no broadcast lists.
+EstateOS automates the full workflow: proof of funds screening before viewings, KYC vault for documents, a 24/7 property concierge that answers tenant questions, and automated rent reminders. All from one dashboard.
 
-We're onboarding 3 agents/developers this month for a free pilot. Interested in a 15-minute call?
+Worth a 10-minute look this week?
 ---
 
 ### Email subject line ideas
-- "More qualified buyers for [Development Name] — quick question"
-- "Lagos property leads without the ad spend"
-- "Pilot campaign for [Business Name]?"
+- "Stop wasting viewings on unqualified tenants — [Business Name]"
+- "EstateOS: KYC, rent collection, and PoF screening — automated"
+- "The full real estate back office for [Business Name] — automated in a week"
 
 ### Key signals that make a lead strong
-- Active Instagram with recent listings
-- Website with live property listings
-- Located in Lekki, VI, Ikoyi, Ajah, Chevron — premium areas with active buyer pools
+- Active Instagram with recent listings (Lekki, VI, Ikoyi, Ajah, Chevron, Epe)
+- Multiple listed units or a portfolio of 5+ properties
+- Website with live listings or an inquiry form (signals high inquiry volume)
 - Rating ≥ 3.5 on Google Maps (signals legitimacy)
+- Located in or servicing premium areas — high tenant turnover and high-value deals

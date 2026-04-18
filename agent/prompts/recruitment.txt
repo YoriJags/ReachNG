@@ -1,30 +1,52 @@
-## Vertical: Recruitment
+## Vertical: HR & Talent — TalentOS
 
 ### Who you're reaching
-HR consulting firms, staffing agencies, and executive search companies in Lagos. They're paid per placement — their revenue depends entirely on filling roles fast with the right people.
+HR consulting firms, staffing agencies, executive search companies, and in-house HR teams at Lagos companies with 10+ staff. They manage hiring, attendance, payroll, leave, compliance, and offboarding — with an overwhelming amount of manual overhead.
 
 ### Their pain
-Sourcing quality candidates in Lagos is slow. Job boards are flooded with unqualified applications. LinkedIn is expensive. Their researchers are doing manual searches that take days. They lose retainers when they can't deliver fast enough.
+Screening hundreds of candidates via WhatsApp back-and-forth takes days. Attendance is tracked on paper or Excel. Leave requests arrive via text and get forgotten. PENCOM remittances are calculated manually every month. Salary benchmarking requires hours of online research. HR teams drown in admin that could be automated — while real strategic work piles up.
 
-### What ReachNG offers them
-AI-powered candidate sourcing via LinkedIn and other professional networks — automatically surfacing qualified profiles that match their open roles. We run the search, write personalised outreach to candidates, and hand them warm responses. They close placements faster.
+### What ReachNG sells them — TalentOS (₦50K–₦200K/month)
 
-### WhatsApp message template (personalise fully)
+TalentOS is a full AI-powered HR operating system for Lagos employers. It eliminates the manual admin layer so HR teams spend time on people, not paperwork.
+
+**WhatsApp Job Screener** — Candidates receive a structured interview via WhatsApp the moment they apply. Claude scores responses on communication, role fit, and competence. HR only sees the top tier. Cuts screening time by 80%.
+
+**Staff Attendance Auditor** — Employees clock in/out via WhatsApp. The system flags anomalies — late arrivals, early exits, suspicious patterns — and delivers a weekly report. No more paper registers.
+
+**Salary Benchmarking Agent** — Instant market rate for any role in Nigeria. Tells you if you're under or over-market before you make an offer or lose a candidate. ₦15K per report.
+
+**PENCOM Remittance Tracker** — Calculates the 8% employee + 10% employer pension contributions automatically from the payroll file. Generates the monthly remittance schedule. Zero manual math.
+
+**Leave & Absence Manager** — Employees request leave via WhatsApp. HR approves or rejects from the dashboard. Balances tracked automatically. No requests lost in someone's DMs.
+
+**Employee Offboarding Checklist** — Triggers a structured exit workflow: asset retrieval, access revocation, final payroll, exit interview. Everything tracked and logged.
+
+**Probation Period Tracker** — Tracks probation end dates for all new hires, sends reminders before expiry, and generates the confirmation or extension letter automatically.
+
+**Company Policy Oracle** — Employees WhatsApp "How many leave days do I have?" or "What's the HMO dental policy?" The bot reads the company handbook and answers instantly. HR stops answering the same question 50 times a day.
+
+**Moonlighting Detector** — Analyses attendance patterns and external signals to flag staff who may be running side operations during work hours.
+
+**Salary Erosion Tracker** — Shows how inflation has eroded each employee's purchasing power since their last raise. Generates a retention risk report.
+
+### WhatsApp message template (personalise fully — this is a guide only)
 ---
-Hi [Name], I noticed [Business Name] specialises in [Sector] recruitment — strong work.
+Hi [Name], I noticed [Business Name] is growing — managing screening, attendance, leave, and PENCOM manually at that scale must be consuming your HR team.
 
-I run ReachNG, we help Lagos recruiters surface qualified candidates faster using AI-powered LinkedIn and professional network search — cuts sourcing time by 70%.
+TalentOS automates the full HR workflow: WhatsApp job screening, attendance tracking, leave management, PENCOM calculations, and a policy bot employees can ask questions 24/7. One dashboard, zero admin chaos.
 
-Taking on 2 agencies this month for a free pilot on one active role. Worth a quick call?
+Worth a 10-minute walk-through this week?
 ---
 
 ### Email subject line ideas
-- "Find qualified [Role Type] candidates 70% faster — pilot for [Business Name]"
-- "AI-powered sourcing for your open roles"
-- "Faster placements for [Business Name] — free pilot"
+- "Your HR admin — automated for [Business Name]"
+- "TalentOS: screening, PENCOM, leave, attendance — all on autopilot"
+- "Cut candidate screening time by 80% — [Business Name] pilot"
 
 ### Key signals that make a lead strong
-- Agency specialises in a specific sector (tech, finance, FMCG) — easier to personalise
-- Has active job postings on their website or LinkedIn
-- Mid-size firm (5–50 employees) — large enough to have budget, small enough to move fast
-- Located in Victoria Island or Ikoyi — professional services hub
+- Agency specialises in a specific sector (tech, finance, FMCG, oil & gas)
+- Company has 10–200 employees — real HR pain, real budget
+- Active job postings on their website or Jobberman/LinkedIn
+- Located in Victoria Island, Ikoyi, Ikeja GRA — professional services hub
+- Hiring for HR, admin, or operations roles (signals manual overhead they want to fix)

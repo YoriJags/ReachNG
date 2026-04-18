@@ -1,31 +1,40 @@
-## Vertical: Events & Experiences
+## Vertical: Events & Experiences — EventOS
 
 ### Who you're reaching
-Event planners, promoters, venue owners, and experience companies in Lagos. They sell tickets, sponsorships, and bookings. Their revenue lives or dies by how many people show up.
+Event planners, promoters, venue owners, caterers, and experience companies in Lagos. They coordinate vendors, manage guest lists, track payments, handle aso-ebi orders, and run ticket sales — all over WhatsApp and spreadsheets.
 
 ### Their pain
-Lagos events are heavily dependent on Instagram advertising and influencer posts — expensive, unpredictable, and hard to track. Promoters waste money reaching people who don't attend. Venue owners don't know where their next booking is coming from. They have no consistent outbound pipeline.
+Events have 15–30 vendors per show. Payments come in late or not at all. Aso-ebi orders get mixed up and cause drama two days before the event. Ticket resellers inflate prices and create fraud. All of it is managed manually, creating chaos at exactly the wrong moment.
 
-### What ReachNG offers them
-Targeted outreach to people who have attended similar events or venues in their area — via WhatsApp and email. We identify the right audience, craft personalised messages about upcoming events, and drive RSVPs and bookings directly. We also help venues reach corporate clients for bookings.
+### What ReachNG sells them — EventOS (₦30K–₦100K/month per planner)
+
+EventOS is an AI-powered event operations system for Lagos planners and promoters. It automates vendor coordination, aso-ebi tracking, budget management, and ticket fraud detection.
+
+**Event Vendor Coordinator** — Manages vendor confirmations, payment milestones, and delivery timelines via WhatsApp automatically. Sends reminders. Flags late vendors to the organiser. One agent replaces three coordination assistants.
+
+**Aso-ebi Coordinator** — Collects fabric orders via WhatsApp, tracks payments per person, assigns reference numbers, sends collection reminders. Organiser gets a clean order sheet — no missed orders, no confusion.
+
+**Ticket Resale Fraud Detector** — Monitors resale channels for inflated or counterfeit tickets linked to your events. Flags suspicious listings and generates takedown evidence.
+
+**Event Budget Tracker** — Tracks spend against budget in real time as vendor invoices and payments come in. Sends an alert before you go over budget, not after.
 
 ### WhatsApp message template (personalise fully)
 ---
-Hi [Name], [Business Name] in [Area] looks like a great spot — love what you're doing.
+Hi [Name], [Business Name] runs serious events — coordinating 20+ vendors per show manually must be intense.
 
-I run ReachNG, we help Lagos event businesses drive RSVPs and bookings through targeted AI outreach — reaching the right people before the event, not after.
+EventOS automates vendor confirmations, aso-ebi order tracking, budget management, and ticket fraud monitoring. You get notified when something needs your attention — not buried in WhatsApp threads.
 
-Running a free pilot for 3 promoters/venues this month. Can we jump on a quick call?
+Running a pilot this month. Worth a quick call?
 ---
 
 ### Email subject line ideas
-- "More RSVPs for your next event — free pilot for [Business Name]"
-- "Targeted outreach for [Venue/Event Name] — no ad spend"
-- "Drive bookings for [Business Name] this month"
+- "Vendor coordination for your next event — automated"
+- "Aso-ebi orders, vendor payments, ticket fraud — all solved"
+- "Replace 3 coordination assistants with one AI agent"
 
 ### Key signals that make a lead strong
-- Active events business with upcoming dates
-- Venue with corporate event capability (conference rooms, AV equipment)
+- Active events business with upcoming dates on Instagram
+- Venue with corporate event capability (conference rooms, AV)
 - Promoter with existing audience (Instagram 5k+)
 - Located in VI, Lekki, Ikeja — high-activity event zones
 - Google Maps rating ≥ 4.0 (legitimacy signal for venue)
