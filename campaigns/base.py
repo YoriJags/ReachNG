@@ -17,7 +17,7 @@ from tools.notifier import notify_whatsapp as notify_owner_whatsapp
 from tools.social import discover_social_leads
 from tools.ab_testing import assign_variant, record_ab_send
 from tools.enrichment import enrich_business, format_enrichment_for_prompt
-from agent import generate_outreach_message, should_contact, generate_social_outreach_message
+from agent import generate_outreach_message, generate_outreach_message_for_client, should_contact, generate_social_outreach_message
 from config import get_settings
 import structlog
 
@@ -99,12 +99,14 @@ class BaseCampaign:
         per_city_quota = max(3, maps_quota // len(target_cities))
         per_city_apollo = max(3, apollo_quota // len(target_cities))
 
+        is_client_campaign = bool(client_name)
         city_tasks = []
         for city in target_cities:
             city_tasks.append(discover_businesses(
                 vertical=self.vertical, max_results=per_city_quota,
                 query_override=query_override, city_override=city,
                 target_sectors=target_sectors,
+                is_client_campaign=is_client_campaign,
             ))
             city_tasks.append(discover_apollo_leads(
                 vertical=self.vertical, max_results=per_city_apollo, city_override=city,
@@ -163,6 +165,7 @@ class BaseCampaign:
                         vertical=self.vertical, max_results=per_city_quota,
                         query_override=query_override, city_override=ecity,
                         target_sectors=target_sectors,
+                        is_client_campaign=is_client_campaign,
                     ))
                     expand_tasks.append(discover_apollo_leads(
                         vertical=self.vertical, max_results=per_city_apollo, city_override=ecity,
@@ -280,6 +283,18 @@ class BaseCampaign:
                         post_text=biz["post_text"],
                         profile_url=biz.get("profile_url", ""),
                         address=biz.get("address"),
+                    )
+                elif client_brief:
+                    generated = generate_outreach_message_for_client(
+                        vertical=self.vertical,
+                        business_name=biz["name"],
+                        channel=channel,
+                        client_context=client_brief,
+                        address=biz.get("address"),
+                        category=biz.get("category"),
+                        rating=biz.get("rating"),
+                        website=biz.get("website"),
+                        is_followup=False,
                     )
                 else:
                     generated = generate_outreach_message(

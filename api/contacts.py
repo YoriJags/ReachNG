@@ -154,6 +154,12 @@ class CloseDealBody(BaseModel):
     notes: str = ""
 
 
+class OnboardBody(BaseModel):
+    plan: str = "starter"
+    monthly_fee_ngn: int | None = None
+    suite: str | None = None
+
+
 @router.patch("/{contact_id}/closed-won")
 async def contact_closed_won(contact_id: str, body: CloseDealBody):
     """Mark a lead as closed/won by the client. Records deal value for ROI tracking."""
@@ -318,6 +324,71 @@ async def discovery_health():
         },
         "unknown_source_count": unknown_count,
         "total": maps_count + apollo_count + social_count + signal_count + unknown_count,
+    }
+
+
+@router.post("/{contact_id}/onboard")
+async def onboard_as_client(contact_id: str, body: OnboardBody = OnboardBody()):
+    """Convert a prospect into a paying client — creates record, generates portal token, returns link."""
+    _validate_id(contact_id)
+    contact = get_contacts().find_one({"_id": ObjectId(contact_id)})
+    if not contact:
+        raise HTTPException(404, "Contact not found")
+
+    client_name = contact.get("name", "Unknown")
+    vertical    = body.suite or contact.get("vertical", "reachng")
+    phone       = contact.get("phone", "")
+    now         = datetime.now(timezone.utc)
+
+    from database import get_db
+    clients_col = get_db()["clients"]
+    set_doc = {
+        "name":            client_name,
+        "vertical":        vertical,
+        "brief":           f"Onboarded via Control Tower. Contact: {phone}",
+        "preferred_channel": "whatsapp",
+        "active":          True,
+        "plan":            body.plan,
+        "payment_status":  "trial",
+        "onboarded_at":    now,
+        "updated_at":      now,
+    }
+    if body.monthly_fee_ngn is not None:
+        set_doc["monthly_fee_ngn"] = body.monthly_fee_ngn
+    if phone:
+        set_doc["whatsapp_phone"] = phone
+
+    clients_col.update_one(
+        {"name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"}},
+        {"$set": set_doc, "$setOnInsert": {"created_at": now}},
+        upsert=True,
+    )
+
+    from api.portal import ensure_client_token
+    token      = ensure_client_token(client_name)
+    portal_url = f"/portal/{token}"
+
+    get_contacts().update_one(
+        {"_id": ObjectId(contact_id)},
+        {"$set": {"status": "converted", "converted_at": now, "client_name": client_name}},
+    )
+
+    first_name = client_name.split()[0]
+    wa_text = (
+        f"Hi {first_name}, welcome to ReachNG!\n\n"
+        f"Your live dashboard is ready — track your leads and outreach performance here:\n"
+        f"{{BASE_URL}}{portal_url}\n\n"
+        f"We're already finding businesses that match your ideal client profile. "
+        f"Let me know when you'd like to book a quick walkthrough."
+    )
+
+    return {
+        "success":       True,
+        "client":        client_name,
+        "portal_token":  token,
+        "portal_url":    portal_url,
+        "whatsapp_text": wa_text,
+        "phone":         phone,
     }
 
 

@@ -49,6 +49,67 @@ def get_expansion_cities(primary_city: str, max_expansions: int = 2) -> list[str
 # ─── Vertical search configs ──────────────────────────────────────────────────
 
 # Queries use {city} placeholder — substituted at runtime with client city (default: Lagos)
+#
+# VERTICAL_QUERIES  — ReachNG self-promotion: find businesses to pitch our products TO
+# PROSPECT_QUERIES  — Client campaign mode: find that client's TARGET CUSTOMERS
+#                     (their buyers/patients/tenants, not other businesses in their sector)
+PROSPECT_QUERIES: dict[str, list[str]] = {
+    "real_estate": [
+        "property buyers {city}",
+        "people looking for apartments {city}",
+        "buy land {city}",
+        "residential investors {city}",
+        "house rental {city}",
+    ],
+    "recruitment": [
+        "companies hiring {city}",
+        "startups hiring {city}",
+        "SME looking for staff {city}",
+        "employers {city}",
+        "companies expanding team {city}",
+    ],
+    "fintech": [
+        "SME needing loans {city}",
+        "small business owners {city}",
+        "entrepreneurs seeking finance {city}",
+        "businesses needing working capital {city}",
+    ],
+    "legal": [
+        "startups needing legal services {city}",
+        "SME needing contract review {city}",
+        "companies CAC registration {city}",
+        "businesses legal advice {city}",
+    ],
+    "logistics": [
+        "ecommerce companies {city}",
+        "manufacturers needing delivery {city}",
+        "importers {city}",
+        "online stores {city}",
+    ],
+    "agriculture": [
+        "food processors {city}",
+        "supermarkets {city}",
+        "restaurant chains {city}",
+        "hotels food supply {city}",
+    ],
+    "events": [
+        "wedding planners {city}",
+        "corporates planning events {city}",
+        "party organisers {city}",
+        "conference organisers {city}",
+    ],
+    "agency_sales": [
+        "real estate agency {city}",
+        "recruitment agency {city}",
+        "law firm {city}",
+        "event management company {city}",
+        "consulting firm {city}",
+        "digital marketing agency {city}",
+        "logistics company {city}",
+        "accounting firm {city}",
+    ],
+}
+
 VERTICAL_QUERIES = {
     "real_estate": [
         "real estate agent {city}",
@@ -195,10 +256,13 @@ async def discover_businesses(
     query_override: Optional[str] = None,
     city_override: Optional[str] = None,
     target_sectors: Optional[list[str]] = None,
+    is_client_campaign: bool = False,
 ) -> list[dict]:
     """
     Discover businesses for a vertical.
     city_override: replaces "Lagos" in all queries — e.g. "London, UK" for international clients.
+    is_client_campaign: when True, uses PROSPECT_QUERIES to find the client's target customers
+                        rather than VERTICAL_QUERIES which finds businesses to pitch ReachNG to.
     Returns a list of enriched contact dicts ready for upsert.
     """
     settings = get_settings()
@@ -207,6 +271,9 @@ async def discover_businesses(
 
     if query_override:
         queries = [query_override]
+    elif is_client_campaign and vertical in PROSPECT_QUERIES:
+        base_queries = PROSPECT_QUERIES[vertical]
+        queries = [q.format(city=city) for q in base_queries]
     elif vertical == "agency_sales" and target_sectors:
         # Build queries from only the requested sectors
         raw_queries = []

@@ -99,3 +99,43 @@ def dc_add_case(req: NewCaseRequest):
 def dc_mark_paid(case_id: str):
     store.mark_paid(case_id)
     return {"case_id": case_id, "status": "paid"}
+
+
+class PayLinkRequest(BaseModel):
+    debtor_email: str
+
+
+@router.post("/cases/{case_id}/payment-link")
+async def dc_payment_link(case_id: str, body: PayLinkRequest):
+    """Generate a Paystack payment link for a debt case. Share with debtor via WhatsApp."""
+    from services.debt_collector.store import get_case
+    from api.paystack import initialize_payment, PaymentLinkRequest as PstkReq
+
+    case = get_case(case_id)
+    if not case:
+        raise HTTPException(404, "Case not found")
+
+    amount = int(case.get("amount_ngn", 0))
+    if amount <= 0:
+        raise HTTPException(400, "Case has no amount recorded")
+
+    link = await initialize_payment(PstkReq(
+        client_name=case.get("debtor_business", case.get("debtor_name", "Debtor")),
+        email=body.debtor_email,
+        amount_ngn=amount,
+        plan_label=f"Debt Settlement — {case.get('description','')[:40]}",
+    ))
+
+    wa_text = (
+        f"Hi {case.get('debtor_name','')}, this is a payment link for the outstanding "
+        f"balance of ₦{amount:,} owed to {case.get('client_name','')}.\n\n"
+        f"Pay securely here: {link['payment_url']}\n\n"
+        f"Reference: {link['reference']}"
+    )
+
+    return {
+        "payment_url":   link["payment_url"],
+        "reference":     link["reference"],
+        "amount_ngn":    amount,
+        "whatsapp_text": wa_text,
+    }

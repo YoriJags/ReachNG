@@ -49,6 +49,10 @@ class Settings(BaseSettings):
     # Without this, fb_ads discovery is silently skipped.
     fb_ads_access_token: str | None = Field(default=None, env="FB_ADS_ACCESS_TOKEN")
 
+    # Paystack — Nigerian payment processing (client subscriptions)
+    paystack_secret_key: str | None = Field(default=None, env="PAYSTACK_SECRET_KEY")
+    paystack_public_key: str | None = Field(default=None, env="PAYSTACK_PUBLIC_KEY")
+
     # Owner notifications
     owner_whatsapp: str | None = Field(default=None, env="OWNER_WHATSAPP")
     slack_webhook_url: str | None = Field(default=None, env="SLACK_WEBHOOK_URL")

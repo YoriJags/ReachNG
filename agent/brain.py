@@ -624,7 +624,12 @@ def generate_auto_reply_draft(
     Returns the draft message text (queued to HITL for human approval before sending).
     """
     intent_instructions = {
-        "interested":      "They want to know more. Confirm their interest, suggest a quick call or meeting, keep it warm and low-pressure.",
+        "interested":      (
+            "They're interested. Confirm warmly, then ask ONE qualifying question: "
+            "either how many [clients/deliveries/employees/deals] they handle per month, "
+            "OR what their biggest operational headache is right now. "
+            "Keep it conversational — 2 sentences max. End with the qualifying question."
+        ),
         "question":        "Answer their question directly. Be helpful and brief. End with a soft next step.",
         "price_question":  "Don't give a full price list. Say pricing depends on their needs and suggest a quick call to understand what they need.",
         "not_now":         "Acknowledge their timing. Keep the door open. Don't push. One sentence max.",

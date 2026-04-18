@@ -94,6 +94,17 @@ def mark_paid(case_id: str):
     )
 
 
+def get_case(case_id: str) -> dict | None:
+    from bson.errors import InvalidId
+    try:
+        doc = _db().find_one({"_id": ObjectId(case_id)})
+    except InvalidId:
+        return None
+    if doc:
+        doc["_id"] = str(doc["_id"])
+    return doc
+
+
 def list_cases(client_name: str | None = None, status: str = "active") -> list[dict]:
     query = {"status": status}
     if client_name:

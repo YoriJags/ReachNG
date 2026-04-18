@@ -27,6 +27,11 @@ from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
 from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router, legal_review_router, loan_officer_router, debt_collector_router, market_credit_router, product_auth_router, material_check_router, fuel_reprice_router, float_optimizer_router, fx_salary_router, moonlighting_router, salary_erosion_router, fx_lock_router, hr_suite_router, estate_router, portal_estate_router, portal_talent_router
+from api.paystack import router as paystack_router
+from api.fleet_dispatcher import router as fleet_dispatcher_router
+from api.market_os import router as market_os_router
+from api.payroll import router as payroll_router
+from api.rent_roll import router as rent_roll_router
 from api.plans import seed_plans_if_empty
 from auth import require_auth
 from mcp_server import mcp
@@ -107,10 +112,16 @@ async def lifespan(app: FastAPI):
     ensure_b2c_indexes()
     from api.school_fees import ensure_school_fees_indexes
     ensure_school_fees_indexes()
+    from services.fleet_dispatcher.store import ensure_indexes as ensure_fleet_indexes
+    ensure_fleet_indexes()
     from services.legal_review.store import ensure_legal_indexes
     ensure_legal_indexes()
     from services.loan_officer.store import ensure_indexes as ensure_loan_indexes
     ensure_loan_indexes()
+    from services.hr_suite.payroll import ensure_payroll_indexes
+    from services.estate.rent_roll import ensure_rent_indexes
+    ensure_payroll_indexes()
+    ensure_rent_indexes()
     scheduler = setup_scheduler()
     scheduler.start()
     log.info("scheduler_started", jobs=[job.id for job in scheduler.get_jobs()])
@@ -197,6 +208,11 @@ app.include_router(hr_suite_router,         **_auth)
 app.include_router(estate_router,           **_auth)
 app.include_router(portal_estate_router)   # Token-gated — no Basic Auth
 app.include_router(portal_talent_router)   # Token-gated — no Basic Auth
+app.include_router(paystack_router,          prefix="/api/v1", **_auth)
+app.include_router(fleet_dispatcher_router,  prefix="/api/v1", **_auth)
+app.include_router(market_os_router,         prefix="/api/v1", **_auth)
+app.include_router(payroll_router,            **_auth)
+app.include_router(rent_roll_router,          **_auth)
 app.include_router(dashboard_router, **_auth)
 
 # Mount MCP server — exposes tools to Claude
