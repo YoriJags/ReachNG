@@ -550,37 +550,54 @@
   .wizard-check-status.fail { color: #ff4444; }
   .wizard-check-status.checking { color: #f5c842; }
 
-  /* ── Suite Switcher ── */
-  .product-switcher {
-    display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
-    padding: 14px 28px 0;
-    background: #080c10;
-    border-bottom: 1px solid #141a22;
+  /* ── Sidebar Layout ── */
+  .layout { display: flex; height: calc(100vh - 57px); overflow: hidden; }
+
+  .sidebar {
+    width: 190px; min-width: 190px;
+    background: #05080c;
+    border-right: 1px solid #0d1520;
+    overflow-y: auto; overflow-x: hidden;
+    padding: 8px 0 32px;
+    scrollbar-width: thin; scrollbar-color: #1a2530 transparent;
+    flex-shrink: 0;
   }
-  .suite-group-label {
-    font-size: 9px; color: #2a3a4a; text-transform: uppercase; letter-spacing: 1.5px;
-    padding: 0 8px 0 4px; align-self: center; user-select: none;
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #1a2530; border-radius: 2px; }
+
+  .sidebar-label {
+    font-size: 9px; color: #1a2a38; text-transform: uppercase;
+    letter-spacing: 1.5px; padding: 16px 16px 4px; display: block; user-select: none;
   }
-  .suite-divider {
-    width: 1px; height: 20px; background: #1e2530; margin: 0 6px; align-self: center; flex-shrink: 0;
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px 9px 13px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: 0.1px;
+    color: #2e4458; cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: color 0.1s, background 0.1s;
+    user-select: none;
   }
-  .product-pill {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
-    padding: 5px 14px; border-radius: 20px;
-    border: 1px solid #1e1e1e; background: #111; color: #555;
-    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  .sidebar-item:hover { color: #7090a8; background: #080e16; }
+  .sidebar-item.active { color: #d8eaf8; background: #0a1520; }
+  .sidebar-dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    opacity: 0.4; transition: opacity 0.1s;
   }
-  .product-pill:hover { color: #c0d0e0; border-color: #2a3a4a; background: #0e1420; }
-  .product-pill.active { background: #111820; color: #f0f8ff; border-color: #ff5c00; box-shadow: 0 0 0 1px #ff5c0020; }
-  .product-pill-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 6px currentColor; }
+  .sidebar-item.active .sidebar-dot { opacity: 1; }
+  .sidebar-item.active { border-left-color: var(--suite-accent, #ff5c00); }
+
+  .main-content {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    display: flex; flex-direction: column; min-width: 0;
+  }
+
+  /* ── Tab nav (inside main-content) ── */
   .tab-section-label {
-    font-size: 9px; color: #2a4060; text-transform: uppercase; letter-spacing: 1.2px;
-    padding: 0 6px; align-self: center; user-select: none; white-space: nowrap;
+    font-size: 9px; color: #1e3040; text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 0 8px; align-self: center; user-select: none; white-space: nowrap;
   }
-  .tab-divider { width: 1px; height: 18px; background: #1e2530; margin: 0 4px; align-self: center; flex-shrink: 0; }
-  .pill-add { color: #333; border-style: dashed; }
-  .pill-add:hover { color: #555; }
+  .tab-divider { width: 1px; height: 18px; background: #1a2530; margin: 0 4px; align-self: center; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -597,58 +614,61 @@
   </div>
 </header>
 
-<!-- ── Suite Switcher ── -->
-<div class="product-switcher" id="product-switcher">
-  <span class="suite-group-label">Outreach</span>
-  <button class="product-pill active" data-product="outreach" onclick="switchProduct('outreach', this)">
-    <span class="product-pill-dot" style="background:#ff5c00;color:#ff5c00;"></span> Outreach
-  </button>
-  <div class="suite-divider"></div>
-  <span class="suite-group-label">Real Estate</span>
-  <button class="product-pill" data-product="estate_os" onclick="switchProduct('estate_os', this)">
-    <span class="product-pill-dot" style="background:#f5c842;color:#f5c842;"></span> EstateOS
-  </button>
-  <div class="suite-divider"></div>
-  <span class="suite-group-label">HR &amp; Talent</span>
-  <button class="product-pill" data-product="talent_os" onclick="switchProduct('talent_os', this)">
-    <span class="product-pill-dot" style="background:#6366f1;color:#6366f1;"></span> TalentOS
-  </button>
-  <div class="suite-divider"></div>
-  <span class="suite-group-label">Lending</span>
-  <button class="product-pill" data-product="lend_os" onclick="switchProduct('lend_os', this)">
-    <span class="product-pill-dot" style="background:#16a34a;color:#16a34a;"></span> LendOS
-  </button>
-  <div class="suite-divider"></div>
-  <span class="suite-group-label">Business</span>
-  <button class="product-pill" data-product="biz_os" onclick="switchProduct('biz_os', this)">
-    <span class="product-pill-dot" style="background:#ef4444;color:#ef4444;"></span> BizOS
-  </button>
-  <div class="suite-divider"></div>
-  <span class="suite-group-label">Education</span>
-  <button class="product-pill" data-product="school_os" onclick="switchProduct('school_os', this)">
-    <span class="product-pill-dot" style="background:#00b4d8;color:#00b4d8;"></span> SchoolOS
-  </button>
-  <div class="suite-divider"></div>
-  <span class="suite-group-label">Legal</span>
-  <button class="product-pill" data-product="legal_os" onclick="switchProduct('legal_os', this)">
-    <span class="product-pill-dot" style="background:#a78bfa;color:#a78bfa;"></span> LegalOS
-  </button>
-  <div class="suite-divider"></div>
-  <span class="suite-group-label">Construction</span>
-  <button class="product-pill" data-product="build_os" onclick="switchProduct('build_os', this)">
-    <span class="product-pill-dot" style="background:#f97316;color:#f97316;"></span> BuildOS
-  </button>
-  <div class="suite-divider"></div>
-  <span class="suite-group-label">Fleet &amp; Logistics</span>
-  <button class="product-pill" data-product="fleet_os" onclick="switchProduct('fleet_os', this)">
-    <span class="product-pill-dot" style="background:#84cc16;color:#84cc16;"></span> FleetOS
-  </button>
-  <div class="suite-divider"></div>
-  <span class="suite-group-label">Verification</span>
-  <button class="product-pill" data-product="trust_os" onclick="switchProduct('trust_os', this)">
-    <span class="product-pill-dot" style="background:#ec4899;color:#ec4899;"></span> TrustOS
-  </button>
-</div>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+
+  <span class="sidebar-label">Outreach</span>
+  <div class="sidebar-item active" data-product="outreach" style="--suite-accent:#ff5c00" onclick="switchProduct('outreach', this)">
+    <span class="sidebar-dot" style="background:#ff5c00;"></span> Outreach
+  </div>
+
+  <span class="sidebar-label">Real Estate</span>
+  <div class="sidebar-item" data-product="estate_os" style="--suite-accent:#f5c842" onclick="switchProduct('estate_os', this)">
+    <span class="sidebar-dot" style="background:#f5c842;"></span> EstateOS
+  </div>
+
+  <span class="sidebar-label">HR &amp; Talent</span>
+  <div class="sidebar-item" data-product="talent_os" style="--suite-accent:#6366f1" onclick="switchProduct('talent_os', this)">
+    <span class="sidebar-dot" style="background:#6366f1;"></span> TalentOS
+  </div>
+
+  <span class="sidebar-label">Lending</span>
+  <div class="sidebar-item" data-product="lend_os" style="--suite-accent:#16a34a" onclick="switchProduct('lend_os', this)">
+    <span class="sidebar-dot" style="background:#16a34a;"></span> LendOS
+  </div>
+
+  <span class="sidebar-label">Business</span>
+  <div class="sidebar-item" data-product="biz_os" style="--suite-accent:#ef4444" onclick="switchProduct('biz_os', this)">
+    <span class="sidebar-dot" style="background:#ef4444;"></span> BizOS
+  </div>
+
+  <span class="sidebar-label">Education</span>
+  <div class="sidebar-item" data-product="school_os" style="--suite-accent:#00b4d8" onclick="switchProduct('school_os', this)">
+    <span class="sidebar-dot" style="background:#00b4d8;"></span> SchoolOS
+  </div>
+
+  <span class="sidebar-label">Legal</span>
+  <div class="sidebar-item" data-product="legal_os" style="--suite-accent:#a78bfa" onclick="switchProduct('legal_os', this)">
+    <span class="sidebar-dot" style="background:#a78bfa;"></span> LegalOS
+  </div>
+
+  <span class="sidebar-label">Construction</span>
+  <div class="sidebar-item" data-product="build_os" style="--suite-accent:#f97316" onclick="switchProduct('build_os', this)">
+    <span class="sidebar-dot" style="background:#f97316;"></span> BuildOS
+  </div>
+
+  <span class="sidebar-label">Fleet &amp; Logistics</span>
+  <div class="sidebar-item" data-product="fleet_os" style="--suite-accent:#84cc16" onclick="switchProduct('fleet_os', this)">
+    <span class="sidebar-dot" style="background:#84cc16;"></span> FleetOS
+  </div>
+
+  <span class="sidebar-label">Verification</span>
+  <div class="sidebar-item" data-product="trust_os" style="--suite-accent:#ec4899" onclick="switchProduct('trust_os', this)">
+    <span class="sidebar-dot" style="background:#ec4899;"></span> TrustOS
+  </div>
+
+</aside>
+<div class="main-content" id="main-content">
 
 <!-- ── Outreach Tab Nav ── -->
 <nav class="tab-nav product-tabs" data-product="outreach">
@@ -2970,7 +2990,8 @@
       <button class="btn btn-approve" onclick="submitEdit()">Save &amp; Send</button>
     </div>
   </div>
-</div>
+</div><!-- /main-content -->
+</div><!-- /layout -->
 
 <script>
 const VERTICAL_ICONS = { real_estate:"RE", recruitment:"HR", events:"EV", fintech:"FT", legal:"LG", logistics:"LS", agriculture:"AG" };
@@ -3155,7 +3176,7 @@ function _replyCardHtml(r, INTENT_CLASS) {
 
 function switchProduct(product, pill) {
   _activeProduct = product;
-  document.querySelectorAll(".product-pill").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".sidebar-item").forEach(p => p.classList.remove("active"));
   pill.classList.add("active");
 
   // Show/hide tab navs
