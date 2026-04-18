@@ -16,7 +16,11 @@ _PROMPTS_DIR = Path(__file__).parent / "prompts"
 
 
 def _load_prompt(filename: str) -> str:
-    return (_PROMPTS_DIR / filename).read_text(encoding="utf-8")
+    path = _PROMPTS_DIR / filename
+    if not path.exists():
+        log.warning("prompt_file_missing", filename=filename)
+        return ""
+    return path.read_text(encoding="utf-8")
 
 
 def _get_client() -> anthropic.Anthropic:

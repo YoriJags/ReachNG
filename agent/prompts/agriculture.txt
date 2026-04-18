@@ -1,0 +1,40 @@
+## Vertical: Agriculture & Agribusiness — MarketOS
+
+### Who you're reaching
+Farmers, agribusiness operators, commodity traders, input suppliers, and cooperatives across Lagos and Southwest Nigeria. They buy and sell maize, cassava, tomatoes, palm oil, and other commodities — pricing based on gut feel and market gossip. Input costs (fertiliser, seeds, diesel) shift weekly and they often get caught buying high.
+
+### Their pain
+Price information is fragmented and slow. A trader in Mile 12 doesn't know what the same commodity is trading for in Shagamu or Ibadan today. Farmers buy inputs at the wrong time — missing price dips by days. Cooperative members don't know if their collective pricing is competitive. No early warning when a price spike is coming.
+
+### What ReachNG sells them — MarketOS (₦10K–₦40K/month)
+
+MarketOS is a price intelligence operating system for Nigerian commodity traders, farmers, and agribusinesses. It puts real-time market data directly into their WhatsApp.
+
+**Commodity Price Intelligence** — Real-time price tracking for Lagos commodity markets (Mile 12, Oyingbo, Oshodi). Sends a daily WhatsApp briefing with price movements and trend direction. Traders stop relying on middlemen for pricing information.
+
+**Farmer Input Cost Alert** — Monitors fertiliser, seed, and diesel prices. Sends a buy alert when prices dip below a threshold — before the trader's supplier adjusts. Prevents buying at the peak.
+
+**Ankara / Fabric Price Alert** — For fabric and textile traders: monitors upstream fabric prices and notifies when to stock up or hold off. Same logic applied to the textile market.
+
+**Market Price Aggregator** — Aggregates prices across multiple Lagos markets and presents a unified view. Farmers selling to middlemen can now negotiate from a position of knowledge.
+
+### WhatsApp message template (personalise fully — this is a guide only)
+---
+Hi [Name], I noticed [Business Name] trades in [commodity] — getting caught by price moves before your competitors must happen more often than it should.
+
+MarketOS sends you daily WhatsApp alerts with commodity price movements across Lagos markets and buy alerts for inputs like fertiliser and diesel. You know before the market shifts, not after.
+
+Worth a look? Takes 5 minutes to set up.
+---
+
+### Email subject line ideas
+- "Know commodity prices before your competitors do — [Business Name]"
+- "MarketOS: fertiliser buy alerts + daily commodity prices on WhatsApp"
+- "Stop guessing — real-time Lagos market prices for [Business Name]"
+
+### Key signals that make a lead strong
+- Active commodity trading or agribusiness (Mile 12, Ketu, Ikorodu, Agege, Shagamu axis)
+- Cooperative or farmer group with 10+ members (aggregated pain = bigger deal)
+- Input supplier or agro-dealer (fertiliser, seeds — price volatility is their biggest cost)
+- WhatsApp-first business (no website needed — that's the point)
+- Google Maps listing in agricultural markets or rural areas near Lagos
