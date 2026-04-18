@@ -1,0 +1,136 @@
+"""
+HR Suite — multi-feature engine for Nigerian SME HR management.
+
+Features:
+  1. Job Screener        — AI-generated WhatsApp screening questionnaire
+  2. Salary Benchmark    — Nigerian market rate lookup via Claude
+  3. Offboarding         — structured checklist generator
+  4. Policy Bot          — handbook Q&A via Claude
+  5. PENCOM              — pension remittance calculator (18% of basic salary)
+"""
+import anthropic
+from datetime import datetime, timezone, date
+from config import get_settings
+import structlog
+
+log = structlog.get_logger()
+
+
+def _claude(prompt: str, system: str = "", max_tokens: int = 800) -> str:
+    client = anthropic.Anthropic(api_key=get_settings().anthropic_api_key)
+    kwargs = dict(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=max_tokens,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    if system:
+        kwargs["system"] = system
+    return client.messages.create(**kwargs).content[0].text.strip()
+
+
+# ── Job Screener ───────────────────────────────────────────────────────────────
+
+_SCREENER_SYSTEM = """You are an HR consultant generating WhatsApp screening questions \
+for Nigerian SMEs. Questions must be concise (WhatsApp-friendly), role-specific, and \
+uncover real competency. Nigerian hiring context: many candidates inflate CVs, \
+so probe with specific situational questions. Include 1 practical test question."""
+
+
+def generate_screening_questions(role: str, sector: str, requirements: str, salary_range: str, location: str) -> str:
+    prompt = f"""Create a 5-question WhatsApp screening interview for:
+
+Role: {role}
+Sector: {sector}
+Location: {location}
+Salary Range: {salary_range}
+Key Requirements: {requirements}
+
+Format as numbered questions (1–5). Each question max 2 sentences. \
+Include one practical question that reveals actual skill level. \
+End with instructions for the candidate on how to respond."""
+    return _claude(prompt, system=_SCREENER_SYSTEM, max_tokens=600)
+
+
+# ── Salary Benchmarking ────────────────────────────────────────────────────────
+
+_BENCH_SYSTEM = """You are a Nigerian HR compensation specialist with current market data \
+from Jobberman, LinkedIn Nigeria, MyJobMag, and direct recruiter intel. \
+You know salary ranges across Lagos, Abuja, Port Harcourt, and remote roles. \
+Be specific with naira figures. Format: Min / Mid / Max per month."""
+
+
+def benchmark_salary(role: str, sector: str, location: str, years_exp: str, company_size: str) -> dict:
+    prompt = f"""What is the current market salary range for this role in Nigeria?
+
+Role: {role}
+Sector / Industry: {sector}
+Location: {location}
+Experience Required: {years_exp} years
+Company Size: {company_size}
+
+Give:
+1. Min salary (₦/month) — entry of this bracket
+2. Mid salary (₦/month) — competitive offer
+3. Max salary (₦/month) — top of market for this role
+4. 2-sentence context (what drives the range, recent trends)
+5. Hiring insight: one thing Nigerian companies get wrong when hiring for this role
+
+Be direct with specific naira figures. No ranges like "₦150K–₦200K" in the min/mid/max — give one number each."""
+    text = _claude(prompt, system=_BENCH_SYSTEM, max_tokens=500)
+    return {"benchmark_text": text}
+
+
+# ── Offboarding Checklist ──────────────────────────────────────────────────────
+
+def generate_offboarding_checklist(
+    company: str, staff_name: str, role: str,
+    last_day: str, reason: str, assets: str
+) -> str:
+    prompt = f"""Generate a structured employee offboarding checklist for a Nigerian company.
+
+COMPANY: {company}
+DEPARTING STAFF: {staff_name}
+ROLE: {role}
+LAST WORKING DAY: {last_day}
+REASON FOR LEAVING: {reason}
+COMPANY ASSETS HELD: {assets}
+
+Format as a numbered checklist with owner (HR / IT / Finance / Manager) in brackets.
+Sections: Day 1 (immediate), Before Last Day, Last Day, Post-Departure.
+Include: IT access revocation, asset return, handover document, final salary + outstanding leave pay,
+PENCOM final remittance, reference letter (if applicable), LinkedIn disconnection from company page.
+Be specific to Nigerian context (e.g. mention BVN, NHF, PENCOM where relevant)."""
+    return _claude(prompt, max_tokens=700)
+
+
+# ── Policy Bot ─────────────────────────────────────────────────────────────────
+
+def answer_policy_question(policy_text: str, question: str) -> str:
+    prompt = f"""COMPANY POLICY DOCUMENT:
+{policy_text[:3000]}
+
+STAFF QUESTION: {question}
+
+Answer the question directly based only on the policy document above. \
+If the policy doesn't cover this topic, say so clearly. \
+Keep answer under 4 sentences. Use plain English — no legal jargon."""
+    return _claude(prompt, max_tokens=300)
+
+
+# ── PENCOM Calculator ──────────────────────────────────────────────────────────
+
+PENCOM_EMPLOYER_PCT = 0.10   # 10% employer contribution
+PENCOM_EMPLOYEE_PCT = 0.08   # 8% employee contribution (total 18% of basic)
+
+
+def calculate_pencom(basic_salary: float) -> dict:
+    employer = round(basic_salary * PENCOM_EMPLOYER_PCT)
+    employee = round(basic_salary * PENCOM_EMPLOYEE_PCT)
+    total    = employer + employee
+    return {
+        "basic_salary":      basic_salary,
+        "employer_contribution": employer,
+        "employee_contribution": employee,
+        "total_monthly":     total,
+        "annual_total":      total * 12,
+    }

@@ -26,7 +26,7 @@ from posthog import Posthog
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
-from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router, legal_review_router, loan_officer_router
+from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router, legal_review_router, loan_officer_router, debt_collector_router, market_credit_router, product_auth_router, material_check_router, fuel_reprice_router, float_optimizer_router, fx_salary_router, moonlighting_router, salary_erosion_router, fx_lock_router, hr_suite_router, estate_router, portal_estate_router, portal_talent_router
 from api.plans import seed_plans_if_empty
 from auth import require_auth
 from mcp_server import mcp
@@ -183,6 +183,20 @@ app.include_router(webhooks_router,       prefix="/api/v1")  # No Basic Auth —
 app.include_router(portal_router)        # Portal uses token auth — no Basic Auth
 app.include_router(legal_review_router)  # /legal/... — public demo (no Basic Auth)
 app.include_router(loan_officer_router)  # /loan/portal public; /loan/apply + management require Basic Auth
+app.include_router(debt_collector_router,   **_auth)
+app.include_router(market_credit_router,    **_auth)
+app.include_router(product_auth_router,     **_auth)
+app.include_router(material_check_router,   **_auth)
+app.include_router(fuel_reprice_router,     **_auth)
+app.include_router(float_optimizer_router,  **_auth)
+app.include_router(fx_salary_router,        **_auth)
+app.include_router(moonlighting_router,     **_auth)
+app.include_router(salary_erosion_router,   **_auth)
+app.include_router(fx_lock_router,          **_auth)
+app.include_router(hr_suite_router,         **_auth)
+app.include_router(estate_router,           **_auth)
+app.include_router(portal_estate_router)   # Token-gated — no Basic Auth
+app.include_router(portal_talent_router)   # Token-gated — no Basic Auth
 app.include_router(dashboard_router, **_auth)
 
 # Mount MCP server — exposes tools to Claude

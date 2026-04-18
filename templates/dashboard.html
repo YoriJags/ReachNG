@@ -552,7 +552,7 @@
 
   /* ── Product Switcher ── */
   .product-switcher {
-    display: flex; align-items: center; gap: 6px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
     padding: 10px 28px 0;
     background: #0a0a0a;
   }
@@ -598,6 +598,33 @@
   <button class="product-pill" data-product="loan_officer" onclick="switchProduct('loan_officer', this)">
     <span class="product-pill-dot" style="background:#16a34a;"></span> Loan Officer
   </button>
+  <button class="product-pill" data-product="debt_collector" onclick="switchProduct('debt_collector', this)">
+    <span class="product-pill-dot" style="background:#ef4444;"></span> Debt Collector
+  </button>
+  <button class="product-pill" data-product="fx_lock" onclick="switchProduct('fx_lock', this)">
+    <span class="product-pill-dot" style="background:#f59e0b;"></span> FX Lock
+  </button>
+  <button class="product-pill" data-product="hr_suite" onclick="switchProduct('hr_suite', this)">
+    <span class="product-pill-dot" style="background:#6366f1;"></span> HR Suite
+  </button>
+  <button class="product-pill" data-product="market_credit" onclick="switchProduct('market_credit', this)">
+    <span class="product-pill-dot" style="background:#14b8a6;"></span> Market Credit
+  </button>
+  <button class="product-pill" data-product="product_auth" onclick="switchProduct('product_auth', this)">
+    <span class="product-pill-dot" style="background:#ec4899;"></span> Product Auth
+  </button>
+  <button class="product-pill" data-product="material_check" onclick="switchProduct('material_check', this)">
+    <span class="product-pill-dot" style="background:#f97316;"></span> Material Check
+  </button>
+  <button class="product-pill" data-product="fuel_reprice" onclick="switchProduct('fuel_reprice', this)">
+    <span class="product-pill-dot" style="background:#84cc16;"></span> Fuel Reprice
+  </button>
+  <button class="product-pill" data-product="float_optimizer" onclick="switchProduct('float_optimizer', this)">
+    <span class="product-pill-dot" style="background:#10b981;"></span> Float Optimizer
+  </button>
+  <button class="product-pill" data-product="estate_os" onclick="switchProduct('estate_os', this)">
+    <span class="product-pill-dot" style="background:#f59e0b;"></span> EstateOS
+  </button>
 </div>
 
 <!-- ── Outreach Tab Nav ── -->
@@ -633,6 +660,85 @@
   <button class="tab-btn" onclick="switchTab('sf_payments', this)">Payments</button>
   <button class="tab-btn" onclick="switchTab('sf_reminders', this)">Reminders</button>
   <button class="tab-btn" id="sf-claims-tab-btn" onclick="switchTab('sf_claims', this)">Claims <span id="sf-claims-badge" style="background:#ff5c00;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:4px;display:none;">0</span></button>
+</nav>
+
+<!-- ── Debt Collector Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="debt_collector" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('dc_overview', this)">Overview</button>
+  <button class="tab-btn" onclick="switchTab('dc_cases', this)">Active Cases</button>
+  <button class="tab-btn" onclick="switchTab('dc_add', this)">Add Case</button>
+</nav>
+
+<!-- ── FX Lock Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="fx_lock" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('fxl_monitor', this)">Rate Monitor</button>
+  <button class="tab-btn" onclick="switchTab('fxl_quotes', this)">Protected Quotes</button>
+  <button class="tab-btn" onclick="switchTab('fxl_settings', this)">Alert Settings</button>
+</nav>
+
+<!-- ── HR Suite Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="hr_suite" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('hr_overview', this); hrLoadOverview();">Overview</button>
+  <button class="tab-btn" onclick="switchTab('hr_screener', this); hrLoadScreenings();">Job Screener</button>
+  <button class="tab-btn" onclick="switchTab('hr_attendance', this); hrLoadAttendanceToday();">Attendance</button>
+  <button class="tab-btn" onclick="switchTab('hr_leave', this); hrLoadLeavePending();">Leave</button>
+  <button class="tab-btn" onclick="switchTab('hr_salary', this); hrLoadBenchmarks();">Salary</button>
+  <button class="tab-btn" onclick="switchTab('hr_pencom', this); hrLoadPencom();">PENCOM</button>
+  <button class="tab-btn" onclick="switchTab('hr_offboarding', this);">Offboarding</button>
+  <button class="tab-btn" onclick="switchTab('hr_erosion', this);">Erosion Tracker</button>
+  <button class="tab-btn" onclick="switchTab('hr_moonlighting', this); mlLoadOverview();">Moonlighting</button>
+  <button class="tab-btn" onclick="switchTab('hr_fxsalary', this); fxsLoadDashboard();">FX Salary</button>
+  <button class="tab-btn" onclick="switchTab('hr_probation', this); hrLoadProbationUpcoming();">Probation</button>
+  <button class="tab-btn" onclick="switchTab('hr_policy', this);">Policy Bot</button>
+</nav>
+
+<!-- ── EstateOS Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="estate_os" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('est_overview', this); estLoadOverview();">Overview</button>
+  <button class="tab-btn" onclick="switchTab('est_listings', this); estLoadListings();">Listings</button>
+  <button class="tab-btn" onclick="switchTab('est_scorecard', this);">Neighborhood Score</button>
+  <button class="tab-btn" onclick="switchTab('est_concierge', this); estLoadListingsForConcierge();">Property Concierge</button>
+  <button class="tab-btn" onclick="switchTab('est_pof', this); estLoadPof();">Proof of Funds</button>
+  <button class="tab-btn" onclick="switchTab('est_kyc', this); estLoadKyc();">KYC Vault</button>
+  <button class="tab-btn" onclick="switchTab('est_background', this); estLoadBackground();">Background Check</button>
+  <button class="tab-btn" onclick="switchTab('est_lawyer', this);">Lawyer Bundle</button>
+</nav>
+
+<!-- ── Market Credit Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="market_credit" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('mc_queue', this)">Application Queue</button>
+  <button class="tab-btn" onclick="switchTab('mc_profiles', this)">Scored Profiles</button>
+  <button class="tab-btn" onclick="switchTab('mc_submit', this)">New Application</button>
+</nav>
+
+
+<!-- ── Product Auth Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="product_auth" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('pa_scan', this)">New Scan</button>
+  <button class="tab-btn" onclick="switchTab('pa_history', this)">Scan History</button>
+  <button class="tab-btn" onclick="switchTab('pa_flagged', this)">Flagged Products</button>
+</nav>
+
+<!-- ── Material Check Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="material_check" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('mch_submit', this)">New Check</button>
+  <button class="tab-btn" onclick="switchTab('mch_results', this)">Results</button>
+  <button class="tab-btn" onclick="switchTab('mch_blacklist', this)">Supplier Blacklist</button>
+</nav>
+
+
+<!-- ── Fuel Reprice Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="fuel_reprice" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('fr_routes', this)">Routes</button>
+  <button class="tab-btn" onclick="switchTab('fr_alerts', this)">Reprice Alerts</button>
+  <button class="tab-btn" onclick="switchTab('fr_letters', this)">Generated Letters</button>
+</nav>
+
+<!-- ── Float Optimizer Tab Nav ── -->
+<nav class="tab-nav product-tabs" data-product="float_optimizer" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('fo_dashboard', this)">Dashboard</button>
+  <button class="tab-btn" onclick="switchTab('fo_agents', this)">Agents</button>
+  <button class="tab-btn" onclick="switchTab('fo_recommendations', this)">Recommendations</button>
 </nav>
 
 <!-- ── Overview ───────────────────────────────────────────────────────────────── -->
@@ -1819,6 +1925,877 @@
   <div id="lo-stats-body" style="color:#5080a0;font-size:13px;">Loading…</div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════════════════
+     DEBT COLLECTOR PANELS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-dc_overview" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Debt Recovery Overview</p>
+  <div id="dc-kpi-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="dc-kpi-active">—</div><div class="ct-kpi-lbl">Active Cases</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="dc-kpi-overdue" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Total Overdue (₦)</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="dc-kpi-legal" style="color:#f59e0b;">—</div><div class="ct-kpi-lbl">At Legal Stage</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="dc-kpi-recovered" style="color:#16a34a;">—</div><div class="ct-kpi-lbl">Recovered This Month</div></div>
+  </div>
+  <div id="dc-overview-body" style="color:#555;font-size:13px;">Loading…</div>
+</div>
+
+<div class="tab-panel" id="tab-dc_cases" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Active Debt Cases</p>
+  <div style="overflow-x:auto;"><table class="data-table" id="dc-cases-table">
+    <thead><tr><th>Debtor</th><th>Business</th><th>Amount (₦)</th><th>Days Overdue</th><th>Stage</th><th>Actions</th></tr></thead>
+    <tbody id="dc-cases-body"><tr><td colspan="6" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
+  </table></div>
+</div>
+
+<div class="tab-panel" id="tab-dc_add" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Add Debt Case</p>
+  <div style="max-width:520px;">
+    <div style="display:grid;gap:12px;">
+      <input class="form-input" id="dc-add-client" placeholder="Your business name (creditor)">
+      <input class="form-input" id="dc-add-debtor-name" placeholder="Debtor name">
+      <input class="form-input" id="dc-add-debtor-biz" placeholder="Debtor business">
+      <input class="form-input" id="dc-add-debtor-phone" placeholder="Debtor WhatsApp number (+234...)">
+      <input class="form-input" id="dc-add-amount" type="number" placeholder="Amount owed (₦)">
+      <input class="form-input" id="dc-add-desc" placeholder="What the debt is for (e.g. Jan 2026 supply invoice)">
+      <input class="form-input" id="dc-add-due-date" type="date" placeholder="Original due date">
+      <textarea class="form-input" id="dc-add-context" rows="2" placeholder="Relationship context (optional — e.g. 'regular supplier for 2 years')"></textarea>
+      <button class="btn btn-approve" onclick="dcAddCase()">Add Case & Start Recovery</button>
+      <div id="dc-add-result" style="font-size:12px;color:#555;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     FX LOCK PANELS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-fxl_monitor" style="display:none;">
+  <p class="section-title" style="margin-top:0;">FX Rate Monitor</p>
+  <div id="fxl-kpi-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxl-kpi-rate" style="color:#f59e0b;">—</div><div class="ct-kpi-lbl">USD/NGN (Parallel)</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxl-kpi-change">—</div><div class="ct-kpi-lbl">24h Change (%)</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxl-kpi-locked" style="color:#16a34a;">—</div><div class="ct-kpi-lbl">Quotes Locked Today</div></div>
+  </div>
+  <div id="fxl-rate-history" style="color:#555;font-size:13px;">Loading rate history…</div>
+</div>
+
+<div class="tab-panel" id="tab-fxl_quotes" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Protected Quotes</p>
+  <p style="color:#555;font-size:12px;margin-bottom:12px;">Quotes locked at a specific exchange rate. System alerts you if the rate moves beyond your threshold before the quote expires.</p>
+  <div style="display:grid;gap:12px;max-width:520px;margin-bottom:20px;">
+    <input class="form-input" id="fxl-client-name" placeholder="Your business name">
+    <input class="form-input" id="fxl-quote-desc" placeholder="Quote description (e.g. March equipment order)">
+    <input class="form-input" id="fxl-quote-usd" type="number" placeholder="Quote value in USD">
+    <input class="form-input" id="fxl-threshold" type="number" placeholder="Alert if rate moves by (%) e.g. 3">
+    <input class="form-input" id="fxl-expiry" type="date" placeholder="Quote expiry date">
+    <button class="btn btn-approve" onclick="fxlLockQuote()">Lock This Quote</button>
+    <div id="fxl-lock-result" style="font-size:12px;color:#555;"></div>
+  </div>
+  <div style="overflow-x:auto;"><table class="data-table" id="fxl-quotes-table">
+    <thead><tr><th>Description</th><th>USD Value</th><th>Locked Rate</th><th>NGN Value</th><th>Expiry</th><th>Status</th></tr></thead>
+    <tbody id="fxl-quotes-body"><tr><td colspan="6" style="color:#444;text-align:center;">No locked quotes yet</td></tr></tbody>
+  </table></div>
+</div>
+
+<div class="tab-panel" id="tab-fxl_settings" style="display:none;">
+  <p class="section-title" style="margin-top:0;">FX Alert Settings</p>
+  <div style="max-width:400px;display:grid;gap:12px;">
+    <input class="form-input" id="fxl-settings-client" placeholder="Business name">
+    <input class="form-input" id="fxl-settings-phone" placeholder="WhatsApp number for alerts (+234...)">
+    <input class="form-input" id="fxl-settings-threshold" type="number" placeholder="Alert threshold (%) — e.g. 3 = alert when rate moves 3%">
+    <button class="btn btn-approve" onclick="fxlSaveSettings()">Save Settings</button>
+    <div id="fxl-settings-result" style="font-size:12px;color:#555;"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     HR SUITE PANELS
+═══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- HR Overview -->
+<div class="tab-panel" id="tab-hr_overview" style="display:none;">
+  <p class="section-title" style="margin-top:0;">HR Suite — Overview</p>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="hr-kpi-staff">—</div><div class="ct-kpi-lbl">Staff Tracked</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="hr-kpi-open-roles" style="color:#6366f1;">—</div><div class="ct-kpi-lbl">Open Roles</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="hr-kpi-leave-pending" style="color:#f59e0b;">—</div><div class="ct-kpi-lbl">Leave Pending</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="hr-kpi-erosion-risk" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Churn Risk Staff</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="hr-kpi-probation-due">—</div><div class="ct-kpi-lbl">Probation Due (30d)</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="hr-kpi-moonlight-flagged" style="color:#d97706;">—</div><div class="ct-kpi-lbl">Moonlighting Alerts</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="hr-kpi-pencom-due" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">PENCOM Overdue</div></div>
+  </div>
+</div>
+
+<!-- Job Screener -->
+<div class="tab-panel" id="tab-hr_screener" style="display:none;">
+  <p class="section-title" style="margin-top:0;">WhatsApp Job Screener</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Create a screening campaign for an open role. Candidates receive a structured WhatsApp interview. Responses are scored and ranked automatically.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="hr-scr-company" placeholder="Company name">
+      <input class="form-input" id="hr-scr-role" placeholder="Role title (e.g. Sales Executive)">
+      <input class="form-input" id="hr-scr-sector" placeholder="Sector / industry">
+      <textarea class="form-input" id="hr-scr-requirements" rows="3" placeholder="Key requirements (3-5 bullet points — used to generate screening questions)"></textarea>
+      <input class="form-input" id="hr-scr-salary" placeholder="Salary range (e.g. ₦150K–₦250K/mo)">
+      <input class="form-input" id="hr-scr-location" placeholder="Job location (e.g. Lagos Island)">
+      <button class="btn btn-approve" onclick="hrCreateScreening()">Create Screening Campaign</button>
+      <div id="hr-scr-result" style="font-size:12px;color:#555;white-space:pre-wrap;"></div>
+    </div>
+    <div>
+      <p style="color:#aaa;font-size:12px;margin-bottom:8px;">Active Screenings</p>
+      <div id="hr-scr-active" style="color:#555;font-size:13px;">Loading…</div>
+    </div>
+  </div>
+  <p class="section-title" style="margin-top:20px;">Candidate Responses</p>
+  <div style="overflow-x:auto;"><table class="data-table" id="hr-scr-table">
+    <thead><tr><th>Candidate</th><th>Role</th><th>Score</th><th>Shortlist</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody id="hr-scr-body"><tr><td colspan="6" style="color:#444;text-align:center;">No responses yet</td></tr></tbody>
+  </table></div>
+</div>
+
+<!-- Attendance -->
+<div class="tab-panel" id="tab-hr_attendance" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Staff Attendance Auditor</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Staff clock in/out via WhatsApp. System flags anomalies and generates weekly attendance reports automatically.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:20px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="hr-att-company" placeholder="Company name">
+      <input class="form-input" id="hr-att-name" placeholder="Staff name">
+      <input class="form-input" id="hr-att-phone" placeholder="Staff WhatsApp (+234...)">
+      <input class="form-input" id="hr-att-role" placeholder="Role">
+      <input class="form-input" id="hr-att-start" placeholder="Work start time (e.g. 08:00)">
+      <input class="form-input" id="hr-att-end" placeholder="Work end time (e.g. 17:00)">
+      <button class="btn btn-approve" onclick="hrAddAttendanceStaff()">Register Staff for Attendance</button>
+      <div id="hr-att-result" style="font-size:12px;color:#555;"></div>
+    </div>
+    <div>
+      <p style="color:#aaa;font-size:12px;margin-bottom:8px;">Today's Attendance</p>
+      <div id="hr-att-today" style="color:#555;font-size:13px;">Loading…</div>
+    </div>
+  </div>
+  <div style="overflow-x:auto;"><table class="data-table" id="hr-att-table">
+    <thead><tr><th>Staff</th><th>Date</th><th>Clock In</th><th>Clock Out</th><th>Hours</th><th>Status</th></tr></thead>
+    <tbody id="hr-att-body"><tr><td colspan="6" style="color:#444;text-align:center;">No records yet</td></tr></tbody>
+  </table></div>
+</div>
+
+<!-- Leave Manager -->
+<div class="tab-panel" id="tab-hr_leave" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Leave & Absence Manager</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div>
+      <p style="color:#aaa;font-size:12px;margin-bottom:8px;">Pending Requests</p>
+      <div id="hr-leave-pending-list" style="color:#555;font-size:13px;">Loading…</div>
+    </div>
+    <div style="display:grid;gap:10px;">
+      <p style="color:#aaa;font-size:12px;">Log Leave Request</p>
+      <input class="form-input" id="hr-leave-company" placeholder="Company name">
+      <input class="form-input" id="hr-leave-staff" placeholder="Staff name">
+      <select class="form-input" id="hr-leave-type">
+        <option value="">Leave type</option>
+        <option value="annual">Annual Leave</option>
+        <option value="sick">Sick Leave</option>
+        <option value="maternity">Maternity Leave</option>
+        <option value="paternity">Paternity Leave</option>
+        <option value="emergency">Emergency Leave</option>
+        <option value="unpaid">Unpaid Leave</option>
+      </select>
+      <input class="form-input" id="hr-leave-start" type="date" placeholder="Start date">
+      <input class="form-input" id="hr-leave-end" type="date" placeholder="End date">
+      <textarea class="form-input" id="hr-leave-reason" rows="2" placeholder="Reason (optional)"></textarea>
+      <button class="btn btn-approve" onclick="hrLogLeave()">Submit Leave Request</button>
+      <div id="hr-leave-result" style="font-size:12px;color:#555;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Salary Benchmarking -->
+<div class="tab-panel" id="tab-hr_salary" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Salary Benchmarking Agent</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Get current market rate for any role in Nigeria based on live job board data. Know before you make or receive an offer.</p>
+  <div style="max-width:520px;display:grid;gap:12px;">
+    <input class="form-input" id="hr-bench-role" placeholder="Role title (e.g. Frontend Developer, Sales Manager)">
+    <input class="form-input" id="hr-bench-sector" placeholder="Industry / sector">
+    <input class="form-input" id="hr-bench-location" placeholder="Location (e.g. Lagos, Abuja, Remote)">
+    <input class="form-input" id="hr-bench-exp" placeholder="Years of experience required">
+    <select class="form-input" id="hr-bench-size">
+      <option value="">Company size context</option>
+      <option value="startup">Startup (1–20 staff)</option>
+      <option value="sme">SME (20–100 staff)</option>
+      <option value="mid">Mid-size (100–500)</option>
+      <option value="large">Large (500+)</option>
+    </select>
+    <button class="btn btn-approve" onclick="hrBenchmarkSalary()">Get Market Rate</button>
+    <div id="hr-bench-result" style="font-size:13px;color:#aaa;white-space:pre-wrap;margin-top:8px;"></div>
+  </div>
+  <p class="section-title" style="margin-top:20px;">Recent Benchmarks</p>
+  <div style="overflow-x:auto;"><table class="data-table" id="hr-bench-table">
+    <thead><tr><th>Role</th><th>Sector</th><th>Location</th><th>Min (₦)</th><th>Mid (₦)</th><th>Max (₦)</th><th>Date</th></tr></thead>
+    <tbody id="hr-bench-body"><tr><td colspan="7" style="color:#444;text-align:center;">No benchmarks yet</td></tr></tbody>
+  </table></div>
+</div>
+
+<!-- PENCOM -->
+<div class="tab-panel" id="tab-hr_pencom" style="display:none;">
+  <p class="section-title" style="margin-top:0;">PENCOM Remittance Tracker</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Track pension contributions per staff member. Alerts when remittance is overdue. Generates PENCOM-compliant schedules automatically.</p>
+  <div id="hr-pencom-kpi" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="hr-pencom-enrolled">—</div><div class="ct-kpi-lbl">Enrolled Staff</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="hr-pencom-due" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Overdue Remittances</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="hr-pencom-this-month">—</div><div class="ct-kpi-lbl">This Month (₦)</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="hr-pencom-company" placeholder="Company name">
+      <input class="form-input" id="hr-pencom-staff" placeholder="Staff name">
+      <input class="form-input" id="hr-pencom-pfa" placeholder="PFA (e.g. Stanbic IBTC, ARM Pension)">
+      <input class="form-input" id="hr-pencom-rsa" placeholder="RSA PIN">
+      <input class="form-input" id="hr-pencom-basic" type="number" placeholder="Basic salary (₦) — pension is 18% of basic">
+      <button class="btn btn-approve" onclick="hrAddPencomStaff()">Enroll Staff</button>
+      <div id="hr-pencom-result" style="font-size:12px;color:#555;"></div>
+    </div>
+    <div>
+      <p style="color:#aaa;font-size:12px;margin-bottom:8px;">Remittance Schedule</p>
+      <div id="hr-pencom-schedule" style="color:#555;font-size:13px;">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Offboarding -->
+<div class="tab-panel" id="tab-hr_offboarding" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Employee Offboarding Checklist</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Generates a structured checklist for each departing employee. Tracks completion of IT access revocation, asset return, handover, and final payroll.</p>
+  <div style="max-width:520px;display:grid;gap:12px;">
+    <input class="form-input" id="hr-off-company" placeholder="Company name">
+    <input class="form-input" id="hr-off-name" placeholder="Departing staff name">
+    <input class="form-input" id="hr-off-role" placeholder="Role / department">
+    <input class="form-input" id="hr-off-last-day" type="date" placeholder="Last working day">
+    <select class="form-input" id="hr-off-reason">
+      <option value="">Reason for leaving</option>
+      <option value="resignation">Resignation</option>
+      <option value="termination">Termination</option>
+      <option value="contract_end">Contract End</option>
+      <option value="retirement">Retirement</option>
+      <option value="redundancy">Redundancy</option>
+    </select>
+    <textarea class="form-input" id="hr-off-assets" rows="2" placeholder="Company assets held (laptop, phone, access cards, keys, etc.)"></textarea>
+    <button class="btn btn-approve" onclick="hrGenerateOffboarding()">Generate Offboarding Checklist</button>
+    <div id="hr-off-result" style="font-size:13px;color:#aaa;white-space:pre-wrap;margin-top:8px;"></div>
+  </div>
+</div>
+
+<!-- Erosion Tracker -->
+<div class="tab-panel" id="tab-hr_erosion" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Salary Erosion Tracker</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Shows real purchasing power of each staff salary vs. when they were hired, adjusted for Nigeria CPI inflation.</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="se-kpi-staff">—</div><div class="ct-kpi-lbl">Staff Tracked</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="se-kpi-avg-erosion" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Avg Real Value Lost (%)</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="se-kpi-at-risk" style="color:#f59e0b;">—</div><div class="ct-kpi-lbl">Staff at Churn Risk</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="se-company" placeholder="Company name">
+      <input class="form-input" id="se-staff-name" placeholder="Staff name">
+      <input class="form-input" id="se-staff-role" placeholder="Role">
+      <input class="form-input" id="se-staff-salary" type="number" placeholder="Current monthly salary (₦)">
+      <input class="form-input" id="se-staff-hired" type="date" placeholder="Date hired">
+      <button class="btn btn-approve" onclick="seAddStaff()">Track This Staff Member</button>
+      <div id="se-staff-result" style="font-size:12px;color:#555;"></div>
+    </div>
+    <div>
+      <button class="btn btn-skip" style="margin-bottom:10px;" onclick="seGenerateReport()">Generate Full Report</button>
+      <input class="form-input" id="se-report-company" placeholder="Company name" style="margin-bottom:8px;">
+      <div id="se-report-output" style="font-size:12px;color:#aaa;white-space:pre-wrap;"></div>
+    </div>
+  </div>
+  <div style="overflow-x:auto;margin-top:16px;"><table class="data-table" id="se-staff-table">
+    <thead><tr><th>Name</th><th>Role</th><th>Hired</th><th>Salary (₦)</th><th>Real Value Today</th><th>Erosion %</th><th>Risk</th></tr></thead>
+    <tbody id="se-staff-body"><tr><td colspan="7" style="color:#444;text-align:center;">No staff tracked yet</td></tr></tbody>
+  </table></div>
+</div>
+
+<!-- Moonlighting -->
+<div class="tab-panel" id="tab-hr_moonlighting" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Staff Moonlighting Detector</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="ml-kpi-staff">—</div><div class="ct-kpi-lbl">Staff Monitored</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="ml-kpi-flagged" style="color:#d97706;">—</div><div class="ct-kpi-lbl">Flagged This Month</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="ml-kpi-confirmed" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Confirmed Cases</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="ml-company" placeholder="Company name">
+      <input class="form-input" id="ml-staff-name" placeholder="Staff name">
+      <input class="form-input" id="ml-staff-role" placeholder="Role">
+      <textarea class="form-input" id="ml-attendance-log" rows="5" placeholder="Paste attendance log (date, time-in, time-out, tasks — one per line)"></textarea>
+      <button class="btn btn-approve" onclick="mlAnalyseStaff()">Analyse Patterns</button>
+      <div id="ml-staff-result" style="font-size:12px;color:#555;white-space:pre-wrap;"></div>
+    </div>
+    <div>
+      <p style="color:#aaa;font-size:12px;margin-bottom:8px;">Flagged Staff</p>
+      <div style="overflow-x:auto;"><table class="data-table" id="ml-alerts-table">
+        <thead><tr><th>Staff</th><th>Risk</th><th>Signal</th><th>Date</th></tr></thead>
+        <tbody id="ml-alerts-body"><tr><td colspan="4" style="color:#444;text-align:center;">No alerts</td></tr></tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<!-- FX Salary -->
+<div class="tab-panel" id="tab-hr_fxsalary" style="display:none;">
+  <p class="section-title" style="margin-top:0;">FX Salary Parity</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">For companies paying dollar-benchmarked salaries in naira. Auto-calculates each month's correct naira equivalent at parallel market rate.</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxs-kpi-rate" style="color:#06b6d4;">—</div><div class="ct-kpi-lbl">USD/NGN Today</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxs-kpi-total-usd">—</div><div class="ct-kpi-lbl">Total Payroll (USD)</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxs-kpi-total-ngn">—</div><div class="ct-kpi-lbl">Total Payroll (NGN)</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="fxs-company" placeholder="Company name">
+      <input class="form-input" id="fxs-name" placeholder="Staff name">
+      <input class="form-input" id="fxs-role" placeholder="Role">
+      <input class="form-input" id="fxs-salary-usd" type="number" placeholder="Monthly salary (USD)">
+      <input class="form-input" id="fxs-phone" placeholder="WhatsApp for payslip (+234...)">
+      <button class="btn btn-approve" onclick="fxsAddStaff()">Add Staff</button>
+      <div id="fxs-staff-result" style="font-size:12px;color:#555;"></div>
+    </div>
+    <div style="overflow-x:auto;"><table class="data-table" id="fxs-staff-table">
+      <thead><tr><th>Name</th><th>Role</th><th>USD</th><th>This Month (₦)</th><th>Last Month (₦)</th><th>Δ</th></tr></thead>
+      <tbody id="fxs-staff-body"><tr><td colspan="6" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- Probation -->
+<div class="tab-panel" id="tab-hr_probation" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Probation Period Tracker</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Automatically alerts HR when a new hire is approaching their confirmation date. Never miss a probation review again.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="hr-prob-company" placeholder="Company name">
+      <input class="form-input" id="hr-prob-name" placeholder="Staff name">
+      <input class="form-input" id="hr-prob-role" placeholder="Role">
+      <input class="form-input" id="hr-prob-start" type="date" placeholder="Start date">
+      <input class="form-input" id="hr-prob-months" type="number" value="3" placeholder="Probation period (months)">
+      <input class="form-input" id="hr-prob-manager" placeholder="Line manager WhatsApp (+234...)">
+      <button class="btn btn-approve" onclick="hrAddProbation()">Track Probation</button>
+      <div id="hr-prob-result" style="font-size:12px;color:#555;"></div>
+    </div>
+    <div>
+      <p style="color:#aaa;font-size:12px;margin-bottom:8px;">Upcoming Confirmations</p>
+      <div id="hr-prob-upcoming" style="color:#555;font-size:13px;">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Policy Bot -->
+<div class="tab-panel" id="tab-hr_policy" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Company Policy WhatsApp Bot</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Upload your staff handbook. Staff ask policy questions via WhatsApp, bot answers instantly from the document. No more "please check the handbook".</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="hr-pol-company" placeholder="Company name">
+      <textarea class="form-input" id="hr-pol-handbook" rows="8" placeholder="Paste your staff handbook / HR policy document here (or key sections: leave policy, code of conduct, benefits, etc.)"></textarea>
+      <button class="btn btn-approve" onclick="hrUploadPolicy()">Upload Policy Document</button>
+      <div id="hr-pol-upload-result" style="font-size:12px;color:#555;"></div>
+    </div>
+    <div style="display:grid;gap:10px;">
+      <p style="color:#aaa;font-size:12px;">Test the Bot</p>
+      <input class="form-input" id="hr-pol-question" placeholder="Ask a policy question (e.g. How many sick days am I entitled to?)">
+      <button class="btn btn-skip" onclick="hrTestPolicy()">Ask Question</button>
+      <div id="hr-pol-answer" style="font-size:13px;color:#aaa;white-space:pre-wrap;margin-top:4px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SALARY EROSION PANELS (old - kept for backward compat IDs) -->
+<div class="tab-panel" id="tab-se_dashboard" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Salary Erosion Tracker</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Shows real purchasing power of each staff salary vs. the month they were hired, adjusted for Nigeria CPI inflation.</p>
+  <div id="se-kpi-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="se-kpi-staff">—</div><div class="ct-kpi-lbl">Staff Tracked</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="se-kpi-avg-erosion" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Avg Real Value Lost (%)</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="se-kpi-at-risk" style="color:#f59e0b;">—</div><div class="ct-kpi-lbl">Staff at Churn Risk</div></div>
+  </div>
+  <div style="overflow-x:auto;"><table class="data-table" id="se-staff-table">
+    <thead><tr><th>Name</th><th>Role</th><th>Hired</th><th>Salary (₦)</th><th>Real Value Today</th><th>Erosion %</th><th>Risk</th></tr></thead>
+    <tbody id="se-staff-body"><tr><td colspan="7" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
+  </table></div>
+</div>
+
+<div class="tab-panel" id="tab-se_staff" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Add Staff Member</p>
+  <div style="max-width:520px;display:grid;gap:12px;">
+    <input class="form-input" id="se-company" placeholder="Company name">
+    <input class="form-input" id="se-staff-name" placeholder="Staff name">
+    <input class="form-input" id="se-staff-role" placeholder="Role / job title">
+    <input class="form-input" id="se-staff-salary" type="number" placeholder="Current monthly salary (₦)">
+    <input class="form-input" id="se-staff-hired" type="date" placeholder="Date hired">
+    <button class="btn btn-approve" onclick="seAddStaff()">Add Staff</button>
+    <div id="se-staff-result" style="font-size:12px;color:#555;"></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-se_report" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Monthly Erosion Report</p>
+  <div style="max-width:400px;display:grid;gap:12px;">
+    <input class="form-input" id="se-report-company" placeholder="Company name">
+    <button class="btn btn-approve" onclick="seGenerateReport()">Generate Report</button>
+  </div>
+  <div id="se-report-output" style="margin-top:16px;font-size:13px;color:#aaa;white-space:pre-wrap;"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     ESTATEOS PANELS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-est_overview" style="display:none;">
+  <p class="section-title" style="margin-top:0;">EstateOS — Overview</p>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="est-kpi-listings">—</div><div class="ct-kpi-lbl">Active Listings</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="est-kpi-checks" style="color:#6366f1;">—</div><div class="ct-kpi-lbl">Background Checks</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="est-kpi-kyc" style="color:#f59e0b;">—</div><div class="ct-kpi-lbl">KYC Documents</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="est-kpi-pof" style="color:#16a34a;">—</div><div class="ct-kpi-lbl">PoF Approved</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+    <span style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;padding:6px 14px;font-size:11px;color:#f59e0b;font-weight:600;">🔒 VAULT-FIRST ARCHITECTURE</span>
+    <span style="font-size:11px;color:#555;">All KYC documents, proof of funds, and deal history stored in your private vault. Never on a shared server.</span>
+  </div>
+  <p style="color:#555;font-size:13px;">EstateOS — the complete vetting system for Lagos real estate agents. Neighborhood scoring, buyer KYC, proof of funds screening, tenant background checks, and lawyer bundle generation — all in one place.</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;">
+    <div style="background:#111;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
+      <div style="color:#f59e0b;font-size:13px;font-weight:600;margin-bottom:6px;">Neighborhood Score</div>
+      <div style="color:#555;font-size:12px;">Google Maps: flood risk, commute to VI at 8AM, amenity density. Know before you list.</div>
+    </div>
+    <div style="background:#111;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
+      <div style="color:#6366f1;font-size:13px;font-weight:600;margin-bottom:6px;">Buyer Vetting Pipeline</div>
+      <div style="color:#555;font-size:12px;">KYC vault → Proof of Funds → Background check → Lawyer bundle. End-to-end deal flow.</div>
+    </div>
+    <div style="background:#111;border:1px solid #1a1a1a;border-radius:8px;padding:16px;">
+      <div style="color:#16a34a;font-size:13px;font-weight:600;margin-bottom:6px;">Property Concierge</div>
+      <div style="color:#555;font-size:12px;">Claude reads your property docs and answers "Is there a C of O?" so your agents don't have to.</div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-est_listings" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Property Listings</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:20px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="est-list-company" placeholder="Agency / company name">
+      <input class="form-input" id="est-list-address" placeholder="Property address (e.g. 12 Admiralty Way, Lekki Phase 1)">
+      <select class="form-input" id="est-list-type">
+        <option value="residential">Residential</option>
+        <option value="commercial">Commercial</option>
+        <option value="land">Land</option>
+      </select>
+      <input class="form-input" id="est-list-beds" type="number" placeholder="Bedrooms">
+      <input class="form-input" id="est-list-price" type="number" placeholder="Asking price (₦)">
+      <select class="form-input" id="est-list-title">
+        <option value="">Title type</option>
+        <option value="C of O">C of O (Certificate of Occupancy)</option>
+        <option value="Governor's Consent">Governor's Consent</option>
+        <option value="Deed of Assignment">Deed of Assignment</option>
+        <option value="Survey Plan">Survey Plan only</option>
+        <option value="Family Land">Family Land</option>
+      </select>
+      <textarea class="form-input" id="est-list-desc" rows="3" placeholder="Property description (features, condition, history)"></textarea>
+      <textarea class="form-input" id="est-list-amenities" rows="2" placeholder="Amenities (generator, borehole, swimming pool, gym, etc.)"></textarea>
+      <input class="form-input" id="est-list-phone" placeholder="Agent contact WhatsApp">
+      <button class="btn btn-approve" onclick="estAddListing()">Add Listing</button>
+      <div id="est-list-result" style="font-size:12px;color:#555;"></div>
+    </div>
+    <div>
+      <p style="color:#aaa;font-size:12px;margin-bottom:8px;">Active Listings</p>
+      <div id="est-listings-body" style="color:#555;font-size:13px;">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-est_scorecard" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Neighborhood Scorecard</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Google Maps powered. Generates a flood risk estimate, commute times to VI / Ikoyi / Ikeja at 8AM, and nearby amenity density for any Lagos address.</p>
+  <div style="max-width:520px;display:grid;gap:12px;">
+    <input class="form-input" id="est-score-address" placeholder="Full property address (e.g. 45 Freedom Way, Lekki Phase 1, Lagos)">
+    <select class="form-input" id="est-score-type">
+      <option value="residential">Residential</option>
+      <option value="commercial">Commercial</option>
+    </select>
+    <button class="btn btn-approve" onclick="estRunScorecard()">Run Neighborhood Scorecard</button>
+    <div id="est-score-loading" style="display:none;color:#555;font-size:12px;">Fetching Google Maps data…</div>
+  </div>
+  <div id="est-scorecard-result" style="margin-top:20px;display:none;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+      <div class="ct-kpi-box"><div class="ct-kpi-val" id="est-sc-overall">—</div><div class="ct-kpi-lbl">Overall Score /100</div></div>
+      <div class="ct-kpi-box"><div class="ct-kpi-val" id="est-sc-flood" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Flood Risk</div></div>
+      <div class="ct-kpi-box"><div class="ct-kpi-val" id="est-sc-amenity" style="color:#16a34a;">—</div><div class="ct-kpi-lbl">Amenity Score</div></div>
+    </div>
+    <p style="color:#aaa;font-size:12px;margin-bottom:8px;">Commute Times to Major Hubs (8AM Peak)</p>
+    <div id="est-sc-commutes" style="display:grid;gap:8px;"></div>
+    <div id="est-sc-flood-note" style="margin-top:12px;font-size:12px;color:#f59e0b;"></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-est_concierge" style="display:none;">
+  <p class="section-title" style="margin-top:0;">WhatsApp Property Concierge</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">AI agent reads property docs and answers buyer FAQs. Test it here — deploy to WhatsApp via Unipile.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div style="display:grid;gap:10px;">
+      <select class="form-input" id="est-con-property-id">
+        <option value="">Select property</option>
+      </select>
+      <input class="form-input" id="est-con-buyer" placeholder="Buyer name (optional)">
+      <textarea class="form-input" id="est-con-question" rows="3" placeholder="Buyer question (e.g. Is there a C of O? Does the generator cover the whole house?)"></textarea>
+      <button class="btn btn-approve" onclick="estAskConcierge()">Get Answer</button>
+      <div id="est-con-result" style="font-size:13px;color:#aaa;white-space:pre-wrap;margin-top:4px;"></div>
+    </div>
+    <div>
+      <p style="color:#aaa;font-size:12px;">Common questions Lagos buyers ask:</p>
+      <div style="display:grid;gap:6px;margin-top:8px;">
+        <button class="btn btn-skip" style="text-align:left;font-size:11px;" onclick="document.getElementById('est-con-question').value='Is there a Certificate of Occupancy (C of O)?'">Is there a C of O?</button>
+        <button class="btn btn-skip" style="text-align:left;font-size:11px;" onclick="document.getElementById('est-con-question').value='Does the generator cover the entire house?'">Does the generator cover the whole house?</button>
+        <button class="btn btn-skip" style="text-align:left;font-size:11px;" onclick="document.getElementById('est-con-question').value='Is there a borehole or is it LSWC water?'">Borehole or LSWC water?</button>
+        <button class="btn btn-skip" style="text-align:left;font-size:11px;" onclick="document.getElementById('est-con-question').value='What is the service charge per annum?'">What is the service charge?</button>
+        <button class="btn btn-skip" style="text-align:left;font-size:11px;" onclick="document.getElementById('est-con-question').value='Has the property ever flooded?'">Has it ever flooded?</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-est_pof" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Proof of Funds Screener</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Verify a prospective buyer has genuine funds before agreeing to a physical viewing. Protects agent time.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="est-pof-price" type="number" placeholder="Property asking price (₦)">
+      <input class="form-input" id="est-pof-buyer" placeholder="Buyer name">
+      <textarea class="form-input" id="est-pof-desc" rows="5" placeholder="Proof of funds submitted (describe what was provided — bank statement summary, portfolio value, asset description, etc.)"></textarea>
+      <textarea class="form-input" id="est-pof-notes" rows="2" placeholder="Agent notes (any red flags, buyer's stated timeline, etc.)"></textarea>
+      <button class="btn btn-approve" onclick="estAssessPof()">Screen Proof of Funds</button>
+      <div id="est-pof-result" style="font-size:13px;white-space:pre-wrap;margin-top:4px;"></div>
+    </div>
+    <div>
+      <p style="color:#aaa;font-size:12px;margin-bottom:8px;">Recent PoF Assessments</p>
+      <div id="est-pof-history" style="font-size:13px;color:#555;">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-est_kyc" style="display:none;">
+  <p class="section-title" style="margin-top:0;">KYC Vault</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Extract and store identity data from NIN slips, international passports, and utility bills. Secure vault for legal teams.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="est-kyc-party" placeholder="Party name (buyer / tenant / guarantor)">
+      <select class="form-input" id="est-kyc-doc-type">
+        <option value="">Document type</option>
+        <option value="NIN Slip">NIN Slip</option>
+        <option value="International Passport">International Passport</option>
+        <option value="Driver's Licence">Driver's Licence</option>
+        <option value="Utility Bill">Utility Bill (AEDC/EKEDC)</option>
+        <option value="Bank Statement">Bank Statement</option>
+        <option value="Company Registration">CAC Certificate</option>
+      </select>
+      <textarea class="form-input" id="est-kyc-text" rows="6" placeholder="Paste document text / OCR output here, or describe the document contents clearly (name, NIN number, address, dates, etc.)"></textarea>
+      <button class="btn btn-approve" onclick="estExtractKyc()">Extract & Store in Vault</button>
+      <div id="est-kyc-result" style="font-size:12px;color:#555;white-space:pre-wrap;"></div>
+    </div>
+    <div>
+      <p style="color:#aaa;font-size:12px;margin-bottom:8px;">KYC Vault</p>
+      <div id="est-kyc-records" style="font-size:13px;color:#555;">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-est_background" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Tenant Background Check</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">AI risk assessment before signing any lease. Checks affordability, employment stability, and previous tenancy record.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div style="display:grid;gap:10px;">
+      <input class="form-input" id="est-bg-company" placeholder="Agency / company (optional)">
+      <input class="form-input" id="est-bg-name" placeholder="Tenant full name">
+      <input class="form-input" id="est-bg-occupation" placeholder="Occupation">
+      <input class="form-input" id="est-bg-employer" placeholder="Employer / business name">
+      <input class="form-input" id="est-bg-income" type="number" placeholder="Monthly income (₦)">
+      <input class="form-input" id="est-bg-rent" type="number" placeholder="Annual rent amount (₦)">
+      <textarea class="form-input" id="est-bg-prev-landlord" rows="2" placeholder="Previous landlord feedback (if available)"></textarea>
+      <textarea class="form-input" id="est-bg-guarantor" rows="2" placeholder="Guarantor info (name, occupation, relationship)"></textarea>
+      <textarea class="form-input" id="est-bg-notes" rows="2" placeholder="Additional notes / red flags"></textarea>
+      <button class="btn btn-approve" onclick="estRunBackground()">Run Background Check</button>
+      <div id="est-bg-result" style="font-size:13px;white-space:pre-wrap;margin-top:4px;"></div>
+    </div>
+    <div>
+      <p style="color:#aaa;font-size:12px;margin-bottom:8px;">Recent Checks</p>
+      <div id="est-bg-history" style="font-size:13px;color:#555;">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-est_lawyer" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Direct-to-Lawyer Pipeline</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Once a deal is agreed, generate a professional handover memo for the closing lawyer. Bundles all deal context for the legal team.</p>
+  <div style="max-width:600px;display:grid;gap:12px;">
+    <input class="form-input" id="est-law-address" placeholder="Property address">
+    <input class="form-input" id="est-law-buyer" placeholder="Buyer full name">
+    <input class="form-input" id="est-law-seller" placeholder="Seller full name / company">
+    <input class="form-input" id="est-law-price" type="number" placeholder="Agreed sale/lease price (₦)">
+    <textarea class="form-input" id="est-law-docs" rows="3" placeholder="Documents collected so far (C of O, survey plan, passport copy, proof of funds, etc.)"></textarea>
+    <textarea class="form-input" id="est-law-summary" rows="4" placeholder="Negotiation summary (how deal was agreed, any conditions, timeline, etc.)"></textarea>
+    <button class="btn btn-approve" onclick="estGenerateLawyerBundle()">Generate Lawyer Handover Memo</button>
+    <div id="est-law-result" style="font-size:13px;color:#aaa;white-space:pre-wrap;margin-top:8px;"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MARKET CREDIT PANELS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-mc_queue" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Market Trader Credit Queue</p>
+  <div style="overflow-x:auto;"><table class="data-table" id="mc-queue-table">
+    <thead><tr><th>Trader Name</th><th>Market</th><th>Requested (₦)</th><th>Score</th><th>Decision</th><th>MFB</th><th>Date</th></tr></thead>
+    <tbody id="mc-queue-body"><tr><td colspan="7" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
+  </table></div>
+</div>
+
+<div class="tab-panel" id="tab-mc_profiles" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Scored Trader Profiles</p>
+  <div id="mc-profiles-body" style="color:#555;font-size:13px;">Loading…</div>
+</div>
+
+<div class="tab-panel" id="tab-mc_submit" style="display:none;">
+  <p class="section-title" style="margin-top:0;">New Market Trader Application</p>
+  <div style="max-width:520px;display:grid;gap:12px;">
+    <input class="form-input" id="mc-mfb" placeholder="MFB / Lender name">
+    <input class="form-input" id="mc-trader-name" placeholder="Trader name">
+    <input class="form-input" id="mc-market" placeholder="Market (e.g. Balogun, Alaba, Mile 12)">
+    <input class="form-input" id="mc-goods" placeholder="Type of goods sold">
+    <input class="form-input" id="mc-years" type="number" placeholder="Years trading at this market">
+    <input class="form-input" id="mc-daily-sales" type="number" placeholder="Estimated daily sales (₦)">
+    <input class="form-input" id="mc-assoc" placeholder="Market association membership (yes/no + name)">
+    <input class="form-input" id="mc-phone" placeholder="Trader WhatsApp (+234...)">
+    <input class="form-input" id="mc-loan-amount" type="number" placeholder="Loan amount requested (₦)">
+    <textarea class="form-input" id="mc-references" rows="2" placeholder="Peer references (names of 2 traders who can vouch)"></textarea>
+    <button class="btn btn-approve" onclick="mcSubmitApplication()">Score This Trader</button>
+    <div id="mc-submit-result" style="font-size:12px;color:#555;"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MOONLIGHTING PANELS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-ml_overview" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Moonlighting Detector</p>
+  <div id="ml-kpi-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="ml-kpi-staff">—</div><div class="ct-kpi-lbl">Staff Monitored</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="ml-kpi-flagged" style="color:#d97706;">—</div><div class="ct-kpi-lbl">Flagged This Month</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="ml-kpi-confirmed" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Confirmed Cases</div></div>
+  </div>
+  <div id="ml-overview-body" style="color:#555;font-size:13px;">Loading…</div>
+</div>
+
+<div class="tab-panel" id="tab-ml_staff" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Staff Attendance Patterns</p>
+  <div style="margin-bottom:16px;display:grid;gap:10px;max-width:480px;">
+    <input class="form-input" id="ml-company" placeholder="Company name">
+    <input class="form-input" id="ml-staff-name" placeholder="Staff name">
+    <input class="form-input" id="ml-staff-role" placeholder="Role">
+    <textarea class="form-input" id="ml-attendance-log" rows="4" placeholder="Paste attendance log (date, time-in, time-out, output/tasks completed — one per line)"></textarea>
+    <button class="btn btn-approve" onclick="mlAnalyseStaff()">Analyse Patterns</button>
+    <div id="ml-staff-result" style="font-size:12px;color:#555;white-space:pre-wrap;"></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-ml_alerts" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Moonlighting Alerts</p>
+  <div style="overflow-x:auto;"><table class="data-table" id="ml-alerts-table">
+    <thead><tr><th>Staff Name</th><th>Company</th><th>Signal</th><th>Confidence</th><th>Flagged</th><th>Status</th></tr></thead>
+    <tbody id="ml-alerts-body"><tr><td colspan="6" style="color:#444;text-align:center;">No alerts yet</td></tr></tbody>
+  </table></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PRODUCT AUTH PANELS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-pa_scan" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Product Authentication Scan</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Describe a product in detail — NAFDAC number, packaging markers, hologram — and the AI will cross-check against known authenticity indicators to assess whether it's genuine or counterfeit.</p>
+  <div style="max-width:520px;display:grid;gap:12px;">
+    <input class="form-input" id="pa-business" placeholder="Your business name">
+    <input class="form-input" id="pa-product-name" placeholder="Product name (e.g. Paracetamol 500mg, Samsung Galaxy S24)">
+    <input class="form-input" id="pa-brand" placeholder="Brand / manufacturer">
+    <input class="form-input" id="pa-nafdac" placeholder="NAFDAC number on pack (if applicable)">
+    <input class="form-input" id="pa-batch" placeholder="Batch number">
+    <input class="form-input" id="pa-supplier" placeholder="Supplier name / location">
+    <textarea class="form-input" id="pa-description" rows="3" placeholder="Describe the packaging: colours, font, seal, hologram, smell, texture — anything unusual compared to known genuine product"></textarea>
+    <button class="btn btn-approve" onclick="paRunScan()">Run Authentication Check</button>
+    <div id="pa-scan-result" style="font-size:13px;color:#aaa;white-space:pre-wrap;margin-top:8px;"></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-pa_history" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Scan History</p>
+  <div style="overflow-x:auto;"><table class="data-table" id="pa-history-table">
+    <thead><tr><th>Product</th><th>Brand</th><th>Supplier</th><th>Result</th><th>Confidence</th><th>Date</th></tr></thead>
+    <tbody id="pa-history-body"><tr><td colspan="6" style="color:#444;text-align:center;">No scans yet</td></tr></tbody>
+  </table></div>
+</div>
+
+<div class="tab-panel" id="tab-pa_flagged" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Flagged Products</p>
+  <div id="pa-flagged-body" style="color:#555;font-size:13px;">Loading flagged products…</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MATERIAL CHECK PANELS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-mch_submit" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Construction Material Check</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">Submit a material batch for adulteration analysis. AI compares stated specs against typical adulteration patterns for that material type in Nigeria.</p>
+  <div style="max-width:520px;display:grid;gap:12px;">
+    <input class="form-input" id="mch-company" placeholder="Construction company / contractor">
+    <input class="form-input" id="mch-material" placeholder="Material type (e.g. Dangote Cement, 12mm iron rod, Dulux paint)">
+    <input class="form-input" id="mch-supplier" placeholder="Supplier name + location">
+    <input class="form-input" id="mch-quantity" placeholder="Quantity delivered (e.g. 500 bags, 5 tonnes)">
+    <input class="form-input" id="mch-price" type="number" placeholder="Price paid per unit (₦)">
+    <textarea class="form-input" id="mch-observations" rows="3" placeholder="Your observations: weight, colour, texture, consistency, any abnormalities compared to previous batches"></textarea>
+    <textarea class="form-input" id="mch-spec" rows="2" placeholder="Stated specifications from supplier (e.g. 42.5N grade, 500MPa yield strength)"></textarea>
+    <button class="btn btn-approve" onclick="mchSubmitCheck()">Run Material Check</button>
+    <div id="mch-submit-result" style="font-size:13px;color:#aaa;white-space:pre-wrap;margin-top:8px;"></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-mch_results" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Material Check Results</p>
+  <div style="overflow-x:auto;"><table class="data-table" id="mch-results-table">
+    <thead><tr><th>Material</th><th>Supplier</th><th>Verdict</th><th>Risk Level</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody id="mch-results-body"><tr><td colspan="6" style="color:#444;text-align:center;">No checks yet</td></tr></tbody>
+  </table></div>
+</div>
+
+<div class="tab-panel" id="tab-mch_blacklist" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Supplier Blacklist</p>
+  <div id="mch-blacklist-body" style="color:#555;font-size:13px;">Loading supplier blacklist…</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     FX SALARY PANELS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-fxs_dashboard" style="display:none;">
+  <p class="section-title" style="margin-top:0;">FX Salary Parity Dashboard</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">For companies paying dollar-benchmarked salaries in naira. Shows each staff member's current naira equivalent at parallel market rate.</p>
+  <div id="fxs-kpi-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxs-kpi-rate" style="color:#06b6d4;">—</div><div class="ct-kpi-lbl">USD/NGN Today</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxs-kpi-total-usd">—</div><div class="ct-kpi-lbl">Total Payroll (USD)</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxs-kpi-total-ngn">—</div><div class="ct-kpi-lbl">Total Payroll (NGN)</div></div>
+  </div>
+  <div style="overflow-x:auto;"><table class="data-table" id="fxs-staff-table">
+    <thead><tr><th>Name</th><th>Role</th><th>Salary (USD)</th><th>This Month (NGN)</th><th>Last Month (NGN)</th><th>Change</th></tr></thead>
+    <tbody id="fxs-staff-body"><tr><td colspan="6" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
+  </table></div>
+</div>
+
+<div class="tab-panel" id="tab-fxs_staff" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Add Staff (USD Salary)</p>
+  <div style="max-width:480px;display:grid;gap:12px;">
+    <input class="form-input" id="fxs-company" placeholder="Company name">
+    <input class="form-input" id="fxs-name" placeholder="Staff name">
+    <input class="form-input" id="fxs-role" placeholder="Role / job title">
+    <input class="form-input" id="fxs-salary-usd" type="number" placeholder="Monthly salary in USD">
+    <input class="form-input" id="fxs-phone" placeholder="WhatsApp for payslip (+234...)">
+    <button class="btn btn-approve" onclick="fxsAddStaff()">Add Staff Member</button>
+    <div id="fxs-staff-result" style="font-size:12px;color:#555;"></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-fxs_history" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Rate History</p>
+  <div id="fxs-history-body" style="color:#555;font-size:13px;">Loading rate history…</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     FUEL REPRICE PANELS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-fr_routes" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Route Profitability</p>
+  <div id="fr-kpi-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fr-kpi-pump" style="color:#84cc16;">—</div><div class="ct-kpi-lbl">Pump Price (₦/litre)</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fr-kpi-loss-routes" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Loss-Making Routes</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fr-kpi-repriced">—</div><div class="ct-kpi-lbl">Letters Generated</div></div>
+  </div>
+  <div style="overflow-x:auto;"><table class="data-table" id="fr-routes-table">
+    <thead><tr><th>Route</th><th>Client</th><th>Agreed Rate (₦)</th><th>Cost at Current Fuel</th><th>Margin</th><th>Status</th></tr></thead>
+    <tbody id="fr-routes-body"><tr><td colspan="6" style="color:#444;text-align:center;">Loading routes…</td></tr></tbody>
+  </table></div>
+</div>
+
+<div class="tab-panel" id="tab-fr_alerts" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Add Route</p>
+  <div style="max-width:520px;display:grid;gap:12px;">
+    <input class="form-input" id="fr-company" placeholder="Logistics company name">
+    <input class="form-input" id="fr-route-name" placeholder="Route (e.g. Lagos–Abuja)">
+    <input class="form-input" id="fr-client-name" placeholder="Client name">
+    <input class="form-input" id="fr-agreed-rate" type="number" placeholder="Agreed rate per trip (₦)">
+    <input class="form-input" id="fr-distance-km" type="number" placeholder="Distance (km)">
+    <input class="form-input" id="fr-fuel-consumption" type="number" placeholder="Litres per 100km">
+    <input class="form-input" id="fr-contract-date" type="date" placeholder="Contract signed date">
+    <input class="form-input" id="fr-fuel-price-at-signing" type="number" placeholder="Fuel price at contract signing (₦/litre)">
+    <button class="btn btn-approve" onclick="frAddRoute()">Add Route</button>
+    <div id="fr-alerts-result" style="font-size:12px;color:#555;"></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-fr_letters" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Repricing Letters</p>
+  <div id="fr-letters-body" style="color:#555;font-size:13px;">Select a loss-making route from the Routes tab to generate a repricing letter for that client.</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     FLOAT OPTIMIZER PANELS
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-fo_dashboard" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Float Optimizer Dashboard</p>
+  <p style="color:#555;font-size:12px;margin-bottom:16px;">OPay/PalmPay/Moniepoint agent float management. Tracks utilization per agent and recommends optimal float levels to prevent liquidity shortfalls.</p>
+  <div id="fo-kpi-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fo-kpi-agents">—</div><div class="ct-kpi-lbl">Agents Tracked</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fo-kpi-total-float" style="color:#10b981;">—</div><div class="ct-kpi-lbl">Total Float (₦)</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fo-kpi-shortfalls" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Shortfalls Today</div></div>
+    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fo-kpi-utilization">—</div><div class="ct-kpi-lbl">Avg Utilization (%)</div></div>
+  </div>
+  <div style="overflow-x:auto;"><table class="data-table" id="fo-agent-table">
+    <thead><tr><th>Agent</th><th>Platform</th><th>Current Float (₦)</th><th>Recommended Float (₦)</th><th>Utilization</th><th>Risk</th></tr></thead>
+    <tbody id="fo-agent-body"><tr><td colspan="6" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
+  </table></div>
+</div>
+
+<div class="tab-panel" id="tab-fo_agents" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Add Agent</p>
+  <div style="max-width:480px;display:grid;gap:12px;">
+    <input class="form-input" id="fo-aggregator" placeholder="Aggregator / Super-agent name">
+    <input class="form-input" id="fo-agent-name" placeholder="Agent name">
+    <select class="form-input" id="fo-platform">
+      <option value="">Platform</option>
+      <option value="opay">OPay</option>
+      <option value="palmpay">PalmPay</option>
+      <option value="moniepoint">Moniepoint</option>
+      <option value="gtworld">GTWorld</option>
+      <option value="other">Other</option>
+    </select>
+    <input class="form-input" id="fo-agent-phone" placeholder="Agent WhatsApp (+234...)">
+    <input class="form-input" id="fo-current-float" type="number" placeholder="Current float balance (₦)">
+    <input class="form-input" id="fo-daily-volume" type="number" placeholder="Average daily transaction volume (₦)">
+    <input class="form-input" id="fo-peak-days" placeholder="Peak days (e.g. Monday, Friday, salary days)">
+    <button class="btn btn-approve" onclick="foAddAgent()">Add Agent</button>
+    <div id="fo-agent-result" style="font-size:12px;color:#555;"></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-fo_recommendations" style="display:none;">
+  <p class="section-title" style="margin-top:0;">Float Recommendations</p>
+  <div id="fo-recommendations-body" style="color:#555;font-size:13px;">Loading recommendations…</div>
+</div>
+
 <!-- ── Setup Wizard Modal ── -->
 <div class="wizard-overlay" id="wizard-overlay">
   <div class="wizard-box">
@@ -2177,6 +3154,15 @@ function switchProduct(product, pill) {
   if (product === "loan_officer") {
     loLoadQueue();
   }
+  if (product === "debt_collector") { dcLoadOverview(); }
+  if (product === "fx_lock") { fxlLoadMonitor(); }
+  if (product === "hr_suite") { hrLoadOverview(); }
+  if (product === "market_credit") { mcLoadQueue(); }
+  if (product === "product_auth") { paLoadHistory(); }
+  if (product === "material_check") { mchLoadResults(); }
+  if (product === "fuel_reprice") { frLoadRoutes(); }
+  if (product === "float_optimizer") { foLoadDashboard(); }
+  if (product === "estate_os") { estLoadOverview(); }
 }
 
 function switchTab(name, btn) {
@@ -4233,6 +5219,920 @@ async function loSubmitOverride() {
   } catch(e) {
     alert("Override failed: " + e.message);
   }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// DEBT COLLECTOR
+// ══════════════════════════════════════════════════════════════════════════
+async function dcLoadOverview() {
+  try {
+    const r = await fetch('/dc/overview', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('dc-kpi-active').textContent = d.active_cases ?? 0;
+    document.getElementById('dc-kpi-overdue').textContent = '₦' + (d.total_overdue_ngn ?? 0).toLocaleString();
+    document.getElementById('dc-kpi-legal').textContent = d.at_legal_stage ?? 0;
+    document.getElementById('dc-kpi-recovered').textContent = '₦' + (d.recovered_this_month ?? 0).toLocaleString();
+    document.getElementById('dc-overview-body').textContent = '';
+  } catch(e) { document.getElementById('dc-overview-body').textContent = 'Could not load — ' + e.message; }
+}
+async function dcLoadCases() {
+  try {
+    const r = await fetch('/dc/cases', {headers: authHeaders()});
+    const d = await r.json();
+    const tbody = document.getElementById('dc-cases-body');
+    tbody.innerHTML = d.cases.length ? d.cases.map(c => `
+      <tr>
+        <td>${c.debtor_name}</td><td>${c.debtor_business}</td>
+        <td>₦${c.amount_ngn.toLocaleString()}</td><td>${c.days_overdue}d</td>
+        <td><span style="color:${c.current_stage==='legal'?'#ef4444':c.current_stage==='final'?'#f59e0b':'#aaa'}">${c.stage_label}</span></td>
+        <td><button class="btn btn-skip" style="font-size:10px;padding:3px 8px;" onclick="dcMarkPaid('${c._id}')">Mark Paid</button></td>
+      </tr>`).join('') : '<tr><td colspan="6" style="color:#444;text-align:center;">No active cases</td></tr>';
+  } catch(e) {}
+}
+async function dcAddCase() {
+  const body = {
+    client_name: document.getElementById('dc-add-client').value,
+    debtor_name: document.getElementById('dc-add-debtor-name').value,
+    debtor_business: document.getElementById('dc-add-debtor-biz').value,
+    debtor_phone: document.getElementById('dc-add-debtor-phone').value,
+    amount_ngn: parseFloat(document.getElementById('dc-add-amount').value),
+    description: document.getElementById('dc-add-desc').value,
+    original_due_date: document.getElementById('dc-add-due-date').value,
+    relationship_context: document.getElementById('dc-add-context').value,
+  };
+  const el = document.getElementById('dc-add-result');
+  el.textContent = 'Creating case…';
+  try {
+    const r = await fetch('/dc/cases', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#16a34a';
+    el.textContent = `Case created. First recovery message queued for ${body.debtor_name}.`;
+  } catch(e) { el.style.color='#ef4444'; el.textContent = 'Error: ' + e.message; }
+}
+async function dcMarkPaid(caseId) {
+  await fetch(`/dc/cases/${caseId}/paid`, {method:'POST', headers: authHeaders()});
+  dcLoadCases();
+  dcLoadOverview();
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// HR SUITE OVERVIEW
+// ══════════════════════════════════════════════════════════════════════════
+async function hrLoadOverview() {
+  try {
+    const [seData, mlData] = await Promise.allSettled([
+      fetch('/salary-erosion/dashboard', {headers: authHeaders()}).then(r => r.json()),
+      fetch('/moonlighting/overview', {headers: authHeaders()}).then(r => r.json()),
+    ]);
+    if (seData.status === 'fulfilled') {
+      document.getElementById('hr-kpi-staff').textContent = seData.value.total_staff ?? 0;
+      document.getElementById('hr-kpi-erosion-risk').textContent = seData.value.at_churn_risk ?? 0;
+    }
+    if (mlData.status === 'fulfilled') {
+      document.getElementById('hr-kpi-moonlight-flagged').textContent = mlData.value.flagged_this_month ?? 0;
+    }
+  } catch(e) {}
+}
+
+// TALENTOS — HR SUITE
+// ══════════════════════════════════════════════════════════════════════════
+async function hrLoadScreenings() {
+  try {
+    const r = await fetch('/hr/screener', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('hr-scr-active').innerHTML = (d.campaigns ?? []).map(c =>
+      `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a;">
+        <span style="color:#e0e0e0;font-weight:600;">${c.role}</span>
+        <span style="color:#555;font-size:11px;margin-left:8px;">${c.company}</span>
+        <span style="color:#6366f1;font-size:11px;float:right;">${c.responses ?? 0} responses</span>
+      </div>`).join('') || '<span style="color:#444;">No active screenings</span>';
+  } catch(e) {}
+}
+async function hrCreateScreening() {
+  const body = {
+    company: document.getElementById('hr-scr-company').value,
+    role: document.getElementById('hr-scr-role').value,
+    sector: document.getElementById('hr-scr-sector').value,
+    requirements: document.getElementById('hr-scr-requirements').value,
+    salary_range: document.getElementById('hr-scr-salary').value,
+    location: document.getElementById('hr-scr-location').value,
+  };
+  const el = document.getElementById('hr-scr-result');
+  el.textContent = 'Generating screening questions…';
+  try {
+    const r = await fetch('/hr/screener', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#16a34a';
+    el.textContent = `Campaign created.\n\n${d.questions}`;
+    hrLoadScreenings();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function hrLoadAttendanceToday() {
+  try {
+    const r = await fetch('/hr/attendance', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('hr-att-today').innerHTML =
+      `<span style="color:#e0e0e0;font-size:22px;font-weight:700;">${d.present}</span>
+       <span style="color:#555;"> / ${d.total_registered} registered today</span>`;
+    document.getElementById('hr-att-body').innerHTML = (d.records ?? []).map(r =>
+      `<tr><td>${r.name}</td><td>${r.date?.slice(0,10)}</td>
+       <td>${r.clock_in ?? '—'}</td><td>${r.clock_out ?? '—'}</td>
+       <td>${r.hours ?? '—'}</td>
+       <td style="color:${r.status==='on_time'?'#16a34a':'#f59e0b'}">${r.status ?? '—'}</td></tr>`
+    ).join('') || '<tr><td colspan="6" style="color:#444;text-align:center;">No records today</td></tr>';
+  } catch(e) {}
+}
+async function hrAddAttendanceStaff() {
+  const body = {
+    company: document.getElementById('hr-att-company').value,
+    name: document.getElementById('hr-att-name').value,
+    phone: document.getElementById('hr-att-phone').value,
+    role: document.getElementById('hr-att-role').value,
+    work_start: document.getElementById('hr-att-start').value || '08:00',
+    work_end: document.getElementById('hr-att-end').value || '17:00',
+  };
+  const el = document.getElementById('hr-att-result');
+  try {
+    await fetch('/hr/attendance/staff', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    el.style.color = '#16a34a'; el.textContent = `${body.name} registered for WhatsApp attendance tracking.`;
+    hrLoadAttendanceToday();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function hrLoadLeavePending() {
+  try {
+    const r = await fetch('/hr/leave/pending', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('hr-leave-pending-list').innerHTML = (d.pending ?? []).map(p =>
+      `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a;">
+        <span style="color:#e0e0e0;font-weight:600;">${p.staff_name}</span>
+        <span style="color:#f59e0b;font-size:11px;margin-left:8px;">${p.leave_type}</span>
+        <div style="color:#555;font-size:11px;">${p.start_date} → ${p.end_date}</div>
+      </div>`).join('') || '<span style="color:#444;">No pending leave requests</span>';
+  } catch(e) {}
+}
+async function hrLogLeave() {
+  const body = {
+    company: document.getElementById('hr-leave-company').value,
+    staff_name: document.getElementById('hr-leave-staff').value,
+    leave_type: document.getElementById('hr-leave-type').value,
+    start_date: document.getElementById('hr-leave-start').value,
+    end_date: document.getElementById('hr-leave-end').value,
+    reason: document.getElementById('hr-leave-reason').value,
+  };
+  const el = document.getElementById('hr-leave-result');
+  try {
+    await fetch('/hr/leave', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    el.style.color = '#16a34a'; el.textContent = `Leave request submitted for ${body.staff_name}.`;
+    hrLoadLeavePending();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function hrLoadBenchmarks() {
+  try {
+    const r = await fetch('/hr/benchmark', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('hr-bench-body').innerHTML = (d.benchmarks ?? []).map(b =>
+      `<tr><td>${b.role}</td><td>${b.sector||'—'}</td><td>${b.location}</td>
+       <td colspan="3" style="color:#aaa;font-size:11px;">${b.benchmark_text?.slice(0,80)}…</td>
+       <td>${b.created_at?.slice(0,10)}</td></tr>`
+    ).join('') || '<tr><td colspan="7" style="color:#444;text-align:center;">No benchmarks yet</td></tr>';
+  } catch(e) {}
+}
+async function hrBenchmarkSalary() {
+  const body = {
+    role: document.getElementById('hr-bench-role').value,
+    sector: document.getElementById('hr-bench-sector').value,
+    location: document.getElementById('hr-bench-location').value || 'Lagos',
+    years_exp: document.getElementById('hr-bench-exp').value || '2-5',
+    company_size: document.getElementById('hr-bench-size').value || 'sme',
+  };
+  const el = document.getElementById('hr-bench-result');
+  el.textContent = 'Pulling market rates…'; el.style.color = '#555';
+  try {
+    const r = await fetch('/hr/benchmark', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#aaa'; el.textContent = d.benchmark_text;
+    hrLoadBenchmarks();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function hrLoadPencom() {
+  try {
+    const r = await fetch('/hr/pencom/stats', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('hr-pencom-enrolled').textContent = d.enrolled ?? 0;
+    document.getElementById('hr-pencom-due').textContent = d.overdue_remittances ?? 0;
+    document.getElementById('hr-pencom-this-month').textContent = '₦' + (d.this_month_ngn ?? 0).toLocaleString();
+    const rs = await fetch('/hr/pencom/schedule', {headers: authHeaders()});
+    const ds = await rs.json();
+    document.getElementById('hr-pencom-schedule').innerHTML = (ds.schedule ?? []).map(s =>
+      `<div style="padding:6px 0;border-bottom:1px solid #1a1a1a;font-size:12px;">
+        <span style="color:#e0e0e0;">${s.staff_name}</span>
+        <span style="color:#555;margin-left:8px;">${s.pfa||'—'}</span>
+        <span style="color:#6366f1;float:right;">₦${(s.total_monthly||0).toLocaleString()}/mo</span>
+      </div>`).join('') || '<span style="color:#444;">No staff enrolled</span>';
+  } catch(e) {}
+}
+async function hrAddPencomStaff() {
+  const body = {
+    company: document.getElementById('hr-pencom-company').value,
+    staff_name: document.getElementById('hr-pencom-staff').value,
+    pfa: document.getElementById('hr-pencom-pfa').value,
+    rsa_pin: document.getElementById('hr-pencom-rsa').value,
+    basic_salary_ngn: parseFloat(document.getElementById('hr-pencom-basic').value),
+  };
+  const el = document.getElementById('hr-pencom-result');
+  try {
+    const r = await fetch('/hr/pencom/staff', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#16a34a';
+    el.textContent = `${body.staff_name} enrolled. Monthly contribution: ₦${(d.total_monthly||0).toLocaleString()} (Employee: ₦${(d.employee_contribution||0).toLocaleString()}, Employer: ₦${(d.employer_contribution||0).toLocaleString()})`;
+    hrLoadPencom();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function hrGenerateOffboarding() {
+  const body = {
+    company: document.getElementById('hr-off-company').value,
+    staff_name: document.getElementById('hr-off-name').value,
+    role: document.getElementById('hr-off-role').value,
+    last_day: document.getElementById('hr-off-last-day').value,
+    reason: document.getElementById('hr-off-reason').value || 'resignation',
+    assets: document.getElementById('hr-off-assets').value,
+  };
+  const el = document.getElementById('hr-off-result');
+  el.textContent = 'Generating checklist…'; el.style.color = '#555';
+  try {
+    const r = await fetch('/hr/offboarding', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#aaa'; el.textContent = d.checklist;
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function hrLoadProbationUpcoming() {
+  try {
+    const r = await fetch('/hr/probation/upcoming', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('hr-prob-upcoming').innerHTML = (d.upcoming ?? []).map(p =>
+      `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a;">
+        <span style="color:#e0e0e0;font-weight:600;">${p.staff_name}</span>
+        <span style="color:#555;font-size:11px;margin-left:8px;">${p.role}</span>
+        <span style="color:${p.days_remaining<=7?'#ef4444':'#f59e0b'};font-size:11px;float:right;">${p.days_remaining}d remaining</span>
+        <div style="color:#444;font-size:11px;">Confirm: ${p.confirmation_date}</div>
+      </div>`).join('') || '<span style="color:#444;">No confirmations due in 30 days</span>';
+  } catch(e) {}
+}
+async function hrAddProbation() {
+  const body = {
+    company: document.getElementById('hr-prob-company').value,
+    staff_name: document.getElementById('hr-prob-name').value,
+    role: document.getElementById('hr-prob-role').value,
+    start_date: document.getElementById('hr-prob-start').value,
+    probation_months: parseInt(document.getElementById('hr-prob-months').value) || 3,
+    manager_phone: document.getElementById('hr-prob-manager').value,
+  };
+  const el = document.getElementById('hr-prob-result');
+  try {
+    const r = await fetch('/hr/probation', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#16a34a';
+    el.textContent = `${body.staff_name} tracked. Confirmation date: ${d.confirmation_date} (${d.days_remaining} days).`;
+    hrLoadProbationUpcoming();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function hrUploadPolicy() {
+  const body = {
+    company: document.getElementById('hr-pol-company').value,
+    policy_text: document.getElementById('hr-pol-handbook').value,
+  };
+  const el = document.getElementById('hr-pol-upload-result');
+  try {
+    const r = await fetch('/hr/policy/upload', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#16a34a'; el.textContent = `Policy uploaded — ${d.word_count} words indexed. Bot is ready.`;
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+async function hrTestPolicy() {
+  const body = {
+    company: document.getElementById('hr-pol-company').value,
+    question: document.getElementById('hr-pol-question').value,
+  };
+  const el = document.getElementById('hr-pol-answer');
+  el.textContent = 'Checking policy…'; el.style.color = '#555';
+  try {
+    const r = await fetch('/hr/policy/ask', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#aaa'; el.textContent = d.answer;
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+// FX LOCK
+// ══════════════════════════════════════════════════════════════════════════
+async function fxlLoadMonitor() {
+  try {
+    const r = await fetch('/fx-lock/rate', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('fxl-kpi-rate').textContent = '₦' + (d.usd_ngn_parallel ?? '—');
+    const chg = d.change_24h_pct ?? 0;
+    const el = document.getElementById('fxl-kpi-change');
+    el.textContent = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+    el.style.color = chg >= 2 ? '#ef4444' : chg >= 0.5 ? '#f59e0b' : '#16a34a';
+    document.getElementById('fxl-kpi-locked').textContent = d.quotes_locked_today ?? 0;
+    document.getElementById('fxl-rate-history').innerHTML = (d.history ?? []).map(h =>
+      `<div style="display:flex;gap:16px;padding:6px 0;border-bottom:1px solid #1a1a1a;font-size:12px;">
+        <span style="color:#555;width:100px;">${h.date}</span>
+        <span style="color:#aaa;">₦${h.rate.toLocaleString()}</span>
+        <span style="color:${h.change>=0?'#ef4444':'#16a34a'}">${h.change>=0?'+':''}${h.change?.toFixed(2)}%</span>
+      </div>`).join('') || '<span style="color:#444;">No history yet</span>';
+  } catch(e) {}
+}
+async function fxlLockQuote() {
+  const body = {
+    client_name: document.getElementById('fxl-client-name').value,
+    description: document.getElementById('fxl-quote-desc').value,
+    usd_value: parseFloat(document.getElementById('fxl-quote-usd').value),
+    alert_threshold_pct: parseFloat(document.getElementById('fxl-threshold').value),
+    expiry_date: document.getElementById('fxl-expiry').value,
+  };
+  const el = document.getElementById('fxl-lock-result');
+  el.textContent = 'Locking…';
+  try {
+    const r = await fetch('/fx-lock/quotes', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#16a34a';
+    el.textContent = `Quote locked at ₦${d.locked_rate?.toLocaleString()}/USD. NGN value: ₦${d.ngn_value?.toLocaleString()}. Alert if rate moves ${body.alert_threshold_pct}%.`;
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+async function fxlSaveSettings() {
+  const body = {
+    client_name: document.getElementById('fxl-settings-client').value,
+    phone: document.getElementById('fxl-settings-phone').value,
+    threshold_pct: parseFloat(document.getElementById('fxl-settings-threshold').value),
+  };
+  const el = document.getElementById('fxl-settings-result');
+  try {
+    await fetch('/fx-lock/settings', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    el.style.color='#16a34a'; el.textContent='Settings saved. Alerts active.';
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// SALARY EROSION
+// ══════════════════════════════════════════════════════════════════════════
+async function seLoadDashboard() {
+  try {
+    const r = await fetch('/salary-erosion/dashboard', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('se-kpi-staff').textContent = d.total_staff ?? 0;
+    document.getElementById('se-kpi-avg-erosion').textContent = (d.avg_erosion_pct ?? 0).toFixed(1) + '%';
+    document.getElementById('se-kpi-at-risk').textContent = d.at_churn_risk ?? 0;
+    const tbody = document.getElementById('se-staff-body');
+    tbody.innerHTML = (d.staff ?? []).map(s => `
+      <tr>
+        <td>${s.name}</td><td>${s.role}</td><td>${s.hired_date}</td>
+        <td>₦${s.salary_ngn.toLocaleString()}</td>
+        <td>₦${s.real_value_today.toLocaleString()}</td>
+        <td style="color:${s.erosion_pct>30?'#ef4444':s.erosion_pct>15?'#f59e0b':'#aaa'}">${s.erosion_pct.toFixed(1)}%</td>
+        <td><span style="color:${s.churn_risk==='high'?'#ef4444':s.churn_risk==='medium'?'#f59e0b':'#16a34a'}">${s.churn_risk}</span></td>
+      </tr>`).join('') || '<tr><td colspan="7" style="color:#444;text-align:center;">No staff tracked yet</td></tr>';
+  } catch(e) {}
+}
+async function seAddStaff() {
+  const body = {
+    company: document.getElementById('se-company').value,
+    name: document.getElementById('se-staff-name').value,
+    role: document.getElementById('se-staff-role').value,
+    salary_ngn: parseFloat(document.getElementById('se-staff-salary').value),
+    hired_date: document.getElementById('se-staff-hired').value,
+  };
+  const el = document.getElementById('se-staff-result');
+  try {
+    await fetch('/salary-erosion/staff', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    el.style.color='#16a34a'; el.textContent=`${body.name} added. Erosion tracking active.`;
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+async function seGenerateReport() {
+  const company = document.getElementById('se-report-company').value;
+  const el = document.getElementById('se-report-output');
+  el.textContent = 'Generating…';
+  try {
+    const r = await fetch(`/salary-erosion/report?company=${encodeURIComponent(company)}`, {headers: authHeaders()});
+    const d = await r.json();
+    el.textContent = d.report_text ?? JSON.stringify(d, null, 2);
+  } catch(e) { el.textContent = 'Error: '+e.message; }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// MARKET CREDIT
+// ══════════════════════════════════════════════════════════════════════════
+async function mcLoadQueue() {
+  try {
+    const r = await fetch('/market-credit/applications', {headers: authHeaders()});
+    const d = await r.json();
+    const tbody = document.getElementById('mc-queue-body');
+    tbody.innerHTML = (d.applications ?? []).map(a => `
+      <tr>
+        <td>${a.trader_name}</td><td>${a.market}</td>
+        <td>₦${a.loan_amount_ngn.toLocaleString()}</td>
+        <td style="font-weight:600;">${a.score ?? '—'}/100</td>
+        <td style="color:${a.decision==='Approve'?'#16a34a':a.decision==='Decline'?'#ef4444':'#f59e0b'}">${a.decision ?? 'Pending'}</td>
+        <td>${a.mfb}</td><td>${a.created_at?.slice(0,10)}</td>
+      </tr>`).join('') || '<tr><td colspan="7" style="color:#444;text-align:center;">No applications yet</td></tr>';
+  } catch(e) {}
+}
+async function mcSubmitApplication() {
+  const body = {
+    mfb: document.getElementById('mc-mfb').value,
+    trader_name: document.getElementById('mc-trader-name').value,
+    market: document.getElementById('mc-market').value,
+    goods_type: document.getElementById('mc-goods').value,
+    years_trading: parseInt(document.getElementById('mc-years').value),
+    daily_sales_ngn: parseFloat(document.getElementById('mc-daily-sales').value),
+    association_membership: document.getElementById('mc-assoc').value,
+    phone: document.getElementById('mc-phone').value,
+    loan_amount_ngn: parseFloat(document.getElementById('mc-loan-amount').value),
+    peer_references: document.getElementById('mc-references').value,
+  };
+  const el = document.getElementById('mc-submit-result');
+  el.textContent = 'Scoring…';
+  try {
+    const r = await fetch('/market-credit/apply', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = d.decision==='Approve'?'#16a34a':d.decision==='Decline'?'#ef4444':'#f59e0b';
+    el.textContent = `${d.decision} — Score: ${d.score}/100. ${d.rationale}`;
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// MOONLIGHTING
+// ══════════════════════════════════════════════════════════════════════════
+async function mlLoadOverview() {
+  try {
+    const r = await fetch('/moonlighting/overview', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('ml-kpi-staff').textContent = d.total_staff ?? 0;
+    document.getElementById('ml-kpi-flagged').textContent = d.flagged_this_month ?? 0;
+    document.getElementById('ml-kpi-confirmed').textContent = d.confirmed_cases ?? 0;
+    const badge = document.getElementById('ml-alert-badge');
+    if (d.flagged_this_month > 0) { badge.style.display='inline'; badge.textContent = d.flagged_this_month; }
+  } catch(e) {}
+}
+async function mlAnalyseStaff() {
+  const body = {
+    company: document.getElementById('ml-company').value,
+    staff_name: document.getElementById('ml-staff-name').value,
+    role: document.getElementById('ml-staff-role').value,
+    attendance_log: document.getElementById('ml-attendance-log').value,
+  };
+  const el = document.getElementById('ml-staff-result');
+  el.textContent = 'Analysing patterns…';
+  try {
+    const r = await fetch('/moonlighting/analyse', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = d.risk_level==='high'?'#ef4444':d.risk_level==='medium'?'#f59e0b':'#16a34a';
+    el.textContent = `Risk: ${d.risk_level.toUpperCase()}\n\n${d.analysis}\n\nSignals: ${(d.signals??[]).join(', ')||'None detected'}`;
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// PRODUCT AUTH
+// ══════════════════════════════════════════════════════════════════════════
+async function paLoadHistory() {
+  try {
+    const r = await fetch('/product-auth/history', {headers: authHeaders()});
+    const d = await r.json();
+    const tbody = document.getElementById('pa-history-body');
+    tbody.innerHTML = (d.scans ?? []).map(s => `
+      <tr>
+        <td>${s.product_name}</td><td>${s.brand}</td><td>${s.supplier}</td>
+        <td style="color:${s.verdict==='GENUINE'?'#16a34a':s.verdict==='COUNTERFEIT'?'#ef4444':'#f59e0b'}">${s.verdict}</td>
+        <td>${s.confidence}</td><td>${s.created_at?.slice(0,10)}</td>
+      </tr>`).join('') || '<tr><td colspan="6" style="color:#444;text-align:center;">No scans yet</td></tr>';
+  } catch(e) {}
+}
+async function paRunScan() {
+  const body = {
+    business: document.getElementById('pa-business').value,
+    product_name: document.getElementById('pa-product-name').value,
+    brand: document.getElementById('pa-brand').value,
+    nafdac_number: document.getElementById('pa-nafdac').value,
+    batch_number: document.getElementById('pa-batch').value,
+    supplier: document.getElementById('pa-supplier').value,
+    description: document.getElementById('pa-description').value,
+  };
+  const el = document.getElementById('pa-scan-result');
+  el.textContent = 'Running authentication check…';
+  try {
+    const r = await fetch('/product-auth/scan', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = d.verdict==='GENUINE'?'#16a34a':d.verdict==='COUNTERFEIT'?'#ef4444':'#f59e0b';
+    el.textContent = `Verdict: ${d.verdict} (${d.confidence} confidence)\n\n${d.analysis}\n\nRed flags: ${(d.red_flags??[]).join('; ')||'None'}`;
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// MATERIAL CHECK
+// ══════════════════════════════════════════════════════════════════════════
+async function mchLoadResults() {
+  try {
+    const r = await fetch('/material-check/results', {headers: authHeaders()});
+    const d = await r.json();
+    const tbody = document.getElementById('mch-results-body');
+    tbody.innerHTML = (d.checks ?? []).map(c => `
+      <tr>
+        <td>${c.material}</td><td>${c.supplier}</td>
+        <td style="color:${c.verdict==='PASS'?'#16a34a':c.verdict==='FAIL'?'#ef4444':'#f59e0b'}">${c.verdict}</td>
+        <td style="color:${c.risk_level==='high'?'#ef4444':c.risk_level==='medium'?'#f59e0b':'#aaa'}">${c.risk_level}</td>
+        <td>${c.created_at?.slice(0,10)}</td>
+        <td><button class="btn btn-skip" style="font-size:10px;padding:3px 8px;" onclick="mchBlacklist('${c._id}','${c.supplier}')">Blacklist</button></td>
+      </tr>`).join('') || '<tr><td colspan="6" style="color:#444;text-align:center;">No checks yet</td></tr>';
+  } catch(e) {}
+}
+async function mchSubmitCheck() {
+  const body = {
+    company: document.getElementById('mch-company').value,
+    material: document.getElementById('mch-material').value,
+    supplier: document.getElementById('mch-supplier').value,
+    quantity: document.getElementById('mch-quantity').value,
+    price_per_unit: parseFloat(document.getElementById('mch-price').value),
+    observations: document.getElementById('mch-observations').value,
+    stated_spec: document.getElementById('mch-spec').value,
+  };
+  const el = document.getElementById('mch-submit-result');
+  el.textContent = 'Running material check…';
+  try {
+    const r = await fetch('/material-check/check', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = d.verdict==='PASS'?'#16a34a':d.verdict==='FAIL'?'#ef4444':'#f59e0b';
+    el.textContent = `Verdict: ${d.verdict} — Risk: ${d.risk_level}\n\n${d.analysis}\n\nRecommendation: ${d.recommendation}`;
+    mchLoadResults();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+async function mchBlacklist(checkId, supplier) {
+  await fetch(`/material-check/${checkId}/blacklist`, {method:'POST', headers: authHeaders()});
+  document.getElementById('mch-blacklist-body').textContent = `${supplier} added to supplier blacklist.`;
+  mchLoadResults();
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// FX SALARY
+// ══════════════════════════════════════════════════════════════════════════
+async function fxsLoadDashboard() {
+  try {
+    const r = await fetch('/fx-salary/dashboard', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('fxs-kpi-rate').textContent = '₦' + (d.usd_ngn_rate ?? '—').toLocaleString();
+    document.getElementById('fxs-kpi-total-usd').textContent = '$' + (d.total_usd ?? 0).toLocaleString();
+    document.getElementById('fxs-kpi-total-ngn').textContent = '₦' + (d.total_ngn ?? 0).toLocaleString();
+    const tbody = document.getElementById('fxs-staff-body');
+    tbody.innerHTML = (d.staff ?? []).map(s => {
+      const chg = s.change_pct ?? 0;
+      return `<tr>
+        <td>${s.name}</td><td>${s.role}</td>
+        <td>$${s.salary_usd.toLocaleString()}</td>
+        <td>₦${s.this_month_ngn.toLocaleString()}</td>
+        <td>₦${s.last_month_ngn.toLocaleString()}</td>
+        <td style="color:${chg>=0?'#16a34a':'#ef4444'}">${chg>=0?'+':''}${chg.toFixed(1)}%</td>
+      </tr>`;}).join('') || '<tr><td colspan="6" style="color:#444;text-align:center;">No staff added yet</td></tr>';
+  } catch(e) {}
+}
+async function fxsAddStaff() {
+  const body = {
+    company: document.getElementById('fxs-company').value,
+    name: document.getElementById('fxs-name').value,
+    role: document.getElementById('fxs-role').value,
+    salary_usd: parseFloat(document.getElementById('fxs-salary-usd').value),
+    phone: document.getElementById('fxs-phone').value,
+  };
+  const el = document.getElementById('fxs-staff-result');
+  try {
+    await fetch('/fx-salary/staff', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    el.style.color='#16a34a'; el.textContent=`${body.name} added. Monthly naira calculation active.`;
+    fxsLoadDashboard();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// FUEL REPRICE
+// ══════════════════════════════════════════════════════════════════════════
+async function frLoadRoutes() {
+  try {
+    const r = await fetch('/fuel-reprice/routes', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('fr-kpi-pump').textContent = '₦' + (d.pump_price_per_litre ?? '—').toLocaleString();
+    document.getElementById('fr-kpi-loss-routes').textContent = d.loss_making_count ?? 0;
+    document.getElementById('fr-kpi-repriced').textContent = d.letters_generated ?? 0;
+    const tbody = document.getElementById('fr-routes-body');
+    tbody.innerHTML = (d.routes ?? []).map(rt => {
+      const margin = rt.margin_ngn ?? 0;
+      return `<tr>
+        <td>${rt.route_name}</td><td>${rt.client_name}</td>
+        <td>₦${rt.agreed_rate.toLocaleString()}</td>
+        <td>₦${rt.cost_at_current_fuel.toLocaleString()}</td>
+        <td style="color:${margin<0?'#ef4444':margin<5000?'#f59e0b':'#16a34a'}">₦${margin.toLocaleString()}</td>
+        <td>
+          ${margin<0?`<button class="btn btn-skip" style="font-size:10px;padding:3px 8px;" onclick="frGenerateLetter('${rt._id}')">Generate Letter</button>`:'<span style="color:#16a34a">Profitable</span>'}
+        </td>
+      </tr>`;}).join('') || '<tr><td colspan="6" style="color:#444;text-align:center;">No routes added yet</td></tr>';
+  } catch(e) {}
+}
+async function frAddRoute() {
+  const body = {
+    company: document.getElementById('fr-company').value,
+    route_name: document.getElementById('fr-route-name').value,
+    client_name: document.getElementById('fr-client-name').value,
+    agreed_rate_ngn: parseFloat(document.getElementById('fr-agreed-rate').value),
+    distance_km: parseFloat(document.getElementById('fr-distance-km').value),
+    litres_per_100km: parseFloat(document.getElementById('fr-fuel-consumption').value),
+    contract_date: document.getElementById('fr-contract-date').value,
+    fuel_price_at_signing: parseFloat(document.getElementById('fr-fuel-price-at-signing').value),
+  };
+  const el = document.getElementById('fr-alerts-result');
+  try {
+    const r = await fetch('/fuel-reprice/routes', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color='#16a34a';
+    el.textContent=`Route added. Current margin: ₦${d.margin_ngn?.toLocaleString()}. ${d.margin_ngn<0?'LOSS-MAKING — generate repricing letter now.':'Profitable at current fuel price.'}`;
+    frLoadRoutes();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+async function frGenerateLetter(routeId) {
+  const r = await fetch(`/fuel-reprice/routes/${routeId}/letter`, {method:'POST', headers: authHeaders()});
+  const d = await r.json();
+  document.getElementById('fr-letters-body').style.color='#aaa';
+  document.getElementById('fr-letters-body').textContent = d.letter_text ?? 'Letter generated.';
+  switchTab('fr_letters', document.querySelector('.product-tabs[data-product="fuel_reprice"] .tab-btn:last-child'));
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// FLOAT OPTIMIZER
+// ══════════════════════════════════════════════════════════════════════════
+async function foLoadDashboard() {
+  try {
+    const r = await fetch('/float-optimizer/dashboard', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('fo-kpi-agents').textContent = d.total_agents ?? 0;
+    document.getElementById('fo-kpi-total-float').textContent = '₦' + (d.total_float_ngn ?? 0).toLocaleString();
+    document.getElementById('fo-kpi-shortfalls').textContent = d.shortfalls_today ?? 0;
+    document.getElementById('fo-kpi-utilization').textContent = (d.avg_utilization_pct ?? 0).toFixed(0) + '%';
+    const tbody = document.getElementById('fo-agent-body');
+    tbody.innerHTML = (d.agents ?? []).map(a => `
+      <tr>
+        <td>${a.agent_name}</td><td>${a.platform}</td>
+        <td>₦${a.current_float.toLocaleString()}</td>
+        <td>₦${a.recommended_float.toLocaleString()}</td>
+        <td>${a.utilization_pct.toFixed(0)}%</td>
+        <td style="color:${a.risk==='high'?'#ef4444':a.risk==='medium'?'#f59e0b':'#16a34a'}">${a.risk}</td>
+      </tr>`).join('') || '<tr><td colspan="6" style="color:#444;text-align:center;">No agents added yet</td></tr>';
+    document.getElementById('fo-recommendations-body').innerHTML = (d.recommendations ?? []).map(rec =>
+      `<div style="padding:10px;border:1px solid #1a1a1a;border-radius:8px;margin-bottom:8px;">
+        <div style="font-size:12px;font-weight:600;color:#aaa;">${rec.agent_name}</div>
+        <div style="font-size:12px;color:#10b981;margin-top:4px;">${rec.action}</div>
+        <div style="font-size:11px;color:#555;margin-top:2px;">${rec.reason}</div>
+      </div>`).join('') || '<span style="color:#444">No recommendations yet — add agents first.</span>';
+  } catch(e) {}
+}
+async function foAddAgent() {
+  const body = {
+    aggregator: document.getElementById('fo-aggregator').value,
+    agent_name: document.getElementById('fo-agent-name').value,
+    platform: document.getElementById('fo-platform').value,
+    phone: document.getElementById('fo-agent-phone').value,
+    current_float_ngn: parseFloat(document.getElementById('fo-current-float').value),
+    avg_daily_volume_ngn: parseFloat(document.getElementById('fo-daily-volume').value),
+    peak_days: document.getElementById('fo-peak-days').value,
+  };
+  const el = document.getElementById('fo-agent-result');
+  try {
+    await fetch('/float-optimizer/agents', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    el.style.color='#16a34a'; el.textContent=`${body.agent_name} added. Float optimization active.`;
+    foLoadDashboard();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+// ESTATEOS — REAL ESTATE VETTING
+// ══════════════════════════════════════════════════════════════════════════
+async function estLoadOverview() {
+  try {
+    const r = await fetch('/estate/overview', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('est-kpi-listings').textContent = d.total_listings ?? 0;
+    document.getElementById('est-kpi-checks').textContent = d.background_checks ?? 0;
+    document.getElementById('est-kpi-kyc').textContent = d.kyc_documents ?? 0;
+    document.getElementById('est-kpi-pof').textContent = d.pof_approved ?? 0;
+  } catch(e) {}
+}
+
+async function estLoadListings() {
+  try {
+    const r = await fetch('/estate/properties', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('est-listings-body').innerHTML = (d.properties ?? []).map(p =>
+      `<div style="padding:10px 0;border-bottom:1px solid #1a1a1a;">
+        <div style="color:#e0e0e0;font-weight:600;">${p.address}</div>
+        <div style="display:flex;gap:12px;margin-top:4px;font-size:11px;">
+          <span style="color:#f59e0b;">${p.property_type}</span>
+          <span style="color:#555;">${p.bedrooms} beds</span>
+          <span style="color:#6366f1;">₦${(p.asking_price_ngn||0).toLocaleString()}</span>
+          <span style="color:#16a34a;">${p.title_type||'—'}</span>
+        </div>
+      </div>`).join('') || '<span style="color:#444;">No listings yet</span>';
+  } catch(e) {}
+}
+
+async function estAddListing() {
+  const body = {
+    agent_company: document.getElementById('est-list-company').value,
+    address: document.getElementById('est-list-address').value,
+    property_type: document.getElementById('est-list-type').value,
+    bedrooms: parseInt(document.getElementById('est-list-beds').value) || 0,
+    asking_price_ngn: parseFloat(document.getElementById('est-list-price').value) || 0,
+    title_type: document.getElementById('est-list-title').value,
+    description: document.getElementById('est-list-desc').value,
+    amenities: document.getElementById('est-list-amenities').value,
+    contact_phone: document.getElementById('est-list-phone').value,
+  };
+  const el = document.getElementById('est-list-result');
+  try {
+    const r = await fetch('/estate/properties', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#16a34a'; el.textContent = `Listing added. ID: ${d.property_id}`;
+    estLoadListings();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function estRunScorecard() {
+  const address = document.getElementById('est-score-address').value;
+  const type = document.getElementById('est-score-type').value;
+  if (!address) return;
+  document.getElementById('est-score-loading').style.display = 'block';
+  document.getElementById('est-scorecard-result').style.display = 'none';
+  try {
+    const r = await fetch('/estate/scorecard', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify({address, property_type: type})});
+    const d = await r.json();
+    document.getElementById('est-sc-overall').textContent = d.overall_score ?? '—';
+    document.getElementById('est-sc-overall').style.color = (d.overall_score >= 70) ? '#16a34a' : (d.overall_score >= 50) ? '#f59e0b' : '#ef4444';
+    document.getElementById('est-sc-flood').textContent = d.flood_risk?.level ?? '—';
+    document.getElementById('est-sc-flood').style.color = d.flood_risk?.level === 'HIGH' ? '#ef4444' : d.flood_risk?.level === 'MEDIUM' ? '#f59e0b' : '#16a34a';
+    document.getElementById('est-sc-amenity').textContent = d.amenity_score ?? '—';
+    document.getElementById('est-sc-flood-note').textContent = d.flood_risk?.note ?? '';
+    const commutes = d.commute_times ?? {};
+    document.getElementById('est-sc-commutes').innerHTML = Object.entries(commutes).map(([hub, data]) =>
+      `<div style="display:flex;justify-content:space-between;padding:8px 12px;background:#111;border-radius:6px;">
+        <span style="color:#aaa;">${hub}</span>
+        <span style="color:${data.rating==='good'?'#16a34a':data.rating==='moderate'?'#f59e0b':'#ef4444'};font-weight:600;">
+          ${data.duration_mins != null ? data.duration_mins + ' min' : 'unavailable'} ${data.distance_km ? '('+data.distance_km+'km)' : ''}
+        </span>
+      </div>`).join('');
+    document.getElementById('est-score-loading').style.display = 'none';
+    document.getElementById('est-scorecard-result').style.display = 'block';
+  } catch(e) {
+    document.getElementById('est-score-loading').textContent = 'Error: ' + e.message;
+  }
+}
+
+async function estLoadListingsForConcierge() {
+  try {
+    const r = await fetch('/estate/properties', {headers: authHeaders()});
+    const d = await r.json();
+    const sel = document.getElementById('est-con-property-id');
+    sel.innerHTML = '<option value="">Select property</option>' +
+      (d.properties ?? []).map(p => `<option value="${p._id}">${p.address}</option>`).join('');
+  } catch(e) {}
+}
+async function estAskConcierge() {
+  const body = {
+    property_id: document.getElementById('est-con-property-id').value,
+    question: document.getElementById('est-con-question').value,
+    buyer_name: document.getElementById('est-con-buyer').value,
+  };
+  const el = document.getElementById('est-con-result');
+  el.textContent = 'Reading property docs…'; el.style.color = '#555';
+  try {
+    const r = await fetch('/estate/concierge/ask', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#aaa'; el.textContent = d.answer;
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function estLoadPof() {
+  try {
+    const r = await fetch('/estate/pof', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('est-pof-history').innerHTML = (d.assessments ?? []).map(a =>
+      `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a;">
+        <span style="color:#e0e0e0;font-weight:600;">${a.buyer_name||'—'}</span>
+        <span style="color:${a.verdict==='PROCEED'?'#16a34a':a.verdict==='DECLINE'?'#ef4444':'#f59e0b'};margin-left:10px;font-size:12px;">${a.verdict}</span>
+        <div style="color:#555;font-size:11px;">₦${(a.property_price_ngn||0).toLocaleString()} property · ${a.created_at?.slice(0,10)}</div>
+      </div>`).join('') || '<span style="color:#444;">No assessments yet</span>';
+  } catch(e) {}
+}
+async function estAssessPof() {
+  const body = {
+    property_price_ngn: parseFloat(document.getElementById('est-pof-price').value),
+    pof_description: document.getElementById('est-pof-desc').value,
+    buyer_name: document.getElementById('est-pof-buyer').value,
+    notes: document.getElementById('est-pof-notes').value,
+  };
+  const el = document.getElementById('est-pof-result');
+  el.textContent = 'Assessing proof of funds…'; el.style.color = '#555';
+  try {
+    const r = await fetch('/estate/pof/assess', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = d.verdict==='PROCEED'?'#16a34a':d.verdict==='DECLINE'?'#ef4444':'#f59e0b';
+    el.textContent = `Verdict: ${d.verdict}\n\n${d.assessment}`;
+    estLoadPof();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function estLoadKyc() {
+  try {
+    const r = await fetch('/estate/kyc', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('est-kyc-records').innerHTML = (d.records ?? []).map(rec => {
+      const ext = rec.extracted_data ?? {};
+      return `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a;">
+        <span style="color:#e0e0e0;font-weight:600;">${rec.party_name}</span>
+        <span style="color:#6366f1;font-size:11px;margin-left:8px;">${rec.document_type}</span>
+        <span style="color:${ext.overall_authenticity==='LIKELY_GENUINE'?'#16a34a':ext.overall_authenticity==='SUSPICIOUS'?'#ef4444':'#f59e0b'};font-size:11px;float:right;">${ext.overall_authenticity||'—'}</span>
+        <div style="color:#555;font-size:11px;">${ext.full_name||''} ${ext.document_number?'· '+ext.document_number:''}</div>
+      </div>`;
+    }).join('') || '<span style="color:#444;">Vault is empty</span>';
+  } catch(e) {}
+}
+async function estExtractKyc() {
+  const body = {
+    party_name: document.getElementById('est-kyc-party').value,
+    document_type: document.getElementById('est-kyc-doc-type').value,
+    document_text: document.getElementById('est-kyc-text').value,
+  };
+  const el = document.getElementById('est-kyc-result');
+  el.textContent = 'Extracting data…'; el.style.color = '#555';
+  try {
+    const r = await fetch('/estate/kyc/extract', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    const ext = d.extracted ?? {};
+    el.style.color = '#16a34a';
+    el.textContent = `Stored in vault.\nName: ${ext.full_name||'—'} | Doc#: ${ext.document_number||'—'}\nAuthenticity: ${ext.overall_authenticity||'—'}`;
+    estLoadKyc();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function estLoadBackground() {
+  try {
+    const r = await fetch('/estate/background', {headers: authHeaders()});
+    const d = await r.json();
+    document.getElementById('est-bg-history').innerHTML = (d.checks ?? []).map(c =>
+      `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a;">
+        <span style="color:#e0e0e0;font-weight:600;">${c.tenant_name}</span>
+        <span style="color:${c.risk_rating==='LOW'?'#16a34a':c.risk_rating==='HIGH'?'#ef4444':'#f59e0b'};margin-left:10px;font-size:12px;">${c.risk_rating} RISK</span>
+        <span style="color:#555;font-size:11px;float:right;">${c.recommendation}</span>
+        <div style="color:#555;font-size:11px;">Rent/income: ${c.rent_to_income_pct}% · ${c.created_at?.slice(0,10)}</div>
+      </div>`).join('') || '<span style="color:#444;">No checks yet</span>';
+  } catch(e) {}
+}
+async function estRunBackground() {
+  const body = {
+    agent_company: document.getElementById('est-bg-company').value,
+    tenant_name: document.getElementById('est-bg-name').value,
+    occupation: document.getElementById('est-bg-occupation').value,
+    employer: document.getElementById('est-bg-employer').value,
+    monthly_income_ngn: parseFloat(document.getElementById('est-bg-income').value) || 0,
+    rent_amount_ngn: parseFloat(document.getElementById('est-bg-rent').value) || 0,
+    previous_landlord_feedback: document.getElementById('est-bg-prev-landlord').value,
+    guarantor_info: document.getElementById('est-bg-guarantor').value,
+    additional_notes: document.getElementById('est-bg-notes').value,
+  };
+  const el = document.getElementById('est-bg-result');
+  el.textContent = 'Running background assessment…'; el.style.color = '#555';
+  try {
+    const r = await fetch('/estate/background', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = d.risk_rating==='LOW'?'#16a34a':d.risk_rating==='HIGH'?'#ef4444':'#f59e0b';
+    el.textContent = `Risk: ${d.risk_rating} | Recommendation: ${d.recommendation}\n\n${d.assessment}`;
+    estLoadBackground();
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
+}
+
+async function estGenerateLawyerBundle() {
+  const body = {
+    property_address: document.getElementById('est-law-address').value,
+    buyer_name: document.getElementById('est-law-buyer').value,
+    seller_name: document.getElementById('est-law-seller').value,
+    agreed_price_ngn: parseFloat(document.getElementById('est-law-price').value) || 0,
+    documents_collected: document.getElementById('est-law-docs').value,
+    chat_summary: document.getElementById('est-law-summary').value,
+  };
+  const el = document.getElementById('est-law-result');
+  el.textContent = 'Generating lawyer handover memo…'; el.style.color = '#555';
+  try {
+    const r = await fetch('/estate/lawyer-bundle', {method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    const d = await r.json();
+    el.style.color = '#aaa'; el.textContent = d.memo;
+  } catch(e) { el.style.color='#ef4444'; el.textContent='Error: '+e.message; }
 }
 </script>
 </body>
