@@ -255,6 +255,26 @@ async def clear_logs():
     return {"cleared": True}
 
 
+@app.post("/api/v1/demo/seed-landlord", dependencies=[Depends(require_auth)])
+async def seed_demo_landlord(wipe: bool = False):
+    """Seed a realistic Lagos demo landlord with 5 units, 4 tenants, mixed ledger.
+
+    Use for sales/demo pitches — idempotent. Pass wipe=true to reset.
+    Returns the portal path so you can open the EstateOS portal directly.
+    """
+    from scripts.seed_demo_landlord import seed, wipe as wipe_fn, DEMO_NAME
+    if wipe:
+        wipe_fn()
+    token = seed()
+    return {
+        "client":     DEMO_NAME,
+        "portal_url": f"/portal/{token}",
+        "estate_url": f"/portal/estate/{token}",
+        "token":      token,
+        "wiped":      wipe,
+    }
+
+
 @app.get("/api/v1/health", dependencies=[Depends(require_auth)])
 async def rich_health():
     """Detailed integration health check for the onboarding wizard and dashboard."""
