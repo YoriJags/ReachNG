@@ -255,3 +255,60 @@ def estate_portal_lawyer(token: str, req: _LawyerReq):
     doc = {**req.model_dump(), "memo": memo, "created_at": datetime.now(timezone.utc)}
     inserted = get_db()["estate_lawyer_bundles"].insert_one(doc)
     return {"bundle_id": str(inserted.inserted_id), "memo": memo, "property_address": req.property_address}
+
+
+# ── Rent Roll (read-only for landlord) ────────────────────────────────────────
+
+@router.get("/{token}/rent")
+def estate_portal_rent(token: str):
+    """Landlord-scoped rent roll: units, occupancy, collected, overdue ledger.
+
+    Scope: unit.landlord_company == client.name (or client.company).
+    Read-only — write ops stay in admin dashboard.
+    """
+    client = _get_client(token)
+    landlord_company = client.get("company") or client["name"]
+
+    from services.estate.rent_roll import (
+        list_units, list_tenants, get_overdue_charges,
+    )
+
+    db = get_db()
+    units = list_units(landlord_company)
+    unit_ids = [u["_id"] for u in units]
+
+    occupied = db["estate_tenants"].count_documents(
+        {"unit_id": {"$in": unit_ids}, "status": "active"}
+    )
+
+    now = datetime.now(timezone.utc)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    collected = sum(
+        c.get("paid_amount", 0) or c.get("amount_ngn", 0)
+        for c in db["estate_rent_ledger"].find({
+            "unit_id": {"$in": unit_ids},
+            "status":  "paid",
+            "paid_at": {"$gte": month_start},
+        })
+    )
+
+    overdue = get_overdue_charges(landlord_company)
+    outstanding = sum(c["amount_ngn"] for c in overdue)
+
+    for c in overdue:
+        for k in ("due_date", "last_chased_at", "created_at"):
+            v = c.get(k)
+            if hasattr(v, "isoformat"):
+                c[k] = v.isoformat()
+
+    return {
+        "landlord":             landlord_company,
+        "total_units":          len(units),
+        "occupied":             occupied,
+        "vacancy_rate":         round((len(units) - occupied) / len(units) * 100, 1) if units else 0,
+        "collected_this_month": round(collected, 2),
+        "outstanding_overdue":  round(outstanding, 2),
+        "overdue_count":        len(overdue),
+        "units":                units,
+        "overdue":              overdue,
+    }

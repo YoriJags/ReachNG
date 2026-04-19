@@ -110,14 +110,22 @@ async def demo_portal(request: Request):
 
 @router.get("/{token}", response_class=HTMLResponse)
 async def client_portal(token: str, request: Request):
-    """Render the client portal HTML dashboard."""
+    """Render the client portal HTML dashboard.
+
+    Real-estate clients are routed to the EstateOS landlord portal.
+    """
     client = _get_client_by_token(token)
     if not client:
         raise HTTPException(404, "Portal not found")
 
     client_name = client["name"]
-    vertical = client.get("vertical", "").replace("_", " ").title()
+    vertical_raw = client.get("vertical", "")
 
+    if vertical_raw == "real_estate":
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url=f"/portal/estate/{token}", status_code=307)
+
+    vertical = vertical_raw.replace("_", " ").title()
     templates = request.app.state.templates
     return templates.TemplateResponse(request, "portal.html", {"token": token, "client_name": client_name, "vertical": vertical})
 

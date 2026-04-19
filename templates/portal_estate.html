@@ -140,6 +140,11 @@ tr:last-child td { border-bottom: none; }
       <span class="nav-dot"></span> Dashboard
     </div>
 
+    <div class="nav-section">Rent Roll</div>
+    <div class="nav-item" data-panel="rent" onclick="show('rent',this)">
+      <span class="nav-dot"></span> Rent &amp; Chase
+    </div>
+
     <div class="nav-section">Listings</div>
     <div class="nav-item" data-panel="listings" onclick="show('listings',this)">
       <span class="nav-dot"></span> My Properties
@@ -183,6 +188,37 @@ tr:last-child td { border-bottom: none; }
       <div class="page-sub">EstateOS · Real-time overview</div>
       <div class="kpi-grid" id="kpi-grid">
         <div class="loading"><span class="spinner"></span> Loading…</div>
+      </div>
+    </div>
+
+    <!-- RENT ROLL -->
+    <div id="panel-rent" class="panel">
+      <div class="page-title">Rent Roll &amp; Auto-Chase</div>
+      <div class="page-sub">Track units, collections and overdue — Lagos Tenancy Law aware</div>
+      <div class="kpi-grid" id="rent-kpi-grid">
+        <div class="loading"><span class="spinner"></span> Loading…</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Overdue Ledger</div>
+        <div id="rent-overdue-table">
+          <p style="color:var(--muted);font-size:13px;">Loading overdue charges…</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Unit Inventory</div>
+        <div id="rent-units-table">
+          <p style="color:var(--muted);font-size:13px;">Loading unit list…</p>
+        </div>
+      </div>
+      <div class="card" style="background:#0c0c08;border-color:#2a2400;">
+        <div class="card-title" style="color:var(--gold);">How this works</div>
+        <p style="color:var(--muted);font-size:12px;line-height:1.6;">
+          Your ReachNG admin team adds units and tenants on your behalf. Every month we automatically
+          open charges and track payments. When a tenant is overdue, our scheduler drafts a WhatsApp
+          reminder in the correct tone (friendly → firm → serious → warning → final) and routes it to
+          your account manager for review before sending. You never send a bad message — and you
+          never chase a tenant manually again.
+        </p>
       </div>
     </div>
 
@@ -574,11 +610,77 @@ function show(panel, el) {
   document.getElementById('panel-' + panel).classList.add('active');
   el.classList.add('active');
   if (panel === 'overview')    loadOverview();
+  if (panel === 'rent')        loadRentRoll();
   if (panel === 'listings')    loadListings();
   if (panel === 'pof')         loadPofList();
   if (panel === 'kyc')         loadKycList();
   if (panel === 'background')  loadBgList();
   if (panel === 'concierge')   loadConciergeProps();
+}
+
+function fmtNgn(n) {
+  if (n == null || isNaN(n)) return '—';
+  if (n >= 1_000_000) return '₦' + (n / 1_000_000).toFixed(2) + 'M';
+  if (n >= 1_000) return '₦' + (n / 1_000).toFixed(0) + 'k';
+  return '₦' + Math.round(Number(n)).toLocaleString();
+}
+
+async function loadRentRoll() {
+  try {
+    const d = await get('/rent');
+    const grid = document.getElementById('rent-kpi-grid');
+    grid.innerHTML = `
+      <div class="kpi"><div class="kpi-val c-orange">${d.total_units ?? 0}</div><div class="kpi-lbl">Total Units</div></div>
+      <div class="kpi"><div class="kpi-val c-green">${d.occupied ?? 0}</div><div class="kpi-lbl">Occupied · ${d.vacancy_rate ?? 0}% vacancy</div></div>
+      <div class="kpi"><div class="kpi-val c-green">${fmtNgn(d.collected_this_month)}</div><div class="kpi-lbl">Collected This Month</div></div>
+      <div class="kpi"><div class="kpi-val c-red">${fmtNgn(d.outstanding_overdue)}</div><div class="kpi-lbl">Overdue · ${d.overdue_count ?? 0} open</div></div>
+    `;
+
+    const overdueWrap = document.getElementById('rent-overdue-table');
+    const overdue = d.overdue || [];
+    if (!overdue.length) {
+      overdueWrap.innerHTML = '<p style="color:var(--muted);font-size:13px;">All tenants up to date.</p>';
+    } else {
+      overdueWrap.innerHTML = `
+        <table>
+          <thead><tr><th>Tenant</th><th>Unit</th><th>Period</th><th>Amount</th><th>Overdue</th><th>Stage</th><th>Chases</th></tr></thead>
+          <tbody>${overdue.map(c => {
+            const st = (c.stage && c.stage.stage) || 'reminder';
+            const lbl = (c.stage && c.stage.label) || 'Reminder';
+            return `<tr>
+              <td>${c.tenant ? c.tenant.name : '—'}</td>
+              <td style="color:var(--muted)">${c.unit ? (c.unit.address + (c.unit.unit_label ? ' — ' + c.unit.unit_label : '')) : '—'}</td>
+              <td style="color:var(--muted)">${c.period || '—'}</td>
+              <td style="color:var(--gold)">${fmtNgn(c.amount_ngn)}</td>
+              <td style="color:var(--muted)">${c.days_overdue} days</td>
+              <td><span class="verdict-decline" style="padding:2px 8px;border-radius:3px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;">${lbl}</span></td>
+              <td style="color:var(--muted)">${c.chase_count || 0}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>`;
+    }
+
+    const unitsWrap = document.getElementById('rent-units-table');
+    const units = d.units || [];
+    if (!units.length) {
+      unitsWrap.innerHTML = '<p style="color:var(--muted);font-size:13px;">No units on record yet. Your account manager can add them.</p>';
+    } else {
+      unitsWrap.innerHTML = `
+        <table>
+          <thead><tr><th>Address</th><th>Type</th><th>Rent</th><th>Cycle</th></tr></thead>
+          <tbody>${units.map(u => `
+            <tr>
+              <td>${u.address}${u.unit_label ? ' — ' + u.unit_label : ''}</td>
+              <td style="color:var(--muted)">${(u.property_type || '—').replace('_', ' ')}</td>
+              <td style="color:var(--gold)">${fmtNgn(u.monthly_rent_ngn)}</td>
+              <td style="color:var(--muted)">${u.rent_cycle || 'monthly'}</td>
+            </tr>`).join('')}</tbody>
+        </table>`;
+    }
+  } catch (e) {
+    document.getElementById('rent-kpi-grid').innerHTML = '<p style="color:var(--red);font-size:13px;">Error loading rent roll.</p>';
+    console.error(e);
+  }
 }
 
 // ── Helpers ──
