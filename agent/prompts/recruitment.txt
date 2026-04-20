@@ -41,14 +41,14 @@ Every outbound message to staff or candidates is drafted by Claude and **human-a
 ---
 Hi [Name], noticed [Business Name] is growing — managing PAYE, PENCOM, leave, and candidate screening manually at that scale must be consuming your HR team.
 
-TalentOS automates the back office: Nigerian-compliant payroll math with PAYE/CRA/PENCOM/NHF built in, WhatsApp policy bot for employees, leave manager, probation tracker, AI candidate screener. You keep full control of your bank transfers — we just do the admin around them.
+ReachNG automates the back office: Nigerian-compliant payroll math with PAYE/CRA/PENCOM/NHF built in, WhatsApp policy bot for employees, leave manager, probation tracker, AI candidate screener. You keep full control of your bank transfers — we just do the admin around them.
 
 Worth a 10-minute walk-through this week?
 ---
 
 ### Email subject line ideas
 - "Your HR admin — automated for [Business Name]"
-- "TalentOS: PAYE, CRA, PENCOM, leave, probation — all handled"
+- "ReachNG: PAYE, CRA, PENCOM, leave, probation — all handled"
 - "Cut candidate screening prep by 80% — [Business Name] pilot"
 
 ### Custom Build angle

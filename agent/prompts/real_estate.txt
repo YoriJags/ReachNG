@@ -30,14 +30,14 @@ EstateOS is an AI-powered back office for Lagos real estate businesses. We never
 ---
 Hi [Name], I saw [Business Name] manages properties in [Area] — chasing rent and qualifying tenants manually must be taking serious time.
 
-EstateOS automates the work around the money (we never hold your funds): WhatsApp rent chase with Lagos Tenancy Law escalation, KYC vault with Claude Vision on NIN/passport, instant tenant affordability scoring, and a lawyer handover bundle when a deal closes. One dashboard, every draft human-approved before it sends.
+ReachNG automates the work around the money (we never hold your funds): WhatsApp rent chase with Lagos Tenancy Law escalation, KYC vault with NIN/passport scanning, instant tenant affordability scoring, and a lawyer handover bundle when a deal closes. One dashboard, every draft human-approved before it sends.
 
 Worth a 10-minute look this week?
 ---
 
 ### Email subject line ideas
 - "Automate your rent chase — [Business Name], tenants still pay you directly"
-- "EstateOS: KYC vault, affordability scoring, Lagos Tenancy Law chase"
+- "ReachNG: KYC vault, affordability scoring, Lagos Tenancy Law chase"
 - "Your full real estate back office — automated in a week"
 
 ### Custom Build angle
