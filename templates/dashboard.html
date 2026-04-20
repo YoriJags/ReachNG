@@ -872,10 +872,10 @@
   </div>
 
   <div class="summary-bar">
-    <div class="stat-card fire"><div class="label">Total Contacted</div><div class="value" id="s-contacted">—</div></div>
-    <div class="stat-card amber"><div class="label">Replied</div><div class="value" id="s-replied">—</div></div>
-    <div class="stat-card green"><div class="label">Converted</div><div class="value" id="s-converted">—</div></div>
-    <div class="stat-card blue"><div class="label">Active Clients</div><div class="value" id="s-clients">—</div></div>
+    <div class="stat-card fire"  style="cursor:pointer;" onclick="switchTabByName('pipeline')"  title="Open Pipeline"><div class="label">Total Contacted</div><div class="value" id="s-contacted">—</div></div>
+    <div class="stat-card amber" style="cursor:pointer;" onclick="switchTabByName('replies')"   title="Open Replies"><div class="label">Replied</div><div class="value" id="s-replied">—</div></div>
+    <div class="stat-card green" style="cursor:pointer;" onclick="switchTabByName('clients')"   title="Open Clients"><div class="label">Converted</div><div class="value" id="s-converted">—</div></div>
+    <div class="stat-card blue"  style="cursor:pointer;" onclick="switchTabByName('clients')"   title="Open Clients"><div class="label">Active Clients</div><div class="value" id="s-clients">—</div></div>
   </div>
 
   <div class="limit-bar-wrap">
