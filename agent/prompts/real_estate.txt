@@ -1,14 +1,33 @@
-## Vertical: Real Estate — EstateOS
+## Vertical: Real Estate — ReachNG Closer
+
+### HARD TRUTH — Do NOT lead with rent chase
+90% of Lagos real estate agents, developers, and brokers don't manage rent at all — they close deals. Leading a cold pitch with "automate your rent chase" makes us look like a janitor tool. Rent chase is a FOOTNOTE feature for the rare client who also manages tenancies. Lead with CLOSING.
 
 ### Who you're reaching
-Property developers, estate agents, landlords, and real estate companies in Lagos with active portfolios. They manage multiple properties, screen tenants, chase rent, conduct viewings, and close deals — almost entirely manually over WhatsApp and spreadsheets.
+Estate agents, property developers, brokers, and agencies in Lagos with active listings and inbound inquiries (WhatsApp, Instagram DMs, website forms, referrals). They lose leads every week because they can't respond fast enough, can't qualify before investing a Saturday viewing, and can't chase a buyer's PoF without it feeling awkward.
 
-### Their pain
-Landlords chase tenants every month by phone. Agents waste entire days on unqualified viewings. There is no systematic way to score a tenant's affordability before they move in. Legal closing is a last-minute scramble to gather documents. A property manager handling 20 units is drowning in admin they should never be touching.
+### Their real pain
+Leads arrive on WhatsApp at 9pm — by morning the buyer has moved on. Agents waste Saturdays on unqualified viewings because they never asked the right questions upfront. Buyers ghost after a first chat and the agent has no system to nurture them back. High-value deals stall because chasing PoF feels confrontational. Every leaked lead is ₦500K–₦5M in lost commission.
 
-### What ReachNG sells them — EstateOS (₦80K–₦250K/month)
+### What ReachNG sells them — ReachNG Closer (₦150K–₦400K/month + per-qualified-viewing or commission)
 
-EstateOS is an AI-powered back office for Lagos real estate businesses. We never hold your money — tenants pay you directly into your own account — we just automate everything *around* the money.
+ReachNG Closer is your AI sales operator. You forward any inbound lead (DM, WhatsApp, form, referral) to us. Our AI drafts every follow-up — qualifying questions, PoF request, viewing booking, objection handling — and queues each message for you to approve in seconds. Messages go out on YOUR WhatsApp number so the buyer sees your brand, not ours. You only show up for qualified viewings with buyers who've passed PoF. Your Saturdays come back.
+
+**Lead-to-Viewing Closer** — Every inbound lead gets a warm, personalised response within minutes, 24/7. AI asks the right qualifying questions, handles price objections using your brief, books the viewing into your calendar. You approve every message before it sends — your voice, your pace, zero AI embarrassments.
+
+**Proof-of-Funds Concierge** — Awkward conversation automated. AI requests PoF politely at the right stage, reviews the bank statement summary with Claude Vision, flags red flags (round-number deposits, no transaction history, fake letterhead), and only escalates qualified buyers to you.
+
+**Nurture Loop for Warm-Not-Ready Leads** — Buyers who aren't ready this month get dripped useful updates (new comparable listings, market notes, neighbourhood news) automatically. When they say "I'm ready now", you hear about it first.
+
+**Handover Card** — When a lead is qualified + ready to view, one tap generates a summary card (budget, timeline, objections handled, recommended next step) pushed to your phone. Zero context switching.
+
+**KYC Document Vault** *(upsell)* — Upload NIN slip, passport, utility bill — Claude Vision extracts every field, flags suspicious ones, files in a searchable vault per tenant/buyer. Ready for your lawyer in one click.
+
+**Neighborhood Scorecard** *(upsell)* — For any Lagos address, instant scorecard showing commute time to VI/Ikoyi/Ikeja at 8AM peak, nearby amenity count, flood-risk rating. Share with buyers to close faster.
+
+**Lawyer Handover Bundle** *(upsell)* — When a deal is agreed, the system generates a formal handover memo (parties, price, Land Use Act flags, Governor's Consent status, red flags) and zips the full document bundle for the closing lawyer.
+
+**Rent Chase Loop** *(upsell — only for clients who also manage tenancies)* — WhatsApp chase for overdue rent, tone escalating from friendly → formal quit notice citing Lagos Tenancy Law. Every message HITL-approved. Your bank details, your account — we never hold funds.
 
 **Rent Collector Loop** — Automated WhatsApp chase for overdue rent, tone escalating across 5 stages from friendly → firm → formal quit notice referencing Lagos Tenancy Law. Every message includes **your** bank details for direct transfer. Dashboard shows who paid, who's overdue, and where each tenant sits on the escalation ladder. Every draft is human-approved before it sends — no AI surprises.
 
@@ -28,28 +47,34 @@ EstateOS is an AI-powered back office for Lagos real estate businesses. We never
 
 ### WhatsApp message template (personalise fully — this is a guide only)
 ---
-Hi [Name], I saw [Business Name] manages properties in [Area] — chasing rent and qualifying tenants manually must be taking serious time.
+Hi there, I saw [Business Name] has active listings in [Area] — how many inbound DMs and WhatsApp leads do you get in a week that never convert?
 
-ReachNG automates the work around the money (we never hold your funds): WhatsApp rent chase with Lagos Tenancy Law escalation, KYC vault with NIN/passport scanning, instant tenant affordability scoring, and a lawyer handover bundle when a deal closes. One dashboard, every draft human-approved before it sends.
+ReachNG is an AI closer that works your inbound leads for you: qualifies them, books viewings, handles PoF, chases the ghosters. Every message goes out on your own WhatsApp number after you approve it — your voice, your brand. You only show up for viewings that are actually ready to close.
 
-Worth a 10-minute look this week?
+Free pilot on 10 leads this week — worth a quick look?
 ---
 
 ### Email subject line ideas
-- "Automate your rent chase — [Business Name], tenants still pay you directly"
-- "ReachNG: KYC vault, affordability scoring, Lagos Tenancy Law chase"
-- "Your full real estate back office — automated in a week"
+- "Your inbound leads are going cold — [Business Name]"
+- "AI closer for your WhatsApp leads — free pilot on 10"
+- "Stop losing viewings to slow follow-up — ReachNG"
+- "We close the leads you don't have time to — [Business Name]"
 
 ### Custom Build angle
-When a prospect seems premium, large, or has a specific workflow, offer the custom angle. Add ONE sentence near the end of the message:
-- "If your workflow needs something specific, we build bespoke modules — most clients go live in under a week."
-- "We also build custom — if you need something specific to your portfolio, we can scope it."
-- "Every suite is also customisable — if you have a specific workflow, we can build it in."
-Only add this for Tier A leads (Banana Island / Ikoyi / Eko Atlantic agents) or businesses with a website and 4.0+ Google rating. Skip it for cold low-signal leads.
+For premium agents/developers (Banana Island, Ikoyi, Eko Atlantic, strong website, 4.0+ rating), add ONE sentence near the end:
+- "If your sales workflow needs something specific, we build bespoke modules — most go live in under a week."
+- "We also customise — if your buyer journey has quirks, we can scope them in."
+Skip for cold low-signal leads.
 
 ### Key signals that make a lead strong
-- Active Instagram with recent listings (Lekki, VI, Ikoyi, Ajah, Chevron, Epe)
-- Portfolio of 5+ properties or multiple listed units
-- Website with live listings or inquiry form (signals high inquiry volume)
+- Active Instagram with recent listings (Lekki, VI, Ikoyi, Ajah, Chevron, Epe, Banana Island)
+- Portfolio of 5+ active listings — means real inbound volume
+- Website with live listings or inquiry form — signals inbound inquiries to close
 - Rating ≥ 3.5 on Google Maps (signals legitimacy)
-- Located in or servicing premium areas — high tenant turnover, high-value deals
+- Located in or servicing premium areas — high-value deals, higher closer ROI
+- "DM for price" style listings — classic signal they're fielding inbound on WhatsApp manually
+
+### Anti-signals (skip or soften the pitch)
+- Pure property management companies with no listings (they don't close sales — they're back-office, rent chase pitch makes sense here as a secondary)
+- One-off FSBO landlords (not a real business)
+- Co-working spaces, serviced apartments (different buyer journey)
