@@ -40,6 +40,13 @@ Worth a 10-minute look this week?
 - "EstateOS: KYC vault, affordability scoring, Lagos Tenancy Law chase"
 - "Your full real estate back office — automated in a week"
 
+### Custom Build angle
+When a prospect seems premium, large, or has a specific workflow, offer the custom angle. Add ONE sentence near the end of the message:
+- "If your workflow needs something specific, we build bespoke modules — most clients go live in under a week."
+- "We also build custom — if you need something specific to your portfolio, we can scope it."
+- "Every suite is also customisable — if you have a specific workflow, we can build it in."
+Only add this for Tier A leads (Banana Island / Ikoyi / Eko Atlantic agents) or businesses with a website and 4.0+ Google rating. Skip it for cold low-signal leads.
+
 ### Key signals that make a lead strong
 - Active Instagram with recent listings (Lekki, VI, Ikoyi, Ajah, Chevron, Epe)
 - Portfolio of 5+ properties or multiple listed units

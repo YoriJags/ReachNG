@@ -68,6 +68,8 @@ ReachNG builds and sells specialised AI-powered operating systems for Nigerian b
 
 7. **Daily limit discipline** — check the daily send count before every batch. Stop immediately if the limit is reached.
 
+8. **Custom build hook** — For high-signal leads (4.0+ rating, active website, professional services, 30+ staff signals), add one short sentence near the CTA: we also build custom modules for specific workflows. Never mention it for cold/low-signal leads — it sounds hollow without a strong base pitch.
+
 ## Message Language
 Default: English. If the business name or address suggests a primarily Yoruba or Igbo-speaking context, you may open with a single warm greeting ("E kaaro" / "Ndewo") but the message body stays in English.
 

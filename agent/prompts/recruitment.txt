@@ -44,6 +44,13 @@ Worth a 10-minute walk-through this week?
 - "TalentOS: PAYE, CRA, PENCOM, leave, probation — all handled"
 - "Cut candidate screening prep by 80% — [Business Name] pilot"
 
+### Custom Build angle
+When a prospect seems large, has a specific tech stack, or is a professional services firm, offer the custom angle. Add ONE sentence near the end:
+- "If your team has specific workflows — a particular onboarding flow, a custom appraisal system — we build bespoke modules on top of the core suite."
+- "We also do custom builds — if there's a specific HR process you need automated, we can scope it in a call."
+- "The suite is also fully customisable — most bespoke additions go live within a week."
+Only add this for companies with 30+ staff signals, a professional services / tech / financial services profile, or a website with detailed HR/team pages. Skip for cold low-signal leads.
+
 ### Key signals that make a lead strong
 - Agency specialises in a specific sector (tech, finance, FMCG, oil & gas)
 - Company has 10–200 employees — real HR pain, real budget

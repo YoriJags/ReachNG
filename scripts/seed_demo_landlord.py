@@ -24,7 +24,7 @@ from database.mongo import get_db
 from services.estate.rent_roll import ensure_rent_indexes
 
 
-DEMO_NAME = "Demo Landlord NG"
+DEMO_NAME = "ReachNG Demo"
 LANDLORD_PHONE = "+2348000000001"
 
 UNITS = [

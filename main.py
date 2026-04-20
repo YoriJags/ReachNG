@@ -275,6 +275,64 @@ async def seed_demo_landlord(wipe: bool = False):
     }
 
 
+@app.post("/api/v1/demo/seed-talent", dependencies=[Depends(require_auth)])
+async def seed_demo_talent(wipe: bool = False):
+    """Seed a realistic Lagos demo company with TalentOS data (staff, leave, PENCOM, probation).
+
+    Idempotent. Pass wipe=true to reset. Shares portal_token with seed-landlord if run after it.
+    """
+    from scripts.seed_demo_talent import seed, wipe as wipe_fn, DEMO_NAME
+    if wipe:
+        wipe_fn()
+    token = seed()
+    return {
+        "client":     DEMO_NAME,
+        "talent_url": f"/portal/talent/{token}",
+        "token":      token,
+        "wiped":      wipe,
+    }
+
+
+
+@app.post("/api/v1/demo/seed-all", dependencies=[Depends(require_auth)])
+async def seed_demo_all(wipe: bool = False):
+    """Seed both EstateOS and TalentOS demo data under one 'ReachNG Demo' client.
+
+    Single portal_token — one 'View Portal' button opens both ReachNG portals.
+    """
+    from scripts.seed_demo_landlord import seed as seed_estate, wipe as wipe_estate, DEMO_NAME
+    from scripts.seed_demo_talent import seed as seed_talent, wipe as wipe_talent
+    if wipe:
+        wipe_estate()
+        wipe_talent()
+    token = seed_estate()   # creates/upserts the single 'ReachNG Demo' client
+    seed_talent()           # seeds HR data under the same client, reuses token
+    return {
+        "client":      DEMO_NAME,
+        "estate_url":  f"/portal/estate/{token}",
+        "talent_url":  f"/portal/talent/{token}",
+        "token":       token,
+        "wiped":       wipe,
+    }
+
+
+@app.post("/api/v1/clients/backfill-tokens", dependencies=[Depends(require_auth)])
+async def backfill_portal_tokens():
+    """Generate portal_token for any active client that doesn't have one yet."""
+    import secrets as _secrets
+    from datetime import datetime, timezone
+    db = get_db()
+    updated = []
+    for c in db["clients"].find({"active": True, "portal_token": {"$exists": False}}):
+        token = _secrets.token_urlsafe(24)
+        db["clients"].update_one(
+            {"_id": c["_id"]},
+            {"$set": {"portal_token": token, "portal_created_at": datetime.now(timezone.utc)}},
+        )
+        updated.append(c["name"])
+    return {"backfilled": len(updated), "clients": updated}
+
+
 @app.get("/api/v1/health", dependencies=[Depends(require_auth)])
 async def rich_health():
     """Detailed integration health check for the onboarding wizard and dashboard."""
