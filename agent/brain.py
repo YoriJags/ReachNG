@@ -94,6 +94,8 @@ Website: {website or "None found"}
 
 {channel_guide}
 
+CRITICAL: Never use placeholder text like [Partner Name], [Name], [Contact], [First Name], or any bracket-enclosed variable. If you do not know the contact's name, address them as "there" or use the business name directly. Never leave any placeholder unresolved.
+
 If website intelligence is provided above, reference at least one specific detail in the message.
 No explanations. No preamble. Just the message.
 """

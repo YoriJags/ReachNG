@@ -851,6 +851,20 @@
     </div>
   </div>
 
+  <!-- Demo Sandbox shortcut -->
+  <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #7c3aed;border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:200px;">
+      <div style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:2px;">Demo Sandbox</div>
+      <div style="font-size:11px;color:#556;">Seed realistic demo data and show a live portal in seconds.</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-approve" style="font-size:11px;padding:5px 12px;background:#7c3aed;border-color:#7c3aed;" onclick="seedDemoWithFeedback('all','demo-seed-result-overview')">Seed Both (recommended)</button>
+      <button class="btn btn-approve" style="font-size:11px;padding:5px 12px;" onclick="seedDemoWithFeedback('estate','demo-seed-result-overview')">EstateOS only</button>
+      <button class="btn btn-approve" style="font-size:11px;padding:5px 12px;background:#00a37a;border-color:#00a37a;" onclick="seedDemoWithFeedback('talent','demo-seed-result-overview')">TalentOS only</button>
+    </div>
+    <div id="demo-seed-result-overview" style="display:none;font-size:11px;width:100%;padding-top:8px;border-top:1px solid #1e2530;margin-top:4px;color:#aaa;"></div>
+  </div>
+
   <!-- Today's Work -->
   <p class="section-title" style="margin-top:0;">Today's Work</p>
   <div class="todays-work" id="todays-work">
@@ -3702,8 +3716,12 @@ function closePortalEmbed() {
   document.getElementById("portal-embed-frame").src = "";
 }
 
-async function seedDemo(type) {
-  const el = document.getElementById("demo-seed-result");
+async function seedDemoWithFeedback(type, resultElId) {
+  return seedDemo(type, resultElId);
+}
+
+async function seedDemo(type, resultElId) {
+  const el = document.getElementById(resultElId || "demo-seed-result");
   el.style.display = "block";
   el.innerHTML = '<span style="color:#888;">Seeding...</span>';
   try {

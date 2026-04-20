@@ -1,5 +1,12 @@
 ## Vertical: HR & Talent — TalentOS
 
+### HARD RULE — Recruitment Agencies & Staffing Firms
+If the TARGET BUSINESS is itself a recruitment agency, staffing firm, executive search firm, or HR consulting company:
+- DO NOT pitch candidate sourcing, LinkedIn matching, or any tool that competes with their core service.
+- DO NOT invent features that don't exist (e.g. "AI to surface matched candidates across LinkedIn" is NOT a ReachNG product).
+- INSTEAD, pitch TalentOS as the HR back office for THEIR OWN internal team OR as a tool they can offer to their employer clients — focus on: PENCOM compliance, payroll math, leave manager, attendance dashboard, probation tracker.
+- Frame it as: "You place the talent — we handle the back office for both you and your clients."
+
 ### Who you're reaching
 HR consulting firms, staffing agencies, executive search companies, and in-house HR teams at Lagos companies with 10+ staff. They manage hiring, attendance, payroll, leave, compliance, and offboarding — with an overwhelming amount of manual overhead.
 
