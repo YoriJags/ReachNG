@@ -101,6 +101,10 @@ async def _handle_message(sender_phone: str, message_body: str, source: str | No
     """
     Full pipeline for one inbound message:
     link → classify via Claude → auto-reply to debtor → notify bursar → log
+
+    Closer intake (Phase 1): if `source` matches a client's `whatsapp_account_id`
+    AND that client has `closer_enabled=True` AND `vertical=real_estate`, route
+    the inbound to the Closer lead thread. No AI reply yet — Phase 2 adds drafting.
     """
     from tools.outreach import send_whatsapp_for_client
 
@@ -118,6 +122,50 @@ async def _handle_message(sender_phone: str, message_body: str, source: str | No
         "auto_reply_sent": False,
         "bursar_notified": False,
     }
+
+    # ── Closer intake (real-estate clients with closer_enabled) ────────────────
+    # `source` here is the Unipile account_id for inbound messages that arrived
+    # on a per-client WhatsApp line.
+    try:
+        if source and source not in ("meta",):
+            closer_client = _db()["clients"].find_one({
+                "whatsapp_account_id": source,
+                "closer_enabled": True,
+                "vertical": "real_estate",
+                "active": True,
+            })
+            if closer_client:
+                from services.closer import find_lead_by_contact, create_lead, append_thread_message
+                client_id = str(closer_client["_id"])
+                existing = find_lead_by_contact(client_id, phone=sender_phone)
+                if existing:
+                    append_thread_message(
+                        str(existing["_id"]),
+                        direction="in",
+                        channel="whatsapp",
+                        body=message_body,
+                    )
+                    log_doc["linked_product"] = "closer"
+                    log_doc["linked_lead_id"] = str(existing["_id"])
+                else:
+                    lead = create_lead(
+                        client_id=client_id,
+                        client_name=closer_client["name"],
+                        vertical="real_estate",
+                        source="whatsapp",
+                        contact_phone=sender_phone,
+                        inquiry_text=message_body,
+                        source_consent="inbound",
+                    )
+                    log_doc["linked_product"] = "closer"
+                    log_doc["linked_lead_id"] = lead["id"]
+                try:
+                    _db()["inbound_messages"].insert_one(log_doc)
+                except Exception:
+                    pass
+                return
+    except Exception as e:
+        log.error("closer_intake_failed", error=str(e), phone=sender_phone)
 
     # ── Try to link to Rent Roll tenant ───────────────────────────────────────
     tenant = _db()["estate_tenants"].find_one({

@@ -31,13 +31,13 @@ Land first paying Lagos client on **ReachNG Closer (Real Estate)** within 30 day
 
 Real estate clients only. Everything below scoped to `vertical=real_estate` clients.
 
-- [ ] Extend `clients` schema with `closer_brief` object (product, ICP, qualifying questions, red flags, closing action, tone, pricing rules, never-say list)
-- [ ] Create `closer_leads` collection (client_id, source, contact, vertical, stage, thread, handover timestamp)
-- [ ] Intake channel A: forward-to-email `leads-{token}@reachng.ng` → parse → create lead
-- [ ] Intake channel B: shared WhatsApp line per client via Unipile → auto-create lead on new inbound
-- [ ] Intake channel C: webhook `POST /api/v1/closer/leads/{token}` for CRM/form integration
-- [ ] Client portal — "Closer Inbox" tab: list of leads + stage + thread preview
-- [ ] Admin dashboard — per-client Closer inbox visibility for debugging
+- [x] Extend `clients` schema with `closer_brief` object (product, ICP, qualifying questions, red flags, closing action, tone, pricing rules, never-say list)
+- [x] Create `closer_leads` collection (client_id, source, contact, vertical, stage, thread, handover timestamp)
+- [x] Intake channel A (STUB): `POST /api/v1/closer/leads/email` parser ready — real MX forwarder blocked on SPF/DKIM for `reachng.ng`
+- [x] Intake channel B: shared WhatsApp line per client via Unipile → auto-create lead on new inbound (gated by `closer_enabled=True`)
+- [x] Intake channel C: webhook `POST /api/v1/closer/leads/{token}` for CRM/form integration
+- [x] Client portal — "Closer Inbox" tab: list of leads + stage + thread view
+- [x] Admin dashboard — per-client Closer tab: brief editor + lead inbox
 
 ## Next — Phase 2: Closer Brain *(2–3 days)*
 

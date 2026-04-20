@@ -673,6 +673,7 @@
   <button class="tab-btn" onclick="switchTab('tower', this)">Control Tower</button>
   <button class="tab-btn" onclick="switchTab('campaigns', this)">Campaigns</button>
   <button class="tab-btn" onclick="switchTab('clients', this)">Clients</button>
+  <button class="tab-btn" onclick="switchTab('closer', this); closerAdminLoadClients();">Closer</button>
   <button class="tab-btn" onclick="switchTab('approvals', this)">Message Queue <span class="tab-badge" id="tab-badge-approvals"></span></button>
   <button class="tab-btn" onclick="switchTab('replies', this)">Replies</button>
   <button class="tab-btn" onclick="switchTab('invoices', this)">Invoices</button>
@@ -1183,6 +1184,36 @@
     <div id="ra-result" style="margin-top:10px;display:none;"></div>
   </div>
 
+</div>
+
+<!-- ── Closer (admin) ────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-closer">
+  <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #ff5c00;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+    <div style="font-size:13px;font-weight:700;color:#ff5c00;margin-bottom:4px;">ReachNG Closer (real estate only)</div>
+    <div style="font-size:11px;color:#556;line-height:1.8;">
+      Inbound lead inbox per client. Edit their Closer brief here — qualifying questions, red flags, tone, never-say list — and review every lead on the thread.
+      <br>Intake: (A) email-forward <em>stub — pending DNS</em>, (B) WhatsApp via Unipile, (C) webhook <code>POST /api/v1/closer/leads/{token}</code>.
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:16px;">
+    <!-- Client list -->
+    <div style="background:#0d1117;border:1px solid #1e2530;border-radius:10px;padding:14px;">
+      <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#889;margin-bottom:10px;">Real-estate clients</div>
+      <div id="closer-client-list">
+        <div style="color:#556;font-size:12px">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Selected client details -->
+    <div style="background:#0d1117;border:1px solid #1e2530;border-radius:10px;padding:16px;min-height:420px;">
+      <div id="closer-client-detail">
+        <div style="color:#556;font-size:12px;padding:40px;text-align:center;">
+          Select a real-estate client from the list to view their Closer brief and lead inbox.
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ── Clients ───────────────────────────────────────────────────────────────── -->
@@ -7047,6 +7078,153 @@ async function prEstimate() {
     el.style.color = '#aaa';
     el.textContent = `Gross: ₦${Math.round(d.gross_monthly).toLocaleString()}\nPAYE: ₦${Math.round(d.paye_monthly).toLocaleString()}\nPENCOM: ₦${Math.round(d.pencom_monthly).toLocaleString()}\nNet: ₦${Math.round(d.net_pay).toLocaleString()}`;
   } catch(e) { el.style.color='#ef4444'; el.textContent = 'Error: '+e.message; }
+}
+
+// ── Admin Closer: client list, brief editor, lead inbox ───────────────────────
+let _closerSelected = null;
+
+async function closerAdminLoadClients() {
+  const wrap = document.getElementById('closer-client-list');
+  try {
+    const r = await fetch('/api/v1/clients/', {headers: authHeaders()});
+    const clients = await r.json();
+    const re = clients.filter(c => (c.vertical || '') === 'real_estate');
+    if (!re.length) {
+      wrap.innerHTML = '<div style="color:#556;font-size:12px">No real-estate clients yet. Onboard one in the Clients tab first.</div>';
+      return;
+    }
+    wrap.innerHTML = re.map(c => {
+      const enabled = c.closer_enabled ? '<span style="color:#00e5a0;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;">· enabled</span>' : '<span style="color:#556;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;">· off</span>';
+      return `<div class="closer-client-row" data-name="${encodeURIComponent(c.name)}" onclick="closerAdminSelect('${encodeURIComponent(c.name)}')" style="padding:8px 10px;border-radius:6px;cursor:pointer;border:1px solid transparent;margin-bottom:4px;font-size:13px;">
+        <div style="font-weight:600;color:#d8eaf8;">${c.name}</div>
+        <div style="color:#556;font-size:11px;">${c.city || ''} ${enabled}</div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    wrap.innerHTML = '<div style="color:#ef4444;font-size:12px">Error loading clients.</div>';
+  }
+}
+
+function closerAdminSelect(encName) {
+  const name = decodeURIComponent(encName);
+  _closerSelected = name;
+  document.querySelectorAll('.closer-client-row').forEach(el => {
+    el.style.background = el.dataset.name === encName ? '#1a2530' : 'transparent';
+    el.style.borderColor = el.dataset.name === encName ? '#ff5c00' : 'transparent';
+  });
+  closerAdminRenderDetail(name);
+}
+
+async function closerAdminRenderDetail(name) {
+  const el = document.getElementById('closer-client-detail');
+  el.innerHTML = '<div style="color:#556;font-size:12px;padding:40px;text-align:center;">Loading…</div>';
+  try {
+    const [briefR, leadsR] = await Promise.all([
+      fetch(`/api/v1/closer/clients/${encodeURIComponent(name)}/brief`, {headers: authHeaders()}),
+      fetch(`/api/v1/closer/clients/${encodeURIComponent(name)}/leads`, {headers: authHeaders()}),
+    ]);
+    const brief = (await briefR.json()).brief || {};
+    const leadsD = await leadsR.json();
+    const leads = leadsD.leads || [];
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#d8eaf8;">${name}</div>
+          <div style="font-size:11px;color:#556;letter-spacing:0.1em;text-transform:uppercase;">Closer Brief + Inbox</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn" style="font-size:11px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="closerAdminDryRun()" title="Create a synthetic lead to walk the flow end-to-end">Dry Run</button>
+          <button class="btn btn-approve" style="font-size:11px;" onclick="closerAdminSaveBrief()">Save Brief</button>
+        </div>
+      </div>
+
+      <div style="background:#080c10;border:1px solid #1e2530;border-radius:8px;padding:14px;margin-bottom:16px;">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;margin-bottom:10px;">Closer Brief</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">
+          <label>Product focus<textarea id="cb-product" rows="2" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;">${brief.product || ''}</textarea></label>
+          <label>Ideal client (ICP)<textarea id="cb-icp" rows="2" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;">${brief.icp || ''}</textarea></label>
+          <label>Qualifying questions (one per line)<textarea id="cb-qq" rows="4" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;">${(brief.qualifying_questions || []).join('\n')}</textarea></label>
+          <label>Red flags (one per line)<textarea id="cb-rf" rows="4" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;">${(brief.red_flags || []).join('\n')}</textarea></label>
+          <label>Closing action<input id="cb-ca" value="${(brief.closing_action || '').replace(/"/g,'&quot;')}" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+          <label>Tone<input id="cb-tone" value="${(brief.tone || 'warm-professional').replace(/"/g,'&quot;')}" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+          <label>Pricing rules<textarea id="cb-pr" rows="2" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;">${brief.pricing_rules || ''}</textarea></label>
+          <label>Never say (one per line)<textarea id="cb-ns" rows="2" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;">${(brief.never_say || []).join('\n')}</textarea></label>
+        </div>
+      </div>
+
+      <div style="background:#080c10;border:1px solid #1e2530;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;">Lead Inbox (${leads.length})</div>
+          <button class="btn" style="font-size:11px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="closerAdminRenderDetail('${name.replace(/'/g, "\\'")}')">Refresh</button>
+        </div>
+        ${leads.length === 0 ? '<div style="color:#556;font-size:12px;">No leads yet. Once intake channels are configured, leads will appear here.</div>' : `
+          <div style="max-height:360px;overflow-y:auto;">
+            <table class="data-table" style="width:100%;font-size:12px;">
+              <thead><tr><th>When</th><th>Contact</th><th>Source</th><th>First message</th><th>Stage</th></tr></thead>
+              <tbody>${leads.map(l => {
+                const when = l.created_at ? new Date(l.created_at).toLocaleString() : '—';
+                const contact = l.contact_name || l.contact_phone || l.contact_email || '—';
+                const preview = (l.inquiry_text || '').replace(/\s+/g,' ').slice(0, 70);
+                return `<tr>
+                  <td style="color:#889;font-size:11px">${when}</td>
+                  <td>${contact}</td>
+                  <td style="color:#889;font-size:11px">${l.source || '—'}</td>
+                  <td style="color:#889;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${preview}</td>
+                  <td><span style="padding:2px 8px;border-radius:3px;font-size:10px;background:#1e2530;color:#d8eaf8;text-transform:uppercase;letter-spacing:0.08em;">${l.stage}</span></td>
+                </tr>`;
+              }).join('')}</tbody>
+            </table>
+          </div>`}
+      </div>
+    `;
+  } catch (e) {
+    el.innerHTML = '<div style="color:#ef4444;font-size:12px;padding:40px;text-align:center;">Error loading client.</div>';
+  }
+}
+
+async function closerAdminDryRun() {
+  if (!_closerSelected) return;
+  if (!confirm(`Create a synthetic test lead on "${_closerSelected}"?`)) return;
+  try {
+    const r = await fetch(`/api/v1/closer/dry-run/${encodeURIComponent(_closerSelected)}`, {
+      method: 'POST',
+      headers: {...authHeaders(), 'Content-Type': 'application/json'},
+      body: JSON.stringify({}),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const d = await r.json();
+    alert(`Dry-run lead created (id: ${d.lead.id}). Opening inbox…`);
+    closerAdminRenderDetail(_closerSelected);
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function closerAdminSaveBrief() {
+  if (!_closerSelected) return;
+  const split = v => (v || '').split('\n').map(s => s.trim()).filter(Boolean);
+  const body = {
+    product: document.getElementById('cb-product').value,
+    icp: document.getElementById('cb-icp').value,
+    qualifying_questions: split(document.getElementById('cb-qq').value),
+    red_flags: split(document.getElementById('cb-rf').value),
+    closing_action: document.getElementById('cb-ca').value,
+    tone: document.getElementById('cb-tone').value,
+    pricing_rules: document.getElementById('cb-pr').value,
+    never_say: split(document.getElementById('cb-ns').value),
+  };
+  try {
+    const r = await fetch(`/api/v1/closer/clients/${encodeURIComponent(_closerSelected)}/brief`, {
+      method: 'PUT',
+      headers: {...authHeaders(), 'Content-Type': 'application/json'},
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    alert('Closer brief saved.');
+    closerAdminLoadClients();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
 }
 </script>
 

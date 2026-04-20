@@ -140,6 +140,11 @@ tr:last-child td { border-bottom: none; }
       <span class="nav-dot"></span> Dashboard
     </div>
 
+    <div class="nav-section">Closer</div>
+    <div class="nav-item" data-panel="closer" onclick="show('closer',this)">
+      <span class="nav-dot"></span> Lead Inbox
+    </div>
+
     <div class="nav-section">Rent Roll</div>
     <div class="nav-item" data-panel="rent" onclick="show('rent',this)">
       <span class="nav-dot"></span> Rent &amp; Chase
@@ -505,6 +510,50 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
+    <!-- CLOSER INBOX -->
+    <div id="panel-closer" class="panel">
+      <div class="page-title">Lead Inbox</div>
+      <div class="page-sub">ReachNG Closer · Your inbound leads, worked by us</div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div class="card-title" style="margin-bottom:4px">Active Leads</div>
+            <div style="font-size:12px;color:var(--muted)">New inbound leads from WhatsApp, web forms, and forwarded emails will appear here.</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="closer-stage-filter" onchange="loadCloserLeads()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:6px 10px;border-radius:4px;font-size:12px">
+              <option value="">All stages</option>
+              <option value="new">New</option>
+              <option value="qualifying">Qualifying</option>
+              <option value="ready">Ready to hand over</option>
+              <option value="booked">Booked</option>
+              <option value="stalled">Stalled</option>
+              <option value="lost">Lost</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="loadCloserLeads()">Refresh</button>
+          </div>
+        </div>
+        <div id="closer-leads-table">
+          <div class="loading"><span class="spinner"></span> Loading…</div>
+        </div>
+      </div>
+
+      <div class="card" id="closer-lead-detail" style="display:none">
+        <div class="card-title">Lead detail</div>
+        <div id="closer-lead-body"></div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('closer-lead-detail').style.display='none'">Close</button>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:rgba(255,92,0,0.3)">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--orange)">How this works:</strong> Every inbound lead (WhatsApp, web form, email) lands here. Our Closer works the thread on your behalf from your own WhatsApp number. You'll see a "Ready to hand over" card the moment a lead is qualified with budget + timeline confirmed. AI drafting + one-tap handover arrives in the next update.
+        </div>
+      </div>
+    </div>
+
     <!-- GETTING STARTED / HELP -->
     <div id="panel-guide" class="panel">
       <div class="page-title">Getting Started</div>
@@ -610,12 +659,96 @@ function show(panel, el) {
   document.getElementById('panel-' + panel).classList.add('active');
   el.classList.add('active');
   if (panel === 'overview')    loadOverview();
+  if (panel === 'closer')      loadCloserLeads();
   if (panel === 'rent')        loadRentRoll();
   if (panel === 'listings')    loadListings();
   if (panel === 'pof')         loadPofList();
   if (panel === 'kyc')         loadKycList();
   if (panel === 'background')  loadBgList();
   if (panel === 'concierge')   loadConciergeProps();
+}
+
+// ── Closer Inbox ──
+function closerBadge(stage) {
+  const colors = {
+    new:        'background:#1a2a1a;color:var(--green)',
+    qualifying: 'background:#2a1a00;color:var(--orange)',
+    ready:      'background:#002a1a;color:var(--green);font-weight:700',
+    booked:     'background:#1a1a2a;color:#88f',
+    stalled:    'background:#1a1a1a;color:var(--muted)',
+    lost:       'background:#2a1a1a;color:#f44',
+  };
+  const style = colors[stage] || 'background:#1a1a1a;color:var(--muted)';
+  return `<span style="${style};padding:2px 8px;border-radius:3px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;">${stage}</span>`;
+}
+
+async function loadCloserLeads() {
+  const wrap = document.getElementById('closer-leads-table');
+  wrap.innerHTML = '<div class="loading"><span class="spinner"></span> Loading…</div>';
+  try {
+    const stage = document.getElementById('closer-stage-filter').value;
+    const qs = stage ? `?stage=${encodeURIComponent(stage)}` : '';
+    const r = await fetch(`/api/v1/closer/portal/${TOKEN}/leads${qs}`);
+    if (!r.ok) throw new Error('fetch failed');
+    const d = await r.json();
+    const leads = d.leads || [];
+    if (!leads.length) {
+      wrap.innerHTML = '<p style="color:var(--muted);font-size:13px;">No leads yet. As inbound inquiries arrive they will appear here automatically.</p>';
+      return;
+    }
+    wrap.innerHTML = `
+      <table>
+        <thead><tr><th>When</th><th>Contact</th><th>Source</th><th>First message</th><th>Stage</th><th></th></tr></thead>
+        <tbody>${leads.map(l => {
+          const when = l.created_at ? new Date(l.created_at).toLocaleString() : '—';
+          const contact = l.contact_name || l.contact_phone || l.contact_email || '—';
+          const preview = (l.inquiry_text || '').replace(/\s+/g, ' ').slice(0, 80);
+          return `<tr>
+            <td style="color:var(--muted);font-size:11px">${when}</td>
+            <td>${contact}</td>
+            <td style="color:var(--muted);font-size:11px">${l.source || '—'}</td>
+            <td style="color:var(--muted);max-width:320px">${preview}${preview.length === 80 ? '…' : ''}</td>
+            <td>${closerBadge(l.stage)}</td>
+            <td><button class="btn btn-outline btn-sm" onclick="openCloserLead('${l.id}')">View</button></td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`;
+  } catch (e) {
+    wrap.innerHTML = '<p style="color:#f44;font-size:13px;">Error loading leads.</p>';
+    console.error(e);
+  }
+}
+
+async function openCloserLead(leadId) {
+  const box = document.getElementById('closer-lead-detail');
+  const body = document.getElementById('closer-lead-body');
+  box.style.display = '';
+  body.innerHTML = '<div class="loading"><span class="spinner"></span> Loading…</div>';
+  try {
+    const r = await fetch(`/api/v1/closer/portal/${TOKEN}/leads/${leadId}`);
+    const l = await r.json();
+    const thread = (l.thread || []).map(m => {
+      const t = m.at ? new Date(m.at).toLocaleString() : '';
+      const dir = m.direction === 'out' ? 'Out' : m.direction === 'note' ? 'Note' : 'In';
+      const color = m.direction === 'out' ? 'var(--green)' : m.direction === 'note' ? 'var(--gold)' : 'var(--orange)';
+      return `<div style="border-left:2px solid ${color};padding:8px 12px;margin-bottom:8px;background:var(--surface2);border-radius:4px">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase">${dir} · ${m.channel || ''} · ${t}</div>
+        <div style="font-size:13px;margin-top:4px;white-space:pre-wrap">${(m.body || '').replace(/</g, '&lt;')}</div>
+      </div>`;
+    }).join('') || '<p style="color:var(--muted);font-size:12px">No messages yet.</p>';
+    body.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
+        <div><div class="kpi-lbl">Contact</div><div>${l.contact_name || l.contact_phone || l.contact_email || '—'}</div></div>
+        <div><div class="kpi-lbl">Phone</div><div style="color:var(--muted)">${l.contact_phone || '—'}</div></div>
+        <div><div class="kpi-lbl">Email</div><div style="color:var(--muted)">${l.contact_email || '—'}</div></div>
+        <div><div class="kpi-lbl">Stage</div><div>${closerBadge(l.stage)}</div></div>
+      </div>
+      <div class="card-title" style="margin-bottom:8px">Thread</div>
+      ${thread}
+    `;
+  } catch (e) {
+    body.innerHTML = '<p style="color:#f44">Error loading lead.</p>';
+  }
 }
 
 function fmtNgn(n) {
