@@ -3737,7 +3737,7 @@ async function seedDemo(type, resultElId) {
     if (data.token && !data.talent_url) html += `TalentOS portal: <a href="${origin}/portal/talent/${data.token}" target="_blank" style="color:#00e5a0;">${origin}/portal/talent/${data.token}</a><br>`;
     html += '<br><span style="color:#888;font-size:11px;">Refresh the client roster below to see the "View Portal" button.</span>';
     el.innerHTML = html;
-    loadRoster();
+    if (typeof refreshRoster === "function") refreshRoster();
   } catch(e) {
     el.innerHTML = `<span style="color:#ff4444;">Error: ${e.message}</span>`;
   }
@@ -3750,7 +3750,7 @@ async function backfillTokens() {
   try {
     const data = await fetch("/api/v1/clients/backfill-tokens", { method: "POST", credentials: "include" }).then(r => r.json());
     el.innerHTML = `<b style="color:#00e5a0;">Done.</b> ${data.backfilled} client(s) updated: ${(data.clients || []).join(", ") || "none"}. Refresh roster to see View Portal buttons.`;
-    loadRoster();
+    if (typeof refreshRoster === "function") refreshRoster();
   } catch(e) {
     el.innerHTML = `<span style="color:#ff4444;">Error: ${e.message}</span>`;
   }
