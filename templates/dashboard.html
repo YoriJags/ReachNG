@@ -1428,9 +1428,9 @@
     </div>
   </div>
   <div class="approve-all-bar" id="approve-all-bar" style="display:none;">
-    <button class="btn btn-approve" onclick="approveAll()">Approve All</button>
-    <button class="btn btn-skip" onclick="skipAll()">Skip All</button>
-    <span class="approve-count" id="approve-all-label"></span>
+    <button class="btn btn-approve" onclick="approveAll()" title="Send every draft in the queue now">Approve All</button>
+    <button class="btn btn-skip" onclick="rejectAll()" style="background:#3a1a1a;border-color:#7a2020;color:#f87171;" title="Discard every pending draft — none will be sent">Reject All</button>
+    <span class="approve-count" id="approve-all-label" style="color:#6a8aaa;font-size:12px;"></span>
   </div>
   <div class="approvals-list" id="approvals-list">
     <div class="approvals-empty">Loading…</div>
@@ -3370,10 +3370,15 @@ function renderApprovals(approvals) {
   const countBadge = document.getElementById("approval-count-badge");
   if (countBadge) countBadge.textContent = sorted.length ? `(${sorted.length})` : "";
 
+  const bar   = document.getElementById("approve-all-bar");
+  const label = document.getElementById("approve-all-label");
   if (!sorted.length) {
     list.innerHTML = '<div class="approvals-empty">No pending drafts — all clear.</div>';
+    if (bar) bar.style.display = "none";
     return;
   }
+  if (bar) bar.style.display = "flex";
+  if (label) label.textContent = `${sorted.length} draft${sorted.length === 1 ? "" : "s"} pending`;
 
   list.innerHTML = sorted.map(a => {
     const id      = a._id || a.id || "";
@@ -3817,8 +3822,21 @@ async function submitEdit() {
   closeEdit();
   refresh();
 }
-async function approveAll() { await postJSON("/api/v1/approvals/approve-all"); refresh(); }
-async function skipAll()    { await postJSON("/api/v1/approvals/skip-all");    refresh(); }
+async function approveAll() {
+  const label = document.getElementById("approve-all-label");
+  const count = label ? label.textContent : "all pending drafts";
+  if (!confirm(`Send ${count}? There is no undo.`)) return;
+  await postJSON("/api/v1/approvals/approve-all");
+  refresh();
+}
+async function skipAll() { await postJSON("/api/v1/approvals/skip-all"); refresh(); }
+async function rejectAll() {
+  const label = document.getElementById("approve-all-label");
+  const count = label ? label.textContent : "all pending drafts";
+  if (!confirm(`Reject and discard ${count}? None will be sent.`)) return;
+  await postJSON("/api/v1/approvals/skip-all");
+  refresh();
+}
 
 async function markContactStatus(contactId, status) {
   try {
