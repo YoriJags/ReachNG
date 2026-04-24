@@ -1083,21 +1083,42 @@
 <!-- ── Campaigns ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-campaigns">
 
-  <div class="sop-box">
-    <div class="sop-title">Campaign SOP — Do this every weekday morning</div>
-    <div class="sop-step"><span class="sop-num">1</span><span>Select a <b>vertical</b> and run a <b>dry run</b> first. Confirm lead count looks reasonable (5–30 leads).</span></div>
-    <div class="sop-step"><span class="sop-num">2</span><span>Uncheck <b>Dry run</b> and run live. Max 30 contacts per vertical per day to stay under limits.</span></div>
-    <div class="sop-step"><span class="sop-num">3</span><span>Check the <b>Message Queue</b> tab — review any collection drafts (invoice, debt, rent) before they go out.</span></div>
-    <div class="sop-step"><span class="sop-num">4</span><span>Check <b>Replies</b> tab after 2 hours — respond to all <b>Interested</b> leads same day.</span></div>
+  <!-- Quick Launch — May 5 outreach start -->
+  <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #ff5c00;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+    <div style="font-size:13px;font-weight:700;color:#ff5c00;margin-bottom:4px;">Quick Launch</div>
+    <div style="font-size:11px;color:#556;margin-bottom:14px;">
+      Finds Lagos businesses via Google Maps, drafts personalised WhatsApp messages, queues them for your review.
+      Nothing goes out until you approve each one in <strong style="color:#d8eaf8;">Message Queue</strong>.
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+      <button class="btn btn-approve" style="font-size:12px;" onclick="quickLaunch('real_estate')">
+        Pitch Closer — Estate Agents
+      </button>
+      <button class="btn btn-approve" style="font-size:12px;background:#00a37a;border-color:#00a37a;" onclick="quickLaunch('recruitment')">
+        Pitch TalentOS — HR Teams
+      </button>
+      <button class="btn" style="font-size:12px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="quickLaunch('real_estate', true)">
+        Dry Run (Real Estate)
+      </button>
+    </div>
+    <div id="quick-launch-result" style="display:none;background:#080c10;border:1px solid #1e2530;border-radius:6px;padding:12px;font-size:12px;color:#ccc;line-height:1.8;"></div>
   </div>
 
-  <p class="section-title">Run Campaign <span style="color:#ff5c00;font-size:10px;margin-left:6px;">Trigger Outreach</span></p>
+  <div class="sop-box">
+    <div class="sop-title">Outreach SOP — Run every weekday</div>
+    <div class="sop-step"><span class="sop-num">1</span><span>Click <b>Pitch Closer — Estate Agents</b> above. It runs a dry run first — confirm lead count looks right (5–30).</span></div>
+    <div class="sop-step"><span class="sop-num">2</span><span>Then click <b>Pitch Closer</b> again live (dry run unchecked below). Keep to <b>20 contacts/day</b> to warm up the number.</span></div>
+    <div class="sop-step"><span class="sop-num">3</span><span>Go to <b>Message Queue</b> — read every draft before you approve. One click = one WhatsApp sent from our number.</span></div>
+    <div class="sop-step"><span class="sop-num">4</span><span>Check <b>Replies</b> tab 2 hours later. Any <b>Interested</b> reply — respond same day. That is a warm lead.</span></div>
+  </div>
+
+  <p class="section-title">Custom Campaign Run <span style="color:#ff5c00;font-size:10px;margin-left:6px;">Override defaults</span></p>
   <div class="form-card">
     <div class="row">
       <select id="rc-vertical">
         <option value="agency_sales">⭐ Find ReachNG Clients (All Verticals)</option>
-        <option value="real_estate">ReachNG → EstateOS (Real Estate Agencies)</option>
-        <option value="recruitment">ReachNG → TalentOS (HR / Employers)</option>
+        <option value="real_estate">Real Estate Agencies — Pitch Closer</option>
+        <option value="recruitment">HR / Employers — Pitch TalentOS</option>
         <option value="events">Events</option>
         <option value="fintech">Fintech</option>
         <option value="legal">Legal</option>
@@ -3918,6 +3939,53 @@ async function clearLogs() {
 
 // Poll once on page load to show any existing logs
 pollLogs();
+
+// ── Quick Launch — one-tap outreach start ────────────────────────────────────
+function quickLaunch(vertical, dryRun = false) {
+  // Set form fields
+  document.getElementById("rc-vertical").value = vertical;
+  document.getElementById("rc-max").value = vertical === "real_estate" ? 20 : 15;
+  document.getElementById("rc-min-rating").value = "4.0";
+  document.getElementById("rc-hitl").checked = true;
+  document.getElementById("rc-dryrun").checked = dryRun;
+
+  // Trigger sector-checkbox visibility toggle if needed
+  const changeEvt = new Event("change");
+  document.getElementById("rc-vertical").dispatchEvent(changeEvt);
+
+  // Run and redirect result to the quick-launch result box
+  const qlResult = document.getElementById("quick-launch-result");
+  const btn = document.getElementById("rc-btn");
+  const rcResult = document.getElementById("rc-result");
+
+  const payload = {
+    vertical,
+    max_contacts: vertical === "real_estate" ? 20 : 15,
+    dry_run: dryRun,
+    hitl_mode: true,
+    min_rating: 4.0,
+  };
+
+  qlResult.innerHTML = `<span style="color:#aaa;font-size:13px;">Running${dryRun ? " dry run" : ""}…</span>`;
+  qlResult.style.display = "block";
+  startLogPolling();
+
+  postJSON("/api/v1/campaigns/run", payload).then(result => {
+    const label = vertical === "real_estate" ? "Closer — Estate Agents" : "TalentOS — HR Teams";
+    const drafted = result.drafted ?? result.queued ?? "?";
+    qlResult.innerHTML = `
+      <span style="color:#4ade80;font-size:13px;">
+        ${dryRun ? "[DRY RUN] " : ""}${label}: ${drafted} draft(s) queued
+      </span>
+      ${!dryRun ? `<a href="#" style="color:#ff5c00;font-size:12px;margin-left:12px;" onclick="switchTab('approvals',document.querySelector('.tab-btn[onclick*=approvals]'));return false;">→ Go to Message Queue</a>` : ""}
+    `;
+    if (!dryRun) refresh();
+  }).catch(err => {
+    qlResult.innerHTML = `<span style="color:#ff4444;font-size:13px;">Error: ${err.message}</span>`;
+  }).finally(() => {
+    setTimeout(stopLogPolling, 5000);
+  });
+}
 
 // ── Run campaign ─────────────────────────────────────────────────────────────
 async function runCampaign() {

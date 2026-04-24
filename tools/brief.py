@@ -181,7 +181,7 @@ def compile_morning_brief() -> str:
 ⚡ *PIPELINE*
 {chr(10).join(pipeline_lines) if pipeline_lines else "  No contacts yet — run a campaign to get started"}{action_block}
 
-🔔 Next campaign run tonight at 10pm
-→ Open dashboard to approve drafts"""
+🔔 Run outreach manually from the Campaigns tab when ready.
+→ Open dashboard to review and approve drafts before they go out"""
 
     return brief.strip()
