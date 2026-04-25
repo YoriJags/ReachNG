@@ -517,7 +517,7 @@
 <div class="hero">
   <div class="hero-eyebrow">Client Dashboard</div>
   <h1>{{ client_name }}</h1>
-  <div class="hero-sub">Your AI outreach is running &nbsp;<span>·</span>&nbsp; {{ vertical }}</div>
+  <div class="hero-sub">Operations dashboard &nbsp;<span>·</span>&nbsp; {{ vertical }}</div>
   <div class="powered-pill">
     <span class="powered-dot"></span>
     Powered by ReachNG
@@ -535,59 +535,29 @@
     <!-- Stats -->
     <div class="stats-grid" id="stats-grid">
       <div class="stat-card orange">
-        <div class="stat-label">Businesses Reached</div>
+        <div class="stat-label">Messages Sent</div>
         <div class="stat-value" data-counter="0" id="val-contacted">0</div>
-        <div class="stat-change">Total outreach sent</div>
+        <div class="stat-change">Total outbound activity</div>
       </div>
       <div class="stat-card green">
         <div class="stat-label">Replied</div>
         <div class="stat-value" data-counter="0" id="val-replied">0</div>
-        <div class="stat-change">Engaged with your message</div>
+        <div class="stat-change">Conversations opened</div>
       </div>
       <div class="stat-card gold">
-        <div class="stat-label">Converted</div>
+        <div class="stat-label">Closed</div>
         <div class="stat-value" data-counter="0" id="val-converted">0</div>
-        <div class="stat-change">Active deals in progress</div>
+        <div class="stat-change">Marked done by you</div>
       </div>
       <div class="stat-card blue">
-        <div class="stat-label">Active This Week</div>
+        <div class="stat-label">This Week</div>
         <div class="stat-value" data-counter="0" id="val-week">0</div>
-        <div class="stat-change">Messages sent this week</div>
-      </div>
-    </div>
-
-    <!-- Momentum -->
-    <div class="momentum-card">
-      <div class="momentum-header">
-        <span class="momentum-title">Campaign Momentum</span>
-        <span class="momentum-pct" id="momentum-pct">0%</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill" id="momentum-bar" style="width:0%"></div>
-      </div>
-      <div class="momentum-sub" id="momentum-sub">Loading pipeline status…</div>
-    </div>
-
-    <!-- ROI strip -->
-    <div class="roi-strip" id="roi-strip">
-      <div class="roi-item">
-        <div class="roi-value" id="roi-sent">—</div>
-        <div class="roi-label">Messages Sent</div>
-      </div>
-      <div class="roi-divider"></div>
-      <div class="roi-item">
-        <div class="roi-value" id="roi-value" style="color:var(--green);">—</div>
-        <div class="roi-label">Value Generated (₦)</div>
-      </div>
-      <div class="roi-divider"></div>
-      <div class="roi-item">
-        <div class="roi-value" id="roi-multi" style="color:var(--gold);">—</div>
-        <div class="roi-label">ROI Multiplier</div>
+        <div class="stat-change">Messages this week</div>
       </div>
     </div>
 
     <!-- Activity feed -->
-    <div class="section-label">What's Happening</div>
+    <div class="section-label">Recent Activity</div>
     <div class="activity-feed" id="activity-feed">
       <div class="activity-item">
         <span class="activity-icon"></span>
@@ -595,13 +565,13 @@
       </div>
     </div>
 
-    <!-- Lead table -->
-    <div class="section-label">Your Leads</div>
+    <!-- Outreach activity table -->
+    <div class="section-label">Outreach Activity</div>
     <div class="leads-table-wrap">
       <table class="leads-table">
         <thead>
           <tr>
-            <th onclick="sortTable('name')">Business</th>
+            <th onclick="sortTable('name')">Contact</th>
             <th onclick="sortTable('category')">Category</th>
             <th onclick="sortTable('status')">Status</th>
             <th onclick="sortTable('rating')">Rating</th>
@@ -609,7 +579,7 @@
           </tr>
         </thead>
         <tbody id="leads-tbody">
-          <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--dim);">Loading leads…</td></tr>
+          <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--dim);">Loading…</td></tr>
         </tbody>
       </table>
     </div>
