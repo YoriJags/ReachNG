@@ -26,7 +26,7 @@ from posthog import Posthog
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
-from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router, legal_review_router, loan_officer_router, debt_collector_router, market_credit_router, product_auth_router, material_check_router, fuel_reprice_router, float_optimizer_router, fx_salary_router, moonlighting_router, salary_erosion_router, fx_lock_router, hr_suite_router, estate_router, portal_estate_router, portal_talent_router, closer_router, closer_public_router, brief_router, brief_public_router
+from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, b2c_public_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router, legal_review_router, loan_officer_router, debt_collector_router, market_credit_router, product_auth_router, material_check_router, fuel_reprice_router, float_optimizer_router, fx_salary_router, moonlighting_router, salary_erosion_router, fx_lock_router, hr_suite_router, estate_router, portal_estate_router, portal_talent_router, closer_router, closer_public_router, brief_router, brief_public_router
 from api.paystack import router as paystack_router
 from api.fleet_dispatcher import router as fleet_dispatcher_router
 from api.market_os import router as market_os_router
@@ -101,6 +101,7 @@ async def lifespan(app: FastAPI):
     from tools.competitor import ensure_competitor_indexes
     from tools.invoices import ensure_invoice_indexes
     from tools.csv_import import ensure_b2c_indexes
+    from api.b2c import _ensure_lead_imports_indexes
     ensure_approval_indexes()
     ensure_roi_indexes()
     ensure_social_indexes()
@@ -110,6 +111,7 @@ async def lifespan(app: FastAPI):
     ensure_competitor_indexes()
     ensure_invoice_indexes()
     ensure_b2c_indexes()
+    _ensure_lead_imports_indexes()
     from api.school_fees import ensure_school_fees_indexes
     ensure_school_fees_indexes()
     from services.fleet_dispatcher.store import ensure_indexes as ensure_fleet_indexes
@@ -192,6 +194,7 @@ app.include_router(referrals_router,   prefix="/api/v1", **_auth)
 app.include_router(competitors_router, prefix="/api/v1", **_auth)
 app.include_router(invoices_router,    prefix="/api/v1", **_auth)
 app.include_router(b2c_router,            prefix="/api/v1", **_auth)
+app.include_router(b2c_public_router,     prefix="/api/v1")  # token-gated, no Basic Auth
 app.include_router(invoice_chaser_router, prefix="/api/v1", **_auth)
 app.include_router(school_fees_router,    prefix="/api/v1", **_auth)
 app.include_router(plans_router,          prefix="/api/v1", **_auth)

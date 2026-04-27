@@ -36,7 +36,12 @@ async def estate_portal_page(token: str, request: Request):
     client = _get_client(token)
     return request.app.state.templates.TemplateResponse(
         request, "portal_estate.html",
-        {"token": token, "client_name": client["name"], "company": client.get("company", client["name"])},
+        {
+            "token": token,
+            "client_name": client["name"],
+            "company": client.get("company", client["name"]),
+            "vertical": client.get("vertical", "real_estate"),
+        },
     )
 
 

@@ -154,6 +154,9 @@ tr:last-child td { border-bottom: none; }
     <div class="nav-item" data-panel="brief" onclick="show('brief',this); loadBrief();">
       <span class="nav-dot"></span> Business Brief
     </div>
+    <div class="nav-item" data-panel="leads" onclick="show('leads',this); loadLeadLists();">
+      <span class="nav-dot"></span> Lead Lists
+    </div>
 
     <div class="nav-section">Rent Roll</div>
     <div class="nav-item" data-panel="rent" onclick="show('rent',this)">
@@ -668,6 +671,75 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
+    <!-- LEAD LISTS -->
+    <div id="panel-leads" class="panel">
+      <div class="page-title">Lead Lists</div>
+      <div class="page-sub">Upload your contacts. We draft personalised WhatsApp follow-ups using your Business Brief — every message reviewed before it goes out.</div>
+
+      <div id="leads-status-banner" class="card" style="display:none"></div>
+
+      <div class="card">
+        <div class="card-title">Upload a CSV</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.7">
+          Required column: <code>phone</code>, <code>whatsapp</code>, or <code>mobile</code>.
+          Optional: <code>name</code>, <code>email</code>, <code>tags</code>, <code>notes</code>.
+          We'll auto-detect headers, normalise phones to +234, dedupe, and skip anyone who has previously opted out.
+        </div>
+
+        <div id="leads-drop"
+             ondragover="event.preventDefault(); this.style.borderColor='var(--orange)'"
+             ondragleave="this.style.borderColor='var(--border2)'"
+             ondrop="leadsDrop(event)"
+             style="border:2px dashed var(--border2);border-radius:8px;padding:24px;text-align:center;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:12px"
+             onclick="document.getElementById('leads-file').click()">
+          <div style="font-size:28px;margin-bottom:6px">⤴</div>
+          <div id="leads-file-label">Drop a .csv here, or click to browse</div>
+          <input id="leads-file" type="file" accept=".csv" style="display:none" onchange="leadsFilePicked(this.files[0])" />
+        </div>
+
+        <label class="field" style="margin-bottom:10px"><span>Campaign tag (optional)</span>
+          <input id="leads-tag" placeholder="e.g. ikoyi-walk-ins-march" /></label>
+
+        <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text);background:#1a1f28;padding:10px 12px;border:1px solid var(--border2);border-radius:6px;margin-bottom:12px;line-height:1.6">
+          <input type="checkbox" id="leads-consent" style="margin-top:2px;accent-color:var(--orange)" />
+          <span>
+            <strong>Consent attestation (required)</strong> — I confirm every contact in this file has a lawful basis under NDPR (existing relationship, opt-in, or legitimate interest). I take responsibility as the data controller; ReachNG processes the data on my behalf.
+          </span>
+        </label>
+
+        <button class="btn btn-primary" onclick="leadsUpload()">Upload</button>
+        <div id="leads-upload-status" style="font-size:12px;color:var(--muted);margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+          <div>
+            <div class="card-title" style="margin-bottom:2px">Run a campaign</div>
+            <div style="font-size:12px;color:var(--muted)">Drafts queue to your approval inbox before sending. Hard-blocked if your Business Brief is incomplete.</div>
+          </div>
+          <div id="leads-counts" style="font-size:12px;color:var(--muted)"></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:12px">
+          <label class="field"><span>Max contacts</span>
+            <input id="leads-max" type="number" min="1" max="200" value="20" /></label>
+          <label class="field"><span>Mode</span>
+            <select id="leads-dryrun"><option value="false">Live (queue drafts)</option><option value="true" selected>Dry run (no drafts)</option></select></label>
+        </div>
+
+        <button class="btn btn-primary" onclick="leadsRun()">Run campaign</button>
+        <div id="leads-run-status" style="font-size:12px;color:var(--muted);margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="card-title" style="margin:0">Recent uploads</div>
+          <button class="btn btn-outline btn-sm" onclick="loadLeadImports()">Refresh</button>
+        </div>
+        <div id="leads-imports" style="font-size:12px;color:var(--muted)">Loading…</div>
+      </div>
+    </div>
+
     <!-- GETTING STARTED / HELP -->
     <div id="panel-guide" class="panel">
       <div class="page-title">Getting Started</div>
@@ -781,6 +853,158 @@ function show(panel, el) {
   if (panel === 'background')  loadBgList();
   if (panel === 'concierge')   loadConciergeProps();
   if (panel === 'brief')       loadBrief();
+  if (panel === 'leads')       loadLeadLists();
+}
+
+// ── Lead Lists (BYO Leads) ──
+let _leadsFile = null;
+
+function leadsFilePicked(file) {
+  if (!file) return;
+  if (!file.name.endsWith('.csv')) {
+    document.getElementById('leads-upload-status').textContent = 'File must be a .csv';
+    return;
+  }
+  _leadsFile = file;
+  document.getElementById('leads-file-label').textContent = `${file.name} · ${(file.size/1024).toFixed(1)} KB`;
+}
+
+function leadsDrop(ev) {
+  ev.preventDefault();
+  const f = ev.dataTransfer.files?.[0];
+  if (f) leadsFilePicked(f);
+  document.getElementById('leads-drop').style.borderColor = 'var(--border2)';
+}
+
+async function loadLeadLists() {
+  try {
+    const r = await fetch(`/api/v1/portal-leads/${TOKEN}/status`);
+    if (!r.ok) throw new Error(await r.text());
+    const s = await r.json();
+    renderLeadsBanner(s);
+    renderLeadsCounts(s);
+  } catch (e) {
+    document.getElementById('leads-counts').textContent = 'Could not load status: ' + e.message;
+  }
+  loadLeadImports();
+}
+
+function renderLeadsBanner(status) {
+  const banner = document.getElementById('leads-status-banner');
+  const blockers = status?.brief_health?.blockers || [];
+  if (blockers.length) {
+    banner.style.display = '';
+    banner.style.borderColor = '#7a2020';
+    banner.style.background = '#3a1a1a';
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:24px">⚠️</div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:600;color:#f87171;margin-bottom:4px">Outreach paused — finish your Business Brief first</div>
+          <div style="font-size:12px;color:#fca5a5">Missing: ${blockers.join(', ')}. Open the Business Brief tab and save before launching a campaign.</div>
+        </div>
+      </div>`;
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function renderLeadsCounts(status) {
+  const c = status?.contacts_by_status || {};
+  const total = status?.total_contacts || 0;
+  const parts = ['Total: ' + total];
+  if (c.new)        parts.push(c.new + ' new');
+  if (c.contacted)  parts.push(c.contacted + ' contacted');
+  if (c.replied)    parts.push(c.replied + ' replied');
+  if (c.opted_out)  parts.push(c.opted_out + ' opted out');
+  document.getElementById('leads-counts').textContent = parts.join(' · ');
+}
+
+async function leadsUpload() {
+  const status = document.getElementById('leads-upload-status');
+  if (!_leadsFile) { status.textContent = 'Pick a CSV first.'; return; }
+  if (!document.getElementById('leads-consent').checked) {
+    status.textContent = 'Tick the consent attestation box to continue.';
+    return;
+  }
+  status.textContent = 'Uploading and parsing…';
+
+  const fd = new FormData();
+  fd.append('file', _leadsFile);
+  fd.append('consent_attestation', 'true');
+  const tag = document.getElementById('leads-tag').value.trim();
+  if (tag) fd.append('campaign_tag', tag);
+
+  try {
+    const r = await fetch(`/api/v1/portal-leads/${TOKEN}/upload`, { method:'POST', body: fd });
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    status.innerHTML =
+      `<span style="color:#34d399">Imported ${data.imported}.</span>
+       Duplicates: ${data.skipped_duplicate} · Opted-out skipped: ${data.skipped_opted_out} · Invalid phone: ${data.skipped_no_contact} · Errors: ${data.errors}.`;
+    _leadsFile = null;
+    document.getElementById('leads-file-label').textContent = 'Drop a .csv here, or click to browse';
+    document.getElementById('leads-file').value = '';
+    document.getElementById('leads-consent').checked = false;
+    loadLeadLists();
+  } catch (e) {
+    status.innerHTML = `<span style="color:#f87171">Error: ${e.message}</span>`;
+  }
+}
+
+async function leadsRun() {
+  const status = document.getElementById('leads-run-status');
+  const max = parseInt(document.getElementById('leads-max').value) || 20;
+  const dryRun = document.getElementById('leads-dryrun').value === 'true';
+  status.textContent = dryRun ? 'Running dry run…' : 'Queueing drafts…';
+
+  try {
+    const r = await fetch(`/api/v1/portal-leads/${TOKEN}/run`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ vertical: '{{ vertical }}', max_contacts: max, dry_run: dryRun, hitl_mode: true }),
+    });
+    const text = await r.text();
+    if (!r.ok) throw new Error(text);
+    let data; try { data = JSON.parse(text); } catch { data = { message: text }; }
+    if (data.status === 'started') {
+      status.innerHTML = `<span style="color:#34d399">Campaign started in background. Drafts will appear shortly in your approval inbox.</span>`;
+    } else if (dryRun) {
+      const queued = data.drafted ?? data.queued ?? data.processed ?? 'n/a';
+      status.innerHTML = `<span style="color:#34d399">Dry run done. Would draft: ${queued}.</span>`;
+    } else {
+      const queued = data.drafted ?? data.queued ?? 'n/a';
+      status.innerHTML = `<span style="color:#34d399">Drafted ${queued}. Review in your approval inbox before they send.</span>`;
+    }
+    loadLeadLists();
+  } catch (e) {
+    status.innerHTML = `<span style="color:#f87171">Error: ${e.message}</span>`;
+  }
+}
+
+async function loadLeadImports() {
+  const wrap = document.getElementById('leads-imports');
+  try {
+    const r = await fetch(`/api/v1/portal-leads/${TOKEN}/imports`);
+    if (!r.ok) throw new Error(await r.text());
+    const rows = await r.json();
+    if (!rows.length) { wrap.innerHTML = '<div>No uploads yet.</div>'; return; }
+    wrap.innerHTML = rows.map(r => {
+      const s = r.stats || {};
+      const when = r.created_at ? new Date(r.created_at).toLocaleString() : '';
+      return `<div style="border-bottom:1px solid var(--border2);padding:8px 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="color:var(--text);font-weight:600">${r.filename || '—'}</div>
+          <div>${when} · ${r.uploader || ''}${r.campaign_tag ? ' · tag: ' + r.campaign_tag : ''}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="color:#34d399">${s.imported || 0} imported</div>
+          <div>${(s.skipped_duplicate||0)+ (s.skipped_opted_out||0)} skipped · ${s.errors||0} errors</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    wrap.innerHTML = `<span style="color:#f87171">Error: ${e.message}</span>`;
+  }
 }
 
 // ── Business Brief ──

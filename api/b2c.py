@@ -1,15 +1,23 @@
 """
-B2C API — CSV upload + campaign trigger for consumer outreach.
+B2C API — CSV upload + campaign trigger for BYO Leads outreach.
 
 Endpoints:
-  POST /b2c/upload/{client_name}         — Upload CSV, import contacts
+  POST /b2c/upload/{client_name}         — Upload CSV, import contacts (consent attestation REQUIRED)
   POST /b2c/run/{client_name}            — Run campaign against imported contacts
   GET  /b2c/contacts/{client_name}       — List B2C contacts for a client
   GET  /b2c/stats/{client_name}          — Pipeline stats for B2C contacts
-  PATCH /b2c/contacts/{id}/opted-out     — Manual opt-out (GDPR compliance)
+  GET  /b2c/imports/{client_name}        — Audit log of every import + consent attestation
+  PATCH /b2c/contacts/{id}/opted-out     — Manual opt-out (NDPR/GDPR)
+
+Compliance + gating:
+  - Upload requires explicit consent_attestation=True (lawful basis under NDPR)
+  - Each import logs to lead_imports with timestamp/uploader/IP/filename hash
+  - Verticals not in BYO_LEADS_ENABLED_VERTICALS are blocked at upload + run
 """
+import hashlib
 import re
-from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks
+from datetime import datetime, timezone
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -27,6 +35,67 @@ router = APIRouter(prefix="/b2c", tags=["B2C"])
 
 _MAX_CSV_BYTES = 5 * 1024 * 1024   # 5 MB — enough for 100k rows
 
+# Verticals where BYO Leads is allowed. Recruitment + lending NOT in here on
+# purpose — those don't run cold outbound to candidate/borrower lists.
+BYO_LEADS_ENABLED_VERTICALS = {
+    "real_estate", "legal", "insurance", "fitness",
+    "events", "auto", "cooperatives", "general",
+}
+
+
+def _enforce_byo_enabled(client_doc: dict) -> None:
+    """Block uploads/runs for verticals where BYO Leads is disabled.
+    Per-client override via `byo_leads_enabled=False` also respected."""
+    if client_doc.get("byo_leads_enabled") is False:
+        raise HTTPException(403, f"BYO Leads disabled for client '{client_doc.get('name')}'")
+    vertical = client_doc.get("vertical")
+    if vertical and vertical not in BYO_LEADS_ENABLED_VERTICALS:
+        raise HTTPException(
+            403,
+            f"BYO Leads is not available for vertical '{vertical}'. "
+            f"Allowed: {', '.join(sorted(BYO_LEADS_ENABLED_VERTICALS))}",
+        )
+
+
+def _record_import(
+    *,
+    client_doc: dict,
+    filename: str,
+    file_bytes: bytes,
+    consent_attestation: bool,
+    uploader: Optional[str],
+    request: Optional[Request],
+    stats: dict,
+    vertical: str,
+    campaign_tag: Optional[str],
+) -> str:
+    """Persist one row in lead_imports — the audit trail for NDPR + DPA compliance."""
+    ip = (request.client.host if request and request.client else None)
+    file_hash = hashlib.sha256(file_bytes).hexdigest()
+    doc = {
+        "client_id": client_doc["_id"],
+        "client_name": client_doc.get("name"),
+        "vertical": vertical,
+        "filename": filename,
+        "file_hash": file_hash,
+        "file_size_bytes": len(file_bytes),
+        "campaign_tag": campaign_tag,
+        "consent_attestation": bool(consent_attestation),
+        "uploader": uploader or "admin",
+        "uploader_ip": ip,
+        "stats": stats,
+        "created_at": datetime.now(timezone.utc),
+    }
+    res = get_db()["lead_imports"].insert_one(doc)
+    return str(res.inserted_id)
+
+
+def _ensure_lead_imports_indexes() -> None:
+    from pymongo import ASCENDING, DESCENDING
+    col = get_db()["lead_imports"]
+    col.create_index([("client_id", ASCENDING), ("created_at", DESCENDING)])
+    col.create_index([("file_hash", ASCENDING)])
+
 
 # ─── Request schemas ──────────────────────────────────────────────────────────
 
@@ -42,20 +111,28 @@ class RunB2CRequest(BaseModel):
 @router.post("/upload/{client_name}")
 async def upload_b2c_csv(
     client_name: str,
+    request: Request,
     file: UploadFile = File(...),
-    vertical: str = "general",
-    campaign_tag: Optional[str] = None,
+    vertical: Optional[str] = Form(default=None),
+    campaign_tag: Optional[str] = Form(default=None),
+    consent_attestation: bool = Form(default=False),
+    uploader: Optional[str] = Form(default=None),
 ):
-    """
-    Upload a CSV of customer contacts for a client.
-    Columns auto-detected. Required: phone or whatsapp column.
-    Optional: name, email, notes, tags.
+    """Upload a CSV of contacts for a client.
 
-    Example curl:
-        curl -X POST /api/v1/b2c/upload/MercuryLagos \\
-          -F "file=@customers.csv" \\
-          -F "vertical=real_estate"
+    consent_attestation MUST be true — the uploader is asserting that every
+    contact in the file has a lawful basis under NDPR (existing relationship,
+    opt-in, or legitimate interest). This attestation is stored in the
+    lead_imports audit collection and is the legal shield ReachNG relies on
+    when processing the data.
     """
+    if not consent_attestation:
+        raise HTTPException(
+            422,
+            "Consent attestation required. Confirm every contact has a lawful basis "
+            "under NDPR (existing relationship, opt-in, or legitimate interest) before uploading.",
+        )
+
     if not file.filename or not file.filename.endswith(".csv"):
         raise HTTPException(400, "File must be a .csv")
 
@@ -65,22 +142,67 @@ async def upload_b2c_csv(
     if not content:
         raise HTTPException(400, "Empty file")
 
+    # Resolve client + enforce gating BEFORE parsing — fail fast.
+    client_doc = get_db()["clients"].find_one(
+        {"name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"}, "active": True}
+    )
+    if not client_doc:
+        raise HTTPException(404, f"Client '{client_name}' not found or inactive")
+    _enforce_byo_enabled(client_doc)
+
+    effective_vertical = vertical or client_doc.get("vertical") or "general"
+
     try:
         stats = parse_and_import_csv(
             csv_bytes=content,
             client_name=client_name,
-            vertical=vertical,
+            vertical=effective_vertical,
             campaign_tag=campaign_tag,
         )
     except ValueError as exc:
         raise HTTPException(422, str(exc))
 
+    import_id = _record_import(
+        client_doc=client_doc,
+        filename=file.filename,
+        file_bytes=content,
+        consent_attestation=consent_attestation,
+        uploader=uploader,
+        request=request,
+        stats=stats,
+        vertical=effective_vertical,
+        campaign_tag=campaign_tag,
+    )
+
     return {
         "success": True,
         "client": client_name,
-        "vertical": vertical,
+        "vertical": effective_vertical,
+        "import_id": import_id,
         **stats,
     }
+
+
+@router.get("/imports/{client_name}")
+async def list_imports(client_name: str, limit: int = 50):
+    """Audit log: every CSV import for this client + consent attestation timestamp/uploader."""
+    client = get_db()["clients"].find_one(
+        {"name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"}}
+    )
+    if not client:
+        raise HTTPException(404, f"Client '{client_name}' not found")
+    rows = list(
+        get_db()["lead_imports"]
+        .find({"client_id": client["_id"]})
+        .sort("created_at", -1)
+        .limit(min(limit, 200))
+    )
+    for r in rows:
+        r["id"] = str(r.pop("_id"))
+        r["client_id"] = str(r["client_id"])
+        if hasattr(r.get("created_at"), "isoformat"):
+            r["created_at"] = r["created_at"].isoformat()
+    return rows
 
 
 @router.post("/run/{client_name}")
@@ -92,13 +214,36 @@ async def run_b2c_campaign(
     """
     Run a B2C campaign against contacts uploaded for this client.
     Pulls client brief + Unipile account IDs from the clients collection.
+
+    Hard-gated by:
+      - byo_leads_enabled flag + vertical allow-list
+      - BusinessBrief health (queue_draft raises BriefIncompleteError if blocked)
     """
-    # Load client config
     client_doc = get_db()["clients"].find_one(
         {"name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"}, "active": True}
     )
     if not client_doc:
         raise HTTPException(404, f"Client '{client_name}' not found or inactive")
+    _enforce_byo_enabled(client_doc)
+
+    # Pre-check brief health — fail fast with a useful message rather than letting
+    # individual queue_draft calls raise mid-campaign.
+    try:
+        from services.brief import brief_health
+        health = brief_health(client_id=str(client_doc["_id"]))
+        if health.get("blockers"):
+            raise HTTPException(
+                422,
+                f"BusinessBrief incomplete for '{client_name}'. Missing: "
+                f"{', '.join(health['blockers'])}. Health {health.get('score')}/{health.get('max')}. "
+                f"Open the Briefs tab and complete the brief before launching outreach.",
+            )
+    except HTTPException:
+        raise
+    except Exception:
+        # Brief module fault should not silently allow outreach
+        log.exception("brief_health_check_failed", client=client_name)
+        raise HTTPException(500, "Brief health check failed — refusing to run campaign.")
 
     campaign = B2CCampaign()
 
@@ -179,3 +324,176 @@ async def b2c_opt_out(contact_id: str):
 
     mark_b2c_opted_out(contact_id)
     return {"success": True, "status": "opted_out"}
+
+
+# ─── Portal (token-gated) ─────────────────────────────────────────────────────
+# Clients upload + run their own lists from the portal — no Basic Auth.
+public_router = APIRouter(prefix="/portal-leads", tags=["BYO Leads — Portal"])
+
+
+def _client_by_token(token: str) -> dict:
+    client = get_db()["clients"].find_one({"portal_token": token, "active": True})
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    _enforce_byo_enabled(client)
+    return client
+
+
+@public_router.get("/{token}/status")
+async def portal_leads_status(token: str):
+    """Health snapshot for the Lead Lists tab — gates + counts + brief readiness."""
+    client = _client_by_token(token)
+    cid = str(client["_id"])
+    name = client.get("name")
+
+    col = get_db()["b2c_contacts"]
+    pipeline = [
+        {"$match": {"client_name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}}},
+        {"$group": {"_id": "$status", "count": {"$sum": 1}}},
+    ]
+    by_status = {r["_id"]: r["count"] for r in col.aggregate(pipeline)}
+
+    try:
+        from services.brief import brief_health
+        health = brief_health(client_id=cid)
+    except Exception:
+        health = {"score": 0, "blockers": ["icp", "closing_action"]}
+
+    return {
+        "client": name,
+        "vertical": client.get("vertical"),
+        "byo_leads_enabled": client.get("byo_leads_enabled", True),
+        "contacts_by_status": by_status,
+        "total_contacts": sum(by_status.values()),
+        "brief_health": health,
+        "ready_to_run": not (health.get("blockers") or []),
+    }
+
+
+@public_router.post("/{token}/upload")
+async def portal_leads_upload(
+    token: str,
+    request: Request,
+    file: UploadFile = File(...),
+    campaign_tag: Optional[str] = Form(default=None),
+    consent_attestation: bool = Form(default=False),
+):
+    """Client-side CSV upload from the portal. Same compliance rails as admin."""
+    client = _client_by_token(token)
+
+    if not consent_attestation:
+        raise HTTPException(
+            422,
+            "Tick the consent attestation box. You must confirm every contact has a "
+            "lawful basis under NDPR before we can process the file.",
+        )
+    if not file.filename or not file.filename.endswith(".csv"):
+        raise HTTPException(400, "File must be a .csv")
+
+    content = await file.read()
+    if len(content) > _MAX_CSV_BYTES:
+        raise HTTPException(413, f"CSV too large. Max {_MAX_CSV_BYTES // 1024}KB.")
+    if not content:
+        raise HTTPException(400, "Empty file")
+
+    vertical = client.get("vertical") or "general"
+    try:
+        stats = parse_and_import_csv(
+            csv_bytes=content,
+            client_name=client.get("name"),
+            vertical=vertical,
+            campaign_tag=campaign_tag,
+        )
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
+
+    import_id = _record_import(
+        client_doc=client,
+        filename=file.filename,
+        file_bytes=content,
+        consent_attestation=consent_attestation,
+        uploader=f"portal:{token[:8]}",
+        request=request,
+        stats=stats,
+        vertical=vertical,
+        campaign_tag=campaign_tag,
+    )
+
+    return {"success": True, "client": client.get("name"), "vertical": vertical, "import_id": import_id, **stats}
+
+
+@public_router.post("/{token}/run")
+async def portal_leads_run(token: str, body: RunB2CRequest, background_tasks: BackgroundTasks):
+    """Client-side campaign launch from the portal. Hard-gated by brief health."""
+    client = _client_by_token(token)
+
+    try:
+        from services.brief import brief_health
+        health = brief_health(client_id=str(client["_id"]))
+        if health.get("blockers"):
+            raise HTTPException(
+                422,
+                "Outreach paused — Business Brief incomplete. Missing: "
+                f"{', '.join(health['blockers'])}. Open the Business Brief tab and finish "
+                "the brief before launching a campaign.",
+            )
+    except HTTPException:
+        raise
+    except Exception:
+        log.exception("portal_brief_health_failed", token_prefix=token[:8])
+        raise HTTPException(500, "Brief health check failed — refusing to run campaign.")
+
+    campaign = B2CCampaign()
+    kwargs = dict(
+        client_name=client.get("name"),
+        vertical=body.vertical or client.get("vertical") or "general",
+        max_contacts=body.max_contacts,
+        dry_run=body.dry_run,
+        hitl_mode=True,  # portal launches always go through approval queue
+        client_brief=client.get("brief"),
+        whatsapp_account_id=client.get("whatsapp_account_id"),
+        email_account_id=client.get("email_account_id"),
+    )
+
+    if body.max_contacts > 20 and not body.dry_run:
+        background_tasks.add_task(campaign.run, **kwargs)
+        return {"status": "started", "client": client.get("name"), "message": "Campaign running in background"}
+
+    return await campaign.run(**kwargs)
+
+
+@public_router.get("/{token}/imports")
+async def portal_leads_imports(token: str, limit: int = 30):
+    """Client sees their own import history."""
+    client = _client_by_token(token)
+    rows = list(
+        get_db()["lead_imports"]
+        .find({"client_id": client["_id"]})
+        .sort("created_at", -1)
+        .limit(min(limit, 100))
+    )
+    for r in rows:
+        r["id"] = str(r.pop("_id"))
+        r["client_id"] = str(r["client_id"])
+        if hasattr(r.get("created_at"), "isoformat"):
+            r["created_at"] = r["created_at"].isoformat()
+    return rows
+
+
+@public_router.get("/{token}/contacts")
+async def portal_leads_contacts(token: str, status: Optional[str] = None, limit: int = 100, skip: int = 0):
+    """Contacts list scoped to this client only — never cross-client."""
+    client = _client_by_token(token)
+    name = client.get("name")
+    query: dict = {"client_name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}}
+    if status:
+        query["status"] = status
+
+    col = get_db()["b2c_contacts"]
+    contacts = list(col.find(query).sort("created_at", -1).skip(skip).limit(min(limit, 500)))
+    for c in contacts:
+        c["id"] = str(c.pop("_id"))
+        for f in ("created_at", "updated_at", "last_contacted_at", "opted_out_at"):
+            if hasattr(c.get(f), "isoformat"):
+                c[f] = c[f].isoformat()
+    return contacts
