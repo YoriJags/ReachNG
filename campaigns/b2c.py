@@ -70,13 +70,14 @@ class B2CCampaign:
                 skipped += 1
                 continue
 
-            # Generate message
+            # Generate message — passing client_name pulls the structured BusinessBrief.
             try:
                 generated = generate_b2c_message(
                     customer_name=name,
                     channel=channel,
                     vertical=vertical,
                     client_brief=client_brief,
+                    client_name=client_name,
                     notes=notes,
                     tags=tags,
                 )
@@ -90,7 +91,8 @@ class B2CCampaign:
                 sent += 1
                 continue
 
-            # HITL mode — queue for approval
+            # HITL mode — queue for approval. source="byo_leads" so the brief
+            # gate inside queue_draft hard-blocks if the brief regressed mid-run.
             if hitl_mode:
                 queue_draft(
                     contact_id=contact_id,
@@ -101,7 +103,8 @@ class B2CCampaign:
                     subject=generated.get("subject"),
                     phone=phone,
                     email=email,
-                    source="b2c_csv",
+                    source="byo_leads",
+                    client_name=client_name,
                 )
                 queued += 1
                 continue

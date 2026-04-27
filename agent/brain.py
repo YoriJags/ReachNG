@@ -134,32 +134,51 @@ def generate_b2c_message(
     customer_name: str,
     channel: str,               # "whatsapp" | "email"
     vertical: str,
-    client_brief: Optional[str] = None,
+    client_brief: Optional[str] = None,    # legacy free-text brief — used only as a fallback
+    client_name: Optional[str] = None,     # PREFERRED — looks up structured BusinessBrief
     notes: Optional[str] = None,
     tags: Optional[list] = None,
 ) -> dict:
     """
     Generate a personalized B2C outreach message for a customer.
-    Uses client brief + customer notes/tags for personalization.
+
+    When `client_name` is supplied, the system prompt is composed from the
+    structured BusinessBrief + vertical primer via assemble_context().
+    Otherwise we fall back to the loose free-text `client_brief` for back-compat.
     Returns {"message": str} for WhatsApp or {"subject": str, "message": str} for email.
     """
-    system = _load_prompt("system.txt")
+    base_system = _load_prompt("system.txt")
 
-    brief_block = f"\nClient context: {client_brief}" if client_brief else ""
-    notes_block  = f"\nCustomer notes: {notes}" if notes else ""
-    tags_block   = f"\nCustomer tags/segments: {', '.join(tags)}" if tags else ""
+    # Prefer the structured brief context when we know the client.
+    brief_system: Optional[str] = None
+    if client_name:
+        try:
+            from services.brief import assemble_context
+            ctx = assemble_context(client_name=client_name, intent="outreach_warm")
+            brief_system = ctx.get("system_prompt")
+        except Exception as exc:
+            log.warning("brief_context_fetch_failed", client=client_name, error=str(exc))
+
+    system = (brief_system + "\n\n" + base_system) if brief_system else base_system
+
+    notes_block = f"\nCustomer notes: {notes}" if notes else ""
+    tags_block  = f"\nCustomer tags/segments: {', '.join(tags)}" if tags else ""
+    fallback_brief_block = ""
+    if not brief_system and client_brief:
+        fallback_brief_block = f"\nClient context: {client_brief}"
 
     user_prompt = f"""
-Write a {channel} message to a customer on behalf of a business.
+Write a {channel} message to a customer on behalf of {client_name or "the business"}.
 
 Customer name: {customer_name}
 Channel: {channel}
-{brief_block}
+{fallback_brief_block}
 {notes_block}
 {tags_block}
 
 This is a B2C message — warm, personal, conversational. Not a cold sales pitch.
 Reference the customer's name. Keep it friendly and to the point.
+Stay strictly within the voice, vocabulary, and never-say constraints described in the system prompt.
 
 Return ONLY:
 - For WhatsApp: the message text (max 4 sentences, no subject line)
@@ -171,7 +190,7 @@ No explanations. No preamble. Just the message.
     import json
     client = _get_client()
     response = client.messages.create(
-        model="claude-sonnet-4-6",
+        model="claude-haiku-4-5-20251001",
         max_tokens=400,
         system=system,
         messages=[{"role": "user", "content": user_prompt}],
@@ -237,10 +256,25 @@ Rules:
 Return ONLY the message text. No preamble.
 """
 
+    # Pull the structured BusinessBrief if we know the creditor — chasers benefit
+    # from the same tone/never-say guardrails as outreach (warn-only on thin briefs).
+    brief_system: Optional[str] = None
+    try:
+        from services.brief import assemble_context
+        ctx = assemble_context(
+            client_name=client_name,
+            intent="chase",
+            extra_context={"days_overdue": days_overdue, "amount_ngn": amount_ngn},
+        )
+        brief_system = ctx.get("system_prompt")
+    except Exception as exc:
+        log.warning("brief_context_fetch_failed_invoice", client=client_name, error=str(exc))
+
     client = _get_client()
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=200,
+        system=brief_system if brief_system else anthropic.NOT_GIVEN,
         messages=[{"role": "user", "content": user_prompt}],
     )
     return response.content[0].text.strip()

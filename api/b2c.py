@@ -183,6 +183,23 @@ async def upload_b2c_csv(
     }
 
 
+@router.post("/resume/{client_name}")
+async def resume_client_outreach(client_name: str):
+    """Admin override — flip outreach_paused back off after a manual review.
+    Use after the brief has been improved or a noisy list has been pruned."""
+    from tools.account_guard import resume_outreach
+    if not resume_outreach(client_name=client_name):
+        raise HTTPException(404, f"Client '{client_name}' not found")
+    return {"success": True, "client": client_name, "outreach_paused": False}
+
+
+@router.get("/account/{client_name}")
+async def get_client_account_status(client_name: str):
+    """Snapshot for admin: paused flag + daily cap usage."""
+    from tools.account_guard import get_account_status
+    return get_account_status(client_name=client_name)
+
+
 @router.get("/imports/{client_name}")
 async def list_imports(client_name: str, limit: int = 50):
     """Audit log: every CSV import for this client + consent attestation timestamp/uploader."""
@@ -263,7 +280,18 @@ async def run_b2c_campaign(
         background_tasks.add_task(campaign.run, **kwargs)
         return {"status": "started", "client": client_name, "message": "B2C campaign running in background"}
 
-    result = await campaign.run(**kwargs)
+    try:
+        result = await campaign.run(**kwargs)
+    except Exception as exc:
+        from tools.hitl import BriefIncompleteError
+        from tools.account_guard import OutreachCapExceeded, OutreachPaused
+        if isinstance(exc, BriefIncompleteError):
+            raise HTTPException(422, str(exc))
+        if isinstance(exc, OutreachPaused):
+            raise HTTPException(423, str(exc))
+        if isinstance(exc, OutreachCapExceeded):
+            raise HTTPException(429, str(exc))
+        raise
     return result
 
 
@@ -359,6 +387,12 @@ async def portal_leads_status(token: str):
     except Exception:
         health = {"score": 0, "blockers": ["icp", "closing_action"]}
 
+    try:
+        from tools.account_guard import get_account_status
+        guard = get_account_status(client_name=name)
+    except Exception:
+        guard = {}
+
     return {
         "client": name,
         "vertical": client.get("vertical"),
@@ -366,7 +400,12 @@ async def portal_leads_status(token: str):
         "contacts_by_status": by_status,
         "total_contacts": sum(by_status.values()),
         "brief_health": health,
-        "ready_to_run": not (health.get("blockers") or []),
+        "account_guard": guard,
+        "ready_to_run": (
+            not (health.get("blockers") or [])
+            and not guard.get("outreach_paused")
+            and (guard.get("remaining_today", 1) > 0)
+        ),
     }
 
 
@@ -459,7 +498,18 @@ async def portal_leads_run(token: str, body: RunB2CRequest, background_tasks: Ba
         background_tasks.add_task(campaign.run, **kwargs)
         return {"status": "started", "client": client.get("name"), "message": "Campaign running in background"}
 
-    return await campaign.run(**kwargs)
+    try:
+        return await campaign.run(**kwargs)
+    except Exception as exc:
+        from tools.hitl import BriefIncompleteError
+        from tools.account_guard import OutreachCapExceeded, OutreachPaused
+        if isinstance(exc, BriefIncompleteError):
+            raise HTTPException(422, str(exc))
+        if isinstance(exc, OutreachPaused):
+            raise HTTPException(423, str(exc))
+        if isinstance(exc, OutreachCapExceeded):
+            raise HTTPException(429, str(exc))
+        raise
 
 
 @public_router.get("/{token}/imports")

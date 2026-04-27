@@ -91,11 +91,13 @@ def queue_draft(
     the gate but log a warning so we still see thin briefs.
     """
     _enforce_brief_gate(source=source, client_name=client_name)
+    _enforce_account_caps(source=source, client_name=client_name)
 
     col = get_approvals()
     result = col.insert_one({
         "contact_id":    ObjectId(contact_id),
         "contact_name":  contact_name,
+        "client_name":   client_name,
         "vertical":      vertical,
         "channel":       channel,
         "message":       message,
@@ -221,6 +223,20 @@ def _enforce_brief_gate(*, source: str, client_name: str | None) -> None:
             blockers=blockers,
             score=health.get("score"),
         )
+
+
+def _enforce_account_caps(*, source: str, client_name: str | None) -> None:
+    """Apply daily-cap + paused-flag gates for prospecting drafts only.
+    Transactional sources skip caps because chase volume is driven by debtors,
+    not by us — limiting it would defeat the purpose."""
+    if not client_name or source not in _PROSPECTING_SOURCES:
+        return
+    try:
+        from tools.account_guard import enforce_account_caps
+    except Exception as e:
+        log.warning("account_guard_module_missing", error=str(e))
+        return
+    enforce_account_caps(client_name=client_name)
 
 
 def _update_status(approval_id: str, status: str) -> dict | None:

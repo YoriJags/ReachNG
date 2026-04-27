@@ -116,6 +116,15 @@ def _route_reply(msg: dict, channel: str) -> str:
     if intent == "opted_out":
         mark_opted_out(contact_id)
         log.info("auto_opted_out", contact=contact.get("name"), sender=sender)
+        # Auto-pause this client's outreach if opt-out rate spikes — protects
+        # the WhatsApp account from suspension when a list goes south.
+        try:
+            from tools.account_guard import maybe_auto_pause_on_optout_spike
+            cname = contact.get("client_name")
+            if cname:
+                maybe_auto_pause_on_optout_spike(client_name=cname)
+        except Exception as e:
+            log.warning("auto_pause_check_failed", error=str(e))
     elif contact.get("status") == Status.CONTACTED:
         mark_replied(contact_id)
         log.info(

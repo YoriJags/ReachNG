@@ -892,6 +892,12 @@ async function loadLeadLists() {
 function renderLeadsBanner(status) {
   const banner = document.getElementById('leads-status-banner');
   const blockers = status?.brief_health?.blockers || [];
+  const guard    = status?.account_guard || {};
+  const paused   = guard.outreach_paused;
+  const cap      = guard.daily_cap;
+  const sent     = guard.sent_today;
+  const remaining = guard.remaining_today ?? null;
+
   if (blockers.length) {
     banner.style.display = '';
     banner.style.borderColor = '#7a2020';
@@ -902,6 +908,30 @@ function renderLeadsBanner(status) {
         <div style="flex:1;min-width:200px">
           <div style="font-weight:600;color:#f87171;margin-bottom:4px">Outreach paused — finish your Business Brief first</div>
           <div style="font-size:12px;color:#fca5a5">Missing: ${blockers.join(', ')}. Open the Business Brief tab and save before launching a campaign.</div>
+        </div>
+      </div>`;
+  } else if (paused) {
+    banner.style.display = '';
+    banner.style.borderColor = '#7a4a20';
+    banner.style.background = '#3a2a1a';
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:24px">⏸</div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:600;color:#fbbf24;margin-bottom:4px">Outreach auto-paused</div>
+          <div style="font-size:12px;color:#fcd34d">${guard.outreach_paused_reason || 'Outreach paused. Contact your account manager to resume.'}</div>
+        </div>
+      </div>`;
+  } else if (remaining !== null && remaining <= 0) {
+    banner.style.display = '';
+    banner.style.borderColor = '#3a4050';
+    banner.style.background = '#1a1f28';
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:24px">🌙</div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:600;color:#9aa4b2;margin-bottom:4px">Daily cap reached (${sent}/${cap})</div>
+          <div style="font-size:12px;color:#7a8493">More drafts queue tomorrow at 00:00 UTC. Approve any pending drafts in the meantime.</div>
         </div>
       </div>`;
   } else {

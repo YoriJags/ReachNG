@@ -106,11 +106,28 @@ Write the WhatsApp message only. No explanation. Max 5 sentences.
 "For Stage 3+ (serious/warning/final): mention that non-payment will escalate to formal legal demand and credit bureau reporting." if stage["day"] >= 14 else ""
 }"""
 
+    # Layer the structured BusinessBrief on top of the debt-collector system
+    # prompt so chasers respect the creditor's voice, vocabulary, never-say,
+    # and compliance rails. Warn-only on thin briefs (chase still goes out).
+    layered_system = _SYSTEM
+    try:
+        from services.brief import assemble_context
+        ctx = assemble_context(
+            client_name=creditor_name,
+            intent="chase",
+            extra_context={"days_overdue": days_overdue, "amount_ngn": amount_ngn},
+        )
+        brief_prompt = ctx.get("system_prompt") or ""
+        if brief_prompt:
+            layered_system = brief_prompt + "\n\n" + _SYSTEM
+    except Exception as exc:
+        log.warning("brief_context_fetch_failed_debt", creditor=creditor_name, error=str(exc))
+
     client = anthropic.Anthropic(api_key=get_settings().anthropic_api_key)
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=600,
-        system=_SYSTEM,
+        system=layered_system,
         messages=[{"role": "user", "content": prompt}],
     )
 
