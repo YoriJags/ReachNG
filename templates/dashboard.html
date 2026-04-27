@@ -7221,12 +7221,30 @@ async function briefAdminSelect(encName) {
   const detail = document.getElementById('brief-admin-detail');
   detail.innerHTML = '<div style="font-size:12px;color:#666">Loading brief…</div>';
   try {
-    const r = await fetch(`/api/v1/admin/brief/clients/${encName}`, {headers: authHeaders()});
-    if (!r.ok) throw new Error(await r.text());
-    const data = await r.json();
+    const [briefRes, acctRes] = await Promise.all([
+      fetch(`/api/v1/admin/brief/clients/${encName}`, {headers: authHeaders()}),
+      fetch(`/api/v1/b2c/account/${encName}`,        {headers: authHeaders()}),
+    ]);
+    if (!briefRes.ok) throw new Error(await briefRes.text());
+    const data = await briefRes.json();
+    data.account_guard = acctRes.ok ? await acctRes.json() : null;
     briefAdminRender(data);
   } catch (e) {
     detail.innerHTML = `<div style="color:#ef4444;font-size:12px">${e.message}</div>`;
+  }
+}
+
+async function briefAdminResume() {
+  if (!_briefSelected) return;
+  if (!confirm(`Resume outreach for "${_briefSelected}"? Only do this after reviewing the brief and list quality.`)) return;
+  try {
+    const r = await fetch(`/api/v1/b2c/resume/${encodeURIComponent(_briefSelected)}`, {
+      method: 'POST', headers: authHeaders(),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    briefAdminSelect(encodeURIComponent(_briefSelected));
+  } catch (e) {
+    alert('Resume failed: ' + e.message);
   }
 }
 
@@ -7246,6 +7264,18 @@ function briefAdminRender(data) {
          Brief healthy. Health ${score}/${max}.
        </div>`;
 
+  const guard = data.account_guard || {};
+  const guardBanner = guard.outreach_paused
+    ? `<div style="background:#3a2a1a;border:1px solid #7a4a20;color:#fcd34d;padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+         <span><strong style="color:#fbbf24">Outreach auto-paused.</strong> ${guard.outreach_paused_reason || 'No reason recorded.'}</span>
+         <button onclick="briefAdminResume()" style="background:#fbbf24;color:#000;border:none;padding:6px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-size:12px;">Resume outreach</button>
+       </div>`
+    : guard.daily_cap
+    ? `<div style="background:#0d1117;border:1px solid #2a3340;color:#888;padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12px;">
+         Today: <strong style="color:#d8eaf8">${guard.sent_today || 0}/${guard.daily_cap} drafts queued</strong> · ${guard.remaining_today ?? 0} remaining before cap resets at 00:00 UTC.
+       </div>`
+    : '';
+
   const fieldHtml = (id, label, multiline=false, placeholder='') => `
     <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">
       <span>${label}</span>
@@ -7262,6 +7292,7 @@ function briefAdminRender(data) {
       </div>
     </div>
     ${banner}
+    ${guardBanner}
 
     <div style="background:#0a0e13;border:1px dashed #2a3340;border-radius:8px;padding:12px;margin-bottom:14px;">
       <div style="font-size:11px;font-weight:700;color:#ff5c00;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">AI-assisted intake</div>

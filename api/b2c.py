@@ -69,7 +69,12 @@ def _record_import(
     vertical: str,
     campaign_tag: Optional[str],
 ) -> str:
-    """Persist one row in lead_imports — the audit trail for NDPR + DPA compliance."""
+    """Persist one row in lead_imports — the audit trail for NDPR + DPA compliance.
+
+    On Mongo failure we log loudly with the file hash + uploader + counts so
+    the audit can be reconstructed out-of-band. We never silently lose
+    consent attestation.
+    """
     ip = (request.client.host if request and request.client else None)
     file_hash = hashlib.sha256(file_bytes).hexdigest()
     doc = {
@@ -86,8 +91,23 @@ def _record_import(
         "stats": stats,
         "created_at": datetime.now(timezone.utc),
     }
-    res = get_db()["lead_imports"].insert_one(doc)
-    return str(res.inserted_id)
+    try:
+        res = get_db()["lead_imports"].insert_one(doc)
+        return str(res.inserted_id)
+    except Exception as exc:
+        log.error(
+            "lead_import_audit_write_failed",
+            client=client_doc.get("name"),
+            filename=filename,
+            file_hash=file_hash,
+            file_size=len(file_bytes),
+            attestation=bool(consent_attestation),
+            uploader=uploader,
+            ip=ip,
+            stats=stats,
+            error=str(exc),
+        )
+        return ""
 
 
 def _ensure_lead_imports_indexes() -> None:
@@ -359,20 +379,36 @@ async def b2c_opt_out(contact_id: str):
 public_router = APIRouter(prefix="/portal-leads", tags=["BYO Leads — Portal"])
 
 
-def _client_by_token(token: str) -> dict:
+def _client_by_token(token: str, *, enforce_byo: bool = True) -> dict:
+    """Resolve a portal token to a client doc.
+
+    Pass enforce_byo=False on read-only routes (status) so the UI can render
+    the 'BYO disabled for this vertical' state instead of 403ing.
+    """
     client = get_db()["clients"].find_one({"portal_token": token, "active": True})
     if not client:
         raise HTTPException(404, "Portal not found or client inactive")
-    _enforce_byo_enabled(client)
+    if enforce_byo:
+        _enforce_byo_enabled(client)
     return client
 
 
 @public_router.get("/{token}/status")
 async def portal_leads_status(token: str):
-    """Health snapshot for the Lead Lists tab — gates + counts + brief readiness."""
-    client = _client_by_token(token)
+    """Health snapshot for the Lead Lists tab — gates + counts + brief readiness.
+
+    Read-only — does NOT 403 when BYO Leads is disabled, so the UI can render
+    a clear 'BYO Leads not available for your vertical' state.
+    """
+    client = _client_by_token(token, enforce_byo=False)
     cid = str(client["_id"])
     name = client.get("name")
+    vertical = client.get("vertical")
+    byo_disabled_reason: Optional[str] = None
+    if client.get("byo_leads_enabled") is False:
+        byo_disabled_reason = "Disabled for this client. Contact your account manager."
+    elif vertical and vertical not in BYO_LEADS_ENABLED_VERTICALS:
+        byo_disabled_reason = f"Not available for vertical '{vertical}'."
 
     col = get_db()["b2c_contacts"]
     pipeline = [
@@ -393,16 +429,23 @@ async def portal_leads_status(token: str):
     except Exception:
         guard = {}
 
+    byo_enabled = (
+        client.get("byo_leads_enabled", True) is not False
+        and (not vertical or vertical in BYO_LEADS_ENABLED_VERTICALS)
+    )
+
     return {
         "client": name,
-        "vertical": client.get("vertical"),
-        "byo_leads_enabled": client.get("byo_leads_enabled", True),
+        "vertical": vertical,
+        "byo_leads_enabled": byo_enabled,
+        "byo_disabled_reason": byo_disabled_reason,
         "contacts_by_status": by_status,
         "total_contacts": sum(by_status.values()),
         "brief_health": health,
         "account_guard": guard,
         "ready_to_run": (
-            not (health.get("blockers") or [])
+            byo_enabled
+            and not (health.get("blockers") or [])
             and not guard.get("outreach_paused")
             and (guard.get("remaining_today", 1) > 0)
         ),

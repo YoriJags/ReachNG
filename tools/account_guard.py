@@ -14,6 +14,7 @@ State is persisted on the client doc (`outreach_paused`, `outreach_paused_reason
 """
 from __future__ import annotations
 
+import re
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -150,9 +151,8 @@ def resume_outreach(*, client_name: str) -> bool:
 # ─── Internal ────────────────────────────────────────────────────────────────
 
 def _client_lookup(client_name: str) -> Optional[dict]:
-    import re as _re
     return get_db()["clients"].find_one(
-        {"name": {"$regex": f"^{_re.escape(client_name)}$", "$options": "i"}}
+        {"name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"}}
     )
 
 
@@ -163,6 +163,6 @@ def _count_sent_today(client_name: str) -> int:
         return 0
     start_of_day = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     return get_db()["pending_approvals"].count_documents({
-        "client_name": {"$regex": f"^{__import__('re').escape(client_name)}$", "$options": "i"},
+        "client_name": {"$regex": f"^{re.escape(client_name)}$", "$options": "i"},
         "created_at": {"$gte": start_of_day},
     })

@@ -897,6 +897,23 @@ function renderLeadsBanner(status) {
   const cap      = guard.daily_cap;
   const sent     = guard.sent_today;
   const remaining = guard.remaining_today ?? null;
+  const byoEnabled = status?.byo_leads_enabled !== false;
+  const byoReason  = status?.byo_disabled_reason;
+
+  if (!byoEnabled) {
+    banner.style.display = '';
+    banner.style.borderColor = '#3a4050';
+    banner.style.background = '#1a1f28';
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:24px">🔒</div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:600;color:#9aa4b2;margin-bottom:4px">BYO Leads not available</div>
+          <div style="font-size:12px;color:#7a8493">${byoReason || 'This feature is not enabled for your account.'}</div>
+        </div>
+      </div>`;
+    return;
+  }
 
   if (blockers.length) {
     banner.style.display = '';

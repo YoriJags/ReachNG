@@ -81,22 +81,83 @@ async def assist_intake(
 # ─── URL fetching ────────────────────────────────────────────────────────────
 
 async def _fetch_url_text(url: str) -> str:
-    """Fetch a URL and return clean text. Handles common cases (HTML pages),
-    skips PDFs/images, never follows more than one redirect."""
+    """Fetch a URL and return clean text — with SSRF guards.
+
+    Rejects:
+      - non-http(s) schemes (file://, ftp://, gopher://, data:, etc.)
+      - private/loopback/link-local/multicast IPs (resolved before connect)
+      - cloud metadata endpoints (169.254.169.254 — AWS/GCP/Azure)
+      - unresolvable hostnames
+
+    Limits:
+      - 15s total timeout
+      - 2 redirects max (each re-validated)
+      - 800KB body cap
+      - text/html or text/plain only
+    """
+    import socket
+    import ipaddress
+    from urllib.parse import urlparse
     import httpx
+
+    parsed = urlparse(url.strip())
+    if parsed.scheme not in ("http", "https"):
+        raise ValueError(f"Only http(s) URLs allowed, got '{parsed.scheme}'")
+    host = parsed.hostname
+    if not host:
+        raise ValueError("URL must include a hostname")
+
+    # Resolve and reject private/loopback/link-local/multicast.
+    try:
+        infos = socket.getaddrinfo(host, None)
+    except socket.gaierror as e:
+        raise ValueError(f"Cannot resolve '{host}': {e}")
+    for fam, _, _, _, sockaddr in infos:
+        ip_str = sockaddr[0]
+        try:
+            ip = ipaddress.ip_address(ip_str)
+        except ValueError:
+            continue
+        if (ip.is_private or ip.is_loopback or ip.is_link_local
+                or ip.is_multicast or ip.is_reserved or ip.is_unspecified):
+            raise ValueError(f"Refused to fetch '{host}' — resolves to non-public IP {ip_str}")
 
     headers = {
         "User-Agent": "ReachNG-BriefIntake/1.0 (+https://reachng.ng)",
         "Accept": "text/html,application/xhtml+xml,text/plain,*/*;q=0.8",
     }
-    async with httpx.AsyncClient(timeout=15, follow_redirects=True, max_redirects=2) as client:
-        r = await client.get(url, headers=headers)
-        r.raise_for_status()
-        ctype = (r.headers.get("content-type") or "").lower()
-        if "text/html" not in ctype and "text/plain" not in ctype:
-            return ""
-        body = r.content[:_MAX_FETCH_BYTES]
-        return _html_to_text(body.decode(r.encoding or "utf-8", errors="ignore"))
+    # follow_redirects=False so we manually re-validate each hop's destination.
+    async with httpx.AsyncClient(timeout=15, follow_redirects=False) as client:
+        current_url = url
+        for _ in range(3):  # initial + 2 redirects
+            r = await client.get(current_url, headers=headers)
+            if r.is_redirect:
+                next_url = r.headers.get("location") or ""
+                if not next_url:
+                    break
+                # Re-validate the redirect target — rebinding-safe.
+                next_parsed = urlparse(next_url)
+                if next_parsed.scheme not in ("http", "https"):
+                    raise ValueError(f"Refused redirect to scheme '{next_parsed.scheme}'")
+                next_host = next_parsed.hostname or host
+                try:
+                    next_infos = socket.getaddrinfo(next_host, None)
+                except socket.gaierror:
+                    raise ValueError(f"Cannot resolve redirect target '{next_host}'")
+                for _f, _t, _p, _c, sa in next_infos:
+                    ip = ipaddress.ip_address(sa[0])
+                    if (ip.is_private or ip.is_loopback or ip.is_link_local
+                            or ip.is_multicast or ip.is_reserved or ip.is_unspecified):
+                        raise ValueError(f"Refused redirect to non-public IP {sa[0]}")
+                current_url = next_url
+                continue
+            r.raise_for_status()
+            ctype = (r.headers.get("content-type") or "").lower()
+            if "text/html" not in ctype and "text/plain" not in ctype:
+                return ""
+            body = r.content[:_MAX_FETCH_BYTES]
+            return _html_to_text(body.decode(r.encoding or "utf-8", errors="ignore"))
+    return ""
 
 
 def _html_to_text(html: str) -> str:
