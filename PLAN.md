@@ -39,6 +39,29 @@ Real estate clients only. Everything below scoped to `vertical=real_estate` clie
 - [x] Client portal — "Closer Inbox" tab: list of leads + stage + thread view
 - [x] Admin dashboard — per-client Closer tab: brief editor + lead inbox
 
+## Now — Phase 1.5: Business Brief + BYO Leads *(8 days, in progress)*
+
+The outreach machine extension. Clients upload their own lead lists; we draft personalised follow-ups using a per-client business brief layered over per-vertical primers. Enabled for sales-driven verticals only (real_estate, legal, insurance, fitness, events, auto, cooperatives).
+
+### Module 0 — Business Brief layer *(2 days)*
+- [ ] `services/brief/primers.py` — seed vertical primers (real_estate, legal, insurance, fitness, events, auto, cooperatives) in `vertical_primers` Mongo collection
+- [ ] `services/brief/store.py` — `BusinessBrief` Pydantic model (superset of CloserBrief), CRUD on `clients.business_brief`
+- [ ] `services/brief/context.py` — `assemble_context(client_id, intent)` merging primer + brief → returns system_prompt, tone, vocabulary, guardrails. **All AI drafters route through this.**
+- [ ] `services/brief/intake.py` — AI-assisted intake: URL + free-text → structured BusinessBrief draft
+- [ ] `api/brief.py` — admin + portal routers
+- [ ] Portal: new "Business Brief" tab with guided form + AI-assisted intake
+- [ ] Admin: Business Brief sub-tab on client detail
+- [ ] Wire Closer/chasers/invoice drafters through `assemble_context()` (back-compat: read business_brief, fall back to closer_brief)
+
+### Module 1 — BYO Leads productisation *(6 days)*
+- [ ] Compliance gate — mandatory NDPR consent attestation at upload, one-time DPA modal, `lead_imports` audit collection
+- [ ] Per-vertical gating — `byo_leads_enabled` flag on `clients`, default ON for sales verticals only
+- [ ] Portal: "Lead Lists" tab — drag-drop CSV, pre-import preview, contacts table, campaign launcher
+- [ ] Admin: per-client Lead Lists sub-tab + override controls
+- [ ] Per-account guardrails — daily caps, pacing throttle, opt-out rate auto-pause, list quality score
+- [ ] Sequencing — single sequence per client (multi-sequence in v2)
+- [ ] Polish — sample CSV download, smart column mapper override, error report, test-send-to-one
+
 ## Next — Phase 2: Closer Brain *(2–3 days)*
 
 - [ ] New prompt tree: `agent/prompts/closer/real_estate.txt` — loads client's `closer_brief` + real estate vertical primer

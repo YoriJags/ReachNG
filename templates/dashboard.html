@@ -674,6 +674,7 @@
   <button class="tab-btn" onclick="switchTab('campaigns', this)">Campaigns</button>
   <button class="tab-btn" onclick="switchTab('clients', this)">Clients</button>
   <button class="tab-btn" onclick="switchTab('closer', this); closerAdminLoadClients();">Closer</button>
+  <button class="tab-btn" onclick="switchTab('briefs', this); briefAdminLoadClients();">Briefs</button>
   <button class="tab-btn" onclick="switchTab('approvals', this)">Message Queue <span class="tab-badge" id="tab-badge-approvals"></span></button>
   <button class="tab-btn" onclick="switchTab('replies', this)">Replies</button>
   <button class="tab-btn" onclick="switchTab('invoices', this)">Invoices</button>
@@ -1205,6 +1206,29 @@
     <div id="ra-result" style="margin-top:10px;display:none;"></div>
   </div>
 
+</div>
+
+<!-- ── Briefs (admin) ────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-briefs">
+  <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #ff5c00;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+    <div style="font-size:13px;font-weight:700;color:#ff5c00;margin-bottom:4px;">Business Briefs</div>
+    <div style="font-size:11px;color:#556;line-height:1.8;">
+      Outreach is hard-blocked for any client whose brief is missing required fields (ICP + closing action). Edit briefs here on behalf of the client, run AI-assisted intake, or review their health before launching campaigns.
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:18px;">
+    <div style="background:#0d1117;border:1px solid #1e2530;border-radius:10px;padding:14px;max-height:70vh;overflow-y:auto;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#777;margin-bottom:10px;">Clients</div>
+      <div id="brief-admin-clients">
+        <div style="font-size:12px;color:#666">Loading…</div>
+      </div>
+    </div>
+
+    <div id="brief-admin-detail" style="background:#0d1117;border:1px solid #1e2530;border-radius:10px;padding:18px;">
+      <div style="font-size:12px;color:#666">Pick a client on the left to view or edit their brief.</div>
+    </div>
+  </div>
 </div>
 
 <!-- ── Closer (admin) ────────────────────────────────────────────────────────── -->
@@ -7164,6 +7188,178 @@ async function prEstimate() {
     el.style.color = '#aaa';
     el.textContent = `Gross: ₦${Math.round(d.gross_monthly).toLocaleString()}\nPAYE: ₦${Math.round(d.paye_monthly).toLocaleString()}\nPENCOM: ₦${Math.round(d.pencom_monthly).toLocaleString()}\nNet: ₦${Math.round(d.net_pay).toLocaleString()}`;
   } catch(e) { el.style.color='#ef4444'; el.textContent = 'Error: '+e.message; }
+}
+
+// ── Admin Briefs: list every client + edit business brief ────────────────────
+let _briefSelected = null;
+const BRIEF_TEXT_FIELDS_ADMIN  = ['trading_name','one_liner','founder_story','icp','not_a_fit','tone_overrides','signature','closing_action','pricing_rules','brochure_url','calendar_link','payment_terms'];
+const BRIEF_LINES_FIELDS_ADMIN = ['usps','social_proof','never_say','always_say','red_flags','qualifying_questions'];
+const BRIEF_CSV_FIELDS_ADMIN   = ['geography','language_mix'];
+
+async function briefAdminLoadClients() {
+  const wrap = document.getElementById('brief-admin-clients');
+  try {
+    const r = await fetch('/api/v1/clients/', {headers: authHeaders()});
+    const clients = await r.json();
+    if (!clients.length) {
+      wrap.innerHTML = '<div style="color:#666;font-size:12px">No clients yet.</div>';
+      return;
+    }
+    wrap.innerHTML = clients.map(c => {
+      return `<div onclick="briefAdminSelect('${encodeURIComponent(c.name)}')" style="padding:8px 10px;border-radius:6px;cursor:pointer;border:1px solid transparent;margin-bottom:4px;font-size:13px;">
+        <div style="font-weight:600;color:#d8eaf8;">${c.name}</div>
+        <div style="color:#556;font-size:11px;">${(c.vertical || '—').replace('_',' ')}</div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    wrap.innerHTML = '<div style="color:#ef4444;font-size:12px">Error loading clients.</div>';
+  }
+}
+
+async function briefAdminSelect(encName) {
+  _briefSelected = decodeURIComponent(encName);
+  const detail = document.getElementById('brief-admin-detail');
+  detail.innerHTML = '<div style="font-size:12px;color:#666">Loading brief…</div>';
+  try {
+    const r = await fetch(`/api/v1/admin/brief/clients/${encName}`, {headers: authHeaders()});
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    briefAdminRender(data);
+  } catch (e) {
+    detail.innerHTML = `<div style="color:#ef4444;font-size:12px">${e.message}</div>`;
+  }
+}
+
+function briefAdminRender(data) {
+  const detail = document.getElementById('brief-admin-detail');
+  const brief = data.business_brief || {};
+  const health = data.health || {};
+  const blockers = health.blockers || [];
+  const score = health.score ?? 0;
+  const max = health.max ?? 10;
+
+  const banner = blockers.length
+    ? `<div style="background:#3a1a1a;border:1px solid #7a2020;color:#fca5a5;padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12px;">
+         <strong style="color:#f87171">Outreach blocked.</strong> Missing: ${blockers.join(', ')}. Health ${score}/${max}.
+       </div>`
+    : `<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.4);color:#34d399;padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12px;">
+         Brief healthy. Health ${score}/${max}.
+       </div>`;
+
+  const fieldHtml = (id, label, multiline=false, placeholder='') => `
+    <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">
+      <span>${label}</span>
+      ${multiline
+        ? `<textarea id="abf-${id}" rows="3" placeholder="${placeholder}" style="background:#161b22;border:1px solid #2a3340;color:#d8eaf8;padding:8px 10px;border-radius:4px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>`
+        : `<input id="abf-${id}" placeholder="${placeholder}" style="background:#161b22;border:1px solid #2a3340;color:#d8eaf8;padding:8px 10px;border-radius:4px;font-size:13px;" />`}
+    </label>`;
+
+  detail.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:#d8eaf8">${data.client_name}</div>
+        <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:0.08em;">${(data.vertical || 'general').replace('_',' ')}</div>
+      </div>
+    </div>
+    ${banner}
+
+    <div style="background:#0a0e13;border:1px dashed #2a3340;border-radius:8px;padding:12px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;color:#ff5c00;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">AI-assisted intake</div>
+      <input id="abf-intake-url" placeholder="Website URL (optional)" style="width:100%;background:#161b22;border:1px solid #2a3340;color:#d8eaf8;padding:8px 10px;border-radius:4px;font-size:13px;margin-bottom:6px;" />
+      <textarea id="abf-intake-text" rows="3" placeholder="Anything you know about this client — products, ICP, USPs, pricing…" style="width:100%;background:#161b22;border:1px solid #2a3340;color:#d8eaf8;padding:8px 10px;border-radius:4px;font-size:13px;font-family:inherit;resize:vertical;margin-bottom:6px;"></textarea>
+      <button class="btn btn-approve" onclick="briefAdminIntake()" style="font-size:12px;">Generate draft</button>
+      <span id="abf-intake-status" style="font-size:11px;color:#888;margin-left:10px;"></span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+      ${fieldHtml('trading_name','Trading name')}
+      ${fieldHtml('one_liner','One-liner')}
+      ${fieldHtml('founder_story','Founder story',true)}
+      ${fieldHtml('geography','Geography (CSV)')}
+      ${fieldHtml('language_mix','Languages (CSV)')}
+      ${fieldHtml('icp','ICP — required',true,'Who they sell to')}
+      ${fieldHtml('not_a_fit','NOT a fit',true)}
+      ${fieldHtml('usps','USPs (one per line)',true)}
+      ${fieldHtml('social_proof','Social proof (one per line)',true)}
+      ${fieldHtml('tone_overrides','Tone overrides')}
+      ${fieldHtml('signature','Signature')}
+      ${fieldHtml('never_say','Never say (one per line)',true)}
+      ${fieldHtml('always_say','Always say (one per line)',true)}
+      ${fieldHtml('red_flags','Red flags (one per line)',true)}
+      ${fieldHtml('qualifying_questions','Qualifying questions (one per line)',true)}
+      ${fieldHtml('closing_action','Closing action — required')}
+      ${fieldHtml('pricing_rules','Pricing rules')}
+      ${fieldHtml('brochure_url','Brochure URL')}
+      ${fieldHtml('calendar_link','Calendar link')}
+      ${fieldHtml('payment_terms','Payment terms',true)}
+    </div>
+
+    <div style="margin-top:14px;display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-approve" onclick="briefAdminSave()">Save brief</button>
+      <span id="abf-save-status" style="font-size:12px;color:#888;"></span>
+    </div>
+  `;
+
+  // populate
+  const _setA = (id, v) => { const el = document.getElementById('abf-' + id); if (el) el.value = v ?? ''; };
+  BRIEF_TEXT_FIELDS_ADMIN.forEach(k => _setA(k, brief[k] || ''));
+  BRIEF_LINES_FIELDS_ADMIN.forEach(k => _setA(k, Array.isArray(brief[k]) ? brief[k].join('\n') : ''));
+  BRIEF_CSV_FIELDS_ADMIN.forEach(k => _setA(k, Array.isArray(brief[k]) ? brief[k].join(', ') : ''));
+}
+
+function _briefAdminCollect() {
+  const _v = (id) => document.getElementById('abf-' + id)?.value ?? '';
+  const out = {};
+  BRIEF_TEXT_FIELDS_ADMIN.forEach(k => { out[k] = _v(k); });
+  BRIEF_LINES_FIELDS_ADMIN.forEach(k => { out[k] = _v(k).split('\n').map(x=>x.trim()).filter(Boolean); });
+  BRIEF_CSV_FIELDS_ADMIN.forEach(k => { out[k] = _v(k).split(',').map(x=>x.trim()).filter(Boolean); });
+  return out;
+}
+
+async function briefAdminSave() {
+  if (!_briefSelected) return;
+  const status = document.getElementById('abf-save-status');
+  status.textContent = 'Saving…';
+  try {
+    const r = await fetch(`/api/v1/admin/brief/clients/${encodeURIComponent(_briefSelected)}`, {
+      method: 'PUT',
+      headers: {...authHeaders(), 'Content-Type':'application/json'},
+      body: JSON.stringify(_briefAdminCollect()),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    status.textContent = 'Saved.';
+    // re-render with fresh health
+    briefAdminSelect(encodeURIComponent(_briefSelected));
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
+  }
+}
+
+async function briefAdminIntake() {
+  if (!_briefSelected) return;
+  const status = document.getElementById('abf-intake-status');
+  const url = document.getElementById('abf-intake-url')?.value?.trim() || '';
+  const text = document.getElementById('abf-intake-text')?.value?.trim() || '';
+  if (!url && !text) { status.textContent = 'Provide a URL or text first.'; return; }
+  status.textContent = 'Reading and structuring…';
+  try {
+    const r = await fetch(`/api/v1/admin/brief/clients/${encodeURIComponent(_briefSelected)}/intake`, {
+      method: 'POST',
+      headers: {...authHeaders(), 'Content-Type':'application/json'},
+      body: JSON.stringify({ url: url || null, free_text: text || null, save: false }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    const brief = data.brief || {};
+    const _setA = (id, v) => { const el = document.getElementById('abf-' + id); if (el) el.value = v ?? ''; };
+    BRIEF_TEXT_FIELDS_ADMIN.forEach(k => _setA(k, brief[k] || ''));
+    BRIEF_LINES_FIELDS_ADMIN.forEach(k => _setA(k, Array.isArray(brief[k]) ? brief[k].join('\n') : ''));
+    BRIEF_CSV_FIELDS_ADMIN.forEach(k => _setA(k, Array.isArray(brief[k]) ? brief[k].join(', ') : ''));
+    const warn = (data.warnings || []).join(' · ');
+    status.textContent = 'Draft populated — review and Save.' + (warn ? ' Notes: ' + warn : '');
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
+  }
 }
 
 // ── Admin Closer: client list, brief editor, lead inbox ───────────────────────

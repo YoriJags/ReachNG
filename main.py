@@ -26,7 +26,7 @@ from posthog import Posthog
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
-from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router, legal_review_router, loan_officer_router, debt_collector_router, market_credit_router, product_auth_router, material_check_router, fuel_reprice_router, float_optimizer_router, fx_salary_router, moonlighting_router, salary_erosion_router, fx_lock_router, hr_suite_router, estate_router, portal_estate_router, portal_talent_router, closer_router, closer_public_router
+from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router, legal_review_router, loan_officer_router, debt_collector_router, market_credit_router, product_auth_router, material_check_router, fuel_reprice_router, float_optimizer_router, fx_salary_router, moonlighting_router, salary_erosion_router, fx_lock_router, hr_suite_router, estate_router, portal_estate_router, portal_talent_router, closer_router, closer_public_router, brief_router, brief_public_router
 from api.paystack import router as paystack_router
 from api.fleet_dispatcher import router as fleet_dispatcher_router
 from api.market_os import router as market_os_router
@@ -121,9 +121,12 @@ async def lifespan(app: FastAPI):
     from services.hr_suite.payroll import ensure_payroll_indexes
     from services.estate.rent_roll import ensure_rent_indexes
     from services.closer import ensure_closer_indexes
+    from services.brief import ensure_brief_indexes, seed_default_primers
     ensure_payroll_indexes()
     ensure_rent_indexes()
     ensure_closer_indexes()
+    ensure_brief_indexes()
+    seed_default_primers()
     scheduler = setup_scheduler()
     scheduler.start()
     log.info("scheduler_started", jobs=[job.id for job in scheduler.get_jobs()])
@@ -217,6 +220,8 @@ app.include_router(payroll_router,            **_auth)
 app.include_router(rent_roll_router,          **_auth)
 # Closer admin: brief edits, cross-client lead mgmt — Basic Auth.
 app.include_router(closer_router,             prefix="/api/v1", **_auth)
+app.include_router(brief_router,               prefix="/api/v1", **_auth)
+app.include_router(brief_public_router,        prefix="/api/v1")  # token-gated, no Basic Auth
 # Closer public: token-gated intake (webhook + email stub) + portal reads — no Basic Auth.
 app.include_router(closer_public_router,      prefix="/api/v1")
 app.include_router(dashboard_router, **_auth)

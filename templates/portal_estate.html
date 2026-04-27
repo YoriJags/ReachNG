@@ -123,6 +123,13 @@ tr:last-child td { border-bottom: none; }
   .sidebar { transform: translateX(-100%); }
   .main { margin-left: 0; padding: 16px; }
 }
+.field { display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--muted); }
+.field > span { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:0.06em; }
+.field input, .field textarea, .field select {
+  background: var(--surface2); border:1px solid var(--border2); color:var(--text);
+  padding:8px 10px; border-radius:4px; font-family:inherit; font-size:13px;
+}
+.field input:focus, .field textarea:focus, .field select:focus { outline:1px solid var(--orange); border-color: var(--orange); }
 </style>
 </head>
 <body>
@@ -143,6 +150,9 @@ tr:last-child td { border-bottom: none; }
     <div class="nav-section">Closer</div>
     <div class="nav-item" data-panel="closer" onclick="show('closer',this)">
       <span class="nav-dot"></span> Lead Inbox
+    </div>
+    <div class="nav-item" data-panel="brief" onclick="show('brief',this); loadBrief();">
+      <span class="nav-dot"></span> Business Brief
     </div>
 
     <div class="nav-section">Rent Roll</div>
@@ -554,6 +564,110 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
+    <!-- BUSINESS BRIEF -->
+    <div id="panel-brief" class="panel">
+      <div class="page-title">Business Brief</div>
+      <div class="page-sub">Tell us how to represent you. We never run outreach on a thin brief.</div>
+
+      <div id="brief-health-banner" class="card" style="display:none;border-color:#7a2020;background:#3a1a1a">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="font-size:24px">⚠️</div>
+          <div style="flex:1;min-width:200px">
+            <div style="font-weight:600;color:#f87171;margin-bottom:4px">Outreach paused — brief incomplete</div>
+            <div id="brief-blocker-list" style="font-size:12px;color:#fca5a5"></div>
+          </div>
+          <div id="brief-health-score" style="font-weight:700;font-size:18px;color:#f87171"></div>
+        </div>
+      </div>
+
+      <div id="brief-health-ok" class="card" style="display:none;border-color:rgba(16,185,129,0.4)">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="font-size:24px">✅</div>
+          <div style="flex:1;min-width:200px">
+            <div style="font-weight:600;color:#34d399;margin-bottom:4px">Brief healthy — outreach enabled</div>
+            <div id="brief-missing-soft" style="font-size:12px;color:var(--muted)"></div>
+          </div>
+          <div id="brief-health-score-ok" style="font-weight:700;font-size:18px;color:#34d399"></div>
+        </div>
+      </div>
+
+      <!-- AI-assisted intake -->
+      <div class="card">
+        <div class="card-title">Quick start — let AI draft your brief</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
+          Paste your website URL and/or describe your business in your own words.
+          We'll structure it into a draft brief you can review and edit below.
+        </div>
+        <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <input id="brief-intake-url" placeholder="https://your-website.com (optional)"
+                 style="flex:1;min-width:240px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text)" />
+        </div>
+        <textarea id="brief-intake-text" rows="5"
+                  placeholder="In your own words: who do you serve, what do you sell, what makes you different, what's your typical price range, who's NOT a fit?"
+                  style="width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:inherit;resize:vertical;margin-bottom:8px"></textarea>
+        <button class="btn btn-primary" onclick="briefIntake()">Generate draft from this</button>
+        <div id="brief-intake-status" style="font-size:12px;color:var(--muted);margin-top:8px"></div>
+      </div>
+
+      <!-- Brief editor -->
+      <div class="card">
+        <div class="card-title">Your brief</div>
+        <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+          <label class="field"><span>Trading name</span>
+            <input id="bf-trading_name" /></label>
+          <label class="field"><span>One-line description</span>
+            <input id="bf-one_liner" placeholder="e.g. Boutique luxury rentals across Banana Island and Ikoyi" /></label>
+          <label class="field" style="grid-column:1 / -1"><span>Founder story (optional)</span>
+            <textarea id="bf-founder_story" rows="2"></textarea></label>
+          <label class="field"><span>Geography (comma-separated)</span>
+            <input id="bf-geography" placeholder="Banana Island, Ikoyi, Eko Atlantic" /></label>
+          <label class="field"><span>Languages mix</span>
+            <input id="bf-language_mix" placeholder="english, occasional pidgin" /></label>
+
+          <label class="field" style="grid-column:1 / -1"><span>Ideal client profile (ICP) — required</span>
+            <textarea id="bf-icp" rows="2" placeholder="e.g. expat executives 35-55, dollar earners, family of 4+"></textarea></label>
+          <label class="field" style="grid-column:1 / -1"><span>NOT a fit</span>
+            <textarea id="bf-not_a_fit" rows="2" placeholder="e.g. students, sub-letters, sub-₦40M budgets"></textarea></label>
+
+          <label class="field" style="grid-column:1 / -1"><span>USPs (one per line)</span>
+            <textarea id="bf-usps" rows="3"></textarea></label>
+          <label class="field" style="grid-column:1 / -1"><span>Social proof (one per line)</span>
+            <textarea id="bf-social_proof" rows="2" placeholder="e.g. closed Mr X in 2 weeks; Ms Y referred 3 friends"></textarea></label>
+
+          <label class="field"><span>Tone overrides (blank = vertical default)</span>
+            <input id="bf-tone_overrides" /></label>
+          <label class="field"><span>Signature / sign-off</span>
+            <input id="bf-signature" placeholder="— Mercury Realty • Banana Island" /></label>
+
+          <label class="field" style="grid-column:1 / -1"><span>Never say (one per line)</span>
+            <textarea id="bf-never_say" rows="3"></textarea></label>
+          <label class="field" style="grid-column:1 / -1"><span>Always say (one per line)</span>
+            <textarea id="bf-always_say" rows="2"></textarea></label>
+          <label class="field" style="grid-column:1 / -1"><span>Red flags — disqualify a lead fast (one per line)</span>
+            <textarea id="bf-red_flags" rows="2"></textarea></label>
+
+          <label class="field" style="grid-column:1 / -1"><span>Qualifying questions (one per line)</span>
+            <textarea id="bf-qualifying_questions" rows="4"></textarea></label>
+          <label class="field"><span>Closing action — required</span>
+            <input id="bf-closing_action" placeholder="e.g. book a viewing" /></label>
+          <label class="field"><span>Pricing rules</span>
+            <input id="bf-pricing_rules" placeholder="e.g. 5% off only on 12-month upfront" /></label>
+
+          <label class="field"><span>Brochure URL</span>
+            <input id="bf-brochure_url" /></label>
+          <label class="field"><span>Calendar / booking link</span>
+            <input id="bf-calendar_link" /></label>
+          <label class="field" style="grid-column:1 / -1"><span>Payment terms</span>
+            <textarea id="bf-payment_terms" rows="2"></textarea></label>
+        </div>
+
+        <div class="btn-row" style="margin-top:16px;display:flex;gap:8px;align-items:center">
+          <button class="btn btn-primary" onclick="saveBrief()">Save brief</button>
+          <span id="brief-save-status" style="font-size:12px;color:var(--muted)"></span>
+        </div>
+      </div>
+    </div>
+
     <!-- GETTING STARTED / HELP -->
     <div id="panel-guide" class="panel">
       <div class="page-title">Getting Started</div>
@@ -666,6 +780,110 @@ function show(panel, el) {
   if (panel === 'kyc')         loadKycList();
   if (panel === 'background')  loadBgList();
   if (panel === 'concierge')   loadConciergeProps();
+  if (panel === 'brief')       loadBrief();
+}
+
+// ── Business Brief ──
+const BRIEF_TEXT_FIELDS  = ['trading_name','one_liner','founder_story','icp','not_a_fit','tone_overrides','signature','closing_action','pricing_rules','brochure_url','calendar_link','payment_terms'];
+const BRIEF_LINES_FIELDS = ['usps','social_proof','never_say','always_say','red_flags','qualifying_questions'];
+const BRIEF_CSV_FIELDS   = ['geography','language_mix'];
+
+function _val(id) { return document.getElementById(id)?.value ?? ''; }
+function _setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v ?? ''; }
+function _linesToArr(s) { return (s || '').split('\n').map(x => x.trim()).filter(Boolean); }
+function _arrToLines(a) { return Array.isArray(a) ? a.join('\n') : ''; }
+function _csvToArr(s) { return (s || '').split(',').map(x => x.trim()).filter(Boolean); }
+function _arrToCsv(a) { return Array.isArray(a) ? a.join(', ') : ''; }
+
+async function loadBrief() {
+  try {
+    const r = await fetch(`/api/v1/portal-brief/${TOKEN}`);
+    if (!r.ok) throw new Error('Could not load brief');
+    const data = await r.json();
+    const brief = data.business_brief || {};
+    BRIEF_TEXT_FIELDS.forEach(k => _setVal('bf-' + k, brief[k] || ''));
+    BRIEF_LINES_FIELDS.forEach(k => _setVal('bf-' + k, _arrToLines(brief[k])));
+    BRIEF_CSV_FIELDS.forEach(k => _setVal('bf-' + k, _arrToCsv(brief[k])));
+    renderBriefHealth(data.health);
+  } catch (e) {
+    document.getElementById('brief-save-status').textContent = 'Error loading brief: ' + e.message;
+  }
+}
+
+function renderBriefHealth(health) {
+  const banner   = document.getElementById('brief-health-banner');
+  const ok       = document.getElementById('brief-health-ok');
+  const score    = health?.score ?? 0;
+  const max      = health?.max ?? 10;
+  const blockers = health?.blockers || [];
+  const missing  = health?.missing || [];
+
+  if (blockers.length) {
+    banner.style.display = '';
+    ok.style.display = 'none';
+    document.getElementById('brief-blocker-list').textContent =
+      'Missing: ' + blockers.join(', ') + '. Outreach will not run until these are filled.';
+    document.getElementById('brief-health-score').textContent = score + '/' + max;
+  } else {
+    banner.style.display = 'none';
+    ok.style.display = '';
+    document.getElementById('brief-missing-soft').textContent =
+      missing.length ? 'Optional fields still empty: ' + missing.join(', ') : 'All recommended fields filled.';
+    document.getElementById('brief-health-score-ok').textContent = score + '/' + max;
+  }
+}
+
+function _collectBrief() {
+  const out = {};
+  BRIEF_TEXT_FIELDS.forEach(k => { out[k] = _val('bf-' + k); });
+  BRIEF_LINES_FIELDS.forEach(k => { out[k] = _linesToArr(_val('bf-' + k)); });
+  BRIEF_CSV_FIELDS.forEach(k => { out[k] = _csvToArr(_val('bf-' + k)); });
+  return out;
+}
+
+async function saveBrief() {
+  const status = document.getElementById('brief-save-status');
+  status.textContent = 'Saving…';
+  try {
+    const r = await fetch(`/api/v1/portal-brief/${TOKEN}`, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(_collectBrief()),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    renderBriefHealth(data.health);
+    status.textContent = 'Saved.';
+    setTimeout(() => status.textContent = '', 3000);
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
+  }
+}
+
+async function briefIntake() {
+  const status = document.getElementById('brief-intake-status');
+  const url = _val('brief-intake-url').trim();
+  const text = _val('brief-intake-text').trim();
+  if (!url && !text) { status.textContent = 'Provide a URL or some text first.'; return; }
+
+  status.textContent = 'Reading and structuring (10-30 seconds)…';
+  try {
+    const r = await fetch(`/api/v1/portal-brief/${TOKEN}/intake`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ url: url || null, free_text: text || null, save: false }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    const brief = data.brief || {};
+    BRIEF_TEXT_FIELDS.forEach(k => _setVal('bf-' + k, brief[k] || ''));
+    BRIEF_LINES_FIELDS.forEach(k => _setVal('bf-' + k, _arrToLines(brief[k])));
+    BRIEF_CSV_FIELDS.forEach(k => _setVal('bf-' + k, _arrToCsv(brief[k])));
+    const warn = (data.warnings || []).join(' · ');
+    status.textContent = 'Draft populated below — review and click Save brief.' + (warn ? ' Notes: ' + warn : '');
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
+  }
 }
 
 // ── Closer Inbox ──
