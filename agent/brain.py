@@ -46,6 +46,7 @@ def generate_outreach_message(
     Returns {"message": str} for WhatsApp, or {"subject": str, "message": str} for email.
     """
     system = _load_prompt("system.txt")
+    self_brief = _load_prompt("self_brief.txt")
     vertical_context = _load_prompt(f"{vertical}.txt")
 
     location_hint = ""
@@ -101,10 +102,15 @@ No explanations. No preamble. Just the message.
 """
 
     client = _get_client()
+    # Layer order: ReachNG self-brief (voice) → vertical pitch primer (what we
+    # know about their industry) → base system prompt. All three get sent so
+    # Claude has a full picture before drafting.
+    layered_system = f"{self_brief}\n\n{vertical_context}\n\n{system}" if self_brief else f"{system}\n\n{vertical_context}"
+
     response = client.messages.create(
-        model="claude-sonnet-4-6",
+        model="claude-haiku-4-5-20251001",
         max_tokens=400,
-        system=f"{system}\n\n{vertical_context}",
+        system=layered_system,
         messages=[{"role": "user", "content": user_prompt}],
     )
 

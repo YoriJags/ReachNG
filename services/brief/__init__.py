@@ -24,6 +24,8 @@ from services.brief.store import (
     list_primers,
     brief_health,
     ensure_brief_indexes,
+    list_brief_history,
+    restore_brief_version,
 )
 from services.brief.context import assemble_context
 from services.brief.primers import seed_default_primers
@@ -40,4 +42,6 @@ __all__ = [
     "brief_health",
     "seed_default_primers",
     "ensure_brief_indexes",
+    "list_brief_history",
+    "restore_brief_version",
 ]

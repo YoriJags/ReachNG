@@ -98,6 +98,10 @@ def _clients():
 
 def ensure_brief_indexes() -> None:
     _primers().create_index([("vertical", ASCENDING)], unique=True)
+    from pymongo import DESCENDING
+    get_db()["brief_history"].create_index(
+        [("client_id", ASCENDING), ("saved_at", DESCENDING)]
+    )
 
 
 # ─── Vertical primer CRUD ────────────────────────────────────────────────────
@@ -152,15 +156,99 @@ def update_brief(
     brief: BusinessBrief,
     client_id: Optional[str] = None,
     client_name: Optional[str] = None,
+    saved_by: Optional[str] = None,
 ) -> dict:
+    """Save brief + snapshot the previous version into brief_history for rollback."""
     now = datetime.now(timezone.utc)
     payload = brief.model_dump()
     payload["updated_at"] = now
+
+    # Snapshot the current brief BEFORE overwriting — only when there's
+    # something to snapshot. Limits the history collection to meaningful diffs.
+    existing = _clients().find_one(
+        _client_query(client_id, client_name),
+        {"_id": 1, "name": 1, "business_brief": 1},
+    )
+    if existing and existing.get("business_brief"):
+        try:
+            get_db()["brief_history"].insert_one({
+                "client_id": existing["_id"],
+                "client_name": existing.get("name"),
+                "snapshot": existing["business_brief"],
+                "saved_at": now,
+                "saved_by": saved_by or "unknown",
+                "reason": "pre_update",
+            })
+        except Exception:
+            pass  # never block the live save on a history failure
+
     res = _clients().update_one(
         _client_query(client_id, client_name),
         {"$set": {"business_brief": payload, "updated_at": now}},
     )
     return {"matched": res.matched_count, "modified": res.modified_count}
+
+
+# ─── Brief history (rollback) ────────────────────────────────────────────────
+
+def list_brief_history(
+    *, client_id: Optional[str] = None, client_name: Optional[str] = None, limit: int = 20,
+) -> list[dict]:
+    """Most-recent-first list of historical brief snapshots for a client."""
+    client = _clients().find_one(_client_query(client_id, client_name), {"_id": 1})
+    if not client:
+        return []
+    rows = list(
+        get_db()["brief_history"]
+        .find({"client_id": client["_id"]})
+        .sort("saved_at", -1)
+        .limit(min(limit, 100))
+    )
+    out = []
+    for r in rows:
+        out.append({
+            "id": str(r["_id"]),
+            "saved_at": r["saved_at"].isoformat() if hasattr(r.get("saved_at"), "isoformat") else r.get("saved_at"),
+            "saved_by": r.get("saved_by"),
+            "reason": r.get("reason"),
+            "preview": _brief_preview(r.get("snapshot") or {}),
+        })
+    return out
+
+
+def restore_brief_version(
+    *, version_id: str, client_id: Optional[str] = None, client_name: Optional[str] = None,
+    saved_by: Optional[str] = None,
+) -> Optional[dict]:
+    """Restore a prior snapshot. Itself snapshots the current live brief first
+    so the rollback is reversible."""
+    snapshot_doc = get_db()["brief_history"].find_one({"_id": ObjectId(version_id)})
+    if not snapshot_doc:
+        return None
+    snap = snapshot_doc.get("snapshot") or {}
+    try:
+        brief = BusinessBrief(**{k: v for k, v in snap.items() if k in BusinessBrief.model_fields})
+    except Exception:
+        return None
+    return update_brief(
+        brief=brief,
+        client_id=client_id,
+        client_name=client_name,
+        saved_by=(saved_by or "rollback"),
+    )
+
+
+def _brief_preview(brief: dict) -> dict:
+    """Compact summary used in the history list — avoids shipping the full
+    brief on every history row."""
+    return {
+        "trading_name": (brief.get("trading_name") or "").strip()[:60],
+        "one_liner":    (brief.get("one_liner") or "").strip()[:120],
+        "icp":          (brief.get("icp") or "").strip()[:120],
+        "closing_action": (brief.get("closing_action") or "").strip()[:60],
+        "products_count": len(brief.get("products") or []),
+        "usps_count":     len(brief.get("usps") or []),
+    }
 
 
 # ─── Completeness gate ───────────────────────────────────────────────────────

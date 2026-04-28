@@ -7481,10 +7481,12 @@ function briefAdminRender(data) {
       ${fieldHtml('payment_terms','Payment terms',true)}
     </div>
 
-    <div style="margin-top:14px;display:flex;gap:8px;align-items:center;">
+    <div style="margin-top:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <button class="btn btn-approve" onclick="briefAdminSave()">Save brief</button>
+      <button class="btn" onclick="briefAdminToggleHistory()" style="background:transparent;color:#9aa4b2;border:1px solid #2a3340;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer">History</button>
       <span id="abf-save-status" style="font-size:12px;color:#888;"></span>
     </div>
+    <div id="abf-history" style="display:none;margin-top:12px;background:#0a0e13;border:1px solid #2a3340;border-radius:8px;padding:12px"></div>
   `;
 
   // populate
@@ -7501,6 +7503,52 @@ function _briefAdminCollect() {
   BRIEF_LINES_FIELDS_ADMIN.forEach(k => { out[k] = _v(k).split('\n').map(x=>x.trim()).filter(Boolean); });
   BRIEF_CSV_FIELDS_ADMIN.forEach(k => { out[k] = _v(k).split(',').map(x=>x.trim()).filter(Boolean); });
   return out;
+}
+
+async function briefAdminToggleHistory() {
+  const wrap = document.getElementById('abf-history');
+  if (!wrap || !_briefSelected) return;
+  if (wrap.style.display !== 'none') { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  wrap.innerHTML = '<div style="font-size:12px;color:#666">Loading history…</div>';
+  try {
+    const r = await fetch(`/api/v1/admin/brief/clients/${encodeURIComponent(_briefSelected)}/history`, {headers: authHeaders()});
+    if (!r.ok) throw new Error(await r.text());
+    const rows = await r.json();
+    if (!rows.length) {
+      wrap.innerHTML = '<div style="font-size:12px;color:#666">No prior versions yet — saves create snapshots automatically.</div>';
+      return;
+    }
+    wrap.innerHTML = rows.map(v => {
+      const when = v.saved_at ? new Date(v.saved_at).toLocaleString() : '';
+      const p = v.preview || {};
+      return `<div style="border-bottom:1px solid #2a3340;padding:8px 0;display:flex;gap:12px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1;min-width:240px">
+          <div style="font-size:12px;color:#d8eaf8;font-weight:600">${p.trading_name || '—'}</div>
+          <div style="font-size:11px;color:#888">${when} · ${v.saved_by || 'unknown'} · ${v.reason || ''}</div>
+          <div style="font-size:11px;color:#666;margin-top:4px">ICP: ${p.icp || '—'}</div>
+          <div style="font-size:11px;color:#666">Closing: ${p.closing_action || '—'} · ${p.products_count || 0} products · ${p.usps_count || 0} USPs</div>
+        </div>
+        <button onclick="briefAdminRestore('${v.id}')" style="background:#1e2530;color:#d8eaf8;border:1px solid #2a3340;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer">Restore</button>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    wrap.innerHTML = `<div style="color:#ef4444;font-size:12px">${e.message}</div>`;
+  }
+}
+
+async function briefAdminRestore(versionId) {
+  if (!_briefSelected) return;
+  if (!confirm('Restore this version? Your current brief will be snapshotted first so you can roll back.')) return;
+  try {
+    const r = await fetch(`/api/v1/admin/brief/clients/${encodeURIComponent(_briefSelected)}/restore/${versionId}`, {
+      method: 'POST', headers: authHeaders(),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    briefAdminSelect(encodeURIComponent(_briefSelected));
+  } catch (e) {
+    alert('Restore failed: ' + e.message);
+  }
 }
 
 async function briefAdminSave() {

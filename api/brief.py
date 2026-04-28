@@ -33,6 +33,8 @@ from services.brief import (
     upsert_primer,
     list_primers,
     brief_health,
+    list_brief_history,
+    restore_brief_version,
 )
 from services.brief.intake import assist_intake
 
@@ -127,6 +129,23 @@ async def admin_put_client_brief(name: str, brief: BusinessBrief):
 @router.get("/clients/{name}/health")
 async def admin_health(name: str):
     return brief_health(client_name=name)
+
+
+@router.get("/clients/{name}/history")
+async def admin_brief_history(name: str, limit: int = 20):
+    """List prior versions of this client's brief, newest first."""
+    return list_brief_history(client_name=name, limit=limit)
+
+
+@router.post("/clients/{name}/restore/{version_id}")
+async def admin_brief_restore(name: str, version_id: str):
+    """Restore a historical brief version. The current live brief is itself
+    snapshotted first, so the rollback is reversible."""
+    res = restore_brief_version(version_id=version_id, client_name=name, saved_by="admin")
+    if not res:
+        raise HTTPException(404, "Version not found or invalid snapshot")
+    health = brief_health(client_name=name)
+    return {"success": True, **res, "health": health}
 
 
 @router.post("/clients/{name}/intake")

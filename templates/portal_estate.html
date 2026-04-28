@@ -1539,27 +1539,89 @@ async function openCloserLead(leadId) {
   try {
     const r = await fetch(`/api/v1/closer/portal/${TOKEN}/leads/${leadId}`);
     const l = await r.json();
-    const thread = (l.thread || []).map(m => {
+    const safe = (s) => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const messages = l.thread || [];
+
+    // Chat-bubble style — inbound on the left, outbound on the right, notes
+    // centred. Newest at the bottom like a real WhatsApp thread.
+    const bubbles = messages.map(m => {
       const t = m.at ? new Date(m.at).toLocaleString() : '';
-      const dir = m.direction === 'out' ? 'Out' : m.direction === 'note' ? 'Note' : 'In';
-      const color = m.direction === 'out' ? 'var(--green)' : m.direction === 'note' ? 'var(--gold)' : 'var(--orange)';
-      return `<div style="border-left:2px solid ${color};padding:8px 12px;margin-bottom:8px;background:var(--surface2);border-radius:4px">
-        <div style="font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase">${dir} · ${m.channel || ''} · ${t}</div>
-        <div style="font-size:13px;margin-top:4px;white-space:pre-wrap">${(m.body || '').replace(/</g, '&lt;')}</div>
-      </div>`;
+      const body = safe(m.body || '');
+      if (m.direction === 'note') {
+        return `
+          <div style="display:flex;justify-content:center;margin:10px 0">
+            <div style="max-width:80%;background:rgba(240,165,0,0.08);border:1px dashed rgba(240,165,0,0.4);color:var(--gold);font-size:12px;padding:8px 12px;border-radius:8px;font-style:italic;text-align:center">
+              ${body}
+              <div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.06em;text-transform:uppercase;font-style:normal">Note · ${m.author || 'system'} · ${t}</div>
+            </div>
+          </div>`;
+      }
+      const isOut = m.direction === 'out';
+      const align = isOut ? 'flex-end' : 'flex-start';
+      const bg = isOut ? 'rgba(0,229,160,0.10)'  : 'var(--surface2)';
+      const border = isOut ? 'rgba(0,229,160,0.35)' : 'var(--border2)';
+      const fg = isOut ? 'var(--text)' : 'var(--text)';
+      const channel = (m.channel || '').toUpperCase();
+      return `
+        <div style="display:flex;justify-content:${align};margin:6px 0">
+          <div style="max-width:78%;background:${bg};border:1px solid ${border};color:${fg};padding:10px 12px;border-radius:10px;border-${isOut ? 'top-right' : 'top-left'}-radius:2px">
+            <div style="font-size:13px;white-space:pre-wrap;word-break:break-word">${body}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:6px;letter-spacing:0.06em;text-transform:uppercase">${isOut ? 'You' : (l.contact_name || 'Lead')} · ${channel} · ${t}</div>
+          </div>
+        </div>`;
     }).join('') || '<p style="color:var(--muted);font-size:12px">No messages yet.</p>';
+
     body.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
-        <div><div class="kpi-lbl">Contact</div><div>${l.contact_name || l.contact_phone || l.contact_email || '—'}</div></div>
-        <div><div class="kpi-lbl">Phone</div><div style="color:var(--muted)">${l.contact_phone || '—'}</div></div>
-        <div><div class="kpi-lbl">Email</div><div style="color:var(--muted)">${l.contact_email || '—'}</div></div>
+        <div><div class="kpi-lbl">Contact</div><div>${safe(l.contact_name || l.contact_phone || l.contact_email || '—')}</div></div>
+        <div><div class="kpi-lbl">Phone</div><div style="color:var(--muted)">${safe(l.contact_phone || '—')}</div></div>
+        <div><div class="kpi-lbl">Email</div><div style="color:var(--muted)">${safe(l.contact_email || '—')}</div></div>
         <div><div class="kpi-lbl">Stage</div><div>${closerBadge(l.stage)}</div></div>
       </div>
-      <div class="card-title" style="margin-bottom:8px">Thread</div>
-      ${thread}
+
+      ${l.inquiry_text ? `
+        <div style="background:rgba(255,92,0,0.06);border-left:3px solid var(--orange);padding:10px 14px;border-radius:4px;margin-bottom:14px">
+          <div style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange);margin-bottom:4px">Initial inquiry</div>
+          <div style="font-size:13px;color:var(--text);white-space:pre-wrap">${safe(l.inquiry_text)}</div>
+        </div>` : ''}
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div class="card-title" style="margin:0">Conversation</div>
+        <button class="btn btn-outline btn-sm" onclick="closerDraftNext('${leadId}')">Draft next reply</button>
+      </div>
+      <div id="closer-thread-${leadId}" style="background:#0a0e13;border:1px solid var(--border2);border-radius:8px;padding:14px;max-height:60vh;overflow-y:auto">${bubbles}</div>
+      <div id="closer-draft-status-${leadId}" style="font-size:11px;color:var(--muted);margin-top:8px"></div>
     `;
+    // auto-scroll to newest
+    const thread = document.getElementById(`closer-thread-${leadId}`);
+    if (thread) thread.scrollTop = thread.scrollHeight;
   } catch (e) {
     body.innerHTML = '<p style="color:#f44">Error loading lead.</p>';
+  }
+}
+
+// "Draft next reply" — admin-only endpoint, but the portal can call it via
+// the same session if the user is also signed into admin. If 401, surface the
+// fact that this is an owner-only action.
+async function closerDraftNext(leadId) {
+  const status = document.getElementById(`closer-draft-status-${leadId}`);
+  if (!status) return;
+  status.textContent = 'Asking AI to draft the next reply…';
+  try {
+    const r = await fetch(`/api/v1/closer/leads/by-id/${leadId}/draft-next`, { method: 'POST' });
+    if (r.status === 401) {
+      status.textContent = 'Drafts auto-fire on every inbound reply. To re-trigger manually, ask your account manager.';
+      return;
+    }
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    if (!data.success) {
+      status.textContent = data.reason || 'No draft generated.';
+      return;
+    }
+    status.innerHTML = `<span style="color:#34d399">Draft queued.</span> Check the Drafts to approve tab to review and send.`;
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
   }
 }
 
