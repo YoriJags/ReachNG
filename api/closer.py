@@ -218,6 +218,20 @@ async def patch_stage(lead_id: str, payload: StagePayload):
     return {"success": True, "lead_id": lead_id, "stage": payload.stage}
 
 
+@router.post("/leads/by-id/{lead_id}/draft-next")
+async def draft_next_for_lead(lead_id: str):
+    """Manually trigger the auto-drafter on this lead. Queues to HITL."""
+    try:
+        ObjectId(lead_id)
+    except Exception:
+        raise HTTPException(400, "Invalid lead_id")
+    from services.closer import draft_next_move
+    result = draft_next_move(lead_id)
+    if not result:
+        return {"success": False, "reason": "Drafter declined — lead may be lost/booked, brief incomplete, or no inbound to react to."}
+    return {"success": True, **result}
+
+
 @router.post("/leads/by-id/{lead_id}/note")
 async def add_note(lead_id: str, payload: NotePayload):
     try:

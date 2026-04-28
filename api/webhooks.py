@@ -139,14 +139,21 @@ async def _handle_message(sender_phone: str, message_body: str, source: str | No
                 client_id = str(closer_client["_id"])
                 existing = find_lead_by_contact(client_id, phone=sender_phone)
                 if existing:
+                    lead_id = str(existing["_id"])
                     append_thread_message(
-                        str(existing["_id"]),
+                        lead_id,
                         direction="in",
                         channel="whatsapp",
                         body=message_body,
                     )
                     log_doc["linked_product"] = "closer"
-                    log_doc["linked_lead_id"] = str(existing["_id"])
+                    log_doc["linked_lead_id"] = lead_id
+                    # Auto-draft the next move — queues to HITL, never auto-sends.
+                    try:
+                        from services.closer.brain import draft_next_move
+                        draft_next_move(lead_id)
+                    except Exception as _e:
+                        log.warning("closer_autodraft_failed", lead=lead_id, error=str(_e))
                 else:
                     lead = create_lead(
                         client_id=client_id,
@@ -159,6 +166,12 @@ async def _handle_message(sender_phone: str, message_body: str, source: str | No
                     )
                     log_doc["linked_product"] = "closer"
                     log_doc["linked_lead_id"] = lead["id"]
+                    # First-touch auto-draft on the new lead — owner approves to send.
+                    try:
+                        from services.closer.brain import draft_next_move
+                        draft_next_move(lead["id"])
+                    except Exception as _e:
+                        log.warning("closer_autodraft_first_failed", lead=lead["id"], error=str(_e))
                 try:
                     _db()["inbound_messages"].insert_one(log_doc)
                 except Exception:

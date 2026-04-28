@@ -97,6 +97,21 @@ _SAMPLE_CSV_BY_VERTICAL: dict[str, str] = {
 }
 
 
+def _parse_overrides(raw: Optional[str]) -> Optional[dict]:
+    """Decode the column_overrides_json form field into a clean dict.
+    Returns None if blank or unparseable — the parser then relies on auto-detect."""
+    import json
+    if not raw or not raw.strip():
+        return None
+    try:
+        decoded = json.loads(raw)
+        if not isinstance(decoded, dict):
+            return None
+        return {k: v for k, v in decoded.items() if isinstance(k, str) and isinstance(v, str)}
+    except Exception:
+        return None
+
+
 def _enforce_byo_enabled(client_doc: dict) -> None:
     """Block uploads/runs for verticals where BYO Leads is disabled.
     Per-client override via `byo_leads_enabled=False` also respected."""
@@ -507,11 +522,16 @@ async def portal_leads_status(token: str):
 
 
 @public_router.post("/{token}/preview")
-async def portal_leads_preview(token: str, file: UploadFile = File(...)):
+async def portal_leads_preview(
+    token: str,
+    file: UploadFile = File(...),
+    column_overrides_json: Optional[str] = Form(default=None),
+):
     """Pre-import preview — shows the user what would happen without committing.
 
-    Returns valid/dup/invalid counts + a sample of normalised rows so the user
-    confirms before posting to /upload. No DB writes happen here.
+    Optional column_overrides_json lets the user pin specific CSV headers to
+    specific fields when auto-detect misses (e.g. {"phone": "GSM"}).
+    No DB writes happen here.
     """
     client = _client_by_token(token)
     if not file.filename or not file.filename.endswith(".csv"):
@@ -521,7 +541,8 @@ async def portal_leads_preview(token: str, file: UploadFile = File(...)):
         raise HTTPException(413, f"CSV too large. Max {_MAX_CSV_BYTES // 1024}KB.")
     if not content:
         raise HTTPException(400, "Empty file")
-    return preview_csv(content, client_name=client.get("name"))
+    overrides = _parse_overrides(column_overrides_json)
+    return preview_csv(content, client_name=client.get("name"), column_overrides=overrides)
 
 
 @public_router.post("/{token}/upload")
@@ -531,8 +552,13 @@ async def portal_leads_upload(
     file: UploadFile = File(...),
     campaign_tag: Optional[str] = Form(default=None),
     consent_attestation: bool = Form(default=False),
+    column_overrides_json: Optional[str] = Form(default=None),
 ):
-    """Client-side CSV upload from the portal. Same compliance rails as admin."""
+    """Client-side CSV upload from the portal. Same compliance rails as admin.
+
+    `column_overrides_json` is the user's pinned column mapping from the
+    preview UI — applied on top of the parser's auto-detect.
+    """
     client = _client_by_token(token)
 
     if not consent_attestation:
@@ -551,12 +577,14 @@ async def portal_leads_upload(
         raise HTTPException(400, "Empty file")
 
     vertical = client.get("vertical") or "general"
+    overrides = _parse_overrides(column_overrides_json)
     try:
         stats = parse_and_import_csv(
             csv_bytes=content,
             client_name=client.get("name"),
             vertical=vertical,
             campaign_tag=campaign_tag,
+            column_overrides=overrides,
         )
     except ValueError as exc:
         raise HTTPException(422, str(exc))

@@ -897,6 +897,10 @@ function leadsFilePicked(file) {
     return;
   }
   _leadsFile = file;
+  // New file = clear any cached column mapping from a previous file.
+  _leadsHeaders = [];
+  _leadsColumnMap = {};
+  document.getElementById('leads-preview-result').style.display = 'none';
   document.getElementById('leads-file-label').textContent = `${file.name} · ${(file.size/1024).toFixed(1)} KB`;
 }
 
@@ -941,6 +945,11 @@ async function loadSuppression() {
   }
 }
 
+// Persisted across preview/upload so the user's manual mapping survives
+// either action. Cleared when a new file is picked.
+let _leadsHeaders = [];
+let _leadsColumnMap = {};
+
 async function leadsPreview() {
   const status = document.getElementById('leads-upload-status');
   const result = document.getElementById('leads-preview-result');
@@ -950,18 +959,29 @@ async function leadsPreview() {
 
   const fd = new FormData();
   fd.append('file', _leadsFile);
+  if (Object.keys(_leadsColumnMap).length) {
+    fd.append('column_overrides_json', JSON.stringify(_leadsColumnMap));
+  }
   try {
     const r = await fetch(`/api/v1/portal-leads/${TOKEN}/preview`, { method:'POST', body: fd });
     if (!r.ok) throw new Error(await r.text());
     const p = await r.json();
     status.textContent = '';
+    _leadsHeaders = p.headers || [];
+    // Seed override map from auto-detected mapping so dropdowns reflect what the
+    // parser will actually use; user can change any of them.
+    _leadsColumnMap = Object.assign({}, p.column_map || {});
+
+    result.style.display = '';
     if (!p.ok) {
-      result.style.display = '';
       result.style.borderColor = '#7a2020';
-      result.innerHTML = `<span style="color:#f87171">${p.error}</span>`;
+      result.innerHTML = `
+        <div style="color:#f87171;margin-bottom:8px">${p.error}</div>
+        ${renderColumnMapperUI()}
+      `;
+      attachColumnMapperHandlers();
       return;
     }
-    result.style.display = '';
     result.style.borderColor = 'var(--border2)';
     const sample = (p.sample || []).map(s =>
       `<div style="display:flex;gap:12px;padding:4px 0;border-top:1px dashed #2a3340;font-size:11px;color:var(--muted)">
@@ -976,13 +996,55 @@ async function leadsPreview() {
         ${p.total_rows} rows scanned
       </div>
       ${sample ? `<div style="margin-top:8px"><div style="font-size:10px;letter-spacing:0.08em;color:#666;text-transform:uppercase;margin-bottom:4px">Sample (first 5)</div>${sample}</div>` : ''}
-      <div style="margin-top:10px;color:#9aa4b2;font-size:11px">If this looks right, click <strong>Upload &amp; import</strong>.</div>
+      ${renderColumnMapperUI()}
+      <div style="margin-top:10px;color:#9aa4b2;font-size:11px">If this looks right, click <strong>Upload &amp; import</strong>. Or change a mapping and click Preview again.</div>
     `;
+    attachColumnMapperHandlers();
   } catch (e) {
     result.style.display = '';
     result.style.borderColor = '#7a2020';
     result.innerHTML = `<span style="color:#f87171">Error: ${e.message}</span>`;
   }
+}
+
+function renderColumnMapperUI() {
+  if (!_leadsHeaders.length) return '';
+  const fields = [
+    {key:'phone',  label:'Phone (required)'},
+    {key:'name',   label:'Name'},
+    {key:'email',  label:'Email'},
+    {key:'tags',   label:'Tags'},
+    {key:'notes',  label:'Notes'},
+  ];
+  const opts = (selected) =>
+    `<option value="">— ignore —</option>` +
+    _leadsHeaders.map(h => `<option value="${h}" ${h===selected?'selected':''}>${h}</option>`).join('');
+  const rows = fields.map(f =>
+    `<div style="display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted)">
+       <label style="flex:0 0 130px">${f.label}</label>
+       <select data-mapfield="${f.key}" style="flex:1;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:4px 8px;border-radius:4px;font-size:12px">
+         ${opts(_leadsColumnMap[f.key] || '')}
+       </select>
+     </div>`
+  ).join('');
+  return `
+    <details style="margin-top:12px;border-top:1px dashed #2a3340;padding-top:10px" ${_leadsHeaders.length && !_leadsColumnMap.phone ? 'open' : ''}>
+      <summary style="font-size:11px;color:#9aa4b2;cursor:pointer;letter-spacing:0.06em;text-transform:uppercase">Column mapping</summary>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">${rows}</div>
+      <div style="font-size:11px;color:#666;margin-top:6px">Auto-detected; change any if a column needs a different mapping. Click Preview again to refresh.</div>
+    </details>
+  `;
+}
+
+function attachColumnMapperHandlers() {
+  document.querySelectorAll('[data-mapfield]').forEach(sel => {
+    sel.addEventListener('change', e => {
+      const f = e.target.dataset.mapfield;
+      const v = e.target.value;
+      if (v) _leadsColumnMap[f] = v;
+      else delete _leadsColumnMap[f];
+    });
+  });
 }
 
 async function leadsTestSend() {
@@ -1114,6 +1176,9 @@ async function leadsUpload() {
   fd.append('consent_attestation', 'true');
   const tag = document.getElementById('leads-tag').value.trim();
   if (tag) fd.append('campaign_tag', tag);
+  if (Object.keys(_leadsColumnMap).length) {
+    fd.append('column_overrides_json', JSON.stringify(_leadsColumnMap));
+  }
 
   try {
     const r = await fetch(`/api/v1/portal-leads/${TOKEN}/upload`, { method:'POST', body: fd });
@@ -1123,9 +1188,12 @@ async function leadsUpload() {
       `<span style="color:#34d399">Imported ${data.imported}.</span>
        Duplicates: ${data.skipped_duplicate} · Opted-out skipped: ${data.skipped_opted_out} · Invalid phone: ${data.skipped_no_contact} · Errors: ${data.errors}.`;
     _leadsFile = null;
+    _leadsHeaders = [];
+    _leadsColumnMap = {};
     document.getElementById('leads-file-label').textContent = 'Drop a .csv here, or click to browse';
     document.getElementById('leads-file').value = '';
     document.getElementById('leads-consent').checked = false;
+    document.getElementById('leads-preview-result').style.display = 'none';
     loadLeadLists();
   } catch (e) {
     status.innerHTML = `<span style="color:#f87171">Error: ${e.message}</span>`;

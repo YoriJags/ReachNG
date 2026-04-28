@@ -39,9 +39,15 @@ def parse_and_import_csv(
     client_name: str,
     vertical: str,
     campaign_tag: Optional[str] = None,
+    column_overrides: Optional[dict] = None,
 ) -> dict:
     """
     Parse a CSV file and upsert contacts into MongoDB b2c_contacts collection.
+
+    `column_overrides` lets the caller pin specific columns to specific fields
+    when auto-detect fails (e.g. headers like "GSM", "Cell", "Mobile Number").
+    Shape: {"phone": "GSM", "name": "Customer Name", "email": "Mail"}.
+    Overrides win over auto-detect; auto-detect fills any field not overridden.
 
     Returns:
         {
@@ -59,7 +65,7 @@ def parse_and_import_csv(
     if not reader.fieldnames:
         raise ValueError("CSV has no headers")
 
-    col_map = _map_columns(reader.fieldnames)
+    col_map = _merge_column_map(_map_columns(reader.fieldnames), column_overrides, list(reader.fieldnames))
     if not col_map.get("phone"):
         raise ValueError("CSV must have a phone/whatsapp column. Found: " + str(list(reader.fieldnames)))
 
@@ -104,7 +110,11 @@ def parse_and_import_csv(
     return stats
 
 
-def preview_csv(csv_bytes: bytes, client_name: Optional[str] = None) -> dict:
+def preview_csv(
+    csv_bytes: bytes,
+    client_name: Optional[str] = None,
+    column_overrides: Optional[dict] = None,
+) -> dict:
     """Parse a CSV without writing to Mongo. Returns the same stats shape as
     parse_and_import_csv plus a small sample of how rows would be normalised.
 
@@ -129,11 +139,11 @@ def preview_csv(csv_bytes: bytes, client_name: Optional[str] = None) -> dict:
             "column_map": {},
         }
 
-    col_map = _map_columns(reader.fieldnames)
+    col_map = _merge_column_map(_map_columns(reader.fieldnames), column_overrides, list(reader.fieldnames))
     if not col_map.get("phone"):
         return {
             "ok": False,
-            "error": "CSV must have a phone/whatsapp/mobile/number column",
+            "error": "CSV must have a phone/whatsapp/mobile/number column. Use the column-mapper below to pick one manually.",
             "total_rows": 0,
             "valid": 0,
             "duplicates_in_file": 0,
@@ -253,6 +263,36 @@ def ensure_b2c_indexes():
 
 def _get_b2c_contacts():
     return get_db()["b2c_contacts"]
+
+
+_OVERRIDABLE_FIELDS = {"phone", "email", "name", "first_name", "last_name", "notes", "tags"}
+
+
+def _merge_column_map(
+    auto_map: dict,
+    overrides: Optional[dict],
+    fieldnames: list[str],
+) -> dict:
+    """Merge user-supplied column overrides on top of auto-detected mapping.
+
+    Overrides win where set. Empty / None override values are ignored.
+    Override values must match an actual CSV header (case-sensitive) — anything
+    that doesn't match is dropped silently rather than risk a key error.
+    """
+    if not overrides:
+        return auto_map
+    fieldset = set(fieldnames)
+    out = dict(auto_map)
+    for field, header in (overrides or {}).items():
+        if field not in _OVERRIDABLE_FIELDS:
+            continue
+        header = (header or "").strip()
+        if not header:
+            continue
+        if header not in fieldset:
+            continue
+        out[field] = header
+    return out
 
 
 def _map_columns(fieldnames: list) -> dict:

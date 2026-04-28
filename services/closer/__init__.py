@@ -11,6 +11,7 @@ from .store import (
     CloserBrief,
     VALID_STAGES,
 )
+from .brain import draft_next_move
 
 __all__ = [
     "ensure_closer_indexes",
@@ -21,6 +22,7 @@ __all__ = [
     "append_thread_message",
     "update_stage",
     "update_brief",
+    "draft_next_move",
     "CloserLead",
     "CloserBrief",
     "VALID_STAGES",
