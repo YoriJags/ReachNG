@@ -25,7 +25,7 @@ from bson import ObjectId
 from database import get_db
 from tools.csv_import import (
     parse_and_import_csv, get_b2c_contacts_for_campaign,
-    mark_b2c_opted_out, ensure_b2c_indexes,
+    mark_b2c_opted_out, ensure_b2c_indexes, preview_csv,
 )
 from campaigns.b2c import B2CCampaign
 import structlog
@@ -452,6 +452,24 @@ async def portal_leads_status(token: str):
     }
 
 
+@public_router.post("/{token}/preview")
+async def portal_leads_preview(token: str, file: UploadFile = File(...)):
+    """Pre-import preview — shows the user what would happen without committing.
+
+    Returns valid/dup/invalid counts + a sample of normalised rows so the user
+    confirms before posting to /upload. No DB writes happen here.
+    """
+    client = _client_by_token(token)
+    if not file.filename or not file.filename.endswith(".csv"):
+        raise HTTPException(400, "File must be a .csv")
+    content = await file.read()
+    if len(content) > _MAX_CSV_BYTES:
+        raise HTTPException(413, f"CSV too large. Max {_MAX_CSV_BYTES // 1024}KB.")
+    if not content:
+        raise HTTPException(400, "Empty file")
+    return preview_csv(content, client_name=client.get("name"))
+
+
 @public_router.post("/{token}/upload")
 async def portal_leads_upload(
     token: str,
@@ -571,6 +589,90 @@ async def portal_leads_imports(token: str, limit: int = 30):
         if hasattr(r.get("created_at"), "isoformat"):
             r["created_at"] = r["created_at"].isoformat()
     return rows
+
+
+@public_router.get("/{token}/suppression")
+async def portal_leads_suppression(token: str):
+    """Suppression-list summary for the portal.
+
+    Returns counts only — never names/phones — to satisfy NDPR. The owner sees
+    'X contacts have opted out and will never be messaged again' rather than
+    a list of personal data.
+    """
+    client = _client_by_token(token, enforce_byo=False)
+    name = client.get("name")
+    col = get_db()["b2c_contacts"]
+    query = {"client_name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}}
+    opted_out = col.count_documents({**query, "status": "opted_out"})
+    total     = col.count_documents(query)
+    return {
+        "client": name,
+        "opted_out": opted_out,
+        "total_contacts": total,
+        "opt_out_rate_pct": round((opted_out / total) * 100, 2) if total else 0.0,
+    }
+
+
+class TestSendPayload(BaseModel):
+    phone: str = Field(..., description="Owner's own number to receive the test draft")
+    sample_name: str = Field(default="Test Customer")
+    sample_notes: Optional[str] = None
+
+
+@public_router.post("/{token}/test-send")
+async def portal_leads_test_send(token: str, payload: TestSendPayload):
+    """Generate a draft using the BusinessBrief and queue it to ONE phone the
+    owner controls — for sanity-checking voice/tone before launching a campaign.
+
+    Routes through queue_draft like everything else, so the brief gate + caps
+    apply. The owner approves it from the dashboard like a normal draft.
+    """
+    client = _client_by_token(token)
+    client_name = client.get("name")
+    vertical = client.get("vertical") or "general"
+
+    from agent.brain import generate_b2c_message
+    from tools.hitl import queue_draft, BriefIncompleteError
+    from tools.account_guard import OutreachCapExceeded, OutreachPaused
+
+    try:
+        generated = generate_b2c_message(
+            customer_name=payload.sample_name,
+            channel="whatsapp",
+            vertical=vertical,
+            client_name=client_name,
+            notes=payload.sample_notes,
+            tags=["test-send"],
+        )
+    except Exception as e:
+        raise HTTPException(500, f"Draft generation failed: {e}")
+
+    # Synthetic contact_id — test-send drafts aren't tied to a real contact row.
+    synthetic_id = ObjectId()
+    try:
+        approval_id = queue_draft(
+            contact_id=str(synthetic_id),
+            contact_name=payload.sample_name,
+            vertical=vertical,
+            channel="whatsapp",
+            message=generated.get("message", ""),
+            phone=payload.phone,
+            source="byo_leads",
+            client_name=client_name,
+        )
+    except BriefIncompleteError as e:
+        raise HTTPException(422, str(e))
+    except OutreachPaused as e:
+        raise HTTPException(423, str(e))
+    except OutreachCapExceeded as e:
+        raise HTTPException(429, str(e))
+
+    return {
+        "success": True,
+        "approval_id": approval_id,
+        "preview": generated.get("message", ""),
+        "message": "Draft queued. Approve it from the Message Queue to deliver to the test phone.",
+    }
 
 
 @public_router.get("/{token}/contacts")

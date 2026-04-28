@@ -104,6 +104,99 @@ def parse_and_import_csv(
     return stats
 
 
+def preview_csv(csv_bytes: bytes, client_name: Optional[str] = None) -> dict:
+    """Parse a CSV without writing to Mongo. Returns the same stats shape as
+    parse_and_import_csv plus a small sample of how rows would be normalised.
+
+    Used by the portal upload flow to surface a "342 valid, 18 duplicates,
+    7 invalid — proceed?" confirmation step before committing the import.
+    """
+    text = csv_bytes.decode("utf-8-sig", errors="ignore")
+    reader = csv.DictReader(io.StringIO(text))
+
+    if not reader.fieldnames:
+        return {
+            "ok": False,
+            "error": "CSV has no headers",
+            "total_rows": 0,
+            "valid": 0,
+            "duplicates_in_file": 0,
+            "duplicates_existing": 0,
+            "opted_out_existing": 0,
+            "invalid_phone": 0,
+            "sample": [],
+            "headers": [],
+            "column_map": {},
+        }
+
+    col_map = _map_columns(reader.fieldnames)
+    if not col_map.get("phone"):
+        return {
+            "ok": False,
+            "error": "CSV must have a phone/whatsapp/mobile/number column",
+            "total_rows": 0,
+            "valid": 0,
+            "duplicates_in_file": 0,
+            "duplicates_existing": 0,
+            "opted_out_existing": 0,
+            "invalid_phone": 0,
+            "sample": [],
+            "headers": list(reader.fieldnames),
+            "column_map": col_map,
+        }
+
+    contacts_col = _get_b2c_contacts()
+    seen_phones_in_file: set[str] = set()
+    valid = 0
+    dup_in_file = 0
+    dup_existing = 0
+    opted_out = 0
+    invalid_phone = 0
+    total = 0
+    sample: list[dict] = []
+
+    for row in reader:
+        total += 1
+        phone_raw = row.get(col_map.get("phone", ""), "")
+        phone = _clean_phone(phone_raw)
+        if not phone:
+            invalid_phone += 1
+            continue
+        if phone in seen_phones_in_file:
+            dup_in_file += 1
+            continue
+        seen_phones_in_file.add(phone)
+
+        existing = contacts_col.find_one({"phone": phone}, {"status": 1})
+        if existing:
+            if existing.get("status") == "opted_out":
+                opted_out += 1
+            else:
+                dup_existing += 1
+            continue
+
+        valid += 1
+        if len(sample) < 5:
+            sample.append({
+                "name": _extract_name(row, col_map),
+                "phone": phone,
+                "email": _clean_email(row.get(col_map.get("email", ""), "")) if col_map.get("email") else None,
+            })
+
+    return {
+        "ok": True,
+        "total_rows": total,
+        "valid": valid,
+        "duplicates_in_file": dup_in_file,
+        "duplicates_existing": dup_existing,
+        "opted_out_existing": opted_out,
+        "invalid_phone": invalid_phone,
+        "sample": sample,
+        "headers": list(reader.fieldnames),
+        "column_map": col_map,
+    }
+
+
 def get_b2c_contacts_for_campaign(client_name: str, vertical: str, limit: int = 200) -> list[dict]:
     """
     Return B2C contacts for this client+vertical that haven't been contacted yet
@@ -152,6 +245,8 @@ def ensure_b2c_indexes():
     col.create_index([("phone", ASCENDING)], unique=True, sparse=True)
     col.create_index([("client_name", ASCENDING), ("vertical", ASCENDING)])
     col.create_index([("status", ASCENDING)])
+    # Sequence engine — finds contacts whose next step is due.
+    col.create_index([("next_due_at", ASCENDING), ("status", ASCENDING)], sparse=True)
 
 
 # ─── Internal helpers ─────────────────────────────────────────────────────────

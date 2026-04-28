@@ -106,6 +106,13 @@ class B2CCampaign:
                     source="byo_leads",
                     client_name=client_name,
                 )
+                # Start the contact in the default sequence — subsequent steps
+                # (follow-up, final touch) fire from the sequence_tick scheduler.
+                try:
+                    from services.sequences import start_contact_in_sequence
+                    start_contact_in_sequence(contact_id, sequence_name="default")
+                except Exception as _e:
+                    log.warning("sequence_start_failed", contact=name, error=str(_e))
                 queued += 1
                 continue
 

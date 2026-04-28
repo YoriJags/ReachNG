@@ -707,8 +707,33 @@ tr:last-child td { border-bottom: none; }
           </span>
         </label>
 
-        <button class="btn btn-primary" onclick="leadsUpload()">Upload</button>
+        <div class="btn-row" style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="leadsPreview()">Preview (no commit)</button>
+          <button class="btn btn-primary" onclick="leadsUpload()">Upload &amp; import</button>
+        </div>
         <div id="leads-upload-status" style="font-size:12px;color:var(--muted);margin-top:10px"></div>
+        <div id="leads-preview-result" style="display:none;background:#0a0e13;border:1px dashed var(--border2);border-radius:8px;padding:12px;margin-top:10px;font-size:12px;color:var(--text)"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Test send to one number</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.7">
+          Sanity-check voice and tone with a test draft using your Business Brief — sent to a phone you control. The draft queues to your approval inbox like any other; approve it to deliver.
+        </div>
+        <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <input id="test-send-phone" placeholder="+2348XXXXXXXXX (your own phone)"
+                 style="flex:1;min-width:220px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text)" />
+          <input id="test-send-name" value="Test Customer"
+                 style="flex:1;min-width:160px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text)" />
+        </div>
+        <button class="btn btn-outline" onclick="leadsTestSend()">Generate test draft</button>
+        <div id="test-send-status" style="font-size:12px;color:var(--muted);margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Suppression list</div>
+        <div id="suppression-summary" style="font-size:12px;color:var(--muted);line-height:1.7">Loading…</div>
+        <div style="font-size:11px;color:#666;margin-top:8px">Names and numbers are not shown here per NDPR. Counts only.</div>
       </div>
 
       <div class="card">
@@ -887,6 +912,93 @@ async function loadLeadLists() {
     document.getElementById('leads-counts').textContent = 'Could not load status: ' + e.message;
   }
   loadLeadImports();
+  loadSuppression();
+}
+
+async function loadSuppression() {
+  const wrap = document.getElementById('suppression-summary');
+  try {
+    const r = await fetch(`/api/v1/portal-leads/${TOKEN}/suppression`);
+    if (!r.ok) throw new Error(await r.text());
+    const s = await r.json();
+    if (!s.total_contacts) {
+      wrap.innerHTML = 'No contacts uploaded yet.';
+      return;
+    }
+    wrap.innerHTML = `
+      <strong style="color:var(--text)">${s.opted_out}</strong> contact${s.opted_out===1?'':'s'} opted out
+      out of ${s.total_contacts} total · <strong>${s.opt_out_rate_pct}%</strong> opt-out rate
+      ${s.opt_out_rate_pct >= 3 ? ' <span style="color:#fbbf24">— elevated</span>' : ''}
+    `;
+  } catch (e) {
+    wrap.textContent = 'Error: ' + e.message;
+  }
+}
+
+async function leadsPreview() {
+  const status = document.getElementById('leads-upload-status');
+  const result = document.getElementById('leads-preview-result');
+  if (!_leadsFile) { status.textContent = 'Pick a CSV first.'; return; }
+  status.textContent = 'Parsing…';
+  result.style.display = 'none';
+
+  const fd = new FormData();
+  fd.append('file', _leadsFile);
+  try {
+    const r = await fetch(`/api/v1/portal-leads/${TOKEN}/preview`, { method:'POST', body: fd });
+    if (!r.ok) throw new Error(await r.text());
+    const p = await r.json();
+    status.textContent = '';
+    if (!p.ok) {
+      result.style.display = '';
+      result.style.borderColor = '#7a2020';
+      result.innerHTML = `<span style="color:#f87171">${p.error}</span>`;
+      return;
+    }
+    result.style.display = '';
+    result.style.borderColor = 'var(--border2)';
+    const sample = (p.sample || []).map(s =>
+      `<div style="display:flex;gap:12px;padding:4px 0;border-top:1px dashed #2a3340;font-size:11px;color:var(--muted)">
+         <span style="flex:1">${s.name}</span><span style="flex:1">${s.phone}</span><span style="flex:1">${s.email||''}</span>
+       </div>`
+    ).join('');
+    result.innerHTML = `
+      <div style="font-weight:600;color:#34d399;margin-bottom:6px">${p.valid} valid · ready to import</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">
+        ${p.duplicates_in_file} dup in file · ${p.duplicates_existing} already in your list ·
+        ${p.opted_out_existing} opted-out (skipped) · ${p.invalid_phone} invalid phone ·
+        ${p.total_rows} rows scanned
+      </div>
+      ${sample ? `<div style="margin-top:8px"><div style="font-size:10px;letter-spacing:0.08em;color:#666;text-transform:uppercase;margin-bottom:4px">Sample (first 5)</div>${sample}</div>` : ''}
+      <div style="margin-top:10px;color:#9aa4b2;font-size:11px">If this looks right, click <strong>Upload &amp; import</strong>.</div>
+    `;
+  } catch (e) {
+    result.style.display = '';
+    result.style.borderColor = '#7a2020';
+    result.innerHTML = `<span style="color:#f87171">Error: ${e.message}</span>`;
+  }
+}
+
+async function leadsTestSend() {
+  const status = document.getElementById('test-send-status');
+  const phone = document.getElementById('test-send-phone').value.trim();
+  const name  = document.getElementById('test-send-name').value.trim() || 'Test Customer';
+  if (!phone) { status.textContent = 'Enter a phone number you control.'; return; }
+  status.textContent = 'Generating test draft…';
+  try {
+    const r = await fetch(`/api/v1/portal-leads/${TOKEN}/test-send`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ phone, sample_name: name }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    status.innerHTML = `
+      <div style="color:#34d399;margin-bottom:6px">${data.message}</div>
+      <div style="background:#0a0e13;border:1px dashed var(--border2);border-radius:6px;padding:10px;margin-top:6px;color:var(--text);white-space:pre-wrap;font-size:13px">${data.preview}</div>
+    `;
+  } catch (e) {
+    status.innerHTML = `<span style="color:#f87171">Error: ${e.message}</span>`;
+  }
 }
 
 function renderLeadsBanner(status) {

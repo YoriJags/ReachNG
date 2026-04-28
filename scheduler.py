@@ -7,11 +7,11 @@ Loops scheduled:
   08–23  Unipile reply polling (every 30 min)
   09:00  Invoice chaser — queue overdue-invoice WhatsApp drafts to HITL
   09:30  Debt collector — queue escalating debt-recovery drafts to HITL
-  10:00  Fleet dispatcher — alert on incidents pending >4h
+  09:45  Rent chase — queue overdue-rent WhatsApp drafts to HITL
   10:30  Market OS — run buy/sell alert checks and notify owner
+  Every hour  Fleet dispatcher — alert on incidents pending >4h
 
-Legacy SDR outreach loops (nightly discovery + 48h follow-up) have been
-retired. The product is the 12 revenue suites now; HITL queues per suite.
+SDR outreach campaigns are run manually from the Control Tower dashboard.
 """
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -33,6 +33,17 @@ async def _reply_poll():
         log.info("reply_poll_done", **result)
     except Exception as e:
         log.error("reply_poll_failed", error=str(e))
+
+
+async def _sequence_tick():
+    """Fire the next step of any due multi-touch sequences (BYO Leads)."""
+    log.info("sequence_tick_start")
+    try:
+        from services.sequences import process_due_contacts
+        result = await process_due_contacts(max_per_run=100)
+        log.info("sequence_tick_done", **result)
+    except Exception as e:
+        log.error("sequence_tick_failed", error=str(e))
 
 
 async def _invoice_reminder_run():
@@ -307,6 +318,14 @@ def setup_scheduler():
         _reply_poll,
         CronTrigger(hour="8-23", minute="*/30", timezone="Africa/Lagos"),
         id="reply_poll", replace_existing=True, misfire_grace_time=120,
+    )
+
+    # Sequence tick — multi-touch follow-ups for BYO Leads. Runs hourly during
+    # working hours so day-3/day-7 steps fire close to when the initial was sent.
+    scheduler.add_job(
+        _sequence_tick,
+        CronTrigger(hour="8-20", minute=15, timezone="Africa/Lagos"),
+        id="sequence_tick", replace_existing=True, misfire_grace_time=180,
     )
 
     scheduler.add_job(
