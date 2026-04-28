@@ -43,6 +43,60 @@ BYO_LEADS_ENABLED_VERTICALS = {
 }
 
 
+# Per-vertical CSV templates the client can download. Header names match the
+# parser's auto-detect map (phone/whatsapp/mobile, name, email, tags, notes).
+_SAMPLE_CSV_BY_VERTICAL: dict[str, str] = {
+    "real_estate": (
+        "name,phone,email,tags,notes\n"
+        "Adaeze Okafor,+2348011112222,adaeze@example.com,walk-in,Inquired about 3-bed Banana terrace\n"
+        "Tunde Bello,08022223333,tunde@example.com,referral,Family of 4 relocating from Abuja\n"
+        "Emeka Nwosu,+2348033334444,,viewing-march,Saw Eko Atlantic listing\n"
+        "Funmi Lawal,+2348044445555,funmi@example.com,past-client,Bought in 2024, asked about new builds\n"
+    ),
+    "legal": (
+        "name,phone,email,tags,notes\n"
+        "Chinedu Eze,+2348011112222,chinedu@example.com,past-client,Family law consult 2024\n"
+        "Bolanle Adekunle,08022223333,,referral,Property dispute in Lekki\n"
+        "Ibrahim Sani,+2348033334444,ibrahim@example.com,enquiry,Asked about retainer terms\n"
+    ),
+    "insurance": (
+        "name,phone,email,tags,notes\n"
+        "Kemi Adebayo,+2348011112222,kemi@example.com,renewal,Motor policy expires May\n"
+        "Segun Olatunji,08022223333,segun@example.com,family-cover,3 dependents, asked for quote\n"
+        "Amaka Okonkwo,+2348033334444,,lapsed,Health policy lapsed Feb 2026\n"
+    ),
+    "fitness": (
+        "name,phone,email,tags,notes\n"
+        "Tomi Bakare,+2348011112222,tomi@example.com,trial,Free trial Jan; didn't convert\n"
+        "Ife Adeoye,08022223333,ife@example.com,past-member,Returning after baby; injury history\n"
+        "Daniel Okoro,+2348033334444,daniel@example.com,referral,Wants strength + mobility plan\n"
+    ),
+    "events": (
+        "name,phone,email,tags,notes\n"
+        "Ngozi Eze,+2348011112222,ngozi@example.com,wedding-2026,June wedding, ~250 guests\n"
+        "Tobi Adekunle,08022223333,,corporate,Annual gala dinner enquiry\n"
+        "Bisi Lawal,+2348033334444,bisi@example.com,birthday,40th birthday, intimate\n"
+    ),
+    "auto": (
+        "name,phone,email,tags,notes\n"
+        "Yusuf Audu,+2348011112222,yusuf@example.com,test-drive,SUV; trading in 2019 Camry\n"
+        "Chioma Iwu,08022223333,chioma@example.com,service,Last service Aug 2025\n"
+        "Femi Ojo,+2348033334444,,enquiry,Asked about 2024 imports\n"
+    ),
+    "cooperatives": (
+        "name,phone,email,tags,notes\n"
+        "Ada Onwuka,+2348011112222,ada@example.com,prospective,Referred by member 12\n"
+        "Bayo Adeyemi,08022223333,bayo@example.com,member,Cycle 3, ₦25k contribution\n"
+        "Chika Eze,+2348033334444,,member,Cycle 4, due for payout in May\n"
+    ),
+    "general": (
+        "name,phone,email,tags,notes\n"
+        "Sample Customer,+2348011112222,sample@example.com,warm,Past customer\n"
+        "Another Lead,08022223333,another@example.com,referral,Came via word of mouth\n"
+    ),
+}
+
+
 def _enforce_byo_enabled(client_doc: dict) -> None:
     """Block uploads/runs for verticals where BYO Leads is disabled.
     Per-client override via `byo_leads_enabled=False` also respected."""
@@ -673,6 +727,22 @@ async def portal_leads_test_send(token: str, payload: TestSendPayload):
         "preview": generated.get("message", ""),
         "message": "Draft queued. Approve it from the Message Queue to deliver to the test phone.",
     }
+
+
+@public_router.get("/{token}/sample.csv")
+async def portal_leads_sample_csv(token: str):
+    """Vertical-tuned sample CSV — gives clients a working template instead of
+    asking them to guess column names. Headers match what the parser auto-detects.
+    """
+    from fastapi.responses import PlainTextResponse
+    client = _client_by_token(token, enforce_byo=False)
+    vertical = client.get("vertical") or "general"
+    csv_text = _SAMPLE_CSV_BY_VERTICAL.get(vertical, _SAMPLE_CSV_BY_VERTICAL["general"])
+    return PlainTextResponse(
+        content=csv_text,
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="reachng-sample-{vertical}.csv"'},
+    )
 
 
 @public_router.get("/{token}/contacts")

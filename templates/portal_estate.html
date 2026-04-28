@@ -679,7 +679,13 @@ tr:last-child td { border-bottom: none; }
       <div id="leads-status-banner" class="card" style="display:none"></div>
 
       <div class="card">
-        <div class="card-title">Upload a CSV</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+          <div class="card-title" style="margin:0">Upload a CSV</div>
+          <a href="/api/v1/portal-leads/{{ token }}/sample.csv" download
+             style="font-size:11px;color:var(--orange);text-decoration:none;border:1px solid var(--orange);border-radius:4px;padding:4px 10px">
+            ⬇ Download sample
+          </a>
+        </div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.7">
           Required column: <code>phone</code>, <code>whatsapp</code>, or <code>mobile</code>.
           Optional: <code>name</code>, <code>email</code>, <code>tags</code>, <code>notes</code>.
@@ -1061,6 +1067,21 @@ function renderLeadsBanner(status) {
         <div style="flex:1;min-width:200px">
           <div style="font-weight:600;color:#9aa4b2;margin-bottom:4px">Daily cap reached (${sent}/${cap})</div>
           <div style="font-size:12px;color:#7a8493">More drafts queue tomorrow at 00:00 UTC. Approve any pending drafts in the meantime.</div>
+        </div>
+      </div>`;
+  } else if (guard.warmup && guard.warmup.active) {
+    // Informational only — outreach is allowed but at a reduced cap.
+    banner.style.display = '';
+    banner.style.borderColor = '#3a4a30';
+    banner.style.background = '#1a2418';
+    const day = (guard.warmup.day ?? 0) + 1;
+    const total = guard.warmup.days_total ?? 7;
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:24px">🌱</div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:600;color:#86efac;margin-bottom:4px">Sender warm-up — Day ${day}/${total}</div>
+          <div style="font-size:12px;color:#bbf7d0">Capped at ${cap}/day to protect your WhatsApp number from Meta's anti-spam filters. Cap auto-ramps over the first 7 days.</div>
         </div>
       </div>`;
   } else {
