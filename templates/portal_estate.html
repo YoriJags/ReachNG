@@ -157,6 +157,9 @@ tr:last-child td { border-bottom: none; }
     <div class="nav-item" data-panel="leads" onclick="show('leads',this); loadLeadLists();">
       <span class="nav-dot"></span> Lead Lists
     </div>
+    <div class="nav-item" data-panel="drafts" onclick="show('drafts',this); loadDrafts();">
+      <span class="nav-dot"></span> Drafts to approve <span id="drafts-badge" style="background:rgba(255,92,0,0.18);color:var(--orange);font-size:10px;padding:1px 6px;border-radius:9px;margin-left:4px;display:none"></span>
+    </div>
 
     <div class="nav-section">Rent Roll</div>
     <div class="nav-item" data-panel="rent" onclick="show('rent',this)">
@@ -771,6 +774,22 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
+    <!-- DRAFTS TO APPROVE -->
+    <div id="panel-drafts" class="panel">
+      <div class="page-title">Drafts to approve</div>
+      <div class="page-sub">AI-drafted messages waiting for your tap. Approve, edit, or skip — nothing leaves your number until you say so.</div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap">
+          <div id="drafts-stats" style="font-size:12px;color:var(--muted)">Loading…</div>
+          <button class="btn btn-outline btn-sm" onclick="loadDrafts()">Refresh</button>
+        </div>
+        <div id="drafts-list">
+          <div class="loading"><span class="spinner"></span> Loading drafts…</div>
+        </div>
+      </div>
+    </div>
+
     <!-- GETTING STARTED / HELP -->
     <div id="panel-guide" class="panel">
       <div class="page-title">Getting Started</div>
@@ -885,6 +904,109 @@ function show(panel, el) {
   if (panel === 'concierge')   loadConciergeProps();
   if (panel === 'brief')       loadBrief();
   if (panel === 'leads')       loadLeadLists();
+  if (panel === 'drafts')      loadDrafts();
+}
+
+// ── Drafts to approve (client-facing HITL) ──
+async function loadDrafts() {
+  const list = document.getElementById('drafts-list');
+  const stats = document.getElementById('drafts-stats');
+  list.innerHTML = '<div class="loading"><span class="spinner"></span> Loading drafts…</div>';
+  try {
+    const [pendingRes, statsRes] = await Promise.all([
+      fetch(`/api/v1/portal-approvals/${TOKEN}/`),
+      fetch(`/api/v1/portal-approvals/${TOKEN}/stats`),
+    ]);
+    if (!pendingRes.ok) throw new Error(await pendingRes.text());
+    const pending = await pendingRes.json();
+    const counts  = statsRes.ok ? await statsRes.json() : {};
+
+    const pendingCount = counts.pending || 0;
+    const badge = document.getElementById('drafts-badge');
+    if (pendingCount > 0) { badge.textContent = pendingCount; badge.style.display = 'inline-block'; }
+    else                  { badge.style.display = 'none'; }
+    stats.innerHTML = `
+      <strong style="color:var(--text)">${pendingCount}</strong> pending ·
+      ${counts.approved || 0} approved · ${counts.edited || 0} edited · ${counts.skipped || 0} skipped
+    `;
+
+    if (!pending.length) {
+      list.innerHTML = `<div style="text-align:center;padding:32px 16px;color:var(--muted);font-size:13px">
+        No drafts waiting. Replies on your Closer threads or BYO Leads campaigns will land here.
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = pending.map(d => {
+      const ts = d.created_at ? new Date(d.created_at).toLocaleString() : '';
+      const safe = (s) => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const phone = d.phone ? `<span style="color:var(--muted)">${safe(d.phone)}</span>` : '';
+      return `
+        <div class="card" style="background:#0a0e13;border:1px solid var(--border2);margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+            <div>
+              <div style="font-weight:600;color:var(--text)">${safe(d.contact_name || 'Unknown')}</div>
+              <div style="font-size:11px;color:#666">${ts} · ${safe(d.channel)} ${phone} · source: ${safe(d.source)}</div>
+            </div>
+            <span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;background:rgba(255,92,0,0.12);color:var(--orange);padding:2px 8px;border-radius:3px">PENDING</span>
+          </div>
+          <textarea id="draft-msg-${d.id}" rows="4" style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px;border-radius:4px;font-family:inherit;font-size:13px;resize:vertical;margin-bottom:8px">${safe(d.message)}</textarea>
+          <div class="btn-row" style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" onclick="draftApprove('${d.id}')">Send as-is</button>
+            <button class="btn btn-outline btn-sm" onclick="draftEditAndSend('${d.id}')">Send edited</button>
+            <button class="btn btn-outline btn-sm" style="border-color:#7a2020;color:#f87171" onclick="draftSkip('${d.id}')">Skip</button>
+            <span id="draft-status-${d.id}" style="font-size:11px;color:var(--muted);align-self:center"></span>
+          </div>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    list.innerHTML = `<div style="color:#f87171;font-size:12px">Error: ${e.message}</div>`;
+  }
+}
+
+async function draftApprove(id) {
+  const status = document.getElementById('draft-status-' + id);
+  status.textContent = 'Approving…';
+  try {
+    const r = await fetch(`/api/v1/portal-approvals/${TOKEN}/${id}/approve`, { method:'POST' });
+    if (!r.ok) throw new Error(await r.text());
+    status.textContent = 'Sent.'; status.style.color = '#34d399';
+    setTimeout(loadDrafts, 600);
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message; status.style.color = '#f87171';
+  }
+}
+
+async function draftEditAndSend(id) {
+  const ta = document.getElementById('draft-msg-' + id);
+  const status = document.getElementById('draft-status-' + id);
+  const newMsg = (ta?.value || '').trim();
+  if (!newMsg) { status.textContent = 'Edit cannot be empty.'; status.style.color = '#f87171'; return; }
+  status.textContent = 'Sending edited…';
+  try {
+    const r = await fetch(`/api/v1/portal-approvals/${TOKEN}/${id}/edit`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ new_message: newMsg }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    status.textContent = 'Sent (edited).'; status.style.color = '#34d399';
+    setTimeout(loadDrafts, 600);
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message; status.style.color = '#f87171';
+  }
+}
+
+async function draftSkip(id) {
+  if (!confirm('Skip this draft? It will not be sent.')) return;
+  const status = document.getElementById('draft-status-' + id);
+  status.textContent = 'Skipping…';
+  try {
+    const r = await fetch(`/api/v1/portal-approvals/${TOKEN}/${id}/skip`, { method:'POST' });
+    if (!r.ok) throw new Error(await r.text());
+    setTimeout(loadDrafts, 400);
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message; status.style.color = '#f87171';
+  }
 }
 
 // ── Lead Lists (BYO Leads) ──

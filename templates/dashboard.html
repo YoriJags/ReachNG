@@ -1217,16 +1217,42 @@
     </div>
   </div>
 
-  <div style="display:grid;grid-template-columns:280px 1fr;gap:18px;">
-    <div style="background:#0d1117;border:1px solid #1e2530;border-radius:10px;padding:14px;max-height:70vh;overflow-y:auto;">
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#777;margin-bottom:10px;">Clients</div>
-      <div id="brief-admin-clients">
-        <div style="font-size:12px;color:#666">Loading…</div>
+  <div style="display:flex;gap:6px;margin-bottom:14px">
+    <button class="btn" id="briefs-mode-clients" onclick="briefsModeSwitch('clients')"
+            style="background:#1e2530;color:#d8eaf8;border:1px solid #2a3340;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer">Client briefs</button>
+    <button class="btn" id="briefs-mode-primers" onclick="briefsModeSwitch('primers')"
+            style="background:transparent;color:#888;border:1px solid #2a3340;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer">Vertical primers</button>
+  </div>
+
+  <div id="briefs-pane-clients">
+    <div style="display:grid;grid-template-columns:280px 1fr;gap:18px;">
+      <div style="background:#0d1117;border:1px solid #1e2530;border-radius:10px;padding:14px;max-height:70vh;overflow-y:auto;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#777;margin-bottom:10px;">Clients</div>
+        <div id="brief-admin-clients">
+          <div style="font-size:12px;color:#666">Loading…</div>
+        </div>
+      </div>
+
+      <div id="brief-admin-detail" style="background:#0d1117;border:1px solid #1e2530;border-radius:10px;padding:18px;">
+        <div style="font-size:12px;color:#666">Pick a client on the left to view or edit their brief.</div>
       </div>
     </div>
+  </div>
 
-    <div id="brief-admin-detail" style="background:#0d1117;border:1px solid #1e2530;border-radius:10px;padding:18px;">
-      <div style="font-size:12px;color:#666">Pick a client on the left to view or edit their brief.</div>
+  <div id="briefs-pane-primers" style="display:none">
+    <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #f0a500;border-radius:10px;padding:14px 18px;margin-bottom:14px;font-size:11px;color:#bbb;line-height:1.7">
+      Vertical primers are the AI's industry baseline — used when a client hasn't filled their brief yet, or to fill any gaps in their brief. Edits here apply globally to that vertical. Client briefs always win on conflict.
+    </div>
+    <div style="display:grid;grid-template-columns:240px 1fr;gap:18px;">
+      <div style="background:#0d1117;border:1px solid #1e2530;border-radius:10px;padding:14px;max-height:70vh;overflow-y:auto;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#777;margin-bottom:10px;">Verticals</div>
+        <div id="primer-admin-list">
+          <div style="font-size:12px;color:#666">Loading…</div>
+        </div>
+      </div>
+      <div id="primer-admin-detail" style="background:#0d1117;border:1px solid #1e2530;border-radius:10px;padding:18px;">
+        <div style="font-size:12px;color:#666">Pick a vertical on the left to edit its primer.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -7188,6 +7214,136 @@ async function prEstimate() {
     el.style.color = '#aaa';
     el.textContent = `Gross: ₦${Math.round(d.gross_monthly).toLocaleString()}\nPAYE: ₦${Math.round(d.paye_monthly).toLocaleString()}\nPENCOM: ₦${Math.round(d.pencom_monthly).toLocaleString()}\nNet: ₦${Math.round(d.net_pay).toLocaleString()}`;
   } catch(e) { el.style.color='#ef4444'; el.textContent = 'Error: '+e.message; }
+}
+
+// ── Admin Briefs mode toggle ──────────────────────────────────────────────────
+function briefsModeSwitch(mode) {
+  const c = document.getElementById('briefs-pane-clients');
+  const p = document.getElementById('briefs-pane-primers');
+  const bc = document.getElementById('briefs-mode-clients');
+  const bp = document.getElementById('briefs-mode-primers');
+  if (mode === 'primers') {
+    c.style.display = 'none'; p.style.display = '';
+    bc.style.background = 'transparent'; bc.style.color = '#888';
+    bp.style.background = '#1e2530';     bp.style.color = '#d8eaf8';
+    primerAdminLoadList();
+  } else {
+    p.style.display = 'none'; c.style.display = '';
+    bp.style.background = 'transparent'; bp.style.color = '#888';
+    bc.style.background = '#1e2530';     bc.style.color = '#d8eaf8';
+  }
+}
+
+// ── Admin Vertical Primers: edit the AI's industry baselines ──────────────────
+let _primerSelected = null;
+
+async function primerAdminLoadList() {
+  const wrap = document.getElementById('primer-admin-list');
+  try {
+    const r = await fetch('/api/v1/admin/brief/primers', {headers: authHeaders()});
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    const primers = data.primers || [];
+    if (!primers.length) {
+      wrap.innerHTML = '<div style="font-size:12px;color:#666">No primers seeded yet — restart the server to seed defaults.</div>';
+      return;
+    }
+    wrap.innerHTML = primers.map(p => `
+      <div onclick="primerAdminSelect('${encodeURIComponent(p.vertical)}')"
+           style="padding:8px 10px;border-radius:6px;cursor:pointer;border:1px solid transparent;margin-bottom:4px;font-size:13px;">
+        <div style="font-weight:600;color:#d8eaf8;">${p.label || p.vertical}</div>
+        <div style="color:#556;font-size:11px;">${p.vertical}</div>
+      </div>
+    `).join('');
+  } catch (e) {
+    wrap.innerHTML = `<div style="color:#ef4444;font-size:12px">${e.message}</div>`;
+  }
+}
+
+async function primerAdminSelect(encVertical) {
+  _primerSelected = decodeURIComponent(encVertical);
+  const detail = document.getElementById('primer-admin-detail');
+  detail.innerHTML = '<div style="font-size:12px;color:#666">Loading primer…</div>';
+  try {
+    const r = await fetch(`/api/v1/admin/brief/primers/${encVertical}`, {headers: authHeaders()});
+    if (!r.ok) throw new Error(await r.text());
+    const p = await r.json();
+    primerAdminRender(p);
+  } catch (e) {
+    detail.innerHTML = `<div style="color:#ef4444;font-size:12px">${e.message}</div>`;
+  }
+}
+
+const PRIMER_TEXT  = ['label','default_tone','default_cta','sample_one_liner'];
+const PRIMER_LINES = ['vocabulary','default_qualifying_questions','default_objections','compliance_notes','never_say_defaults'];
+
+function primerAdminRender(p) {
+  const detail = document.getElementById('primer-admin-detail');
+  const updated = p.updated_at ? new Date(p.updated_at).toLocaleString() : 'never';
+
+  const fieldHtml = (id, label, multiline=false, hint='') => `
+    <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">
+      <span>${label}${hint ? ` <span style="text-transform:none;letter-spacing:0;color:#666;font-weight:400">— ${hint}</span>` : ''}</span>
+      ${multiline
+        ? `<textarea id="apf-${id}" rows="4" style="background:#161b22;border:1px solid #2a3340;color:#d8eaf8;padding:8px 10px;border-radius:4px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>`
+        : `<input id="apf-${id}" style="background:#161b22;border:1px solid #2a3340;color:#d8eaf8;padding:8px 10px;border-radius:4px;font-size:13px;" />`}
+    </label>`;
+
+  detail.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:#d8eaf8">${p.vertical}</div>
+        <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:0.08em;">Last edited: ${updated}</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+      ${fieldHtml('label','Label','','Display name shown to admins')}
+      ${fieldHtml('default_tone','Default tone','','Used when client hasnt set tone_overrides')}
+      ${fieldHtml('default_cta','Default CTA','','e.g. "book a viewing"')}
+      ${fieldHtml('sample_one_liner','Sample one-liner',true,'Placeholder shown in the brief form')}
+      ${fieldHtml('vocabulary','Vocabulary',true,'one term per line')}
+      ${fieldHtml('default_qualifying_questions','Default qualifying questions',true,'one per line')}
+      ${fieldHtml('default_objections','Default objections',true,'one per line')}
+      ${fieldHtml('compliance_notes','Compliance notes',true,'one per line — legal/regulatory rails')}
+      ${fieldHtml('never_say_defaults','Never say (defaults)',true,'one per line')}
+    </div>
+
+    <div style="margin-top:14px;display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-approve" onclick="primerAdminSave()">Save primer</button>
+      <span id="apf-save-status" style="font-size:12px;color:#888;"></span>
+    </div>
+  `;
+
+  const _setA = (id, v) => { const el = document.getElementById('apf-' + id); if (el) el.value = v ?? ''; };
+  PRIMER_TEXT.forEach(k => _setA(k, p[k] || ''));
+  PRIMER_LINES.forEach(k => _setA(k, Array.isArray(p[k]) ? p[k].join('\n') : ''));
+}
+
+async function primerAdminSave() {
+  if (!_primerSelected) return;
+  const status = document.getElementById('apf-save-status');
+  status.textContent = 'Saving…';
+
+  const _v = (id) => document.getElementById('apf-' + id)?.value ?? '';
+  const body = { vertical: _primerSelected };
+  PRIMER_TEXT.forEach(k => { body[k] = _v(k); });
+  PRIMER_LINES.forEach(k => {
+    body[k] = _v(k).split('\n').map(x => x.trim()).filter(Boolean);
+  });
+
+  try {
+    const r = await fetch(`/api/v1/admin/brief/primers/${encodeURIComponent(_primerSelected)}`, {
+      method: 'PUT',
+      headers: {...authHeaders(), 'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    status.textContent = 'Saved.';
+    setTimeout(() => status.textContent = '', 2500);
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
+  }
 }
 
 // ── Admin Briefs: list every client + edit business brief ────────────────────
