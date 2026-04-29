@@ -105,7 +105,6 @@ ReachNG uses the following sub-processors as of the Effective Date:
 | Unipile | WhatsApp gateway | EU |
 | MongoDB Atlas | Data storage | AWS Cape Town / Frankfurt |
 | Railway | Application hosting | USA |
-| Smile ID | Identity verification (LendOS only — not currently active) | Nigeria |
 
 ReachNG will give the Client **30 days' notice** of any new sub-processor; Client may object in writing.
 

@@ -22,8 +22,8 @@ Four documents drafted ready for lawyer review. Every clause needing legal verif
 
 - **What we are**: Nigerian SaaS platform that orchestrates AI-drafted, human-approved outbound messaging (WhatsApp + email) for SMEs across real estate and HR.
 - **What we are not**: not a lender, not a payments provider, not a custodian of client funds, not a CRM. We process PII on behalf of our clients (data processor, not controller).
-- **Sub-processors**: Anthropic (AI drafting), Unipile (WhatsApp gateway), MongoDB Atlas (storage), Railway (hosting), Smile ID (identity verification — only when LendOS launches).
-- **PII categories**: full name, phone, email, address, BVN/NIN (only via Smile ID for the future LendOS suite, not currently).
+- **Sub-processors**: Anthropic (AI drafting), Unipile (WhatsApp gateway), MongoDB Atlas (storage), Railway (hosting).
+- **PII categories**: full name, phone, email, address.
 - **Geography**: Nigeria-first; data may transit AWS regions (Cape Town / Frankfurt) via sub-processors.
 
 ## How to use these drafts

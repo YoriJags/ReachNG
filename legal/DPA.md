@@ -24,7 +24,6 @@ Terms used in this DPA have the meanings set out in the NDPA / NDPR. In particul
 | Address / area | Client upload, Closer intake | Lead context |
 | Inbound message content | Closer / reply router | Reply classification + drafting |
 | Engagement metadata | Platform-generated | Status tracking, opt-out enforcement |
-| Identity documents (BVN, NIN, biometric) | Smile ID via LendOS only — **not active under this MSA** unless LendOS suite is added by amendment | KYC verification |
 
 ## 4. Processing instructions
 
