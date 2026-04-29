@@ -305,19 +305,19 @@ def setup_scheduler():
     scheduler.add_job(
         _system_sweep,
         CronTrigger(hour=7, minute=0, timezone="Africa/Lagos"),
-        id="system_sweep", replace_existing=True, misfire_grace_time=300,
+        id="system_sweep", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=300,
     )
 
     scheduler.add_job(
         _morning_brief,
         CronTrigger(hour=8, minute=0, timezone="Africa/Lagos"),
-        id="morning_brief", replace_existing=True, misfire_grace_time=300,
+        id="morning_brief", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=300,
     )
 
     scheduler.add_job(
         _reply_poll,
         CronTrigger(hour="8-23", minute="*/30", timezone="Africa/Lagos"),
-        id="reply_poll", replace_existing=True, misfire_grace_time=120,
+        id="reply_poll", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=120,
     )
 
     # Sequence tick — multi-touch follow-ups for BYO Leads. Runs hourly during
@@ -325,52 +325,52 @@ def setup_scheduler():
     scheduler.add_job(
         _sequence_tick,
         CronTrigger(hour="8-20", minute=15, timezone="Africa/Lagos"),
-        id="sequence_tick", replace_existing=True, misfire_grace_time=180,
+        id="sequence_tick", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=180,
     )
 
     scheduler.add_job(
         _invoice_reminder_run,
         CronTrigger(hour=9, minute=0, timezone="Africa/Lagos"),
-        id="invoice_reminder_run", replace_existing=True, misfire_grace_time=300,
+        id="invoice_reminder_run", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=300,
     )
 
     scheduler.add_job(
         _debt_collector_run,
         CronTrigger(hour=9, minute=30, timezone="Africa/Lagos"),
-        id="debt_collector_run", replace_existing=True, misfire_grace_time=300,
+        id="debt_collector_run", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=300,
     )
 
     scheduler.add_job(
         _fleet_escalation_check,
         CronTrigger(hour="8-20", minute=0, timezone="Africa/Lagos"),
-        id="fleet_escalation_check", replace_existing=True, misfire_grace_time=120,
+        id="fleet_escalation_check", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=120,
     )
 
     scheduler.add_job(
         _market_alerts_run,
         CronTrigger(hour="9,13,17", minute=0, timezone="Africa/Lagos"),
-        id="market_alerts_run", replace_existing=True, misfire_grace_time=180,
+        id="market_alerts_run", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=180,
     )
 
     # Rent roll: open monthly charges on the 1st at 00:30
     scheduler.add_job(
         _rent_period_open,
         CronTrigger(day=1, hour=0, minute=30, timezone="Africa/Lagos"),
-        id="rent_period_open", replace_existing=True, misfire_grace_time=600,
+        id="rent_period_open", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=600,
     )
 
     # Rent chase: daily at 09:45 — generate drafts → HITL
     scheduler.add_job(
         _rent_chase_run,
         CronTrigger(hour=9, minute=45, timezone="Africa/Lagos"),
-        id="rent_chase_run", replace_existing=True, misfire_grace_time=300,
+        id="rent_chase_run", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=300,
     )
 
     # Probation alerts: daily at 08:30 — WhatsApp manager 7 days before confirmation
     scheduler.add_job(
         _probation_alerts,
         CronTrigger(hour=8, minute=30, timezone="Africa/Lagos"),
-        id="probation_alerts", replace_existing=True, misfire_grace_time=300,
+        id="probation_alerts", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=300,
     )
 
     return scheduler

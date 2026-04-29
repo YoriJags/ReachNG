@@ -141,15 +141,22 @@ async def send_manual_reminder(
 
     invoice["id"] = str(invoice["_id"])
     background_tasks.add_task(_send_one_reminder, invoice, body.tone)
-    return {"success": True, "message": f"Reminder queued with tone: {body.tone}"}
+    return {"success": True, "message": f"Draft queued ({body.tone}) — approve in Message Queue to send."}
 
 
 async def _send_one_reminder(invoice: dict, tone: str):
+    """Manual invoice reminder — drafts and routes through HITL.
+    Nothing sends until a human approves in the Message Queue.
+    """
     from agent import generate_invoice_reminder
-    from tools.outreach import send_whatsapp
+    from tools.hitl import queue_draft
     from datetime import datetime, timezone
     import structlog
     log = structlog.get_logger()
+
+    if not invoice.get("debtor_id"):
+        log.warning("manual_reminder_orphan", invoice_id=invoice.get("id"))
+        return
 
     due_date = invoice.get("due_date")
     now = datetime.now(timezone.utc)
@@ -165,20 +172,19 @@ async def _send_one_reminder(invoice: dict, tone: str):
             tone=tone,
             reminder_count=invoice.get("reminder_count", 0),
         )
-        result = await send_whatsapp(phone=invoice["debtor_phone"], message=message)
-        if result.get("success", True):
-            # Map tone to stage
-            tone_stage_map = {
-                "polite": InvoiceStatus.REMINDED,
-                "firm": InvoiceStatus.FOLLOWED_UP,
-                "payment_plan": InvoiceStatus.PLAN_OFFERED,
-                "final": InvoiceStatus.FINAL_NOTICE,
-            }
-            stage = tone_stage_map.get(tone, InvoiceStatus.REMINDED)
-            record_reminder_sent(invoice["id"], stage)
-            log.info("manual_reminder_sent", debtor=invoice["debtor_name"], tone=tone)
+        queue_draft(
+            contact_id=str(invoice["debtor_id"]),
+            contact_name=invoice["debtor_name"],
+            vertical="invoice_chaser",
+            channel="whatsapp",
+            message=message,
+            phone=invoice.get("debtor_phone"),
+            source="invoice",
+            client_name=invoice.get("client_name"),
+        )
+        log.info("manual_reminder_queued", debtor=invoice["debtor_name"], tone=tone)
     except Exception as e:
-        log.error("manual_reminder_failed", invoice_id=invoice["id"], error=str(e))
+        log.error("manual_reminder_failed", invoice_id=invoice.get("id"), error=str(e))
 
 
 def _validate_id(invoice_id: str):
