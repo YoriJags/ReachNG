@@ -6,6 +6,7 @@ import structlog
 import uvicorn
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, Request
+from fastapi.responses import RedirectResponse
 from tools.log_buffer import buffer_processor
 
 # Configure structlog to capture logs into the dashboard buffer
@@ -239,13 +240,18 @@ app.mount("/mcp", mcp.http_app())
 
 
 @app.get("/")
-async def root():
+async def root(request: Request):
+    # Browsers land on the dashboard; API/health probes get JSON.
+    accept = (request.headers.get("accept") or "").lower()
+    if "text/html" in accept:
+        return RedirectResponse(url="/dashboard", status_code=302)
     return {
         "service": "ReachNG",
         "status": "running",
         "verticals": ["real_estate", "recruitment", "events"],
         "docs": "/docs",
         "mcp": "/mcp",
+        "dashboard": "/dashboard",
     }
 
 

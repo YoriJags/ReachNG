@@ -597,13 +597,19 @@
     font-size: 9px; color: #1e3040; text-transform: uppercase; letter-spacing: 1.2px;
     padding: 0 8px; align-self: center; user-select: none; white-space: nowrap;
   }
+  .tab-section-clickable {
+    background: transparent; border: 1px solid transparent; cursor: pointer;
+    color: #ff5c00; font-weight: 700; padding: 4px 8px; border-radius: 4px;
+    transition: all 0.15s ease;
+  }
+  .tab-section-clickable:hover { background: #1a2530; border-color: #ff5c00; color: #ff7a30; }
   .tab-divider { width: 1px; height: 18px; background: #1a2530; margin: 0 4px; align-self: center; flex-shrink: 0; }
 </style>
 </head>
 <body>
 
 <header>
-  <a href="/" style="text-decoration:none;"><div class="logo">Reach<span>NG</span> <span style="font-size:11px;font-weight:400;color:#333;letter-spacing:0.5px;margin-left:4px;">Control Tower</span></div></a>
+  <a href="/dashboard" style="text-decoration:none;" title="Home — Overview"><div class="logo">Reach<span>NG</span> <span style="font-size:11px;font-weight:400;color:#333;letter-spacing:0.5px;margin-left:4px;">Control Tower</span></div></a>
   <div class="header-right">
     <div class="health-pills">
       <div class="health-pill"><span class="health-dot" id="dot-maps"></span> Maps</div>
@@ -667,28 +673,28 @@
 </aside>
 <div class="main-content" id="main-content">
 
-<!-- ── Outreach Tab Nav (grouped by launch flow) ── -->
+<!-- ── Outreach Tab Nav (grouped by launch flow — section labels are clickable) ── -->
 <nav class="tab-nav product-tabs" data-product="outreach">
-  <span class="tab-section-label">Start</span>
+  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('overview')" title="Jump to Overview">Start</button>
   <button class="tab-btn active" onclick="switchTab('overview', this)" title="Today's work, ROI, system health">Overview</button>
   <div class="tab-divider"></div>
-  <span class="tab-section-label">1. Setup</span>
+  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('clients')" title="Jump to Setup — Clients">1. Setup</button>
   <button class="tab-btn" onclick="switchTab('clients', this)" title="Add a client and pair their WhatsApp">Clients</button>
   <button class="tab-btn" onclick="switchTab('briefs', this); briefAdminLoadClients();" title="Legal pack + Business Brief — required before outreach">Briefs &amp; Legal</button>
   <div class="tab-divider"></div>
-  <span class="tab-section-label">2. Run</span>
+  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('campaigns')" title="Jump to Run — Campaigns">2. Run</button>
   <button class="tab-btn" onclick="switchTab('campaigns', this)" title="Upload lead list (BYO) or run discovery">Campaigns</button>
   <button class="tab-btn" onclick="switchTab('approvals', this)" title="Approve drafted messages before they send">Message Queue <span class="tab-badge" id="tab-badge-approvals"></span></button>
   <div class="tab-divider"></div>
-  <span class="tab-section-label">3. Engage</span>
+  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('replies')" title="Jump to Engage — Replies">3. Engage</button>
   <button class="tab-btn" onclick="switchTab('replies', this)" title="Inbound replies needing attention">Replies</button>
   <button class="tab-btn" onclick="switchTab('closer', this); closerAdminLoadClients();" title="Live conversations the AI Closer is running">Closer</button>
   <div class="tab-divider"></div>
-  <span class="tab-section-label">4. Money</span>
+  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('pipeline')" title="Jump to Money — Pipeline">4. Money</button>
   <button class="tab-btn" onclick="switchTab('pipeline', this)" title="Funnel: contacted → replied → converted">Pipeline</button>
   <button class="tab-btn" onclick="switchTab('invoices', this)" title="Send and chase invoices">Invoices</button>
   <div class="tab-divider"></div>
-  <span class="tab-section-label">System</span>
+  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('tower')" title="Jump to System — Control Tower">System</button>
   <button class="tab-btn" onclick="switchTab('tower', this)" title="Live ops feed — what every job is doing right now">Control Tower</button>
   <button class="tab-btn" onclick="switchTab('tools', this)" title="System checks, demo seed, utilities">Tools</button>
 </nav>
