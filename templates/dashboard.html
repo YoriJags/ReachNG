@@ -7377,16 +7377,99 @@ async function briefAdminSelect(encName) {
   const detail = document.getElementById('brief-admin-detail');
   detail.innerHTML = '<div style="font-size:12px;color:#666">Loading brief…</div>';
   try {
-    const [briefRes, acctRes] = await Promise.all([
+    const [briefRes, acctRes, legalRes] = await Promise.all([
       fetch(`/api/v1/admin/brief/clients/${encName}`, {headers: authHeaders()}),
       fetch(`/api/v1/b2c/account/${encName}`,        {headers: authHeaders()}),
+      fetch(`/api/v1/admin/legal/clients/${encName}`,{headers: authHeaders()}),
     ]);
     if (!briefRes.ok) throw new Error(await briefRes.text());
     const data = await briefRes.json();
     data.account_guard = acctRes.ok ? await acctRes.json() : null;
+    data.legal = legalRes.ok ? await legalRes.json() : null;
     briefAdminRender(data);
   } catch (e) {
     detail.innerHTML = `<div style="color:#ef4444;font-size:12px">${e.message}</div>`;
+  }
+}
+
+function renderLegalSection(legal) {
+  if (!legal) return '';
+  const docs = legal.docs || [];
+  const headerColor = legal.complete ? '#34d399' : '#fbbf24';
+  const headerBg = legal.complete ? 'rgba(16,185,129,0.06)' : '#3a2a1a';
+  const headerBorder = legal.complete ? 'rgba(16,185,129,0.4)' : '#7a4a20';
+  const headerText = legal.complete
+    ? 'Legal pack complete — all required documents accepted at current versions.'
+    : 'Legal pack incomplete — outreach will be blocked until all required docs are accepted.';
+
+  const rows = docs.map(d => {
+    const required = d.required ? '<span style="color:#fbbf24;font-size:10px;letter-spacing:0.06em;text-transform:uppercase">Required</span>' : '<span style="color:#666;font-size:10px;letter-spacing:0.06em;text-transform:uppercase">Optional</span>';
+    let stateBadge = '';
+    let actionBtn = `<button onclick="legalAdminAccept('${d.slug}')" style="background:#1e2530;color:#d8eaf8;border:1px solid #2a3340;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer">Mark accepted</button>`;
+    if (d.status === 'accepted' && d.current_version_accepted) {
+      stateBadge = `<span style="color:#34d399;font-size:11px">Accepted v${d.version}</span>`;
+      actionBtn = `<button onclick="legalAdminRevoke('${d.slug}')" style="background:transparent;color:#f87171;border:1px solid #7a2020;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer">Revoke</button>`;
+    } else if (d.status === 'accepted' && !d.current_version_accepted) {
+      stateBadge = `<span style="color:#fbbf24;font-size:11px">Outdated — was v${d.version}, current v${d.current_version}</span>`;
+    } else if (d.status === 'revoked') {
+      stateBadge = `<span style="color:#f87171;font-size:11px">Revoked</span>`;
+    } else {
+      stateBadge = `<span style="color:#888;font-size:11px">Pending</span>`;
+    }
+    const at = d.at ? new Date(d.at).toLocaleString() : '';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px dashed #2a3340;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:13px;color:#d8eaf8;font-weight:600">${d.name} <span style="color:#666;font-size:10px;font-weight:400">v${d.current_version}</span></div>
+        <div style="font-size:11px;color:#888;margin-top:2px">${required}${at ? ' · ' + at : ''}${d.by ? ' · ' + d.by : ''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <a href="/api/v1/admin/legal/docs/${d.slug}.pdf" target="_blank" style="font-size:11px;color:#ff5c00;text-decoration:none;border:1px solid #ff5c00;padding:4px 10px;border-radius:4px">Download PDF</a>
+        ${stateBadge}
+        ${actionBtn}
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div style="background:${headerBg};border:1px solid ${headerBorder};border-radius:8px;padding:12px 14px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+        <div style="font-size:12px;font-weight:600;color:${headerColor}">${headerText}</div>
+      </div>
+      ${rows}
+    </div>
+  `;
+}
+
+async function legalAdminAccept(slug) {
+  if (!_briefSelected) return;
+  const accepter = prompt(`Record acceptance of ${slug} for "${_briefSelected}".\n\nEnter signatory name + title (e.g. "Jane Doe, MD"):`);
+  if (!accepter || !accepter.trim()) return;
+  try {
+    const r = await fetch(`/api/v1/admin/legal/clients/${encodeURIComponent(_briefSelected)}/accept`, {
+      method: 'POST',
+      headers: {...authHeaders(), 'Content-Type':'application/json'},
+      body: JSON.stringify({ doc_slug: slug, accepter: accepter.trim() }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    briefAdminSelect(encodeURIComponent(_briefSelected));
+  } catch (e) {
+    alert('Accept failed: ' + e.message);
+  }
+}
+
+async function legalAdminRevoke(slug) {
+  if (!_briefSelected) return;
+  if (!confirm(`Revoke acceptance of ${slug} for "${_briefSelected}"? Outreach will be blocked until re-accepted.`)) return;
+  try {
+    const r = await fetch(`/api/v1/admin/legal/clients/${encodeURIComponent(_briefSelected)}/revoke`, {
+      method: 'POST',
+      headers: {...authHeaders(), 'Content-Type':'application/json'},
+      body: JSON.stringify({ doc_slug: slug, reason: 'admin_action' }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    briefAdminSelect(encodeURIComponent(_briefSelected));
+  } catch (e) {
+    alert('Revoke failed: ' + e.message);
   }
 }
 
@@ -7449,6 +7532,7 @@ function briefAdminRender(data) {
     </div>
     ${banner}
     ${guardBanner}
+    ${renderLegalSection(data.legal)}
 
     <div style="background:#0a0e13;border:1px dashed #2a3340;border-radius:8px;padding:12px;margin-bottom:14px;">
       <div style="font-size:11px;font-weight:700;color:#ff5c00;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">AI-assisted intake</div>

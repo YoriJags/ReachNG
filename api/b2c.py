@@ -347,9 +347,24 @@ async def run_b2c_campaign(
     except HTTPException:
         raise
     except Exception:
-        # Brief module fault should not silently allow outreach
         log.exception("brief_health_check_failed", client=client_name)
         raise HTTPException(500, "Brief health check failed — refusing to run campaign.")
+
+    # Pre-check legal pack — same hard gate as brief.
+    try:
+        from api.legal import is_legal_pack_complete
+        if not is_legal_pack_complete(client_name=client_name):
+            raise HTTPException(
+                422,
+                f"Legal pack not signed for '{client_name}'. MSA, DPA, NDA "
+                "(and Closer Addendum if applicable) must be accepted before outreach. "
+                "Open the Onboarding panel to record acceptance.",
+            )
+    except HTTPException:
+        raise
+    except Exception:
+        log.exception("legal_pack_check_failed", client=client_name)
+        raise HTTPException(500, "Legal pack check failed — refusing to run campaign.")
 
     campaign = B2CCampaign()
 
@@ -624,6 +639,20 @@ async def portal_leads_run(token: str, body: RunB2CRequest, background_tasks: Ba
     except Exception:
         log.exception("portal_brief_health_failed", token_prefix=token[:8])
         raise HTTPException(500, "Brief health check failed — refusing to run campaign.")
+
+    try:
+        from api.legal import is_legal_pack_complete
+        if not is_legal_pack_complete(client_id=str(client["_id"])):
+            raise HTTPException(
+                422,
+                "Outreach paused — legal pack not yet accepted. Please review and accept "
+                "MSA, DPA, NDA (and Closer Addendum where applicable) on the Onboarding tab.",
+            )
+    except HTTPException:
+        raise
+    except Exception:
+        log.exception("portal_legal_check_failed", token_prefix=token[:8])
+        raise HTTPException(500, "Legal pack check failed — refusing to run campaign.")
 
     campaign = B2CCampaign()
     kwargs = dict(

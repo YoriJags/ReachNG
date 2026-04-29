@@ -38,3 +38,6 @@ openpyxl>=3.1.5
 python-multipart>=0.0.12
 pymupdf
 google-generativeai
+
+# Legal pack PDF generation (legal/build_pdfs.py)
+reportlab>=4.0.0

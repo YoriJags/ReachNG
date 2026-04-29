@@ -151,6 +151,9 @@ tr:last-child td { border-bottom: none; }
     <div class="nav-item" data-panel="closer" onclick="show('closer',this)">
       <span class="nav-dot"></span> Lead Inbox
     </div>
+    <div class="nav-item" data-panel="legal" onclick="show('legal',this); loadLegal();">
+      <span class="nav-dot"></span> Onboarding &amp; Legal <span id="legal-badge" style="background:rgba(255,92,0,0.18);color:var(--orange);font-size:10px;padding:1px 6px;border-radius:9px;margin-left:4px;display:none"></span>
+    </div>
     <div class="nav-item" data-panel="brief" onclick="show('brief',this); loadBrief();">
       <span class="nav-dot"></span> Business Brief
     </div>
@@ -774,6 +777,16 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
+    <!-- LEGAL / ONBOARDING -->
+    <div id="panel-legal" class="panel">
+      <div class="page-title">Onboarding &amp; Legal</div>
+      <div class="page-sub">Review and accept the four legal documents before your first campaign. Outreach is hard-blocked until all required documents are signed.</div>
+      <div id="legal-status-banner" class="card" style="display:none"></div>
+      <div id="legal-docs-list">
+        <div class="loading"><span class="spinner"></span> Loading…</div>
+      </div>
+    </div>
+
     <!-- DRAFTS TO APPROVE -->
     <div id="panel-drafts" class="panel">
       <div class="page-title">Drafts to approve</div>
@@ -905,6 +918,95 @@ function show(panel, el) {
   if (panel === 'brief')       loadBrief();
   if (panel === 'leads')       loadLeadLists();
   if (panel === 'drafts')      loadDrafts();
+  if (panel === 'legal')       loadLegal();
+}
+
+// ── Onboarding / legal pack ──
+async function loadLegal() {
+  const banner = document.getElementById('legal-status-banner');
+  const list   = document.getElementById('legal-docs-list');
+  list.innerHTML = '<div class="loading"><span class="spinner"></span> Loading…</div>';
+  try {
+    const r = await fetch(`/api/v1/portal-legal/${TOKEN}/docs`);
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+
+    const badge = document.getElementById('legal-badge');
+    const pendingCount = (data.docs || []).filter(d => d.required && !d.current_version_accepted).length;
+    if (pendingCount > 0) { badge.textContent = pendingCount; badge.style.display = 'inline-block'; }
+    else                  { badge.style.display = 'none'; }
+
+    if (data.complete) {
+      banner.style.display = '';
+      banner.style.borderColor = 'rgba(16,185,129,0.4)';
+      banner.style.background = 'rgba(16,185,129,0.06)';
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="font-size:24px">✅</div>
+          <div style="flex:1;min-width:200px">
+            <div style="font-weight:600;color:#34d399;margin-bottom:4px">Legal pack complete</div>
+            <div style="font-size:12px;color:var(--muted)">All required documents accepted. Outreach is enabled.</div>
+          </div>
+        </div>`;
+    } else {
+      banner.style.display = '';
+      banner.style.borderColor = '#7a4a20';
+      banner.style.background = '#3a2a1a';
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="font-size:24px">⚠️</div>
+          <div style="flex:1;min-width:200px">
+            <div style="font-weight:600;color:#fbbf24;margin-bottom:4px">Legal pack pending</div>
+            <div style="font-size:12px;color:#fcd34d">Review and accept the documents below. Outreach will be blocked until all required documents are signed.</div>
+          </div>
+        </div>`;
+    }
+
+    list.innerHTML = (data.docs || []).map(d => {
+      const required = d.required ? '<span style="color:var(--orange);font-size:10px;letter-spacing:0.06em;text-transform:uppercase">Required</span>' : '<span style="color:var(--muted);font-size:10px;letter-spacing:0.06em;text-transform:uppercase">Optional</span>';
+      let stateBadge = '';
+      let actionBtn = '';
+      if (d.status === 'accepted' && d.current_version_accepted) {
+        stateBadge = `<span style="color:#34d399;font-size:12px">Accepted v${d.version}</span>`;
+        actionBtn = '';
+      } else {
+        stateBadge = `<span style="color:#fbbf24;font-size:12px">Pending</span>`;
+        actionBtn = `<button class="btn btn-primary btn-sm" onclick="legalPortalAccept('${d.slug}', '${d.name.replace(/'/g, "\\'")}')">Read &amp; accept</button>`;
+      }
+      const at = d.at ? new Date(d.at).toLocaleString() : '';
+      return `<div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:14px;font-weight:600;color:var(--text)">${d.name} <span style="color:var(--muted);font-size:11px;font-weight:400">v${d.current_version}</span></div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">${required}${at ? ' · ' + at : ''}${d.by ? ' · signed by ' + d.by : ''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <a href="/api/v1/portal-legal/${TOKEN}/docs/${d.slug}.pdf" target="_blank" class="btn btn-outline btn-sm">Download PDF</a>
+            ${stateBadge}
+            ${actionBtn}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    list.innerHTML = `<div style="color:#f87171;font-size:12px">Error: ${e.message}</div>`;
+  }
+}
+
+async function legalPortalAccept(slug, name) {
+  const accepter = prompt(`Accepting "${name}" on behalf of your business.\n\nEnter your name and title (e.g. "Jane Doe, MD"):`);
+  if (!accepter || !accepter.trim()) return;
+  if (!confirm(`Confirm acceptance of "${name}"?\n\nThis is recorded with your name, IP, and timestamp as a legal commitment.`)) return;
+  try {
+    const r = await fetch(`/api/v1/portal-legal/${TOKEN}/accept`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ doc_slug: slug, accepter: accepter.trim() }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    loadLegal();
+  } catch (e) {
+    alert('Accept failed: ' + e.message);
+  }
 }
 
 // ── Drafts to approve (client-facing HITL) ──
