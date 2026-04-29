@@ -667,19 +667,30 @@
 </aside>
 <div class="main-content" id="main-content">
 
-<!-- ── Outreach Tab Nav ── -->
+<!-- ── Outreach Tab Nav (grouped by launch flow) ── -->
 <nav class="tab-nav product-tabs" data-product="outreach">
-  <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
-  <button class="tab-btn" onclick="switchTab('tower', this)">Control Tower</button>
-  <button class="tab-btn" onclick="switchTab('campaigns', this)">Campaigns</button>
-  <button class="tab-btn" onclick="switchTab('clients', this)">Clients</button>
-  <button class="tab-btn" onclick="switchTab('closer', this); closerAdminLoadClients();">Closer</button>
-  <button class="tab-btn" onclick="switchTab('briefs', this); briefAdminLoadClients();">Briefs</button>
-  <button class="tab-btn" onclick="switchTab('approvals', this)">Message Queue <span class="tab-badge" id="tab-badge-approvals"></span></button>
-  <button class="tab-btn" onclick="switchTab('replies', this)">Replies</button>
-  <button class="tab-btn" onclick="switchTab('invoices', this)">Invoices</button>
-  <button class="tab-btn" onclick="switchTab('pipeline', this)">Pipeline</button>
-  <button class="tab-btn" onclick="switchTab('tools', this)">Tools</button>
+  <span class="tab-section-label">Start</span>
+  <button class="tab-btn active" onclick="switchTab('overview', this)" title="Today's work, ROI, system health">Overview</button>
+  <div class="tab-divider"></div>
+  <span class="tab-section-label">1. Setup</span>
+  <button class="tab-btn" onclick="switchTab('clients', this)" title="Add a client and pair their WhatsApp">Clients</button>
+  <button class="tab-btn" onclick="switchTab('briefs', this); briefAdminLoadClients();" title="Legal pack + Business Brief — required before outreach">Briefs &amp; Legal</button>
+  <div class="tab-divider"></div>
+  <span class="tab-section-label">2. Run</span>
+  <button class="tab-btn" onclick="switchTab('campaigns', this)" title="Upload lead list (BYO) or run discovery">Campaigns</button>
+  <button class="tab-btn" onclick="switchTab('approvals', this)" title="Approve drafted messages before they send">Message Queue <span class="tab-badge" id="tab-badge-approvals"></span></button>
+  <div class="tab-divider"></div>
+  <span class="tab-section-label">3. Engage</span>
+  <button class="tab-btn" onclick="switchTab('replies', this)" title="Inbound replies needing attention">Replies</button>
+  <button class="tab-btn" onclick="switchTab('closer', this); closerAdminLoadClients();" title="Live conversations the AI Closer is running">Closer</button>
+  <div class="tab-divider"></div>
+  <span class="tab-section-label">4. Money</span>
+  <button class="tab-btn" onclick="switchTab('pipeline', this)" title="Funnel: contacted → replied → converted">Pipeline</button>
+  <button class="tab-btn" onclick="switchTab('invoices', this)" title="Send and chase invoices">Invoices</button>
+  <div class="tab-divider"></div>
+  <span class="tab-section-label">System</span>
+  <button class="tab-btn" onclick="switchTab('tower', this)" title="Live ops feed — what every job is doing right now">Control Tower</button>
+  <button class="tab-btn" onclick="switchTab('tools', this)" title="System checks, demo seed, utilities">Tools</button>
 </nav>
 
 <!-- ── LegalOS Tab Nav ── -->
@@ -800,50 +811,50 @@
   <div class="onboarding-banner" id="onboarding-banner" style="display:none;">
     <div class="ob-header">
       <div>
-        <div class="ob-title">Get ReachNG ready to run</div>
-        <div class="ob-subtitle">Complete these 5 steps to launch your first campaign</div>
+        <div class="ob-title">Launch path — get your first paying client live</div>
+        <div class="ob-subtitle">Five steps from empty dashboard to first approved message sent.</div>
       </div>
       <button class="ob-dismiss" onclick="dismissOnboarding()" title="Dismiss (shows again on refresh until complete)">✕ Dismiss</button>
     </div>
     <div class="ob-steps" id="ob-steps">
-      <div class="ob-step" id="obs-auth">
-        <div class="ob-check pending" id="obc-auth">1</div>
-        <div>
-          <div class="ob-step-title">Secure the dashboard</div>
-          <div class="ob-step-desc">Set DASHBOARD_USER and DASHBOARD_PASS in Railway environment variables.</div>
-          <div class="ob-step-action" onclick="window.open('https://railway.app','_blank')">Open Railway →</div>
-        </div>
-      </div>
-      <div class="ob-step" id="obs-maps">
-        <div class="ob-check pending" id="obc-maps">2</div>
-        <div>
-          <div class="ob-step-title">Verify Google Maps</div>
-          <div class="ob-step-desc">Google Places API must be active with billing enabled.</div>
-          <div class="ob-step-action" onclick="runSystemCheck()">Check now →</div>
-        </div>
-      </div>
-      <div class="ob-step" id="obs-apollo">
-        <div class="ob-check pending" id="obc-apollo">3</div>
-        <div>
-          <div class="ob-step-title">Connect Apollo.io</div>
-          <div class="ob-step-desc">Add your APOLLO_API_KEY to Railway for B2B lead discovery.</div>
-          <div class="ob-step-action" onclick="runSystemCheck()">Check now →</div>
-        </div>
-      </div>
       <div class="ob-step" id="obs-client">
-        <div class="ob-check pending" id="obc-client">4</div>
+        <div class="ob-check pending" id="obc-client">1</div>
         <div>
           <div class="ob-step-title">Add your first client</div>
-          <div class="ob-step-desc">Create a client brief so campaigns are personalised to their business.</div>
+          <div class="ob-step-desc">Create the client record and pair their WhatsApp via Unipile. Outreach goes from their number, not yours.</div>
           <div class="ob-step-action" onclick="switchTabByName('clients')">Go to Clients →</div>
         </div>
       </div>
-      <div class="ob-step" id="obs-campaign">
-        <div class="ob-check pending" id="obc-campaign">5</div>
+      <div class="ob-step" id="obs-brief">
+        <div class="ob-check pending" id="obc-brief">2</div>
         <div>
-          <div class="ob-step-title">Run first dry run</div>
-          <div class="ob-step-desc">Run a dry run campaign to confirm leads are being discovered.</div>
+          <div class="ob-step-title">Complete legal pack &amp; Business Brief</div>
+          <div class="ob-step-desc">Client signs MSA, DPA, NDA (and Closer Addendum if applicable) and fills the brief — ICP, tone, qualifying questions, closing action. Outreach is hard-blocked until both are done.</div>
+          <div class="ob-step-action" onclick="switchTabByName('briefs')">Go to Briefs &amp; Legal →</div>
+        </div>
+      </div>
+      <div class="ob-step" id="obs-leads">
+        <div class="ob-check pending" id="obc-leads">3</div>
+        <div>
+          <div class="ob-step-title">Upload first lead list</div>
+          <div class="ob-step-desc">BYO Leads (CSV) or run Maps/Apollo discovery. Preview rows, attest consent, then import.</div>
           <div class="ob-step-action" onclick="switchTabByName('campaigns')">Go to Campaigns →</div>
+        </div>
+      </div>
+      <div class="ob-step" id="obs-approve">
+        <div class="ob-check pending" id="obc-approve">4</div>
+        <div>
+          <div class="ob-step-title">Approve first drafted message</div>
+          <div class="ob-step-desc">AI drafts; you (or the client in the portal) approve. Nothing goes out without HITL approval.</div>
+          <div class="ob-step-action" onclick="switchTabByName('approvals')">Go to Message Queue →</div>
+        </div>
+      </div>
+      <div class="ob-step" id="obs-send">
+        <div class="ob-check pending" id="obc-send">5</div>
+        <div>
+          <div class="ob-step-title">First message lands → watch replies</div>
+          <div class="ob-step-desc">Replies route to the Closer; warm-up cap auto-ramps over 7 days. You're live.</div>
+          <div class="ob-step-action" onclick="switchTabByName('replies')">Go to Replies →</div>
         </div>
       </div>
     </div>
@@ -5332,31 +5343,52 @@ function initOnboarding() {
 }
 
 async function updateOnboardingChecklist() {
-  const steps = { auth: false, maps: false, apollo: false, client: false, campaign: false };
+  const steps = { client: false, brief: false, leads: false, approve: false, send: false };
+  let firstClient = null;
 
-  // Auth — we can only infer this if we're logged in (if we're here, basic auth passed if set)
-  // Check if DASHBOARD_USER is set via a dedicated endpoint
-  try {
-    const h = await fetchJSON("/api/v1/health");
-    steps.auth    = h.auth_configured === true;
-    steps.maps    = h.maps === "ok";
-    steps.apollo  = h.apollo === "ok";
-  } catch(e) {}
-
-  // Client — check if any clients exist
+  // 1. Client exists
   try {
     const clients = await fetchJSON("/api/v1/clients/");
-    steps.client = Array.isArray(clients) && clients.length > 0;
+    if (Array.isArray(clients) && clients.length > 0) {
+      steps.client = true;
+      firstClient = clients[0].name || clients[0].client_name || null;
+    }
   } catch(e) {}
 
-  // Campaign — check if any contacts have been found
+  // 2. Brief + legal pack complete (against the first client we find)
+  if (firstClient) {
+    let briefOK = false, legalOK = false;
+    try {
+      const h = await fetchJSON(`/api/v1/admin/brief/clients/${encodeURIComponent(firstClient)}/health`);
+      briefOK = h && Array.isArray(h.blockers) && h.blockers.length === 0;
+    } catch(e) {}
+    try {
+      const legal = await fetchJSON(`/api/v1/admin/legal/clients/${encodeURIComponent(firstClient)}`);
+      legalOK = legal && legal.complete === true;
+    } catch(e) {}
+    steps.brief = briefOK && legalOK;
+
+    // 3. First lead list imported
+    try {
+      const imps = await fetchJSON(`/api/v1/b2c/imports/${encodeURIComponent(firstClient)}`);
+      steps.leads = Array.isArray(imps) && imps.length > 0;
+    } catch(e) {}
+  }
+
+  // 4. At least one draft approved
+  try {
+    const stats = await fetchJSON("/api/v1/approvals/stats");
+    steps.approve = stats && (stats.approved || 0) > 0;
+  } catch(e) {}
+
+  // 5. At least one message sent
   try {
     const pipeline = await fetchJSON("/api/v1/contacts/pipeline");
-    const total = Object.values(pipeline).reduce((s, v) => s + (v.contacted || 0) + (v.not_contacted || 0), 0);
-    steps.campaign = total > 0;
+    const total = Object.values(pipeline || {}).reduce((s, v) => s + (v.contacted || 0), 0);
+    steps.send = total > 0;
   } catch(e) {}
 
-  const stepIds = ["auth", "maps", "apollo", "client", "campaign"];
+  const stepIds = ["client", "brief", "leads", "approve", "send"];
   let done = 0;
   stepIds.forEach(id => {
     const stepEl  = document.getElementById(`obs-${id}`);
