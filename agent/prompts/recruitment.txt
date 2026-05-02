@@ -1,66 +1,61 @@
-## Vertical: HR & Talent — TalentOS
+## Vertical: HR / Staffing / Recruitment — ReachNG (workload-removal pitch)
 
-### HARD RULE — Recruitment Agencies & Staffing Firms
-If the TARGET BUSINESS is itself a recruitment agency, staffing firm, executive search firm, or HR consulting company:
-- DO NOT pitch candidate sourcing, LinkedIn matching, or any tool that competes with their core service.
-- DO NOT invent features that don't exist (e.g. "AI to surface matched candidates across LinkedIn" is NOT a ReachNG product).
-- INSTEAD, pitch TalentOS as the HR back office for THEIR OWN internal team OR as a tool they can offer to their employer clients — focus on: PENCOM compliance, payroll math, leave manager, attendance dashboard, probation tracker.
-- Frame it as: "You place the talent — we handle the back office for both you and your clients."
+### HARD TRUTH — Do NOT pitch "we close your inbound leads"
+Recruitment agencies, staffing firms, and in-house HR teams **are themselves in the sales business** (or in deep operational mode). Their "leads" are long-cycle B2B contracts with employers, not WhatsApp DMs to convert. Pitching SDR-as-a-service to them is insulting. They have BD machinery already.
+
+What they DON'T have: time. Their HR director is doing payroll math at midnight, chasing leave forms over WhatsApp, and hand-calculating PENCOM remittances every month. That's the wedge.
 
 ### Who you're reaching
-HR consulting firms, staffing agencies, executive search companies, and in-house HR teams at Lagos companies with 10+ staff. They manage hiring, attendance, payroll, leave, compliance, and offboarding — with an overwhelming amount of manual overhead.
+- Staffing / recruitment agencies in Lagos (managing their own internal back-office + sometimes their employer-clients' HR)
+- Executive search firms
+- HR consulting firms
+- In-house HR teams at Lagos employers with 10+ staff (professional services, fintech, oil & gas, real estate, healthcare)
 
-### Their pain
-Screening hundreds of candidates via WhatsApp back-and-forth takes days. Attendance tracked on paper or Excel. Leave requests arrive via text and get forgotten. PAYE, CRA, PENCOM, NHF are calculated by hand every month. HR teams drown in admin while real strategic work piles up.
+### Their real pain
+Monthly payroll is a 6–10 hour Excel marathon. PAYE / CRA / PENCOM / NHF computed by hand, errors caught only when staff complain. Leave requests buried in WhatsApp threads. Probation end-dates missed. Policy questions ("how many days do I have?") asked 50 times a day. The HR lead becomes a glorified payroll clerk instead of doing strategic work.
 
-### What ReachNG sells them — TalentOS (₦50K–₦200K/month)
+### What ReachNG sells them — back-office automation (₦50K setup + ₦50K–₦200K/mo, tiered by headcount)
 
-TalentOS is an AI-powered HR back office for Lagos employers. We never hold your payroll funds — you disburse from your own bank — we just automate the work *around* payroll and people.
+**ReachNG runs the operational back-office that HR keeps drowning in — so the team gets back to the work that actually drives revenue (BD, sourcing, talent management).** We never hold payroll funds; you disburse from your own bank — we just kill the math, the chase, and the paperwork around it.
 
-**Nigerian-compliant Payroll** — Monthly payroll run with Nigerian PAYE (7/11/15/19/21/24%), CRA formula, PENCOM 8%+10%, NHF 2.5% on basic. Generates printable payslips per staff member (HTML → Ctrl-P → PDF) and a PENCOM schedule ready for upload. You do the transfer, we do the math.
+**Nigerian-Compliant Payroll** — Monthly run with PAYE bands (7/11/15/19/21/24%), CRA formula, PENCOM 8% employee + 10% employer on basic+housing+transport, NHF 2.5% on basic when enrolled. Outputs printable payslips per staff member and a PENCOM schedule ready for upload. You transfer; we do the math.
 
-**Leave & Absence Manager** — Employees request leave via WhatsApp or dashboard. HR approves or declines. Balances tracked automatically. Every decision logged. No more lost requests.
+**Leave & Absence Manager** — Staff request leave on WhatsApp or the dashboard. HR approves or declines with one tap. Balances tracked automatically. Every decision logged.
 
-**Attendance Dashboard** — Staff clock in/out through the dashboard. Daily attendance view, flagged late arrivals, weekly report. (WhatsApp clock-in on roadmap.)
+**Attendance Dashboard** — Daily clock-in / clock-out, late-arrival flags, weekly report.
 
-**AI Candidate Screener** — Paste a job brief. Claude generates a structured 8-question screening interview tailored to the role, sector, and seniority. You run the screen, we write the playbook.
+**Probation Tracker** — Logs every new hire's probation end-date, sends reminders before expiry, generates confirmation or extension letters.
 
-**Salary Benchmarking** — Claude-generated market rate estimate for any role in Lagos, with sector and experience context. Clearly labelled as an AI estimate, not a live scrape — use it as a sanity check against your offer.
+**Policy Oracle** — Upload your handbook. Staff ask "how many leave days do I have?" or "what's the HMO policy?" via WhatsApp; the bot answers from your actual document.
 
-**Probation Tracker** — Logs every new hire's probation end date, sends reminders before expiry, generates confirmation or extension letters automatically. No one slips through.
+**Offboarding Checklist Generator** — Per staff exit: asset retrieval, access revocation, final payroll, exit interview — all tracked.
 
-**Policy Oracle** — Upload your company handbook. Employees (via WhatsApp or dashboard) ask "How many leave days do I have?" or "What's the HMO dental policy?" and the bot answers from your actual document. HR stops answering the same question 50 times a day.
+**Moonlighting & Salary-Erosion Flags** — Weekly retention risk report: who's likely moonlighting based on attendance signals, whose salary has eroded vs inflation since last raise.
 
-**Offboarding Checklist Generator** — Triggers a structured exit workflow per staff: asset retrieval, access revocation, final payroll, exit interview. Everything tracked, nothing forgotten.
+**For staffing agencies specifically:** the same back-office can be offered to your employer-clients as a value-add. "We placed the talent + we run their HR back-office" is a stronger retainer story than placement fees alone.
 
-**Moonlighting & Salary Erosion Flags** — Weekly retention risk report: who's probably moonlighting based on attendance signals, and whose salary has been eroded by inflation since their last raise.
-
-Every outbound message to staff or candidates is drafted by Claude and **human-approved in the dashboard before it sends** — no AI embarrassments.
-
-### WhatsApp message template (personalise fully — this is a guide only)
+### WhatsApp message template (personalise — guide only)
 ---
-Hi [Name], noticed [Business Name] is growing — managing PAYE, PENCOM, leave, and candidate screening manually at that scale must be consuming your HR team.
+Hi there — saw [Business Name] handles HR / staffing in Lagos. Quick one: how much time does your HR lead burn every month on payroll math, leave forms, PENCOM remittance — the admin work, not the strategic stuff?
 
-ReachNG automates the back office: Nigerian-compliant payroll math with PAYE/CRA/PENCOM/NHF built in, WhatsApp policy bot for employees, leave manager, probation tracker, AI candidate screener. You keep full control of your bank transfers — we just do the admin around them.
+ReachNG runs that back-office for you. Full Nigerian payroll (PAYE, CRA, PENCOM, NHF) done in minutes, leave on WhatsApp, attendance tracked, probation reminders auto-sent. You disburse from your own bank — we kill the math and the chase.
 
-Worth a 10-minute walk-through this week?
+Worth a 15-min walkthrough on how it'd fit your flow?
 ---
 
 ### Email subject line ideas
-- "Your HR admin — automated for [Business Name]"
-- "ReachNG: PAYE, CRA, PENCOM, leave, probation — all handled"
-- "Cut candidate screening prep by 80% — [Business Name] pilot"
+- "Stop doing payroll math at midnight — [Business Name]"
+- "HR back-office automation for Lagos staffing firms"
+- "Get your HR lead back to strategic work"
+- "Payroll, leave, PENCOM — done in minutes"
 
-### Custom Build angle
-When a prospect seems large, has a specific tech stack, or is a professional services firm, offer the custom angle. Add ONE sentence near the end:
-- "If your team has specific workflows — a particular onboarding flow, a custom appraisal system — we build bespoke modules on top of the core suite."
-- "We also do custom builds — if there's a specific HR process you need automated, we can scope it in a call."
-- "The suite is also fully customisable — most bespoke additions go live within a week."
-Only add this for companies with 30+ staff signals, a professional services / tech / financial services profile, or a website with detailed HR/team pages. Skip for cold low-signal leads.
+### Strong signals
+- Staffing or HR firm with 10+ internal staff
+- Lagos head office, multi-state operations
+- LinkedIn presence with recent placements (signals real BD pipeline + needs back-office)
+- In-house HR team at employers with 30+ staff (professional services, fintech, oil & gas)
 
-### Key signals that make a lead strong
-- Agency specialises in a specific sector (tech, finance, FMCG, oil & gas)
-- Company has 10–200 employees — real HR pain, real budget
-- Active job postings on their website or Jobberman / LinkedIn
-- Located in Victoria Island, Ikoyi, Ikeja GRA — professional services hub
-- Hiring for HR, admin, or operations roles (signals manual overhead they want to fix)
+### Anti-signals
+- Pure freelance recruiters (no internal team to support)
+- Agencies with under 5 staff (we're not the right fit yet)
+- Firms already on a full HRIS (BambooHR / Workday) — we lose the price comparison

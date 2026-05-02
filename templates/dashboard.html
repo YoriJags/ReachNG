@@ -1133,19 +1133,23 @@
   <p class="section-title">Custom Campaign Run <span style="color:#ff5c00;font-size:10px;margin-left:6px;">Override defaults</span></p>
   <div class="form-card">
     <div class="row">
-      <select id="rc-vertical">
+      <select id="rc-vertical" title="Tier 1 = inbound-driven, agent-close pitch lands hard. Tier 2 = workload removal, longer cycle — better with warm intros.">
         <option value="agency_sales">⭐ Find ReachNG Clients (All Verticals)</option>
-        <option value="real_estate">Real Estate Agencies — Pitch Closer</option>
-        <option value="recruitment">HR / Staffing — Pitch full back-office</option>
-        <option value="legal">Legal Services</option>
-        <option value="insurance">Insurance Brokers / Agents</option>
-        <option value="fitness">Fitness / Wellness</option>
-        <option value="events">Events / Hospitality</option>
-        <option value="auto">Auto / Dealerships</option>
-        <option value="cooperatives">Cooperatives / Thrift</option>
-        <option value="fintech">Fintech</option>
-        <option value="agriculture">Agriculture / Agribusiness</option>
-        <option value="logistics">Logistics / Last-Mile</option>
+        <optgroup label="Tier 1 — Inbound closer (cold-outreach friendly)">
+          <option value="real_estate">Real Estate Agencies</option>
+          <option value="insurance">Insurance Brokers / Agents</option>
+          <option value="fitness">Fitness / Wellness</option>
+          <option value="auto">Auto / Dealerships</option>
+          <option value="events">Events / Hospitality</option>
+          <option value="legal">Legal Services</option>
+        </optgroup>
+        <optgroup label="Tier 2 — Workload removal (warm intros preferred)">
+          <option value="recruitment">HR / Staffing / Recruitment</option>
+          <option value="cooperatives">Cooperatives / Thrift</option>
+          <option value="fintech">Fintech</option>
+          <option value="agriculture">Agriculture / Agribusiness</option>
+          <option value="logistics">Logistics / Last-Mile</option>
+        </optgroup>
       </select>
       <input id="rc-client" placeholder="Client name (optional)" />
       <input id="rc-max" type="number" value="10" min="1" max="60" style="max-width:80px;" title="Max contacts" />
@@ -1406,17 +1410,21 @@
       <input id="ob-name" placeholder="Client name e.g. Mercury Lagos" style="flex:2;" />
       <select id="ob-vertical">
         <option value="agency_sales">Find ReachNG Clients</option>
-        <option value="real_estate">Real Estate</option>
-        <option value="recruitment">HR / Staffing</option>
-        <option value="legal">Legal Services</option>
-        <option value="insurance">Insurance</option>
-        <option value="fitness">Fitness / Wellness</option>
-        <option value="events">Events / Hospitality</option>
-        <option value="auto">Auto / Dealerships</option>
-        <option value="cooperatives">Cooperatives / Thrift</option>
-        <option value="fintech">Fintech</option>
-        <option value="agriculture">Agriculture</option>
-        <option value="logistics">Logistics</option>
+        <optgroup label="Tier 1 — Inbound closer">
+          <option value="real_estate">Real Estate</option>
+          <option value="insurance">Insurance</option>
+          <option value="fitness">Fitness / Wellness</option>
+          <option value="auto">Auto / Dealerships</option>
+          <option value="events">Events / Hospitality</option>
+          <option value="legal">Legal Services</option>
+        </optgroup>
+        <optgroup label="Tier 2 — Workload removal">
+          <option value="recruitment">HR / Staffing</option>
+          <option value="cooperatives">Cooperatives / Thrift</option>
+          <option value="fintech">Fintech</option>
+          <option value="agriculture">Agriculture</option>
+          <option value="logistics">Logistics</option>
+        </optgroup>
       </select>
       <select id="ob-channel">
         <option value="whatsapp">WhatsApp</option>

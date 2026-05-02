@@ -45,11 +45,34 @@ def generate_outreach_message(
     Generate a personalised outreach message for a business.
     Returns {"message": str} for WhatsApp, or {"subject": str, "message": str} for email.
     """
-    from services.brief.verticals import vertical_extras
+    from services.brief.verticals import vertical_extras, vertical_pitch_mode
 
     system = _load_prompt("system.txt")
     self_brief = _load_prompt("self_brief.txt")
     vertical_context = _load_prompt(f"{vertical}.txt")
+
+    # Pitch framing depends on whether the vertical is inbound-driven (close their
+    # existing leads) or operations-driven (free their team from back-office work).
+    pitch_mode = vertical_pitch_mode(vertical)
+    if pitch_mode == "workload_removal":
+        framing_rule = (
+            "\n\nPITCH FRAMING FOR THIS VERTICAL — workload_removal.\n"
+            "This business is itself in the sales business OR runs heavy ops. "
+            "Their 'leads' are long-cycle B2B relationships, not WhatsApp DMs to convert. "
+            "Do NOT pitch 'we close your inbound leads' — it's insulting and irrelevant. "
+            "Instead, lead with WORKLOAD REMOVAL: we run the operational back-office "
+            "(payroll, contributions, dispatch, compliance ops, whatever fits) so their "
+            "team gets back to what they actually do (BD, sourcing, delivery). "
+            "Frame the agent as a back-office hire, not a salesperson."
+        )
+    else:
+        framing_rule = (
+            "\n\nPITCH FRAMING FOR THIS VERTICAL — inbound_closer.\n"
+            "Lead with: 'we close the inbound leads you already have' — DMs, walk-ins, "
+            "form fills, referrals. Frame the agent as the AI sales operator that drafts "
+            "every reply, qualifies, follows up, and books the action — all from their "
+            "own WhatsApp number, all human-approved. Never claim we generate new leads."
+        )
 
     # Vertical-matched operational suite — mention as 'and-also', not the headline.
     extras_blurb = vertical_extras(vertical)
@@ -57,11 +80,11 @@ def generate_outreach_message(
         f"\n\nOPERATIONAL EXTRAS FOR THIS VERTICAL: {extras_blurb}.\n"
         "If — and only if — the prospect's profile clearly fits this vertical, "
         "you MAY mention these once near the end as 'included, no extra fee.' "
-        "Never lead with them. Never bullet-list them. The agent close-and-nurture "
-        "pitch is always the headline."
+        "Never lead with them. Never bullet-list them. The framing rule above "
+        "is always the headline."
         if extras_blurb else
-        "\n\nNo operational suite ships for this vertical yet. Lead with the "
-        "agent close-and-nurture pitch only — do NOT promise back-office modules."
+        "\n\nNo additional operational extras ship for this vertical yet. "
+        "Stick to the framing rule above — do NOT promise back-office modules."
     )
 
     location_hint = ""
@@ -121,9 +144,9 @@ No explanations. No preamble. Just the message.
     # know about their industry) → base system prompt. All three get sent so
     # Claude has a full picture before drafting.
     layered_system = (
-        f"{self_brief}\n\n{vertical_context}{extras_rule}\n\n{system}"
+        f"{self_brief}\n\n{vertical_context}{framing_rule}{extras_rule}\n\n{system}"
         if self_brief else
-        f"{system}\n\n{vertical_context}{extras_rule}"
+        f"{system}\n\n{vertical_context}{framing_rule}{extras_rule}"
     )
 
     response = client.messages.create(
