@@ -247,6 +247,142 @@ _SEEDS: list[VerticalPrimer] = [
         ],
         sample_one_liner="Workplace thrift cooperative for Lagos SME teams — transparent rotating savings.",
     ),
+
+    VerticalPrimer(
+        vertical="recruitment",
+        label="HR / Staffing / Recruitment",
+        vocabulary=[
+            "shortlist", "candidate", "JD", "screening", "probation",
+            "PAYE", "PENCOM", "NHF", "CRA", "headcount", "retainer",
+            "contract staff", "permanent", "background check",
+        ],
+        default_tone="professional, organised, calm-under-pressure",
+        default_qualifying_questions=[
+            "How many roles are you trying to fill right now?",
+            "Are these contract or permanent positions?",
+            "What's your timeline to onboard?",
+            "Have you defined the JD or do you need help shaping it?",
+        ],
+        default_objections=[
+            "We've used agencies before and got bad shortlists",
+            "Your fee is too high",
+            "We can post on LinkedIn / Jobberman ourselves",
+            "We need someone yesterday",
+        ],
+        default_cta="book a 15-min scoping call",
+        compliance_notes=[
+            "NDPR applies to candidate CV data",
+            "Avoid disclosing one candidate's details to another client",
+            "Background checks require candidate consent in writing",
+        ],
+        never_say_defaults=[
+            "guaranteed hire",
+            "we know everyone in your industry",
+            "100% retention",
+        ],
+        sample_one_liner="Lagos staffing partner for finance, tech, and ops roles — vetted shortlists in 7 days.",
+    ),
+
+    VerticalPrimer(
+        vertical="fintech",
+        label="Fintech",
+        vocabulary=[
+            "KYC", "BVN", "NIN", "limit", "tier", "settlement", "MCC",
+            "chargeback", "merchant", "wallet", "payout", "PCIDSS",
+            "CBN sandbox", "PSSP", "PSP", "switching",
+        ],
+        default_tone="precise, compliant, founder-grade",
+        default_qualifying_questions=[
+            "What stage are you at — pre-launch, beta, or live?",
+            "Are you a PSSP, PSP, MMO, or something else?",
+            "Who's your settlement bank / sponsor?",
+            "What's your monthly transaction volume?",
+        ],
+        default_objections=[
+            "We can build this in-house",
+            "Our compliance team won't approve a third-party",
+            "We're already using [competitor]",
+        ],
+        default_cta="book a technical scoping call",
+        compliance_notes=[
+            "CBN regulations apply — never claim we are licensed",
+            "NDPR + PCIDSS for any card data handling",
+            "Marketing claims about 'instant settlement' need disclaimers",
+        ],
+        never_say_defaults=[
+            "regulated by the CBN",
+            "guaranteed instant",
+            "no chargebacks",
+            "fully PCI compliant out of the box",
+        ],
+        sample_one_liner="Lagos-built payment infrastructure for Nigerian SMEs.",
+    ),
+
+    VerticalPrimer(
+        vertical="agriculture",
+        label="Agriculture / Agribusiness",
+        vocabulary=[
+            "off-take", "input financing", "smallholder", "aggregator",
+            "yield", "season", "harvest", "cold chain", "warehouse receipt",
+            "extension", "AGSMEIS", "NIRSAL", "anchor borrower",
+        ],
+        default_tone="grounded, practical, peer-to-peer with operators",
+        default_qualifying_questions=[
+            "What crops or livestock are you working with?",
+            "Are you producing, aggregating, processing, or distributing?",
+            "Do you have off-takers lined up or still searching?",
+            "What's your hectarage / monthly volume?",
+        ],
+        default_objections=[
+            "Margins are too thin to add tooling",
+            "Network is bad in our farm location",
+            "We've been burned by tech promises before",
+        ],
+        default_cta="book a 15-min call",
+        compliance_notes=[
+            "Avoid claims about NIRSAL / CBN / AGSMEIS approval — we are not a financier",
+            "Do not promise off-takers we have not signed",
+        ],
+        never_say_defaults=[
+            "guaranteed off-take",
+            "guaranteed yield improvement",
+            "we are partnered with NIRSAL",
+        ],
+        sample_one_liner="Off-take and aggregation operator serving Lagos & South-West farms.",
+    ),
+
+    VerticalPrimer(
+        vertical="logistics",
+        label="Logistics / Last-Mile",
+        vocabulary=[
+            "rider", "dispatch", "SLA", "POD", "consignment", "manifest",
+            "fleet", "route", "load factor", "turnaround", "geofence",
+            "third-party logistics", "3PL", "last-mile", "intra-city",
+        ],
+        default_tone="operational, fast, no-fluff",
+        default_qualifying_questions=[
+            "How many deliveries / shipments per day?",
+            "Intra-city, inter-state, or both?",
+            "Own fleet, contracted riders, or hybrid?",
+            "What's your biggest pain — late deliveries, lost packages, or rider management?",
+        ],
+        default_objections=[
+            "We've tried logistics tooling and it didn't fit our flow",
+            "Our riders won't use another app",
+            "Our customers prefer WhatsApp updates",
+        ],
+        default_cta="book a 20-min ops walkthrough",
+        compliance_notes=[
+            "Lagos State Transport regulations apply for inter-state",
+            "Driver/rider data is NDPR-covered",
+        ],
+        never_say_defaults=[
+            "guaranteed on-time",
+            "zero failed deliveries",
+            "we replace your dispatcher",
+        ],
+        sample_one_liner="Last-mile dispatch operator covering Lagos mainland and island corridors.",
+    ),
 ]
 
 

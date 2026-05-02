@@ -45,9 +45,24 @@ def generate_outreach_message(
     Generate a personalised outreach message for a business.
     Returns {"message": str} for WhatsApp, or {"subject": str, "message": str} for email.
     """
+    from services.brief.verticals import vertical_extras
+
     system = _load_prompt("system.txt")
     self_brief = _load_prompt("self_brief.txt")
     vertical_context = _load_prompt(f"{vertical}.txt")
+
+    # Vertical-matched operational suite — mention as 'and-also', not the headline.
+    extras_blurb = vertical_extras(vertical)
+    extras_rule = (
+        f"\n\nOPERATIONAL EXTRAS FOR THIS VERTICAL: {extras_blurb}.\n"
+        "If — and only if — the prospect's profile clearly fits this vertical, "
+        "you MAY mention these once near the end as 'included, no extra fee.' "
+        "Never lead with them. Never bullet-list them. The agent close-and-nurture "
+        "pitch is always the headline."
+        if extras_blurb else
+        "\n\nNo operational suite ships for this vertical yet. Lead with the "
+        "agent close-and-nurture pitch only — do NOT promise back-office modules."
+    )
 
     location_hint = ""
     if address:
@@ -105,7 +120,11 @@ No explanations. No preamble. Just the message.
     # Layer order: ReachNG self-brief (voice) → vertical pitch primer (what we
     # know about their industry) → base system prompt. All three get sent so
     # Claude has a full picture before drafting.
-    layered_system = f"{self_brief}\n\n{vertical_context}\n\n{system}" if self_brief else f"{system}\n\n{vertical_context}"
+    layered_system = (
+        f"{self_brief}\n\n{vertical_context}{extras_rule}\n\n{system}"
+        if self_brief else
+        f"{system}\n\n{vertical_context}{extras_rule}"
+    )
 
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",

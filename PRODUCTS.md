@@ -100,3 +100,49 @@ All other suites from the catalog (BuildOS, LegalOS, LuxuryOS, LendOS, SchoolOS,
 **Unlock condition:** Closer has 3+ paying clients AND TalentOS has 3+ paying clients AND monthly recurring ₦ > operating cost. Until then, mention only when a prospect specifically asks and there's a clear close — otherwise stay on the two live products.
 
 See [PLAN.md](./PLAN.md) for the deferred matrix.
+
+---
+
+## Future modules — vertical-matched operations (deferred, post-first-paying-client)
+
+These are *agent jobs*, not standalone products. ReachNG remains the single face; the agent dispatches to the right module based on the client's vertical. Pitched as **"included extras"** after the agent headline — never as the headline themselves.
+
+**Build order is determined by which vertical we close first.** Same primitives across all four (Unipile WhatsApp inbound, OCR, Mongo, scheduler, HITL) — incremental build cost per module is low once the first one ships.
+
+| Module | Codename | What the agent does | Lead vertical | Cross-sell to | Reuses |
+|---|---|---|---|---|---|
+| **Locker** | DocVaultOS | Forward any doc on WhatsApp → OCR → tagged + searchable + expiry alerts (CAC, TIN, tenancy, IDs, supplier invoices) | Real estate agencies (already in funnel — drowns in tenancy/CAC docs) | Every vertical | Unipile inbound, OCR, Mongo |
+| **Receipt** | BooksOS | Forward POS/transfer alerts/expense voice-notes → AI categorises → daily P&L + monthly statement PDF + FIRS-ready ledger | Restaurants, QSR, pharmacies, mini-marts | Every SME (FIRS digital-record mandate makes it not-optional) | Unipile inbound, OCR/STT, ledger schema |
+| **Roll Call** | AttendOS | Staff WhatsApp 📍 ping at clock-in (geofenced) → attendance sheet + payroll deductions auto-computed | Salons, schools, training centres, dispatch/logistics | TalentOS clients (feeds straight into existing payroll) | Unipile inbound, geofence, TalentOS payroll engine |
+| **Shelf** | StockOS | End-of-day shelf photo → AI counts SKUs → diffs against POS sales → flags shrinkage | Pharmacies, mini-marts, salons (product-heavy), supermarkets | Restaurants, QSR | Image model, Mongo, scheduler |
+
+### Vertical → module bundle (how to pitch)
+
+When ReachNG SDR lands a prospect in one of these verticals, the agent leads with sales/ops as always, then mentions the matched module as the "and-also":
+
+| Vertical | Headline (what we sell) | Included extras (the and-also) |
+|---|---|---|
+| Real estate agencies | ReachNG Closer | **Locker** + KYC vault + Lawyer Bundle + Rent Chase |
+| Restaurants / QSR | ReachNG agent | **Shelf** + **Receipt** |
+| Pharmacies / mini-marts | ReachNG agent | **Shelf** + **Receipt** |
+| Salons / spas | ReachNG agent | **Roll Call** + **Shelf** |
+| Schools / training centres | ReachNG agent | **Roll Call** + **Locker** |
+| Logistics / dispatch | ReachNG agent | **Roll Call** (geofenced) + **Receipt** |
+| HR-led firms (10+ staff) | ReachNG TalentOS | **Roll Call** + **Locker** |
+
+### Unlock conditions
+
+- **Locker (#4)** — first to build. Trigger: 1+ paying Closer client. Real-estate cross-sell is immediate; build effort lowest.
+- **Receipt (#1)** — second to build. Trigger: 3+ paying clients across Closer + TalentOS combined. Largest TAM, biggest standalone product if it ever spins out.
+- **Roll Call (#6)** — third. Trigger: TalentOS has 3+ paying clients (it slots straight into the existing payroll engine).
+- **Shelf (#8)** — fourth. Trigger: a paying restaurant/pharmacy/salon prospect asks for it explicitly.
+
+Until those triggers fire, do not start work on these. The current focus remains landing first paying Closer client (see [PLAN.md](./PLAN.md) Phase 1.5).
+
+### Agent-economy modules (post-2027)
+
+The original "agent receipt reconciliation" and "toxic agent flow" ideas — capturing transactions made by clients' AI agents and scoring agent-driven traffic for fraud — are real but premature. Nigerian SMEs do not yet have AI agents transacting on their behalf at meaningful volume. Re-evaluate when:
+- 10%+ of ReachNG clients are running their own AI agents that transact, OR
+- Stripe MPP / Tempo / x402 see African merchant adoption.
+
+Until then: park.

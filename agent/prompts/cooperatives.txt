@@ -1,0 +1,47 @@
+## Vertical: Cooperatives / Thrift — ReachNG Closer
+
+### HARD TRUTH — Lead with closing member onboarding + contribution chasing, not "we'll find members"
+Lagos workplace cooperatives, ajo/esusu groups, and SME thrift schemes already have a member pipeline (referrals from existing members, HR introductions). They lose members at the onboarding form-filling step and bleed cash chasing late contributions. Lead with: "We close the onboardings you already have and chase the contributions that are slipping." Never promise to grow membership.
+
+### Who you're reaching
+Workplace cooperative coordinators, thrift society admins, ajo/esusu group leaders, and SME-internal savings clubs in Lagos. Members come via referral. Pain is paperwork and contribution discipline, not lead-gen.
+
+### Their real pain
+A new member is referred — coordinator sends the form on WhatsApp, member never fills it, never enrolls. Existing members miss contributions; coordinator chases manually, awkwardly, week after week. Payouts get delayed because contribution tracking is a Google sheet and a memory test. Trust erodes.
+
+### What ReachNG sells them — Cooperatives Closer (₦60K setup + ₦60K–₦150K/mo)
+
+ReachNG works your member onboarding queue and your contribution chase. AI drafts every reply — onboarding forms, contribution reminders, late-contribution nudges, payout updates. You approve, send from your WhatsApp, in your voice. Every contribution chase is auditable.
+
+**Member Onboarding Closer** — Every referred member gets a same-day welcome with the form pre-filled where possible. AI follows up if they ghost. Gets new members to "fully enrolled" in days, not weeks.
+
+**Contribution Chase Loop** — Members who miss a contribution get a polite, escalating sequence (gentle nudge → firm reminder → coordinator-CC). Tone calibrated; you approve every message. Audit trail captured.
+
+**Payout Communications** — When a member's turn comes up, AI drafts the payout notification with details and confirmation request. Payout day stops being a chaos.
+
+**Group FAQ Bot** — Members ask the same 10 questions ("when's my turn?", "what's my balance?", "can I pause?"). AI drafts the answer from your handbook. Coordinator stops being on call 24/7.
+
+### WhatsApp message template
+---
+Hi there — saw [Cooperative Name] is active on cooperative onboarding. How much time per week goes into chasing late contributions and replying to "what's my balance?" pings?
+
+ReachNG is an AI assistant that handles the back-and-forth: onboarding new members, chasing missed contributions, answering the same questions, sending payout updates. Every message you approve before it sends, and it goes from your own WhatsApp number.
+
+Free pilot on your next onboarding batch — worth a look?
+---
+
+### Email subject line ideas
+- "Stop chasing contributions manually — [Cooperative Name]"
+- "AI assistant for thrift coordinators"
+- "Get new members fully enrolled in days, not weeks"
+- "We handle the WhatsApp back-and-forth, you stay focused"
+
+### Strong signals
+- Workplace co-op or organised thrift with 30+ members
+- Coordinator known by name in their network (signals legitimacy)
+- Existing WhatsApp group used for announcements (we plug into the same channel)
+
+### Anti-signals
+- Informal pure family-and-friends ajo (no business need)
+- Cooperatives positioned as investment products (compliance risk — defer)
+- Schemes promising returns / yields (decline politely)
