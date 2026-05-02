@@ -20,7 +20,7 @@ Four documents drafted ready for lawyer review. Every clause needing legal verif
 
 ## What we are / aren't (one-pager for the lawyer)
 
-- **What we are**: Nigerian SaaS platform that orchestrates AI-drafted, human-approved outbound messaging (WhatsApp + email) for SMEs across real estate and HR.
+- **What we are**: ReachNG is an agentic employee for Nigerian SMEs. Clients feed the agent their own leads (inbound WhatsApp/IG/web enquiries, BYO contact lists, referrals) and the agent runs the conversation — drafts replies, qualifies, follows up, closes. After a deal is signed, the same agent handles ongoing operational work (rent chase, payroll, invoice reminders, KYC). Every outbound message is human-approved before it sends and is delivered from the client's own WhatsApp number, not ours. We do not prospect on behalf of our clients.
 - **What we are not**: not a lender, not a payments provider, not a custodian of client funds, not a CRM. We process PII on behalf of our clients (data processor, not controller).
 - **Sub-processors**: Anthropic (AI drafting), Unipile (WhatsApp gateway), MongoDB Atlas (storage), Railway (hosting).
 - **PII categories**: full name, phone, email, address.

@@ -2,7 +2,29 @@
 
 What we actually sell. Who to. For how much. Status.
 
-Last updated: 2026-04-20
+Last updated: 2026-04-30
+
+---
+
+## What ReachNG is (lead with this, always)
+
+**ReachNG is an agentic employee for Nigerian SMEs.** The client brings their leads — inbound WhatsApp/IG/web enquiries, BYO CSVs they've already pulled, referrals — and the agent works them: drafts replies, qualifies, follows up, closes. Once a deal is signed, the same agent runs the operational back-office work the founder used to do by hand. Every outbound is human-approved; every message sends from the client's own WhatsApp number, not ours.
+
+The pitch is the agent — what it *does for them*. Not a feature matrix.
+
+**Two things the agent does for paying clients, in order:**
+1. **Closes & nurtures** — works leads the client feeds in. Drafts the first-touch, qualifies the replies, handles objections, books the action (viewing, call, quote, payment), runs day-3 / day-7 follow-up sequences automatically.
+2. **Operates** — once they're a customer, the same agent runs the operational work: rent chase, payroll, invoice follow-up, KYC, lawyer bundles, attendance, payslips. Suites are *jobs the agent already knows how to do*, not products in their own right.
+
+**What ReachNG does NOT do for clients:** prospect on their behalf. Discovery (Google Maps, Apollo, social signals) is *our* internal customer-acquisition funnel — it's how we find SMEs to pitch ReachNG to. It is not a feature we sell. If a client asks for outbound prospecting, that's an upsell conversation, not the default product.
+
+The internal suite names below (EstateOS, TalentOS, etc.) are **codenames only** — they exist for engineering clarity. Externally, everything is "ReachNG."
+
+**However:** for prospects in a vertical where we already have an operational suite, mention it as an *included extra* after leading with the agent pitch. Examples:
+- To a Lagos estate agent: "Because you're in real estate, you also get Rent Roll + chase, KYC vault, and the Lawyer Bundle — included, no extra fee."
+- To an HR firm: "Plus full Nigerian payroll (PAYE/CRA/PENCOM/NHF), Leave, Attendance, Probation tracking — included."
+
+The agent is always the headline. The suite is the *and-also*.
 
 ---
 
