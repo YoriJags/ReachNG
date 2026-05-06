@@ -166,11 +166,14 @@ No explanations. No preamble. Just the message.
     )
 
     raw = response.content[0].text.strip()
-    # Fix double-encoded UTF-8 (e.g. â€" → —)
-    try:
-        raw = raw.encode("latin-1").decode("utf-8")
-    except (UnicodeEncodeError, UnicodeDecodeError):
-        pass
+    # Normalize dashes — Windows-1252 misread of UTF-8 em dash bytes (E2 80 94)
+    # produces â€" (â€”). Replace both garbled and clean forms.
+    raw = (raw
+           .replace("â€”", " - ")   # garbled em dash (cp1252 misread)
+           .replace("â€“", " - ")   # garbled en dash variant
+           .replace("—", " - ")               # proper em dash
+           .replace("–", "-")                 # en dash
+           )
 
     if channel == "email":
         # Parse JSON response
