@@ -83,6 +83,7 @@ class BaseCampaign:
         skipped_contacted = 0
         skipped_no_channel = 0
         errors = 0
+        dry_run_previews: list[dict] = []
 
         # Step 1: Discover — Google Maps + Apollo + Social + Signal Intelligence (run in parallel)
         # Fetch 2x max_new_contacts per source so filters have candidates to work with,
@@ -317,6 +318,16 @@ class BaseCampaign:
 
             if dry_run:
                 log.info("dry_run_message", business=biz["name"], channel=channel, message=generated)
+                dry_run_previews.append({
+                    "business": biz["name"],
+                    "contact_name": biz.get("contact_name"),
+                    "channel": channel,
+                    "phone": biz.get("phone"),
+                    "email": biz.get("email"),
+                    "source": biz.get("source"),
+                    "message": generated.get("message") or generated.get("body"),
+                    "subject": generated.get("subject"),
+                })
                 sent += 1
                 continue
 
@@ -449,6 +460,8 @@ class BaseCampaign:
                 "total_after_dedup": len(businesses),
             },
         }
+        if dry_run and dry_run_previews:
+            summary["messages"] = dry_run_previews
         log.info("campaign_complete", **summary)
         return summary
 
