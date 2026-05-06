@@ -166,6 +166,11 @@ No explanations. No preamble. Just the message.
     )
 
     raw = response.content[0].text.strip()
+    # Fix double-encoded UTF-8 (e.g. â€" → —)
+    try:
+        raw = raw.encode("latin-1").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        pass
 
     if channel == "email":
         # Parse JSON response
