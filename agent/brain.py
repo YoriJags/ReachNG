@@ -760,6 +760,59 @@ def generate_auto_reply_draft(
     return response.content[0].text.strip()
 
 
+def classify_for_autopilot(
+    draft_message: str,
+    inbound_context: Optional[str] = None,
+    channel: str = "whatsapp",
+) -> dict:
+    """
+    Classify whether a draft is safe for autopilot sending or needs a human.
+
+    Returns:
+        verdict:  "SAFE_TO_SEND" | "NEEDS_HUMAN"
+        reason:   one-line reason (only meaningful when NEEDS_HUMAN)
+
+    SAFE_TO_SEND if:   standard outreach / booking confirmation / simple qualification
+    NEEDS_HUMAN if:    complaint, refund, dispute, legal threat, confusion, sensitive topic,
+                       or the draft itself contains uncertainty markers ("I think", "maybe", etc.)
+    """
+    client = _get_client()
+    context_block = f"\n\nInbound message context:\n\"{inbound_context}\"" if inbound_context else ""
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=100,
+        messages=[{
+            "role": "user",
+            "content": (
+                f"You are an autopilot safety classifier. Decide if this draft {channel} message "
+                f"is safe to send automatically or needs human review.\n\n"
+                f"Draft message:\n\"{draft_message}\"{context_block}\n\n"
+                "NEEDS_HUMAN if ANY of these apply:\n"
+                "- Inbound message contains: complaint, refund request, dispute, legal threat, "
+                "anger, abuse, safety concern\n"
+                "- Draft contains uncertainty: 'I think', 'maybe', 'possibly', 'I'm not sure'\n"
+                "- Draft makes a specific promise about pricing, dates, or commitments the human hasn't confirmed\n"
+                "- Inbound is from a distressed or confused customer\n\n"
+                "SAFE_TO_SEND for: standard outreach, booking confirmations, qualification questions, "
+                "follow-ups, simple info responses.\n\n"
+                "Return JSON only: {\"verdict\": \"SAFE_TO_SEND\" | \"NEEDS_HUMAN\", \"reason\": \"one line\"}"
+            ),
+        }],
+    )
+
+    import json
+    raw = response.content[0].text.strip()
+    try:
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        return json.loads(raw.strip())
+    except Exception:
+        log.warning("autopilot_classify_parse_failed", raw=raw)
+        return {"verdict": "NEEDS_HUMAN", "reason": "parse_failed — defaulting to safe"}
+
+
 def generate_campaign_summary(stats: dict, vertical: str) -> str:
     """Generate a plain-English campaign summary for the dashboard."""
     client = _get_client()

@@ -98,6 +98,7 @@ async def get_portal_data(token: str):
         "stats": stats,
         "roi": roi,
         "contacts": contacts,
+        "autopilot": client.get("autopilot", False),
     }
 
 

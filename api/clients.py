@@ -78,6 +78,7 @@ class ClientUpsert(BaseModel):
     meta_access_token: Optional[str] = None
     daily_send_limit: Optional[int] = None   # Overrides global DAILY_SEND_LIMIT for this client
     product: Optional[str] = "reachng"       # "reachng" | "digital_associates" | "loan_officer"
+    autopilot: bool = False                  # If True, safe drafts send without human approval
 
 
 class PaymentUpdate(BaseModel):
@@ -210,6 +211,7 @@ async def upsert_client(payload: ClientUpsert):
         set_doc["daily_send_limit"] = payload.daily_send_limit
     if payload.product is not None:
         set_doc["product"] = payload.product
+    set_doc["autopilot"] = payload.autopilot
 
     result = clients.update_one(
         {"name": {"$regex": f"^{re.escape(payload.name)}$", "$options": "i"}},
@@ -391,6 +393,18 @@ async def list_invoices(name: str):
         if hasattr(inv.get("created_at"), "isoformat"):
             inv["created_at"] = inv["created_at"].isoformat()
     return invoices
+
+
+@router.patch("/{name}/autopilot")
+async def set_autopilot(name: str, enabled: bool):
+    """Toggle autopilot mode on/off for a client."""
+    result = get_clients().update_one(
+        {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}},
+        {"$set": {"autopilot": enabled, "updated_at": datetime.now(timezone.utc)}},
+    )
+    if result.matched_count == 0:
+        raise HTTPException(404, f"Client '{name}' not found")
+    return {"success": True, "client": name, "autopilot": enabled}
 
 
 @router.delete("/{name}")

@@ -565,6 +565,26 @@
       </div>
     </div>
 
+    <!-- Autopilot toggle -->
+    <div class="section-label">AI Settings</div>
+    <div id="autopilot-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;">
+      <div>
+        <div style="font-size:14px;font-weight:600;color:#e8e8e8;">Autopilot Mode</div>
+        <div style="font-size:12px;color:#555;margin-top:4px;" id="ap-portal-desc">
+          When off, every AI draft waits for your approval before sending.
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="ap-portal-status" style="font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.08em;">HITL</span>
+        <label style="position:relative;display:inline-block;width:44px;height:24px;">
+          <input type="checkbox" id="ap-portal-toggle" style="opacity:0;width:0;height:0;" onchange="portalToggleAutopilot(this.checked)">
+          <span id="ap-portal-slider" style="position:absolute;cursor:pointer;inset:0;background:#1e2530;border-radius:24px;transition:.2s;border:1px solid #2a3340;">
+            <span id="ap-portal-knob" style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#555;border-radius:50%;transition:.2s;"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+
     <!-- Outreach activity table -->
     <div class="section-label">Outreach Activity</div>
     <div class="leads-table-wrap">
@@ -738,10 +758,48 @@ async function load() {
     allContacts = contacts;
     renderLeads();
 
+    // Autopilot toggle state
+    const apEnabled = data.autopilot === true;
+    _setApState(apEnabled);
+
   } catch(err) {
     document.getElementById("loading").innerHTML =
       '<div style="color:#ff4444;font-size:13px;">Error loading dashboard. Please refresh.</div>';
     console.error(err);
+  }
+}
+
+function _setApState(enabled) {
+  const toggle = document.getElementById("ap-portal-toggle");
+  const slider = document.getElementById("ap-portal-slider");
+  const knob   = document.getElementById("ap-portal-knob");
+  const status = document.getElementById("ap-portal-status");
+  const desc   = document.getElementById("ap-portal-desc");
+  if (!toggle) return;
+  toggle.checked = enabled;
+  slider.style.background = enabled ? "#ff5500" : "#1e2530";
+  slider.style.borderColor = enabled ? "#ff5500" : "#2a3340";
+  knob.style.transform = enabled ? "translateX(20px)" : "none";
+  knob.style.background = enabled ? "#fff" : "#555";
+  status.textContent = enabled ? "AUTO" : "HITL";
+  status.style.color = enabled ? "#ff5500" : "#555";
+  desc.textContent = enabled
+    ? "Autopilot ON — AI sends safe messages directly. Complaints and disputes still come to you."
+    : "Autopilot OFF — every AI draft waits for your approval before sending.";
+}
+
+async function portalToggleAutopilot(enabled) {
+  try {
+    const resp = await fetch(`/api/v1/clients/{{ client_name }}/autopilot?enabled=${enabled}`, {
+      method: "PATCH",
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    _setApState(enabled);
+  } catch(e) {
+    alert("Could not update autopilot: " + e.message);
+    // Revert toggle
+    _setApState(!enabled);
+    document.getElementById("ap-portal-toggle").checked = !enabled;
   }
 }
 

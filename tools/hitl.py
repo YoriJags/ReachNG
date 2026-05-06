@@ -13,6 +13,8 @@ Brief Gate:
   fleet) are warn-only — the chase can still go out with a thin brief
   because the customer relationship already exists.
 """
+import asyncio
+import concurrent.futures
 from datetime import datetime, timedelta, timezone
 from bson import ObjectId
 from database import get_db
@@ -28,6 +30,17 @@ _PROSPECTING_SOURCES = {
 }
 
 log = structlog.get_logger()
+
+
+def _run_async(coro):
+    """Run an async coroutine from sync code, regardless of whether a loop is already running."""
+    try:
+        asyncio.get_running_loop()
+        # We're inside an async context — run in a thread to avoid loop conflict
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            return pool.submit(asyncio.run, coro).result(timeout=25)
+    except RuntimeError:
+        return asyncio.run(coro)
 
 
 class BriefIncompleteError(Exception):
@@ -82,8 +95,13 @@ def queue_draft(
     post_context: str | None = None, # the triggering post/tweet text
     profile_url: str | None = None,
     client_name: str | None = None, # required for prospecting gate; optional for transactional
+    inbound_context: str | None = None, # inbound message that triggered this draft (for autopilot classifier)
 ) -> str:
     """Store a generated message as a pending approval. Returns approval _id.
+
+    If the client has autopilot=True and the draft passes the safety classifier,
+    sends immediately via Unipile/Meta and stores with status=auto_sent.
+    Otherwise queues as pending for human approval.
 
     Raises BriefIncompleteError if `source` is a prospecting channel
     AND `client_name` is provided AND the client's BusinessBrief has
@@ -92,6 +110,24 @@ def queue_draft(
     """
     _enforce_brief_gate(source=source, client_name=client_name)
     _enforce_account_caps(source=source, client_name=client_name)
+
+    # ── Autopilot check ───────────────────────────────────────────────────────
+    if client_name and _is_autopilot_enabled(client_name):
+        sent = _try_autopilot_send(
+            contact_id=contact_id,
+            contact_name=contact_name,
+            client_name=client_name,
+            vertical=vertical,
+            channel=channel,
+            message=message,
+            subject=subject,
+            phone=phone,
+            email=email,
+            source=source,
+            inbound_context=inbound_context,
+        )
+        if sent:
+            return sent  # Returns the stored doc _id — no human needed
 
     col = get_approvals()
     result = col.insert_one({
@@ -246,3 +282,121 @@ def _update_status(approval_id: str, status: str) -> dict | None:
         {"$set": {"status": status, "actioned_at": datetime.now(timezone.utc)}},
     )
     return col.find_one({"_id": ObjectId(approval_id)})
+
+
+# ─── Autopilot helpers ────────────────────────────────────────────────────────
+
+def _is_autopilot_enabled(client_name: str) -> bool:
+    """Check if client has autopilot mode active."""
+    try:
+        from api.clients import get_clients
+        client = get_clients().find_one(
+            {"name": {"$regex": f"^{client_name}$", "$options": "i"}},
+            {"autopilot": 1},
+        )
+        return bool(client and client.get("autopilot"))
+    except Exception as e:
+        log.warning("autopilot_check_failed", client=client_name, error=str(e))
+        return False
+
+
+def _try_autopilot_send(
+    *,
+    contact_id: str,
+    contact_name: str,
+    client_name: str,
+    vertical: str,
+    channel: str,
+    message: str,
+    subject: str | None,
+    phone: str | None,
+    email: str | None,
+    source: str,
+    inbound_context: str | None,
+) -> str | None:
+    """
+    Run the autopilot classifier. If SAFE_TO_SEND, dispatch the message immediately,
+    log it as auto_sent, and return the stored doc _id. Returns None if NEEDS_HUMAN.
+    """
+    try:
+        from agent.brain import classify_for_autopilot
+        result = classify_for_autopilot(
+            draft_message=message,
+            inbound_context=inbound_context,
+            channel=channel,
+        )
+    except Exception as e:
+        log.warning("autopilot_classify_error", error=str(e))
+        return None
+
+    verdict = result.get("verdict", "NEEDS_HUMAN")
+    reason  = result.get("reason", "")
+
+    if verdict != "SAFE_TO_SEND":
+        log.info("autopilot_escalated", contact=contact_name, reason=reason)
+        # Still queue — but tag so dashboard shows escalation reason
+        col = get_approvals()
+        res = col.insert_one({
+            "contact_id":        ObjectId(contact_id),
+            "contact_name":      contact_name,
+            "client_name":       client_name,
+            "vertical":          vertical,
+            "channel":           channel,
+            "message":           message,
+            "subject":           subject,
+            "phone":             phone,
+            "email":             email,
+            "source":            source,
+            "status":            ApprovalStatus.PENDING,
+            "escalation_reason": reason,
+            "autopilot_checked": True,
+            "created_at":        datetime.now(timezone.utc),
+            "expires_at":        datetime.now(timezone.utc) + timedelta(hours=DRAFT_EXPIRY_HOURS),
+            "actioned_at":       None,
+            "edited_message":    None,
+        })
+        return None  # Signal caller to not store a second record
+
+    # Dispatch
+    from api.clients import get_clients
+    client_doc = get_clients().find_one(
+        {"name": {"$regex": f"^{client_name}$", "$options": "i"}}
+    ) or {}
+
+    send_result: dict = {"success": False}
+    try:
+        if channel == "whatsapp" and phone:
+            from tools.outreach import send_whatsapp_for_client
+            send_result = _run_async(send_whatsapp_for_client(phone, message, client_doc))
+        elif channel == "email" and email:
+            from tools.outreach import send_email
+            send_result = _run_async(send_email(email, subject or "Message from ReachNG", message))
+    except Exception as e:
+        log.error("autopilot_send_failed", contact=contact_name, channel=channel, error=str(e))
+        return None  # Fall back to HITL queue
+
+    if not send_result.get("success"):
+        log.warning("autopilot_send_unsuccessful", contact=contact_name, detail=send_result)
+        return None
+
+    # Log as sent
+    col = get_approvals()
+    res = col.insert_one({
+        "contact_id":    ObjectId(contact_id),
+        "contact_name":  contact_name,
+        "client_name":   client_name,
+        "vertical":      vertical,
+        "channel":       channel,
+        "message":       message,
+        "subject":       subject,
+        "phone":         phone,
+        "email":         email,
+        "source":        source,
+        "status":        "auto_sent",
+        "send_result":   send_result,
+        "created_at":    datetime.now(timezone.utc),
+        "actioned_at":   datetime.now(timezone.utc),
+        "edited_message": None,
+    })
+    log.info("autopilot_sent", contact=contact_name, channel=channel, message_id=send_result.get("message_id"))
+    return str(res.inserted_id)

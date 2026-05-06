@@ -367,11 +367,21 @@
   .ct-usage-fill.safe { background:#00e5a0; }
   .ct-usage-fill.warn { background:#f5c842; }
 
-  .ct-actions { display:flex; gap:6px; flex-wrap:wrap; }
+  .ct-actions { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
   .ct-btn { font-size:10px; font-weight:600; padding:5px 10px; border:1px solid #2a3340; background:#111; color:#aaa; border-radius:6px; cursor:pointer; white-space:nowrap; transition:all 0.15s; }
   .ct-btn:hover { background:#1e2530; color:#e8e8e8; }
   .ct-btn.primary { background:#ff5500; border-color:#ff5500; color:#fff; }
   .ct-btn.primary:hover { background:#cc4400; }
+
+  /* Autopilot toggle */
+  .ap-toggle-wrap { display:flex; align-items:center; gap:5px; }
+  .ap-label { font-size:10px; font-weight:600; color:#555; }
+  .ap-toggle { position:relative; display:inline-block; width:32px; height:18px; }
+  .ap-toggle input { opacity:0; width:0; height:0; }
+  .ap-slider { position:absolute; cursor:pointer; inset:0; background:#1e2530; border-radius:18px; transition:.2s; border:1px solid #2a3340; }
+  .ap-slider:before { position:absolute; content:""; height:12px; width:12px; left:2px; bottom:2px; background:#555; border-radius:50%; transition:.2s; }
+  .ap-toggle input:checked + .ap-slider { background:#ff5500; border-color:#ff5500; }
+  .ap-toggle input:checked + .ap-slider:before { transform:translateX(14px); background:#fff; }
 
   /* Plan cards */
   .plan-card { background:#0e1218; border:1px solid #1e2530; border-radius:10px; padding:20px; position:relative; }
@@ -4333,6 +4343,13 @@ async function loadControlTower() {
             <button class="ct-btn primary" onclick="quickRunCampaign('${c.name}','${c.vertical||"real_estate"}')">Run</button>
             <button class="ct-btn" onclick="openInvoice('${encodeURIComponent(c.name)}')">Invoice</button>
             <button class="ct-btn" onclick="ctUpdatePayment('${c.name}','${payStatus}')">Status</button>
+            <div class="ap-toggle-wrap" data-client="${c.name}" title="${c.autopilot ? 'Autopilot ON — AI sends directly when safe' : 'Autopilot OFF — every draft needs approval'}">
+              <label class="ap-toggle">
+                <input type="checkbox" ${c.autopilot ? 'checked' : ''} onchange="toggleAutopilot('${c.name}', this.checked)">
+                <span class="ap-slider"></span>
+              </label>
+              <span class="ap-label">${c.autopilot ? 'Auto' : 'HITL'}</span>
+            </div>
           </div>
         </div>`;
       }).join("");
@@ -4621,6 +4638,22 @@ async function runTowerSweep() {
 
   } catch(e) {
     console.error("Sweep failed:", e);
+  }
+}
+
+async function toggleAutopilot(name, enabled) {
+  try {
+    await fetch(`/api/v1/clients/${encodeURIComponent(name)}/autopilot?enabled=${enabled}`, { method: "PATCH", headers: authHeaders() });
+    // Refresh row label without full reload
+    const label = document.querySelector(`.ap-toggle-wrap[data-client="${name}"] .ap-label`);
+    if (label) label.textContent = enabled ? "Auto" : "HITL";
+    // Brief toast
+    const msg = enabled
+      ? `${name}: Autopilot ON — AI will send safe drafts directly`
+      : `${name}: Autopilot OFF — all drafts need approval`;
+    showToast(msg);
+  } catch(e) {
+    alert("Toggle failed: " + e.message);
   }
 }
 
