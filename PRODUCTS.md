@@ -2,7 +2,7 @@
 
 What we actually sell. Who to. For how much. Status.
 
-Last updated: 2026-04-30
+Last updated: 2026-05-06
 
 ---
 
@@ -30,26 +30,37 @@ The agent is always the headline. The suite is the *and-also*.
 
 ## Live products (sold externally as "ReachNG")
 
-### 1. ReachNG Closer — Real Estate
+### 1. ReachNG Closer — Inbound Conversion Engine
 **Status:** In build — Phase 1 of 5 (see [PLAN.md](./PLAN.md))
 
-**Who:** Estate agents, property developers, brokers, agencies in Lagos with active listings and inbound inquiry volume (WhatsApp DMs, Instagram messages, website forms, referrals).
+**The core product:** Any Lagos business that gets inbound WhatsApp DMs from potential customers and loses revenue because they can't respond fast enough, qualify quick enough, or follow up consistently. ReachNG handles the entire inbound conversation — drafts every reply, qualifies the enquiry, closes toward the action (booking, order, viewing, call), and follows up if the customer goes quiet. Every message approved by the client before it sends. Everything from their own WhatsApp number.
 
-**Pain solved:** Leads go cold between first ping and viewing. Agents lose ₦500K–₦5M per leaked lead. Saturdays burnt on unqualified viewings. Awkwardness around PoF chase.
+**Primary verticals (ranked by ease of close):**
 
-**What we do:** Work the client's inbound leads for them. AI drafts qualifying questions, books viewings, handles PoF requests, nurtures warm-not-ready buyers. Every message approved in our HITL dashboard and sent from the client's own WhatsApp number. Client only shows up for qualified viewings.
+**Hospitality — bars, rooftop lounges, beach clubs, restaurants**
+- Pain: Bookings lost at 11pm because no one replied. Birthday events not confirmed because the back-and-forth takes 10 messages. Raves and private hires lost to a competitor who responded first.
+- What the agent does: Handles every reservation/event enquiry on WhatsApp — qualifies group size, date, type of booking, budget. Reads live venue capacity before drafting so it never promises a full night. Confirms bookings, collects deposit instructions, adds to pipeline.
+- Pricing: ₦50K–₦150K/mo depending on volume. Venue capacity tracking included.
 
-**Hero features:**
-- Lead-to-Viewing Closer (24/7 WhatsApp response)
-- Proof-of-Funds Concierge
-- Nurture loop for warm-not-ready leads
-- Handover card (budget, timeline, objections)
+**Small Business — IG/TikTok merchants (fashion, food, beauty, decor, events)**
+- Pain: 20-50 DMs a day, half are tyre-kickers, sales lost overnight because the owner is asleep.
+- What the agent does: Replies instantly to "how much?" DMs, qualifies real buyers, closes toward order/payment/appointment. All from owner's WhatsApp. They approve every message.
+- Pricing: ₦30K–₦80K/mo. One-week free pilot on real DMs.
 
-**Upsells:** KYC vault, Neighborhood Scorecard, Lawyer Handover Bundle, Rent Chase Loop (only for clients who manage tenancies).
+**Real Estate — agents, developers, brokers**
+- Pain: Leads go cold between first ping and viewing. Saturdays burnt on unqualified viewings. Awkwardness around PoF chase.
+- What the agent does: Drafts qualifying questions, books viewings, handles PoF requests, nurtures warm-not-ready buyers. HITL-approved, sends from client's number.
+- Upsells: KYC vault, Neighborhood Scorecard, Lawyer Bundle, Rent Chase.
+- Pricing: ₦100K setup + ₦150K–₦400K/mo + ₦5K–₦15K per qualified viewing.
 
-**Pricing:** ₦100K setup + ₦150K–₦400K/mo retainer + ₦5K–₦15K per qualified viewing. Optional commission tier (3–5% of deal value) for luxury agents on Banana Island / Ikoyi / Eko Atlantic.
+**Events — concerts, raves, brand activations**
+- Pain: Ticket enquiries, VIP table requests, sponsorship DMs — all going unanswered or handled slowly by one overwhelmed person.
+- What the agent does: Handles DM enquiries, qualifies tier (GA/VIP/VVIP/sponsor), directs to payment link or confirms table, tracks against capacity.
+- Pricing: ₦80K–₦200K/mo or per-event pricing.
 
-**Internal codename:** EstateOS (use only in code, dashboard, docs — never in client-facing copy)
+**Any other vertical with WhatsApp inbound** — fitness, salons, schools, clinics, logistics — same product, different prompt.
+
+**Internal codename:** EstateOS for real estate module only (use only in code/docs — never client-facing)
 
 ---
 
@@ -83,11 +94,15 @@ The agent is always the headline. The suite is the *and-also*.
 ### ReachNG SDR
 **Status:** Live and running
 
-Google Maps + Apollo + Unipile WhatsApp discovery → cold outreach → HITL draft queue → approved send → reply tracking → conversion.
+Google Maps + DuckDuckGo + Instagram bio scraper + Unipile → cold email/WhatsApp → HITL draft queue → approved send → reply tracking → conversion.
 
-**Two active campaigns:**
-- `real_estate` vertical → pitches ReachNG Closer
-- `recruitment` vertical → pitches ReachNG TalentOS
+**Active campaigns:**
+- `real_estate` → pitches ReachNG Closer (email-first, WhatsApp follow-up)
+- `recruitment` → pitches ReachNG TalentOS
+- `small_business` → pitches ReachNG Closer via Instagram bio scraper + DDG
+- `events`, `hospitality`, `logistics`, `legal`, `fintech`, `agency_sales` → all pitch ReachNG Closer
+
+**Warm/referral path:** Dashboard → Clients tab → "Add Pilot Client" — skips brief gate, generates portal link instantly. For people you know personally (Mercury Lagos etc.).
 
 This funnel never stops. It's our only top-of-funnel until referrals kick in.
 
