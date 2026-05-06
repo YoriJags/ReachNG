@@ -1,121 +1,125 @@
 """
 AI-powered lead discovery — finds B2B decision-makers by vertical + city.
 
-Uses ScrapeGraphAI SearchGraph (Anthropic/Haiku backend) to search Google,
-crawl the top results, and extract structured company data in one pass.
-No Apify Google Search actor needed — free, no per-run cost.
+Uses DuckDuckGo search (free, no API key) to find companies, then enriches
+each domain with httpx + Claude Haiku for contacts.
 
-LinkedIn employee enrichment still uses Apify (residential proxy required).
+No Apify, no ScrapeGraphAI, no paid services — just the Anthropic API we
+already pay for and free DuckDuckGo search.
 """
 import asyncio
 from typing import Optional
-from pydantic import BaseModel, Field
 from config import get_settings
 import structlog
 
 log = structlog.get_logger()
 
 
-# ─── Output schema ────────────────────────────────────────────────────────────
+# ─── Search queries per vertical ─────────────────────────────────────────────
 
-class CompanyContact(BaseModel):
-    name: str = Field(description="Company or agency name")
-    website: Optional[str] = Field(default=None, description="Company website URL")
-    email: Optional[str] = Field(default=None, description="Contact email address")
-    phone: Optional[str] = Field(default=None, description="Contact phone number")
-    decision_maker: Optional[str] = Field(default=None, description="Name of founder, MD, CEO or director")
-    title: Optional[str] = Field(default=None, description="Title of the decision maker")
-    linkedin_url: Optional[str] = Field(default=None, description="LinkedIn company or profile URL")
-
-
-class CompanyList(BaseModel):
-    companies: list[CompanyContact] = Field(description="List of companies found")
-
-
-# ─── Vertical search prompts ──────────────────────────────────────────────────
-
-VERTICAL_PROMPTS: dict[str, str] = {
+VERTICAL_QUERIES: dict[str, str] = {
     "real_estate": (
-        "Find real estate agencies and property development companies in {city}, Nigeria. "
-        "For each company extract: company name, website, email, phone number, and the name "
-        "and title of the founder, MD, CEO or director. Focus on luxury and mid-market firms."
+        "{city} Nigeria real estate agency luxury property developer estate agent site"
     ),
     "recruitment": (
-        "Find recruitment agencies and HR consulting firms in {city}, Nigeria. "
-        "For each extract: company name, website, email, phone, and the founder or MD name and title."
+        "{city} Nigeria recruitment agency HR consulting firm talent acquisition"
     ),
     "legal": (
-        "Find law firms and commercial legal practices in {city}, Nigeria. "
-        "For each extract: firm name, website, email, phone, and the managing partner or senior partner name."
+        "{city} Nigeria law firm commercial legal practice solicitors"
     ),
     "events": (
-        "Find corporate event management and brand activation companies in {city}, Nigeria. "
-        "For each extract: company name, website, email, phone, and the CEO or director name and title."
+        "{city} Nigeria corporate event management brand activation company"
     ),
     "fintech": (
-        "Find fintech startups and digital financial services companies in {city}, Nigeria. "
-        "For each extract: company name, website, email, phone, and the founder or CEO name."
+        "{city} Nigeria fintech startup digital financial services company"
     ),
     "logistics": (
-        "Find logistics, haulage and freight companies in {city}, Nigeria. "
-        "For each extract: company name, website, email, phone, and the operations director or MD name."
+        "{city} Nigeria logistics haulage freight company"
     ),
     "insurance": (
-        "Find insurance brokers and insurance companies in {city}, Nigeria. "
-        "For each extract: company name, website, email, phone, and the director or MD name."
+        "{city} Nigeria insurance broker company"
     ),
     "agency_sales": (
-        "Find consulting firms, digital marketing agencies, and professional service firms in {city}, Nigeria. "
-        "For each extract: company name, website, email, phone, and the founder or managing partner name."
+        "{city} Nigeria digital marketing agency consulting firm professional services"
     ),
 }
 
 
-# ─── SearchGraph runner ───────────────────────────────────────────────────────
+# ─── DuckDuckGo search ────────────────────────────────────────────────────────
 
-def _run_search_graph_sync(prompt: str, api_key: str, max_results: int) -> list[CompanyContact]:
-    """
-    Synchronous SearchGraph run — called via executor to stay async-compatible.
-    Returns list of CompanyContact parsed by the schema.
-    """
-    from scrapegraphai.graphs import SearchGraph
-
-    config = {
-        "llm": {
-            "api_key": api_key,
-            "model": "anthropic/claude-haiku-4-5-20251001",
-        },
-        "max_results": min(max_results, 10),
-        "verbose": False,
-        "headless": True,
-    }
-
-    graph = SearchGraph(prompt=prompt, config=config, schema=CompanyList)
-    result = graph.run()
-
-    # result is either a CompanyList instance or a dict
-    if isinstance(result, CompanyList):
-        return result.companies
-    if isinstance(result, dict):
-        items = result.get("companies", [])
-        return [CompanyContact(**i) if isinstance(i, dict) else i for i in items]
-    return []
-
-
-async def _run_search_graph(prompt: str, api_key: str, max_results: int) -> list[CompanyContact]:
-    """Async wrapper — runs SearchGraph in thread pool to avoid blocking the event loop."""
-    loop = asyncio.get_event_loop()
+def _ddg_search_sync(query: str, max_results: int) -> list[dict]:
+    """Synchronous DuckDuckGo search — returns list of {title, href, body}."""
     try:
-        return await loop.run_in_executor(
-            None,
-            _run_search_graph_sync,
-            prompt,
-            api_key,
-            max_results,
-        )
+        from duckduckgo_search import DDGS
+        with DDGS() as ddgs:
+            results = list(ddgs.text(query, max_results=max_results))
+        return results or []
     except Exception as e:
-        log.error("search_graph_failed", error=str(e))
+        log.error("ddg_search_failed", query=query[:80], error=str(e))
         return []
+
+
+async def _ddg_search(query: str, max_results: int) -> list[dict]:
+    """Async wrapper — runs DDG search in thread pool."""
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, _ddg_search_sync, query, max_results)
+
+
+# ─── Domain extraction ────────────────────────────────────────────────────────
+
+def _extract_domain(url: str) -> Optional[str]:
+    """Extract clean domain from URL, skipping aggregator sites."""
+    _SKIP_DOMAINS = {
+        "google.com", "bing.com", "facebook.com", "linkedin.com",
+        "twitter.com", "youtube.com", "wikipedia.org", "instagram.com",
+        "yellowpages.com.ng", "businesslist.com.ng", "nairaland.com",
+        "vconnect.com", "ngcareers.com", "jobberman.com",
+    }
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+        domain = parsed.netloc.lstrip("www.")
+        if not domain:
+            return None
+        root = ".".join(domain.split(".")[-2:])
+        if root in _SKIP_DOMAINS or any(s in domain for s in _SKIP_DOMAINS):
+            return None
+        return domain
+    except Exception:
+        return None
+
+
+def _result_to_lead_stub(result: dict, vertical: str, city: str) -> dict:
+    """Convert a DDG result to a minimal lead dict for enrichment."""
+    url = result.get("href", "")
+    title = result.get("title", "")
+    domain = _extract_domain(url)
+
+    from urllib.parse import urlparse
+    parsed_url = urlparse(url) if url else None
+    website = f"{parsed_url.scheme}://{parsed_url.netloc}" if parsed_url and parsed_url.netloc else None
+
+    name = title.split(" - ")[0].split(" | ")[0].strip() or domain or "Unknown"
+
+    return {
+        "place_id": f"ddg_{hash(url + city)}",
+        "name": name,
+        "vertical": vertical,
+        "source": "ddg",
+        "phone": None,
+        "email": None,
+        "address": city,
+        "website": website,
+        "domain": domain,
+        "rating": None,
+        "category": vertical.replace("_", " ").title(),
+        "contact_name": None,
+        "contact_title": None,
+        "linkedin_url": None,
+        "enrichment": None,
+        "lead_temperature": 0,
+        "temperature_reason": None,
+    }
 
 
 # ─── Public interface ─────────────────────────────────────────────────────────
@@ -126,88 +130,66 @@ async def discover_apify_leads(
     city_override: Optional[str] = None,
 ) -> list[dict]:
     """
-    Discover B2B leads via ScrapeGraphAI SearchGraph + optional LinkedIn enrichment.
+    Discover B2B leads via DuckDuckGo + httpx/Haiku enrichment.
     Returns lead dicts compatible with the leads Mongo schema.
 
     Falls back silently if ANTHROPIC_API_KEY is not set.
-    LinkedIn enrichment runs in parallel if APIFY_API_TOKEN is set.
     """
     settings = get_settings()
-    api_key = settings.anthropic_api_key
-    if not api_key:
+    if not settings.anthropic_api_key:
         log.warning("anthropic_key_missing", vertical=vertical)
         return []
 
     city = city_override or settings.default_city.split(",")[0].strip()
-    prompt_template = VERTICAL_PROMPTS.get(
+    query_template = VERTICAL_QUERIES.get(
         vertical,
-        "Find {vertical} companies in {city}, Nigeria with contact details and decision-maker names."
+        "{city} Nigeria {vertical} company business"
     )
-    prompt = prompt_template.format(city=city, vertical=vertical.replace("_", " "))
+    query = query_template.format(city=city, vertical=vertical.replace("_", " "))
 
-    companies = await _run_search_graph(prompt, api_key, max_results)
-    if not companies:
-        log.info("search_graph_no_results", vertical=vertical, city=city)
+    raw_results = await _ddg_search(query, max_results=min(max_results, 15))
+    if not raw_results:
+        log.info("ddg_no_results", vertical=vertical, city=city)
         return []
 
-    # Enrich with website scrape (httpx + Haiku) for any leads that have a domain
+    # Deduplicate by domain
+    seen_domains: set[str] = set()
+    stubs: list[dict] = []
+    for r in raw_results:
+        stub = _result_to_lead_stub(r, vertical, city)
+        if stub["domain"] and stub["domain"] not in seen_domains:
+            seen_domains.add(stub["domain"])
+            stubs.append(stub)
+
+    if not stubs:
+        return []
+
+    # Enrich each domain with website scrape (httpx + Haiku)
     from tools.apify_enrich import enrich_lead
-    sem = asyncio.Semaphore(5)
+    sem = asyncio.Semaphore(4)
 
-    async def _enrich_one(c: CompanyContact) -> dict:
-        base = _company_to_lead(c, vertical, city)
-        if base.get("domain") and not base.get("email") and not base.get("contact_name"):
-            async with sem:
-                enrichment = await enrich_lead(domain=base["domain"])
-                if enrichment.get("email"):
-                    base["email"] = enrichment["email"]
-                if enrichment.get("phone") and not base.get("phone"):
-                    base["phone"] = enrichment["phone"]
-                if enrichment.get("decision_maker") and not base["contact_name"]:
-                    base["contact_name"] = enrichment["decision_maker"]
-                base["enrichment"] = enrichment
-        return base
+    async def _enrich_one(stub: dict) -> dict:
+        if not stub.get("domain"):
+            return stub
+        async with sem:
+            enrichment = await enrich_lead(domain=stub["domain"])
+            if enrichment.get("email"):
+                stub["email"] = enrichment["email"]
+            if enrichment.get("phone"):
+                stub["phone"] = enrichment["phone"]
+            if enrichment.get("decision_maker"):
+                stub["contact_name"] = enrichment["decision_maker"]
+            stub["enrichment"] = enrichment
+        return stub
 
-    results = await asyncio.gather(*[_enrich_one(c) for c in companies], return_exceptions=True)
+    results = await asyncio.gather(*[_enrich_one(s) for s in stubs], return_exceptions=True)
 
     leads = []
     for item in results:
         if isinstance(item, Exception):
-            log.warning("apify_discovery_item_error", error=str(item))
+            log.warning("ddg_discovery_item_error", error=str(item))
             continue
         leads.append(item)
 
-    log.info("apify_discovery_complete", vertical=vertical, city=city, count=len(leads))
+    log.info("ddg_discovery_complete", vertical=vertical, city=city, count=len(leads))
     return leads
-
-
-def _company_to_lead(c: CompanyContact, vertical: str, city: str) -> dict:
-    """Convert a CompanyContact schema object to a leads Mongo dict."""
-    from urllib.parse import urlparse
-    domain = None
-    if c.website:
-        try:
-            parsed = urlparse(c.website)
-            domain = parsed.netloc.lstrip("www.") or None
-        except Exception:
-            pass
-
-    return {
-        "place_id": f"sgai_{hash(c.name + city)}",
-        "name": c.name,
-        "vertical": vertical,
-        "source": "scrapegraph",
-        "phone": c.phone,
-        "email": c.email,
-        "address": city,
-        "website": c.website,
-        "domain": domain,
-        "rating": None,
-        "category": vertical.replace("_", " ").title(),
-        "contact_name": c.decision_maker,
-        "contact_title": c.title,
-        "linkedin_url": c.linkedin_url,
-        "enrichment": None,
-        "lead_temperature": 0,
-        "temperature_reason": None,
-    }
