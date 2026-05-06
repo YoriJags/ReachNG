@@ -1,6 +1,7 @@
 from .discovery import discover_businesses
 from .social import discover_social_leads
-from .apollo_discovery import discover_apollo_leads
+from .apollo_discovery import discover_apollo_leads  # kept for reference; scheduler disabled — use discover_apify_leads
+from .apify_discovery import discover_apify_leads
 from .outreach import send_whatsapp, send_email, check_whatsapp_replies, check_email_replies
 from .memory import (
     upsert_contact, has_been_contacted, is_daily_limit_reached,
@@ -13,7 +14,7 @@ from .referral import record_referral, convert_referral, reward_referral, get_re
 from .competitor import discover_competitors, list_competitors
 
 __all__ = [
-    "discover_businesses", "discover_social_leads", "discover_apollo_leads",
+    "discover_businesses", "discover_social_leads", "discover_apollo_leads", "discover_apify_leads",
     "send_whatsapp", "send_email", "check_whatsapp_replies", "check_email_replies",
     "upsert_contact", "has_been_contacted", "is_daily_limit_reached",
     "record_outreach", "mark_replied", "mark_converted", "mark_opted_out",

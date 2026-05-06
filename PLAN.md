@@ -39,6 +39,19 @@ Real estate clients only. Everything below scoped to `vertical=real_estate` clie
 - [x] Client portal — "Closer Inbox" tab: list of leads + stage + thread view
 - [x] Admin dashboard — per-client Closer tab: brief editor + lead inbox
 
+## Now — Phase 1.4: Apify Enrichment Layer *(1 day, blocks outreach quality)*
+
+Lifts every lead from "name + phone" to "decision-maker + signal" before it hits the HITL queue. Used by our own SDR funnel now, inherited by BYO Leads in 1.5.
+Apollo is inactive/expensive — Apify replaces it entirely. `tools/apollo_discovery.py` kept for reference; scheduler disabled.
+
+- [x] `tools/apify_enrich.py` — `enrich_lead(domain, linkedin_company_url) -> {decision_maker, title, linkedin_url, email, phone, recent_signal, enriched_at}`; exponential backoff; structlog without PII
+- [x] `tools/apify_discovery.py` — Google Search → domain → enrich pipeline; replaces Apollo in campaign runner
+- [x] `campaigns/base.py` — swapped `discover_apollo_leads` → `discover_apify_leads`; all variable/log references updated
+- [x] `tools/__init__.py` — exports `discover_apify_leads`; Apollo kept but noted deprecated
+- [ ] `APIFY_API_TOKEN` confirmed in Railway env (token exists locally — add to Railway)
+- [ ] Admin Control Tower — show `enrichment.decision_maker` + `enrichment.title` on lead detail; "Re-enrich" button
+- [ ] HITL drafter reads `enrichment.decision_maker` for personalization (replaces `[Partner Name]` fallback)
+
 ## Now — Phase 1.5: Business Brief + BYO Leads *(8 days, in progress)*
 
 The outreach machine extension. Clients upload their own lead lists; we draft personalised follow-ups using a per-client business brief layered over per-vertical primers. Enabled for sales-driven verticals only (real_estate, legal, insurance, fitness, events, auto, cooperatives).

@@ -32,6 +32,10 @@ structlog>=24.4.0
 # Analytics
 posthog>=3.0.0
 
+# Web intelligence — AI-powered scraping + search
+scrapegraphai>=1.0.0
+langchain-anthropic>=0.3.0
+
 # Data Liberation — file parsing
 pdfplumber>=0.11.4
 openpyxl>=3.1.5

@@ -6,7 +6,7 @@ import asyncio
 import re
 from typing import Optional
 from tools import (
-    discover_businesses, discover_apollo_leads, upsert_contact, has_been_contacted,
+    discover_businesses, discover_apify_leads, upsert_contact, has_been_contacted,
     is_daily_limit_reached, record_outreach, get_daily_send_count,
     send_whatsapp, send_email,
 )
@@ -90,14 +90,14 @@ class BaseCampaign:
         from tools.signal_intelligence import discover_signal_leads
         fetch_quota   = max(5, max_new_contacts * 2)
         maps_quota    = max(5, fetch_quota // 4)
-        apollo_quota  = max(5, fetch_quota // 4)
+        apify_quota   = max(5, fetch_quota // 4)
         social_quota  = max(5, fetch_quota // 4)
-        signal_quota  = fetch_quota - maps_quota - apollo_quota - social_quota
+        signal_quota  = fetch_quota - maps_quota - apify_quota - social_quota
 
         # Multi-city: run Maps + Apollo per city in parallel, then flatten
         target_cities = cities if cities else ([client_city] if client_city else [None])
         per_city_quota = max(3, maps_quota // len(target_cities))
-        per_city_apollo = max(3, apollo_quota // len(target_cities))
+        per_city_apify  = max(3, apify_quota // len(target_cities))
 
         is_client_campaign = bool(client_name)
         city_tasks = []
@@ -108,27 +108,27 @@ class BaseCampaign:
                 target_sectors=target_sectors,
                 is_client_campaign=is_client_campaign,
             ))
-            city_tasks.append(discover_apollo_leads(
-                vertical=self.vertical, max_results=per_city_apollo, city_override=city,
+            city_tasks.append(discover_apify_leads(
+                vertical=self.vertical, max_results=per_city_apify, city_override=city,
             ))
         city_tasks.append(discover_social_leads(vertical=self.vertical, max_results=social_quota))
         city_tasks.append(discover_signal_leads(vertical=self.vertical, max_results=signal_quota))
 
         all_results = await asyncio.gather(*city_tasks, return_exceptions=True)
 
-        maps_leads, apollo_leads, social_leads, signal_leads = [], [], [], []
-        # Results interleaved: [maps_city1, apollo_city1, maps_city2, apollo_city2, ..., social, signal]
+        maps_leads, apify_leads, social_leads, signal_leads = [], [], [], []
+        # Results interleaved: [maps_city1, apify_city1, maps_city2, apify_city2, ..., social, signal]
         for i, city in enumerate(target_cities):
-            r_maps   = all_results[i * 2]
-            r_apollo = all_results[i * 2 + 1]
+            r_maps  = all_results[i * 2]
+            r_apify = all_results[i * 2 + 1]
             if isinstance(r_maps, Exception):
                 log.error("maps_discovery_failed", city=city, error=str(r_maps))
             else:
                 maps_leads.extend(r_maps)
-            if isinstance(r_apollo, Exception):
-                log.error("apollo_discovery_failed", city=city, error=str(r_apollo))
+            if isinstance(r_apify, Exception):
+                log.error("apify_discovery_failed", city=city, error=str(r_apify))
             else:
-                apollo_leads.extend(r_apollo)
+                apify_leads.extend(r_apify)
         r_social = all_results[-2]
         r_signal = all_results[-1]
         if isinstance(r_social, Exception):
@@ -141,12 +141,12 @@ class BaseCampaign:
             signal_leads = r_signal
 
         if cities:
-            log.info("multi_city_discovery", cities=cities, maps=len(maps_leads), apollo=len(apollo_leads))
+            log.info("multi_city_discovery", cities=cities, maps=len(maps_leads), apify=len(apify_leads))
 
         # ── Auto-expand to nearby cities if local pool is thin ─────────────────
         # Threshold: if we found fewer than CITY_EXPAND_THRESHOLD * max_new_contacts
         # unique leads, the local pool is running low — expand to nearby cities.
-        total_found = len(maps_leads) + len(apollo_leads) + len(social_leads)
+        total_found = len(maps_leads) + len(apify_leads) + len(social_leads)
         expand_threshold = max(3, int(max_new_contacts * settings.city_expand_threshold))
         primary_city = (client_city or settings.default_city).split(",")[0].strip()
 
@@ -167,8 +167,8 @@ class BaseCampaign:
                         target_sectors=target_sectors,
                         is_client_campaign=is_client_campaign,
                     ))
-                    expand_tasks.append(discover_apollo_leads(
-                        vertical=self.vertical, max_results=per_city_apollo, city_override=ecity,
+                    expand_tasks.append(discover_apify_leads(
+                        vertical=self.vertical, max_results=per_city_apify, city_override=ecity,
                     ))
                 expand_results = await asyncio.gather(*expand_tasks, return_exceptions=True)
                 for i, ecity in enumerate(expansion_cities):
@@ -177,9 +177,9 @@ class BaseCampaign:
                     if not isinstance(r_m, Exception):
                         maps_leads.extend(r_m)
                     if not isinstance(r_a, Exception):
-                        apollo_leads.extend(r_a)
+                        apify_leads.extend(r_a)
                 log.info("city_expansion_done",
-                         maps_total=len(maps_leads), apollo_total=len(apollo_leads))
+                         maps_total=len(maps_leads), apify_total=len(apify_leads))
 
         # Deduplicate across sources by phone + email
         seen_phones: set[str] = set()
@@ -211,14 +211,14 @@ class BaseCampaign:
             )
             return (temp, score)
 
-        all_leads = signal_leads + social_leads + apollo_leads + maps_leads
+        all_leads = signal_leads + social_leads + apify_leads + maps_leads
         all_leads.sort(key=_sort_key, reverse=True)
         businesses = [b for b in all_leads if not _is_duplicate(b)]
 
         hot_count  = sum(1 for b in businesses if b.get("lead_temperature", 0) == 2)
         warm_count = sum(1 for b in businesses if b.get("lead_temperature", 0) == 1)
         log.info("discovery_done", vertical=self.vertical, maps=len(maps_leads),
-                 apollo=len(apollo_leads), social=len(social_leads), signal=len(signal_leads),
+                 apify=len(apify_leads), social=len(social_leads), signal=len(signal_leads),
                  total_deduped=len(businesses), hot=hot_count, warm=warm_count)
 
         for biz in businesses:
@@ -307,6 +307,8 @@ class BaseCampaign:
                         website=biz.get("website"),
                         is_followup=False,
                         enrichment_context=enrichment_ctx,
+                        contact_name=biz.get("contact_name"),
+                        contact_title=biz.get("contact_title"),
                     )
             except Exception as e:
                 log.error("message_generation_failed", business=biz["name"], error=str(e))
@@ -442,7 +444,7 @@ class BaseCampaign:
             "hitl_mode": hitl_mode,
             "discovery": {
                 "maps":   len(maps_leads),
-                "apollo": len(apollo_leads),
+                "apify": len(apify_leads),
                 "social": len(social_leads),
                 "total_after_dedup": len(businesses),
             },

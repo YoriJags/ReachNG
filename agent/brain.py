@@ -40,6 +40,8 @@ def generate_outreach_message(
     is_followup: bool = False,
     attempt_number: int = 1,
     enrichment_context: Optional[str] = None,   # from tools.enrichment.format_enrichment_for_prompt
+    contact_name: Optional[str] = None,         # decision-maker name from ScrapeGraph/Apify enrichment
+    contact_title: Optional[str] = None,
 ) -> dict:
     """
     Generate a personalised outreach message for a business.
@@ -120,6 +122,13 @@ def generate_outreach_message(
         "- Return JSON with keys 'subject' and 'message' (message = full email body, plain text)."
     )
 
+    contact_block = ""
+    if contact_name:
+        contact_block = f"\nDecision-maker: {contact_name}"
+        if contact_title:
+            contact_block += f" ({contact_title})"
+        contact_block += "\nAddress them by first name in the opener. Keep it personal, not corporate."
+
     user_prompt = f"""
 Write a {channel} outreach message for the following business.
 
@@ -127,7 +136,7 @@ Business name: {business_name}
 Location: {location_hint or address or "Lagos"}
 Category: {category or "Not specified"}
 Google rating: {rating or "Unknown"}
-Website: {website or "None found"}
+Website: {website or "None found"}{contact_block}
 {enrichment_block}
 {followup_note}
 

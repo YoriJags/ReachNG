@@ -45,20 +45,49 @@ ReachNG Closer is your AI sales operator. You forward any inbound lead (DM, What
 
 **Property Inventory Dashboard** — One dashboard for every unit you manage. Track status, list tenants per unit, and see your full portfolio at a glance.
 
-### WhatsApp message template (personalise fully — this is a guide only)
+### WhatsApp message templates — pick one based on lead signals
+
+**Variant A — Named decision-maker known (use when contact_name is set)**
 ---
-Hi there, I saw [Business Name] has active listings in [Area] — how many inbound DMs and WhatsApp leads do you get in a week that never convert?
+Hi [First Name], saw [Business Name] has active listings in [Area]. Quick question — how many of the WhatsApp leads you get every week do you actually close?
 
-ReachNG is an AI closer that works your inbound leads for you: qualifies them, books viewings, handles PoF, chases the ghosters. Every message goes out on your own WhatsApp number after you approve it — your voice, your brand. You only show up for viewings that are actually ready to close.
+We built an AI operator for estate agents that qualifies inbound leads, books viewings, and chases PoF — all from your own WhatsApp number. You approve every message before it sends. You only show up when the buyer's ready.
 
-Free pilot on 10 leads this week — worth a quick look?
+Free pilot on 10 of your current leads — interested?
+---
+
+**Variant B — No name, strong signal (active listings, premium area, good rating)**
+---
+Hi there, [Business Name]'s listings caught my eye — Lekki/VI/Ikoyi is exactly where we work.
+
+We have an AI closer for real estate agents. It takes your inbound leads, qualifies them on WhatsApp, books viewings and handles the PoF conversation — every message approved by you before it sends. Your clients see your number, your voice.
+
+Worth a 10-lead free pilot to see the numbers?
+---
+
+**Variant C — Warm re-engage / follow-up (attempt 2)**
+---
+Hi [First Name or there], following up from earlier — know you're busy.
+
+Just want to flag: agents we've piloted with are getting back 3–4 hours a week just on lead qualification alone. If your inbound volume is high and conversion is painful, that's exactly the gap we close.
+
+Would a quick 15-minute call this week make sense?
 ---
 
 ### Email subject line ideas
 - "Your inbound leads are going cold — [Business Name]"
 - "AI closer for your WhatsApp leads — free pilot on 10"
 - "Stop losing viewings to slow follow-up — ReachNG"
-- "We close the leads you don't have time to — [Business Name]"
+- "[First Name], the leads you didn't have time to chase"
+- "How [Business Name] agents can close without the Saturday grind"
+
+### Message rules (non-negotiable for real estate)
+- ALWAYS open with their first name if known. "Hi Tunde," beats "Hi there," every time.
+- NEVER mention ₦ pricing in cold WhatsApp. If they ask, move to a call.
+- NEVER mention TalentOS, EstateOS, or suite names. It's ReachNG.
+- NEVER promise lead generation — we work THEIR leads, we don't source new ones.
+- If the lead is in Banana Island / Eko Atlantic / Bourdillon tier: add one line — "We also work high-value developers — bespoke onboarding, dedicated number."
+- End with exactly ONE question or CTA. Never two.
 
 ### Custom Build angle
 For premium agents/developers (Banana Island, Ikoyi, Eko Atlantic, strong website, 4.0+ rating), add ONE sentence near the end:
