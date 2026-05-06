@@ -259,6 +259,17 @@ async def _probation_alerts():
         log.error("probation_alerts_failed", error=str(e))
 
 
+async def _client_signal_listener_run():
+    """Every 2 hours — find buyer intent signals for clients with signal_listening=True."""
+    from tools.client_signal_listener import run_all_client_listeners
+    log.info("client_signal_listener_start")
+    try:
+        result = await run_all_client_listeners()
+        log.info("client_signal_listener_done", **result)
+    except Exception as e:
+        log.error("client_signal_listener_failed", error=str(e))
+
+
 async def _market_alerts_run():
     """Check commodity price thresholds and notify owner of triggered alerts."""
     from services.market_os.engine import check_buy_alerts
@@ -388,6 +399,13 @@ def setup_scheduler():
         _probation_alerts,
         CronTrigger(hour=8, minute=30, timezone="Africa/Lagos"),
         id="probation_alerts", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=300,
+    )
+
+    # Client signal listener — buyer intent monitoring every 2 hours (8am–10pm)
+    scheduler.add_job(
+        _client_signal_listener_run,
+        CronTrigger(hour="8-22", minute=0, second=0, timezone="Africa/Lagos"),
+        id="client_signal_listener", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=300,
     )
 
     return scheduler

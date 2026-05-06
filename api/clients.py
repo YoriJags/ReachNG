@@ -80,6 +80,8 @@ class ClientUpsert(BaseModel):
     product: Optional[str] = "reachng"       # "reachng" | "digital_associates" | "loan_officer"
     autopilot: bool = False                  # If True, safe drafts send without human approval
     owner_phone: Optional[str] = None       # Client's WhatsApp number — receives morning brief
+    signal_listening: bool = False          # Opt-in: monitor social for buyer intent signals
+    signal_queries: list[str] = []          # Client-specific DDG queries for signal listener
 
 
 class PaymentUpdate(BaseModel):
@@ -215,6 +217,9 @@ async def upsert_client(payload: ClientUpsert):
     set_doc["autopilot"] = payload.autopilot
     if payload.owner_phone is not None:
         set_doc["owner_phone"] = payload.owner_phone
+    set_doc["signal_listening"] = payload.signal_listening
+    if payload.signal_queries:
+        set_doc["signal_queries"] = payload.signal_queries
 
     result = clients.update_one(
         {"name": {"$regex": f"^{re.escape(payload.name)}$", "$options": "i"}},
@@ -408,6 +413,18 @@ async def set_autopilot(name: str, enabled: bool):
     if result.matched_count == 0:
         raise HTTPException(404, f"Client '{name}' not found")
     return {"success": True, "client": name, "autopilot": enabled}
+
+
+@router.patch("/{name}/signal-listening")
+async def set_signal_listening(name: str, enabled: bool):
+    """Toggle signal listening on/off for a client."""
+    result = get_clients().update_one(
+        {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}},
+        {"$set": {"signal_listening": enabled, "updated_at": datetime.now(timezone.utc)}},
+    )
+    if result.matched_count == 0:
+        raise HTTPException(404, f"Client '{name}' not found")
+    return {"success": True, "client": name, "signal_listening": enabled}
 
 
 @router.delete("/{name}")

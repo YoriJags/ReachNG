@@ -695,6 +695,7 @@
   <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('campaigns')" title="Jump to Run — Campaigns">2. Run</button>
   <button class="tab-btn" onclick="switchTab('campaigns', this)" title="Upload lead list (BYO) or run discovery">Campaigns</button>
   <button class="tab-btn" onclick="switchTab('approvals', this)" title="Approve drafted messages before they send">Message Queue <span class="tab-badge" id="tab-badge-approvals"></span></button>
+  <button class="tab-btn" onclick="switchTab('signal_leads', this); loadSignalLeads();" title="Buyer intent signals found on social — people looking for what your clients sell">Signal Leads <span class="tab-badge" id="tab-badge-signals"></span></button>
   <div class="tab-divider"></div>
   <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('replies')" title="Jump to Engage — Replies">3. Engage</button>
   <button class="tab-btn" onclick="switchTab('replies', this)" title="Inbound replies needing attention">Replies</button>
@@ -1592,6 +1593,31 @@
   </div>
   <div class="approvals-list" id="approvals-list">
     <div class="approvals-empty">Loading…</div>
+  </div>
+</div>
+
+<!-- ── Signal Leads ─────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-signal_leads">
+  <div class="sop-box">
+    <div class="sop-title">Signal Leads — People ALREADY looking for what your client sells</div>
+    <div class="sop-step"><span class="sop-num">1</span><span>ReachNG found these on Twitter/X and the web. <b>They have NOT been contacted.</b> Each card shows what they posted.</span></div>
+    <div class="sop-step"><span class="sop-num">2</span><span>Click <b>Draft Outreach</b> to generate a warm intro that references their intent. It goes to the Message Queue for approval.</span></div>
+    <div class="sop-step"><span class="sop-num">3</span><span>Click <b>Skip</b> if the lead is irrelevant, already a contact, or outside the client's geography.</span></div>
+    <div class="sop-step"><span class="sop-num">4</span><span>Listener runs every 2 hours (8am–10pm Lagos). <b>Only clients with Signal Listening ON</b> appear here.</span></div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+    <p class="section-title" style="margin:0;">Signal Leads <span id="signal-count-badge" style="color:#ff5c00;margin-left:8px;"></span></p>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <select id="signal-client-filter" style="background:#111;color:#ccc;border:1px solid #333;border-radius:6px;padding:5px 10px;font-size:12px;" onchange="loadSignalLeads()">
+        <option value="">All Clients</option>
+      </select>
+      <button class="btn" style="background:#1a2a1a;border:1px solid #2a4a2a;color:#7fcf7f;font-size:12px;" onclick="loadSignalLeads()">Refresh</button>
+    </div>
+  </div>
+
+  <div id="signal-leads-list" style="display:flex;flex-direction:column;gap:10px;">
+    <div class="approvals-empty">Select a client and click Refresh to load signals.</div>
   </div>
 </div>
 
@@ -4363,6 +4389,13 @@ async function loadControlTower() {
               </label>
               <span class="ap-label">${c.autopilot ? 'Auto' : 'HITL'}</span>
             </div>
+            <div class="ap-toggle-wrap" data-sig-client="${c.name}" title="${c.signal_listening ? 'Signal Listening ON' : 'Signal Listening OFF'}">
+              <label class="ap-toggle">
+                <input type="checkbox" ${c.signal_listening ? 'checked' : ''} onchange="toggleSignalListening('${c.name}', this.checked)">
+                <span class="ap-slider" style="${c.signal_listening ? '' : ''}"></span>
+              </label>
+              <span style="font-size:10px;color:#6a8aaa;">${c.signal_listening ? 'Signals' : 'No sig'}</span>
+            </div>
           </div>
         </div>`;
       }).join("");
@@ -4671,6 +4704,105 @@ async function toggleAutopilot(name, enabled) {
     showToast(msg);
   } catch(e) {
     alert("Toggle failed: " + e.message);
+  }
+}
+
+async function toggleSignalListening(name, enabled) {
+  try {
+    await fetch(`/api/v1/clients/${encodeURIComponent(name)}/signal-listening?enabled=${enabled}`, { method: "PATCH", headers: authHeaders() });
+    const wrap = document.querySelector(`[data-sig-client="${name}"]`);
+    if (wrap) wrap.querySelector("span:last-child").textContent = enabled ? "Signals" : "No sig";
+    showToast(enabled ? `${name}: Signal Listening ON` : `${name}: Signal Listening OFF`);
+  } catch(e) {
+    alert("Toggle failed: " + e.message);
+  }
+}
+
+// ── Signal Leads ──────────────────────────────────────────────────────────────
+
+async function loadSignalLeads() {
+  const filter = document.getElementById("signal-client-filter");
+  const clientName = filter ? filter.value : "";
+  const list = document.getElementById("signal-leads-list");
+  if (!list) return;
+
+  // Populate client filter if empty
+  if (filter && filter.options.length <= 1) {
+    try {
+      const clients = await (await fetch("/api/v1/clients/", { headers: authHeaders() })).json();
+      clients.forEach(c => {
+        if (c.signal_listening) {
+          const opt = document.createElement("option");
+          opt.value = c.name; opt.textContent = c.name;
+          filter.appendChild(opt);
+        }
+      });
+    } catch(e) {}
+  }
+
+  if (!clientName) {
+    list.innerHTML = '<div class="approvals-empty">Select a client above to load their signal leads.</div>';
+    return;
+  }
+
+  list.innerHTML = '<div class="approvals-empty">Loading…</div>';
+  try {
+    const data = await (await fetch(`/api/v1/client-signals/${encodeURIComponent(clientName)}`, { headers: authHeaders() })).json();
+    const signals = data.signals || [];
+    document.getElementById("signal-count-badge").textContent = signals.length ? `(${signals.length})` : "";
+    document.getElementById("tab-badge-signals").textContent = signals.length || "";
+    if (!signals.length) {
+      list.innerHTML = '<div class="approvals-empty">No pending signals for this client — check back after the next listener run.</div>';
+      return;
+    }
+    list.innerHTML = signals.map(s => renderSignalCard(s, clientName)).join("");
+  } catch(e) {
+    list.innerHTML = `<div class="approvals-empty">Error: ${e.message}</div>`;
+  }
+}
+
+function renderSignalCard(s, clientName) {
+  const platformColors = { twitter: "#1d9bf0", web: "#888", facebook: "#4267b2" };
+  const color = platformColors[s.platform] || "#888";
+  const platformLabel = s.platform === "twitter" ? "Twitter/X" : s.platform === "facebook" ? "Facebook" : "Web";
+  const phone = s.phone ? `<span style="color:#7fcf7f;font-size:11px;margin-left:8px;">📞 ${s.phone}</span>` : "";
+  const profileLink = s.profile_url
+    ? `<a href="${s.profile_url}" target="_blank" style="color:#6a8aaa;font-size:11px;margin-left:6px;">View profile →</a>`
+    : "";
+  return `<div class="approval-card" id="sigcard-${s.id}" style="border-left:3px solid ${color};">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <span style="background:${color}22;color:${color};padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;">${platformLabel}</span>
+      <span style="font-size:12px;color:#aaa;font-style:italic;">ReachNG found this — they haven't contacted you yet</span>
+    </div>
+    <div style="font-weight:600;font-size:13px;margin-bottom:4px;">${s.display_name || s.handle}${phone}${profileLink}</div>
+    <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:6px;padding:8px;font-size:12px;color:#ccc;margin-bottom:10px;line-height:1.5;">"${s.post_text}"</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-approve" style="font-size:12px;padding:5px 12px;" onclick="draftFromSignal('${clientName}','${s.id}',this)">Draft Outreach</button>
+      <button class="btn btn-skip" style="font-size:12px;padding:5px 12px;" onclick="skipSignal('${clientName}','${s.id}')">Skip</button>
+    </div>
+  </div>`;
+}
+
+async function draftFromSignal(clientName, signalId, btn) {
+  btn.disabled = true; btn.textContent = "Drafting…";
+  try {
+    const data = await postJSON(`/api/v1/client-signals/${encodeURIComponent(clientName)}/${signalId}/draft`);
+    document.getElementById(`sigcard-${signalId}`).remove();
+    showToast(`Draft queued for ${data.contact} — check Message Queue`);
+    loadSignalLeads();
+  } catch(e) {
+    btn.disabled = false; btn.textContent = "Draft Outreach";
+    alert("Draft failed: " + e.message);
+  }
+}
+
+async function skipSignal(clientName, signalId) {
+  try {
+    await postJSON(`/api/v1/client-signals/${encodeURIComponent(clientName)}/${signalId}/skip`);
+    document.getElementById(`sigcard-${signalId}`).remove();
+    showToast("Signal skipped");
+  } catch(e) {
+    alert("Skip failed: " + e.message);
   }
 }
 
