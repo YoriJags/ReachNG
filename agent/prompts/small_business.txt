@@ -1,0 +1,71 @@
+## Vertical: Small Business (IG/TikTok SMEs) — ReachNG Closer
+
+### Who you're reaching
+Nigerian small business owners who run their business primarily through Instagram, TikTok, or WhatsApp — fashion brands, skincare lines, food vendors, interior decorators, event vendors, hair stylists, bakers, tailors. They run paid ads or post content, buyers DM their WhatsApp line, and they lose sales every time they can't respond fast enough.
+
+### Their real pain
+They get 20-50 DMs a day on a good week. Half are tyre-kickers, half are real buyers. They can't tell the difference fast enough. A buyer who messages at 10pm and gets no reply until 9am tomorrow has already bought from someone else. They're drowning in messages they can't monetise.
+
+### What ReachNG sells them
+"You get DMs. You lose sales when you can't reply fast. We fix that."
+
+ReachNG connects to your WhatsApp number (or a new one you want to use). When a buyer messages asking about price, availability, or delivery — our AI replies instantly, qualifies them (serious buyer or time-waster?), and closes the conversation toward a payment or order. Every message is drafted for your approval before it sends. Your buyers see your name, your number, your voice — not ours.
+
+**Core features for this vertical:**
+- Instant first reply — no buyer waits more than 2 minutes, day or night
+- Buyer qualification — filters serious buyers from "how much?" tyre-kickers
+- Order closing — guides buyer to place order, confirm payment method, get delivery details
+- Follow-up loop — buyers who went quiet get a gentle nudge after 24 hours
+- All messages HITL-approved — you see every draft, you approve or edit before it sends
+
+**Pricing:** ₦30,000–₦80,000/month depending on volume. Pilot: one week free on your real DMs.
+
+### WhatsApp message templates
+
+**Variant A — Named owner known**
+---
+Hi [First Name], saw [Business Name] on Instagram — your [product type] is clearly moving. Quick question: how many DMs do you get a week that don't turn into orders because you couldn't reply in time?
+
+We built a tool that replies to your WhatsApp buyers instantly — qualifies them, handles the back and forth, closes toward an order — all from your own number, every message you approve first. You just confirm the sales.
+
+Would a free one-week trial on your actual DMs make sense?
+---
+
+**Variant B — No name**
+---
+Hi there, came across [Business Name] — solid product. Quick question: how many WhatsApp DMs do you lose every week because you couldn't reply fast enough?
+
+We built an AI that handles your buyer DMs — replies instantly, qualifies them, closes toward an order — all from your own number, you approve everything before it sends. You stop losing sales to slow replies.
+
+Worth a free week's trial to see the numbers?
+---
+
+**Variant C — Follow-up (attempt 2)**
+---
+Hi [First Name or there], following up from earlier. One thing I didn't mention — the trial is completely free for one week, on your real incoming DMs. No setup fee, no contract.
+
+If you're losing even 5 sales a week to slow replies, that's worth 15 minutes of your time.
+
+Would a quick call this week make sense?
+---
+
+### Message rules
+- Keep it SHORT. These are busy traders, not corporate MDs. Two paragraphs max.
+- NEVER mention ₦ pricing in the first message. If they ask, move to a call.
+- NEVER use corporate language. Warm, peer-to-peer, like a fellow entrepreneur.
+- NEVER mention TalentOS, EstateOS, or suite names. It's ReachNG.
+- Lead with the PAIN (lost sales from slow replies), not the feature list.
+- CTA is always a trial or a quick call — never a demo or a presentation.
+- End with ONE question only.
+
+### Key signals that make a lead strong
+- Active Instagram with regular product posts and "DM to order" or "WhatsApp us" CTA
+- High engagement on posts (comments, saves) — signals real buyer demand
+- Running paid ads (Facebook Ads Library shows active ads) — signals budget and serious intent
+- Business with physical product (fashion, food, beauty, decor) — clear transactional DMs
+- WhatsApp number in bio — they're already routing buyers there
+
+### Anti-signals (skip)
+- Service businesses with long sales cycles (lawyers, consultants) — wrong buyer journey
+- Large brands with proper customer service teams — don't need us
+- Accounts with no recent posts or very low engagement — probably inactive

@@ -115,10 +115,16 @@ class BaseCampaign:
         city_tasks.append(discover_social_leads(vertical=self.vertical, max_results=social_quota))
         city_tasks.append(discover_signal_leads(vertical=self.vertical, max_results=signal_quota))
 
+        # small_business vertical: also run IG bio scraper
+        if self.vertical == "small_business":
+            from tools.ig_discovery import discover_ig_leads
+            city_tasks.append(discover_ig_leads(max_results=max(5, fetch_quota // 4)))
+
         all_results = await asyncio.gather(*city_tasks, return_exceptions=True)
 
-        maps_leads, apify_leads, social_leads, signal_leads = [], [], [], []
-        # Results interleaved: [maps_city1, apify_city1, maps_city2, apify_city2, ..., social, signal]
+        maps_leads, apify_leads, social_leads, signal_leads, ig_leads = [], [], [], [], []
+        # Results interleaved: [maps_city1, apify_city1, maps_city2, apify_city2, ..., social, signal, (ig)?]
+        city_result_count = len(target_cities) * 2
         for i, city in enumerate(target_cities):
             r_maps  = all_results[i * 2]
             r_apify = all_results[i * 2 + 1]
@@ -130,8 +136,8 @@ class BaseCampaign:
                 log.error("apify_discovery_failed", city=city, error=str(r_apify))
             else:
                 apify_leads.extend(r_apify)
-        r_social = all_results[-2]
-        r_signal = all_results[-1]
+        r_social = all_results[city_result_count]
+        r_signal = all_results[city_result_count + 1]
         if isinstance(r_social, Exception):
             log.error("social_discovery_failed", error=str(r_social))
         else:
@@ -140,6 +146,12 @@ class BaseCampaign:
             log.error("signal_discovery_failed", error=str(r_signal))
         else:
             signal_leads = r_signal
+        if self.vertical == "small_business" and len(all_results) > city_result_count + 2:
+            r_ig = all_results[city_result_count + 2]
+            if isinstance(r_ig, Exception):
+                log.error("ig_discovery_failed", error=str(r_ig))
+            else:
+                ig_leads = r_ig
 
         if cities:
             log.info("multi_city_discovery", cities=cities, maps=len(maps_leads), apify=len(apify_leads))
@@ -212,7 +224,7 @@ class BaseCampaign:
             )
             return (temp, score)
 
-        all_leads = signal_leads + social_leads + apify_leads + maps_leads
+        all_leads = signal_leads + ig_leads + social_leads + apify_leads + maps_leads
         all_leads.sort(key=_sort_key, reverse=True)
         businesses = [b for b in all_leads if not _is_duplicate(b)]
 
@@ -220,6 +232,7 @@ class BaseCampaign:
         warm_count = sum(1 for b in businesses if b.get("lead_temperature", 0) == 1)
         log.info("discovery_done", vertical=self.vertical, maps=len(maps_leads),
                  apify=len(apify_leads), social=len(social_leads), signal=len(signal_leads),
+                 instagram=len(ig_leads),
                  total_deduped=len(businesses), hot=hot_count, warm=warm_count)
 
         for biz in businesses:
@@ -454,9 +467,10 @@ class BaseCampaign:
             "dry_run": dry_run,
             "hitl_mode": hitl_mode,
             "discovery": {
-                "maps":   len(maps_leads),
-                "apify": len(apify_leads),
-                "social": len(social_leads),
+                "maps":      len(maps_leads),
+                "apify":     len(apify_leads),
+                "social":    len(social_leads),
+                "instagram": len(ig_leads),
                 "total_after_dedup": len(businesses),
             },
         }
