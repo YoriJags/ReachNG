@@ -31,6 +31,14 @@ NICHE_QUERIES = [
     "site:instagram.com Lagos small business owner WhatsApp",
 ]
 
+# Follower count tiers — used to score leads and decide whether to pitch
+# <500:    hobby/side hustle — skip (can't afford retainer)
+# 500-5K:  active small business — sweet spot
+# 5K-50K:  serious merchant — high priority
+# 50K+:    likely has social media manager — deprioritise
+_FOLLOWER_MIN = 500    # drop below this
+_FOLLOWER_CAP = 50000  # deprioritise above this
+
 _WA_PATTERN = re.compile(
     r"(?:wa\.me/|whatsapp\.com/send\?phone=|whatsapp[:\s]+|📱[:\s]*|☎[:\s]*|📞[:\s]*)(\+?234\d{9,10}|\+?0[789]\d{9})",
     re.IGNORECASE,
@@ -58,6 +66,40 @@ def _normalise_phone(raw: str) -> str:
     if digits.startswith("0") and len(digits) == 11:
         return "+234" + digits[1:]
     return "+" + digits
+
+
+def _extract_follower_count(html: str) -> Optional[int]:
+    """Extract follower count from public IG profile HTML."""
+    # IG embeds follower count in the meta description:
+    # "1,234 Followers, 56 Following, 78 Posts"
+    m = re.search(r"([\d,]+)\s+Followers", html, re.IGNORECASE)
+    if m:
+        try:
+            return int(m.group(1).replace(",", ""))
+        except ValueError:
+            pass
+    # JSON-LD / shared_data fallback: "edge_followed_by":{"count":1234}
+    m2 = re.search(r'"edge_followed_by"\s*:\s*\{"count"\s*:\s*(\d+)', html)
+    if m2:
+        return int(m2.group(1))
+    return None
+
+
+def _follower_tier(n: Optional[int]) -> str:
+    if n is None:        return "unknown"
+    if n < 500:          return "hobby"
+    if n < 5_000:        return "small"
+    if n < 50_000:       return "serious"
+    return "large"
+
+
+def _follower_score(n: Optional[int]) -> int:
+    """Additive lead score contribution from follower count."""
+    if n is None:        return 0
+    if n < 500:          return -20   # hobby — drag score down
+    if n < 5_000:        return 20    # sweet spot
+    if n < 50_000:       return 30    # serious
+    return 5                          # large — present but low priority
 
 
 def _extract_ig_handle(url: str) -> Optional[str]:
@@ -95,6 +137,31 @@ async def _fetch_ig_profile(handle: str, client: httpx.AsyncClient) -> Optional[
         if not phone:
             return None
 
+        followers = _extract_follower_count(text)
+        tier = _follower_tier(followers)
+
+        # Drop hobby accounts — can't afford the retainer
+        if followers is not None and followers < _FOLLOWER_MIN:
+            log.debug("ig_lead_dropped_hobby", handle=handle, followers=followers)
+            return None
+
+        # Deprioritise large accounts (likely have a social media manager)
+        if followers is not None and followers >= _FOLLOWER_CAP:
+            priority = "low"
+            tier_note = "Large account — may have social media manager"
+        elif tier == "serious":
+            priority = "high"
+            tier_note = f"{followers:,} followers — serious merchant"
+        elif tier == "small":
+            priority = "medium"
+            tier_note = f"{followers:,} followers — active small business (sweet spot)"
+        else:
+            priority = "medium"
+            tier_note = "Follower count unknown"
+
+        base_score = 50
+        lead_score = max(10, min(100, base_score + _follower_score(followers)))
+
         return {
             "place_id": f"ig_{handle}",
             "name": name or handle,
@@ -112,8 +179,12 @@ async def _fetch_ig_profile(handle: str, client: httpx.AsyncClient) -> Optional[
             "linkedin_url": None,
             "enrichment": None,
             "lead_temperature": 1,
-            "temperature_reason": "IG business account with WhatsApp in bio",
+            "temperature_reason": tier_note,
             "ig_handle": handle,
+            "ig_followers": followers,
+            "ig_follower_tier": tier,
+            "ig_priority": priority,
+            "lead_score": lead_score,
             "bio": bio[:300],
         }
     except Exception as e:

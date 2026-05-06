@@ -3548,6 +3548,15 @@ function renderApprovals(approvals) {
     const profileLink = a.profile_url
       ? `<a href="${a.profile_url}" target="_blank" style="font-size:11px;color:#4a90d9;margin-left:8px;">View Profile</a>`
       : "";
+    const igBadge = a.ig_followers != null
+      ? (() => {
+          const f = a.ig_followers;
+          const tier = f < 5000 ? {c:"#00e5a0",lbl:`${f.toLocaleString()} followers · sweet spot`}
+                     : f < 50000 ? {c:"#ff5c00",lbl:`${f.toLocaleString()} followers · serious`}
+                     : {c:"#888",lbl:`${f.toLocaleString()} followers · has social mgr?`};
+          return `<span style="font-size:10px;color:${tier.c};background:#0e1a10;border-radius:4px;padding:1px 7px;margin-left:6px;">IG ${tier.lbl}</span>`;
+        })()
+      : "";
     const sourceBadge = source === "social"
       ? `<span style="font-size:10px;background:#1a2a40;color:#4a90d9;border-radius:4px;padding:1px 6px;margin-left:6px;">${a.platform || "social"}</span>`
       : "";
@@ -3556,7 +3565,7 @@ function renderApprovals(approvals) {
     <div class="approval-card">
       <div class="approval-header">
         <span class="approval-name">${a.contact_name || "Unknown"}</span>
-        <span style="font-size:11px;color:#4a6070;">${channel}${sourceBadge}${profileLink}</span>
+        <span style="font-size:11px;color:#4a6070;">${channel}${sourceBadge}${igBadge}${profileLink}</span>
       </div>
       <div class="approval-meta">${sourceLabel(a)} &nbsp;·&nbsp; ${created}</div>
       ${postCtx}
