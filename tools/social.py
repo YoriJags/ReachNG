@@ -70,6 +70,38 @@ VERTICAL_SOCIAL = {
         "fb_keywords":      ["agribusiness Nigeria", "farm produce Lagos", "poultry Nigeria"],
         "competitor_terms": ["agribusiness company Nigeria", "farm produce supplier Lagos"],
     },
+    "small_business": {
+        "ig_hashtags":      ["LagosSmallBusiness", "LagosEntrepreneur", "MadeInLagos", "LagosBusiness", "NaijaFashion", "LagosFood", "LagosBeauty"],
+        "tt_hashtags":      ["lagossmallbusiness", "lagosvendor", "lagosskincare", "lagosfashion", "lagosfoods", "nigeriaentrepreneur"],
+        "twitter_queries":  [
+            "Lagos small business WhatsApp order",
+            "DM to order Lagos fashion",
+            "Lagos skincare brand order WhatsApp",
+            "Lagos food vendor order DM",
+            "Lagos bespoke tailor WhatsApp",
+        ],
+        "fb_keywords":      ["Lagos small business", "Lagos vendor", "Lagos DM to order"],
+        "competitor_terms": ["Lagos business WhatsApp", "order via DM Lagos"],
+        # WhatsApp directory search terms (used by scrape_wa_directories)
+        "wa_dir_queries":   [
+            "Lagos fashion skincare beauty WhatsApp business",
+            "Lagos food vendor baker catering WhatsApp",
+            "Lagos tailor interior decor events WhatsApp",
+        ],
+    },
+    "hospitality": {
+        "ig_hashtags":      ["LagosRestaurant", "LagosBar", "LagosLounge", "LagosNightlife", "LagosRooftop", "LagosEat"],
+        "tt_hashtags":      ["lagosrestaurant", "lagosbar", "lagoslounge", "lagosparty", "eatinginlagos"],
+        "twitter_queries":  [
+            "Lagos restaurant reservation WhatsApp",
+            "Lagos bar lounge booking table",
+            "rooftop bar Lagos reservation",
+            "event venue Lagos booking",
+        ],
+        "fb_keywords":      ["Lagos restaurant", "Lagos bar lounge", "Lagos event venue"],
+        "competitor_terms": ["restaurant booking Lagos", "bar reservation Lagos"],
+        "wa_dir_queries":   ["Lagos restaurant bar lounge WhatsApp reservation"],
+    },
 }
 
 
@@ -191,6 +223,191 @@ async def _run_apify(actor_id: str, input_data: dict) -> list[dict]:
     except Exception as e:
         log.error("apify_request_failed", actor=actor_id, error=str(e))
         return []
+
+
+# ── Twitter/X — DDG-based (no Apify, no API key) ─────────────────────────────
+
+def _ddg_search_sync(query: str, max_results: int) -> list[dict]:
+    try:
+        from duckduckgo_search import DDGS
+        with DDGS() as ddgs:
+            return list(ddgs.text(query, max_results=max_results)) or []
+    except Exception as e:
+        log.error("ddg_social_search_failed", error=str(e))
+        return []
+
+
+async def scrape_twitter_ddg(vertical: str, max_results: int = 20) -> list[dict]:
+    """
+    Find Lagos business Twitter accounts via DDG — no API key needed.
+    Strategy: DDG site:twitter.com queries → extract handle from URL →
+    snippet often contains bio text with phone numbers.
+    """
+    config  = VERTICAL_SOCIAL.get(vertical, {})
+    queries = config.get("twitter_queries", [])
+    if not queries:
+        return []
+
+    loop = asyncio.get_event_loop()
+    # Run top 3 queries in parallel
+    tasks = [
+        loop.run_in_executor(None, _ddg_search_sync, f"site:twitter.com {q}", 8)
+        for q in queries[:3]
+    ]
+    all_raw = await asyncio.gather(*tasks, return_exceptions=True)
+
+    leads: list[dict] = []
+    seen: set[str] = set()
+
+    for batch in all_raw:
+        if isinstance(batch, Exception):
+            continue
+        for r in batch:
+            url     = r.get("href", "")
+            snippet = r.get("body", "") or r.get("description", "")
+            title   = r.get("title", "")
+
+            # Extract Twitter handle from URL
+            m = re.search(r"twitter\.com/([A-Za-z0-9_]+)(?:/|$)", url)
+            if not m:
+                continue
+            username = m.group(1)
+            if username.lower() in {"search", "hashtag", "i", "home", "explore", "notifications"}:
+                continue
+            if username in seen:
+                continue
+            seen.add(username)
+
+            signal_id = f"tw_ddg_{username}"
+            if _is_seen(signal_id):
+                continue
+
+            combined = f"{title} {snippet}"
+            contact  = _extract_contact(combined)
+
+            # Only keep if we found a phone — cold Twitter profile with no contact is low value
+            if not contact["phone"] and not contact["email"]:
+                continue
+
+            lead = _normalise_lead(
+                platform="twitter",
+                vertical=vertical,
+                username=username,
+                display_name=title.split("(")[0].strip() or username,
+                bio=snippet[:300],
+                post_text="",
+                profile_url=f"https://twitter.com/{username}",
+                follower_count=0,
+                signal_id=signal_id,
+            )
+            lead["phone"]  = contact["phone"]
+            lead["email"]  = contact["email"]
+            lead["website"] = contact["website"]
+            _save_signal({**lead, "vertical": vertical, "signal_id": signal_id})
+            leads.append(lead)
+
+    log.info("twitter_ddg_found", vertical=vertical, count=len(leads))
+    return leads
+
+
+# ── WhatsApp Business Directories ─────────────────────────────────────────────
+
+# These sites aggregate WhatsApp business numbers by category/city.
+# DDG finds them and we extract numbers directly from search snippets.
+_WA_DIR_SITES = [
+    "wasap.my",
+    "wabiz.org",
+    "wa.link",
+    "api.whatsapp.com/send",
+]
+
+async def scrape_wa_directories(vertical: str, max_results: int = 20) -> list[dict]:
+    """
+    Search WhatsApp business directory sites for Lagos businesses in this vertical.
+    These sites list businesses with their WhatsApp links — direct phone number extraction.
+    No profile fetch needed — DDG snippet usually contains the number.
+    """
+    config  = VERTICAL_SOCIAL.get(vertical, {})
+    queries = config.get("wa_dir_queries", [])
+    if not queries:
+        return []
+
+    loop = asyncio.get_event_loop()
+    # Also run a direct wa.me search
+    wa_queries = queries + [
+        f"site:wasap.my Lagos {vertical.replace('_', ' ')}",
+        f"wa.me/234 Lagos {vertical.replace('_', ' ')} business",
+    ]
+    tasks = [
+        loop.run_in_executor(None, _ddg_search_sync, q, 6)
+        for q in wa_queries[:4]
+    ]
+    all_raw = await asyncio.gather(*tasks, return_exceptions=True)
+
+    _WA_RE = re.compile(
+        r"(?:wa\.me/|whatsapp\.com/send\?phone=|wasap\.my/)(\+?234\d{9,10}|234\d{9,10})"
+    )
+    _PHONE_RE = re.compile(r"(\+?234[789]\d{9}|0[789]\d{9})")
+
+    leads: list[dict] = []
+    seen: set[str] = set()
+
+    for batch in all_raw:
+        if isinstance(batch, Exception):
+            continue
+        for r in batch:
+            url     = r.get("href", "")
+            snippet = r.get("body", "") or r.get("description", "")
+            title   = r.get("title", "")
+            combined = f"{url} {title} {snippet}"
+
+            # Extract phone
+            phone = None
+            m = _WA_RE.search(combined)
+            if m:
+                digits = re.sub(r"\D", "", m.group(1))
+                phone  = f"+{digits}" if not digits.startswith("+") else digits
+                if not phone.startswith("+234"):
+                    phone = "+234" + phone.lstrip("+")
+            if not phone:
+                m2 = _PHONE_RE.search(combined)
+                if m2:
+                    raw = m2.group(1)
+                    digits = re.sub(r"\D", "", raw)
+                    phone  = ("+234" + digits[1:]) if digits.startswith("0") else ("+" + digits)
+
+            if not phone or phone in seen:
+                continue
+            seen.add(phone)
+
+            signal_id = f"wa_dir_{re.sub(r'[^a-z0-9]', '_', phone)}"
+            if _is_seen(signal_id):
+                continue
+
+            name = title.split("|")[0].split("-")[0].strip() or "Lagos Business"
+            lead = _normalise_lead(
+                platform="wa_directory",
+                vertical=vertical,
+                username=phone,
+                display_name=name,
+                bio=snippet[:300],
+                post_text="",
+                profile_url=url,
+                follower_count=0,
+                signal_id=signal_id,
+            )
+            lead["phone"]  = phone
+            lead["source"] = "wa_directory"
+            lead["temperature_reason"] = "WhatsApp business directory listing"
+            lead["lead_temperature"] = 1
+            _save_signal({**lead, "vertical": vertical, "signal_id": signal_id})
+            leads.append(lead)
+
+            if len(leads) >= max_results:
+                break
+
+    log.info("wa_directory_found", vertical=vertical, count=len(leads))
+    return leads
 
 
 # ── Instagram (Apify) ─────────────────────────────────────────────────────────
@@ -530,11 +747,13 @@ async def discover_social_leads(
     comp_quota  = per_source if include_competitor_monitoring else 0
 
     tasks = [
-        scrape_instagram_hashtags(vertical, per_source),
-        scrape_tiktok_leads(vertical, per_source),
-        scrape_twitter_leads(vertical, per_source),
-        scrape_twitter_api(vertical, per_source),       # no-ops if no Bearer token
-        scrape_facebook_mentions(vertical, per_source),
+        scrape_twitter_ddg(vertical, per_source),       # DDG-based, always runs
+        scrape_wa_directories(vertical, per_source),    # WhatsApp directory scraper
+        scrape_instagram_hashtags(vertical, per_source), # Apify — no-ops if no token
+        scrape_tiktok_leads(vertical, per_source),       # Apify — no-ops if no token
+        scrape_twitter_leads(vertical, per_source),      # Apify — no-ops if no token
+        scrape_twitter_api(vertical, per_source),        # no-ops if no Bearer token
+        scrape_facebook_mentions(vertical, per_source),  # Apify — no-ops if no token
     ]
     if comp_quota:
         tasks.append(monitor_competitor_mentions(vertical, max_results=comp_quota))
