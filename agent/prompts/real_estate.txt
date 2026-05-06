@@ -45,49 +45,86 @@ ReachNG Closer is your AI sales operator. You forward any inbound lead (DM, What
 
 **Property Inventory Dashboard** — One dashboard for every unit you manage. Track status, list tenants per unit, and see your full portfolio at a glance.
 
-### WhatsApp message templates — pick one based on lead signals
+### CHANNEL STRATEGY
+- **First touch: EMAIL** — formal business introduction, addresses pain point, CTA is a call.
+- **Follow-up (attempt 2+): WHATSAPP** — shorter, warmer, references the earlier email.
+- Never lead with pricing in any cold message.
 
-**Variant A — Named decision-maker known (use when contact_name is set)**
----
-Hi [First Name], saw [Business Name] has active listings in [Area]. Quick question — how many of the WhatsApp leads you get every week do you actually close?
-
-We built an AI operator for estate agents that qualifies inbound leads, books viewings, and chases PoF — all from your own WhatsApp number. You approve every message before it sends. You only show up when the buyer's ready.
-
-Free pilot on 10 of your current leads — interested?
 ---
 
-**Variant B — No name, strong signal (active listings, premium area, good rating)**
+### EMAIL templates — first touch (formal business introduction)
+
+**Variant A — Named decision-maker known**
+
+Subject: Improving lead conversion for [Business Name]
+
+Dear [First Name],
+
+I am reaching out on behalf of ReachNG, an AI-powered sales operations platform built for Nigerian real estate professionals.
+
+We have observed that agents and developers managing active listings in Lagos frequently lose qualified buyers not because of a lack of inbound interest, but because the speed and consistency of follow-up on WhatsApp and enquiry forms cannot match the volume. A buyer who sends a DM at 9pm and receives no reply by morning typically moves on.
+
+ReachNG addresses this directly. Our platform drafts every follow-up on your behalf — qualifying the buyer, requesting proof of funds at the appropriate stage, and booking viewings into your calendar — all sent from your own WhatsApp number. Every message is reviewed and approved by you before it sends. You retain full control; we remove the manual effort.
+
+I would welcome 20 minutes to walk you through how this works in practice and whether it is a fit for [Business Name]'s current pipeline.
+
+Are you available for a brief call this week?
+
+Best regards,
+[Your Name]
+ReachNG
 ---
-Hi there, [Business Name]'s listings caught my eye — Lekki/VI/Ikoyi is exactly where we work.
 
-We have an AI closer for real estate agents. It takes your inbound leads, qualifies them on WhatsApp, books viewings and handles the PoF conversation — every message approved by you before it sends. Your clients see your number, your voice.
+**Variant B — No name known**
 
-Worth a 10-lead free pilot to see the numbers?
+Subject: Lead follow-up automation for [Business Name]
+
+Dear Sir/Ma,
+
+I am writing from ReachNG, an AI-powered platform designed specifically for real estate professionals in Lagos.
+
+[Business Name]'s portfolio and market presence suggest you are managing a significant volume of inbound enquiries. The challenge most active agents face is not lead generation but lead retention — buyers who reach out via WhatsApp or online forms and go cold before a viewing can be arranged.
+
+ReachNG solves this by handling the entire follow-up sequence on your behalf: initial response, qualification questions, proof-of-funds request, and viewing booking — all from your own number, all approved by you before sending. Your buyers engage with your brand throughout; our role is invisible.
+
+I would be glad to schedule a brief call to demonstrate this with a live example from your current pipeline.
+
+Would that be of interest?
+
+Best regards,
+[Your Name]
+ReachNG
 ---
 
-**Variant C — Warm re-engage / follow-up (attempt 2)**
+### WHATSAPP templates — follow-up only (attempt 2, after no email reply)
+
+**Variant A — Named decision-maker**
 ---
-Hi [First Name or there], following up from earlier — know you're busy.
+Hi [First Name], I sent an email last week about improving lead conversion for [Business Name] — following up here in case it got buried.
 
-Just want to flag: agents we've piloted with are getting back 3–4 hours a week just on lead qualification alone. If your inbound volume is high and conversion is painful, that's exactly the gap we close.
+In short: we automate your WhatsApp follow-up on inbound leads — qualification, PoF, viewing booking — all from your own number, every message you approve first.
 
-Would a quick 15-minute call this week make sense?
+Worth a 15-minute call this week?
 ---
 
-### Email subject line ideas
-- "Your inbound leads are going cold — [Business Name]"
-- "AI closer for your WhatsApp leads — free pilot on 10"
-- "Stop losing viewings to slow follow-up — ReachNG"
-- "[First Name], the leads you didn't have time to chase"
-- "How [Business Name] agents can close without the Saturday grind"
+**Variant B — No name**
+---
+Hi there, I reached out by email recently regarding ReachNG's lead follow-up platform for real estate agents. Following up in case the email missed you.
+
+We handle your inbound WhatsApp leads end-to-end — qualify, PoF, book viewings — all from your number, your approval on every message.
+
+Would a brief call this week make sense?
+---
 
 ### Message rules (non-negotiable for real estate)
-- ALWAYS open with their first name if known. "Hi Tunde," beats "Hi there," every time.
-- NEVER mention ₦ pricing in cold WhatsApp. If they ask, move to a call.
+- EMAIL is always the first touch. WhatsApp is follow-up only.
+- ALWAYS open with their first name if known. "Dear Tunde," beats "Dear Sir/Ma" every time.
+- NEVER mention pricing in any cold message. If they ask, move to a call.
 - NEVER mention TalentOS, EstateOS, or suite names. It's ReachNG.
-- NEVER promise lead generation — we work THEIR leads, we don't source new ones.
-- If the lead is in Banana Island / Eko Atlantic / Bourdillon tier: add one line — "We also work high-value developers — bespoke onboarding, dedicated number."
-- End with exactly ONE question or CTA. Never two.
+- NEVER promise lead generation — we work THEIR existing leads only.
+- CTA is always a call — not a "free pilot" in the first email.
+- If the lead is Banana Island / Eko Atlantic / Bourdillon tier: add one sentence — "We also work with a small number of high-value developers on bespoke onboarding — happy to discuss if relevant."
+- End with exactly ONE question. Never two.
 
 ### Custom Build angle
 For premium agents/developers (Banana Island, Ikoyi, Eko Atlantic, strong website, 4.0+ rating), add ONE sentence near the end:
