@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     paystack_secret_key: str | None = Field(default=None, env="PAYSTACK_SECRET_KEY")
     paystack_public_key: str | None = Field(default=None, env="PAYSTACK_PUBLIC_KEY")
 
+    # App public URL — used in morning brief portal links
+    app_base_url: str = Field(default="https://reachng.up.railway.app", env="APP_BASE_URL")
+
     # Owner notifications
     owner_whatsapp: str | None = Field(default=None, env="OWNER_WHATSAPP")
     slack_webhook_url: str | None = Field(default=None, env="SLACK_WEBHOOK_URL")

@@ -79,6 +79,7 @@ class ClientUpsert(BaseModel):
     daily_send_limit: Optional[int] = None   # Overrides global DAILY_SEND_LIMIT for this client
     product: Optional[str] = "reachng"       # "reachng" | "digital_associates" | "loan_officer"
     autopilot: bool = False                  # If True, safe drafts send without human approval
+    owner_phone: Optional[str] = None       # Client's WhatsApp number — receives morning brief
 
 
 class PaymentUpdate(BaseModel):
@@ -212,6 +213,8 @@ async def upsert_client(payload: ClientUpsert):
     if payload.product is not None:
         set_doc["product"] = payload.product
     set_doc["autopilot"] = payload.autopilot
+    if payload.owner_phone is not None:
+        set_doc["owner_phone"] = payload.owner_phone
 
     result = clients.update_one(
         {"name": {"$regex": f"^{re.escape(payload.name)}$", "$options": "i"}},

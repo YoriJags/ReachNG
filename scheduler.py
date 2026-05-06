@@ -299,6 +299,17 @@ async def _morning_brief():
         log.error("morning_brief_failed", error=str(e))
 
 
+async def _client_morning_briefs():
+    """Send per-client morning briefs to every active client that has owner_phone set."""
+    log.info("client_briefs_start")
+    try:
+        from tools.morning_brief_client import run_all_client_briefs
+        result = await run_all_client_briefs()
+        log.info("client_briefs_done", **result)
+    except Exception as e:
+        log.error("client_briefs_failed", error=str(e))
+
+
 def setup_scheduler():
     """Register all jobs and return configured scheduler."""
 
@@ -312,6 +323,12 @@ def setup_scheduler():
         _morning_brief,
         CronTrigger(hour=8, minute=0, timezone="Africa/Lagos"),
         id="morning_brief", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=300,
+    )
+
+    scheduler.add_job(
+        _client_morning_briefs,
+        CronTrigger(hour=8, minute=5, timezone="Africa/Lagos"),  # 5 min after operator brief
+        id="client_morning_briefs", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=300,
     )
 
     scheduler.add_job(

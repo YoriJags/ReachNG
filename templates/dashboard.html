@@ -1065,7 +1065,7 @@
       <div class="ct-section-title" style="margin-bottom:0;">Add Pilot Client</div>
       <span style="font-size:11px;color:#444;">Warm lead or referral — skips brief gate, portal live immediately</span>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;align-items:end;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:10px;align-items:end;">
       <div>
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#555;margin-bottom:6px;">Business Name</div>
         <input id="pilot-name" class="form-input" placeholder="e.g. Mercury Lagos" style="width:100%;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:9px 12px;color:#e8e8e8;font-size:13px;outline:none;" />
@@ -1085,8 +1085,12 @@
         </select>
       </div>
       <div>
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#555;margin-bottom:6px;">WhatsApp Number</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#555;margin-bottom:6px;">Their WhatsApp (Unipile)</div>
         <input id="pilot-phone" class="form-input" placeholder="+2348012345678" style="width:100%;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:9px 12px;color:#e8e8e8;font-size:13px;outline:none;" />
+      </div>
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#555;margin-bottom:6px;">Owner Phone (morning brief)</div>
+        <input id="pilot-owner-phone" class="form-input" placeholder="+2348099999999" style="width:100%;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:9px 12px;color:#e8e8e8;font-size:13px;outline:none;" />
       </div>
       <div>
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#555;margin-bottom:6px;">Note (optional)</div>
@@ -4497,11 +4501,12 @@ async function togglePlanActive(key, currentlyActive) {
 let _addPlanModal = null;
 
 async function addPilotClient() {
-  const name     = document.getElementById("pilot-name").value.trim();
-  const vertical = document.getElementById("pilot-vertical").value;
-  const phone    = document.getElementById("pilot-phone").value.trim();
-  const note     = document.getElementById("pilot-note").value.trim();
-  const resultEl = document.getElementById("pilot-result");
+  const name       = document.getElementById("pilot-name").value.trim();
+  const vertical   = document.getElementById("pilot-vertical").value;
+  const phone      = document.getElementById("pilot-phone").value.trim();
+  const ownerPhone = document.getElementById("pilot-owner-phone").value.trim();
+  const note       = document.getElementById("pilot-note").value.trim();
+  const resultEl   = document.getElementById("pilot-result");
 
   if (!name) { alert("Business name is required."); return; }
 
@@ -4510,19 +4515,22 @@ async function addPilotClient() {
 
   try {
     // 1. Create the client record
+    const payload = {
+      name,
+      vertical,
+      brief: note || `Pilot client — ${vertical.replace(/_/g," ")}. Brief to be completed after onboarding.`,
+      preferred_channel: phone ? "whatsapp" : "email",
+      active: true,
+      plan: "starter",
+      payment_status: "trial",
+      city: "Lagos",
+    };
+    if (ownerPhone) payload.owner_phone = ownerPhone;
+
     const res = await fetch("/api/v1/clients/", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...authHeaders() },
-      body: JSON.stringify({
-        name,
-        vertical,
-        brief: note || `Pilot client — ${vertical.replace(/_/g," ")}. Brief to be completed after onboarding.`,
-        preferred_channel: phone ? "whatsapp" : "email",
-        active: true,
-        plan: "starter",
-        payment_status: "trial",
-        city: "Lagos",
-      }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
