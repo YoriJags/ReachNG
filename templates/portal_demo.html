@@ -196,6 +196,29 @@
   .status-replied    { background: rgba(68,136,255,0.15); color: var(--blue); }
   .status-new        { background: rgba(80,80,80,0.3); color: #888; }
 
+  /* Capacity grid */
+  .cap-day {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 12px; text-align: center;
+  }
+  .cap-day.full   { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+  .cap-day.busy   { border-color: rgba(245,200,66,0.3); background: rgba(245,200,66,0.04); }
+  .cap-day.open   { border-color: rgba(0,229,160,0.25); background: rgba(0,229,160,0.03); }
+  .cap-day.closed { border-color: #111; opacity: 0.4; }
+  .cap-day-name  { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .cap-day-date  { font-size: 11px; color: #444; margin-bottom: 10px; }
+  .cap-bar-wrap  { height: 4px; background: #111; border-radius: 2px; margin-bottom: 10px; }
+  .cap-bar       { height: 4px; border-radius: 2px; transition: width 0.6s ease; }
+  .cap-day.full  .cap-bar { background: #ef4444; }
+  .cap-day.busy  .cap-bar { background: var(--gold); }
+  .cap-day.open  .cap-bar { background: var(--green); }
+  .cap-status    { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .cap-day.full   .cap-status { color: #ef4444; }
+  .cap-day.busy   .cap-status { color: var(--gold); }
+  .cap-day.open   .cap-status { color: var(--green); }
+  .cap-day.closed .cap-status { color: #333; }
+  .cap-note      { font-size: 10px; color: #333; margin-top: 4px; }
+
   footer { padding: 32px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; }
   .footer-text { font-size: 12px; color: var(--muted); }
   .footer-logo { font-size: 13px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
@@ -264,6 +287,9 @@
   </div>
 
   <div class="hitl-queue" id="hitl-queue"></div>
+
+  <div class="section-label" style="margin-top:40px;">Venue Capacity — This Week</div>
+  <div id="capacity-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:40px;"></div>
 
   <div class="section-label">Recent Activity</div>
   <div class="activity-feed" id="activity-feed"></div>
@@ -345,6 +371,35 @@ const DEMO = {
     { guest: "Seun Oladipo",     type: "Table Booking",      details: "3 guests · Sun 11 May",            status: "new" },
   ],
 };
+
+const CAPACITY = [
+  { day: "Mon",  date: "6 May",  pct: 0,   status: "closed", note: "Closed" },
+  { day: "Tue",  date: "7 May",  pct: 35,  status: "open",   note: "Plenty of space" },
+  { day: "Wed",  date: "8 May",  pct: 60,  status: "busy",   note: "Corporate mixer (20 pax)" },
+  { day: "Thu",  date: "9 May",  pct: 45,  status: "open",   note: "Moderate — walk-ins welcome" },
+  { day: "Fri",  date: "10 May", pct: 88,  status: "busy",   note: "Filling fast — 2 events in" },
+  { day: "Sat",  date: "11 May", pct: 100, status: "full",   note: "Birthday takeover — private" },
+  { day: "Sun",  date: "12 May", pct: 20,  status: "open",   note: "Open — light night" },
+];
+
+function buildCapacity() {
+  const grid = document.getElementById("capacity-grid");
+  grid.innerHTML = CAPACITY.map(d => `
+    <div class="cap-day ${d.status}">
+      <div class="cap-day-name">${d.day}</div>
+      <div class="cap-day-date">${d.date}</div>
+      <div class="cap-bar-wrap"><div class="cap-bar" style="width:0%" data-pct="${d.pct}"></div></div>
+      <div class="cap-status">${d.status === "closed" ? "Closed" : d.status === "full" ? "Full" : d.status === "busy" ? "Filling up" : "Available"}</div>
+      <div class="cap-note">${d.note}</div>
+    </div>
+  `).join("");
+  // Animate bars after render
+  setTimeout(() => {
+    grid.querySelectorAll(".cap-bar").forEach(bar => {
+      bar.style.width = bar.dataset.pct + "%";
+    });
+  }, 200);
+}
 
 function animateCounter(el, target, duration, prefix, suffix) {
   const start = performance.now();
@@ -471,6 +526,7 @@ function init() {
   animateCounter(document.getElementById("val-confirmed"), s.confirmed, 900);
   animateCounter(document.getElementById("val-revenue"), s.revenue_k, 1000, "₦", "M");
   animateCounter(document.getElementById("val-response"), s.response_mins, 700, "", " min");
+  buildCapacity();
   buildHITL();
   buildActivity();
   buildPipeline();
