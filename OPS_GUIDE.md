@@ -8,7 +8,7 @@ Your plain-English guide to keeping ReachNG healthy. Check this once a week.
 
 | Dashboard | URL | What it shows |
 |-----------|-----|---------------|
-| **ReachNG Admin** | https://reachng.up.railway.app/dashboard | Your leads, drafts, clients, everything |
+| **ReachNG Admin** | https://reachng-production.up.railway.app/dashboard | Your leads, drafts, clients, everything |
 | **Railway** | https://railway.app → your project | Server health, memory, logs |
 | **MongoDB Atlas** | https://cloud.mongodb.com | Database storage and connections |
 
