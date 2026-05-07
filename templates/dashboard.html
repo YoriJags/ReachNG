@@ -626,9 +626,22 @@
       <div class="health-pill"><span class="health-dot" id="dot-apollo"></span> Apollo</div>
       <div class="health-pill"><span class="health-dot" id="dot-unipile"></span> Unipile</div>
     </div>
+    <button onclick="copyDemoPortalLink(this)" title="Copy public demo portal link to clipboard (for prospects)" style="background:#111;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.3px;">Demo Portal</button>
     <div class="live-badge"><span class="live-dot"></span> Live</div>
   </div>
 </header>
+<script>
+function copyDemoPortalLink(btn){
+  const url = window.location.origin + '/portal/demo';
+  navigator.clipboard.writeText(url).then(()=>{
+    const orig = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    btn.style.background = '#16a34a';
+    window.open(url, '_blank');
+    setTimeout(()=>{ btn.textContent = orig; btn.style.background = '#111'; }, 1800);
+  }).catch(()=>{ window.open(url, '_blank'); });
+}
+</script>
 
 <div class="layout">
 <aside class="sidebar" id="sidebar">
