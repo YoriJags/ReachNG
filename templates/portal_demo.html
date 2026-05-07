@@ -281,9 +281,28 @@
     </div>
   </div>
 
+  <div class="section-label">AI Settings</div>
+  <div id="autopilot-card" style="background:#fff;border:1px solid var(--border-subtle);border-radius:10px;padding:20px 24px;margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;gap:20px;">
+    <div>
+      <div style="font-size:14px;font-weight:600;color:#0a0a0a;">Autopilot Mode</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;" id="ap-demo-desc">
+        When off, every AI draft waits for your approval before sending.
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span id="ap-demo-status" style="font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.08em;">HITL</span>
+      <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;">
+        <input type="checkbox" id="ap-demo-toggle" style="opacity:0;width:0;height:0;" onchange="demoToggleAutopilot(this.checked)">
+        <span id="ap-demo-slider" style="position:absolute;cursor:pointer;inset:0;background:#e5e5e5;border-radius:24px;transition:.2s;border:1px solid #d4d4d4;">
+          <span id="ap-demo-knob" style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#999;border-radius:50%;transition:.2s;"></span>
+        </span>
+      </label>
+    </div>
+  </div>
+
   <div class="section-header">
     <div class="section-label">Pending Approval</div>
-    <span class="pending-badge">3 drafts awaiting you</span>
+    <span class="pending-badge" id="pending-badge-label">3 drafts awaiting you</span>
   </div>
 
   <div class="hitl-queue" id="hitl-queue"></div>
@@ -530,6 +549,36 @@ function init() {
   buildHITL();
   buildActivity();
   buildPipeline();
+}
+
+function demoToggleAutopilot(enabled) {
+  const status = document.getElementById("ap-demo-status");
+  const desc   = document.getElementById("ap-demo-desc");
+  const slider = document.getElementById("ap-demo-slider");
+  const knob   = document.getElementById("ap-demo-knob");
+  const badge  = document.getElementById("pending-badge-label");
+
+  if (enabled) {
+    status.textContent = "AUTOPILOT";
+    status.style.color = "#ff5500";
+    desc.textContent = "Autopilot ON — AI sends safe replies directly. Complaints, disputes and high-value events still come to you.";
+    slider.style.background = "#ff5500";
+    slider.style.borderColor = "#ff5500";
+    knob.style.left = "auto";
+    knob.style.right = "3px";
+    knob.style.background = "#fff";
+    badge.textContent = "1 draft awaiting you (escalated)";
+  } else {
+    status.textContent = "HITL";
+    status.style.color = "#555";
+    desc.textContent = "When off, every AI draft waits for your approval before sending.";
+    slider.style.background = "#e5e5e5";
+    slider.style.borderColor = "#d4d4d4";
+    knob.style.right = "auto";
+    knob.style.left = "3px";
+    knob.style.background = "#999";
+    badge.textContent = "3 drafts awaiting you";
+  }
 }
 
 init();
