@@ -31,6 +31,16 @@ The SDR engine (Yori's own outreach to Lagos SMEs) needs deeper Nigerian-market 
 - [ ] **Bring ALL existing verticals to gold standard** (~120+ lines each) — same depth as `real_estate.txt`. Includes the 6 thin ones (events, agriculture, auto, cooperatives, fitness, insurance) AND the medium ones (legal, fintech, recruitment, small_business, logistics, agency_sales) — every single vertical prompt gets the full treatment. No prompt left as a thin sketch.
 - [ ] **Lead-signal-injection rules** — each vertical prompt mandates referencing concrete signals from enrichment payload (Maps rating, decision_maker, place categories, IG handle).
 
+## P0 — Cross-project SEO audit (~1 hour, blocks SEO campaign decision)
+
+User wants to run an SEO campaign across ReachNG, VIIBE, and Roomly in prep for prelaunch. Each project is at very different SEO maturity — need a per-project audit before committing budget or scope.
+
+- [ ] **ReachNG audit** — does `/` serve a public marketing page? Currently the codebase is all admin/portal/demo. Needs: landing page, vertical sub-pages (one per demo vertical), blog stack, schema.org Organization + SoftwareApplication, robots.txt, sitemap.xml, OG/Twitter cards. Likely scope: build landing site BEFORE running SEO.
+- [ ] **VIIBE audit** — mobile-first (Expo/React Native) so primary play is **ASO** (App Store Optimization) not SEO. Audit App Store listing readiness + need for one web landing page (vibe.ng?) for press/share-link previews.
+- [ ] **Roomly audit** — repo lives at `C:\Users\OAJAGUN\Documents\roomly`, separate from this workspace. Inspect first to know if web (SEO) or mobile (ASO).
+- [ ] **Cross-project assets** — Schema.org Person entity for Yori (E-E-A-T builder), shared blog stack, footer cross-links between domains as internal-network signal.
+- [ ] **Output:** `SEO_AUDIT.md` per project with: current state, 5 highest-impact fixes, target keywords (Lagos-specific where relevant), estimated effort, recommended order. Then user picks which project to ship first.
+
 ## P1 — Quick wins (≤1 day each, high leverage)
 
 - [ ] **PayNudge** — Google Sheets source + Paystack pay-link on existing `services/debt_collector/`. 1 day.
