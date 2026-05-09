@@ -2,7 +2,9 @@
 
 **Single source of truth for what's being built right now.** If it's not on this page, it doesn't exist.
 
-Last updated: 2026-04-20
+Queued work waiting to be promoted into a phase: see [BACKLOG.md](./BACKLOG.md).
+
+Last updated: 2026-05-09
 
 ---
 
