@@ -39,7 +39,7 @@ class CloserLead(BaseModel):
     id: Optional[str] = None
     client_id: str
     client_name: str
-    vertical: str = "real_estate"
+    vertical: str = "general"
     source: CloserSource
     contact_name: Optional[str] = None
     contact_phone: Optional[str] = None

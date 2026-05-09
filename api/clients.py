@@ -182,9 +182,25 @@ async def get_client(name: str):
     return _serialise(client)
 
 
+SUPPORTED_VERTICALS = {
+    "real_estate", "education", "professional_services", "hospitality",
+    "small_business", "fitness", "events", "auto", "cooperatives",
+    "legal", "insurance", "recruitment", "general",
+}
+
+
 @router.post("/")
 async def upsert_client(payload: ClientUpsert):
-    """Create or update a client."""
+    """Create or update a client. Vertical is required and must be a known tag —
+    drives Business Brief primer + Closer persona + downstream routing.
+    """
+    if not payload.vertical or not payload.vertical.strip():
+        raise HTTPException(400, "vertical is required — every client must be tagged so the right persona/primer fires")
+    vertical = payload.vertical.strip().lower()
+    if vertical not in SUPPORTED_VERTICALS:
+        raise HTTPException(400, f"vertical '{payload.vertical}' not recognised. Use one of: {sorted(SUPPORTED_VERTICALS)}")
+    payload.vertical = vertical
+
     now = datetime.now(timezone.utc)
     clients = get_clients()
 

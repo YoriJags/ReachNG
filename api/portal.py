@@ -105,9 +105,22 @@ async def get_portal_data(token: str):
 
 @router.get("/demo", response_class=HTMLResponse)
 async def demo_portal(request: Request):
-    """Public demo portal — shows realistic sample data for pitch/sales purposes."""
+    """Public demo portal — defaults to hospitality (Mercury). Same product, vertical-tailored sample data."""
+    from services.demo_datasets import get_dataset
     templates = request.app.state.templates
-    return templates.TemplateResponse(request, "portal_demo.html")
+    return templates.TemplateResponse(request, "portal_demo.html", {"data": get_dataset(None), "vertical": "hospitality"})
+
+
+@router.get("/demo/{vertical}", response_class=HTMLResponse)
+async def demo_portal_vertical(vertical: str, request: Request):
+    """Public demo portal for a specific vertical — same product, vertical-tailored sample data.
+
+    Same engine as /portal/demo, just loads a different sample dataset so prospects
+    in any Lagos SME vertical see themselves in the product within 5 seconds.
+    """
+    from services.demo_datasets import get_dataset
+    templates = request.app.state.templates
+    return templates.TemplateResponse(request, "portal_demo.html", {"data": get_dataset(vertical), "vertical": vertical.lower()})
 
 
 @router.get("/{token}", response_class=HTMLResponse)

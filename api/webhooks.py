@@ -183,9 +183,11 @@ async def _handle_message(sender_phone: str, message_body: str, source: str | No
     except Exception as e:
         log.warning("holding_reply_lookup_failed", error=str(e))
 
-    # ── Closer intake (real-estate clients with closer_enabled) ────────────────
+    # ── Closer intake (any vertical with closer_enabled) ───────────────────────
+    # Closer is now universal — the Business Brief drives persona, not the vertical.
+    # Any active client with closer_enabled gets inbound routed to the lead thread.
     try:
-        if matched_client and matched_client.get("closer_enabled") and matched_client.get("vertical") == "real_estate":
+        if matched_client and matched_client.get("closer_enabled"):
             closer_client = matched_client
             if closer_client:
                 from services.closer import find_lead_by_contact, create_lead, append_thread_message
@@ -211,7 +213,7 @@ async def _handle_message(sender_phone: str, message_body: str, source: str | No
                     lead = create_lead(
                         client_id=client_id,
                         client_name=closer_client["name"],
-                        vertical="real_estate",
+                        vertical=closer_client.get("vertical") or "general",
                         source="whatsapp",
                         contact_phone=sender_phone,
                         inquiry_text=message_body,

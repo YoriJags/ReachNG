@@ -235,21 +235,21 @@
 
 <div class="demo-banner">
   <span class="demo-pip"></span>
-  Demo Mode &mdash; Mercury Lagos &mdash; ReachNG Closer
+  Demo Mode &mdash; {{ data.brand }} &mdash; Powered by ReachNG
 </div>
 
 <nav class="topbar">
   <div class="topbar-logo">Reach<span>NG</span></div>
   <div class="topbar-status">
     <span class="live-dot"></span>
-    Live &middot; Hospitality
+    Live &middot; {{ data.category }}
   </div>
 </nav>
 
 <div class="hero">
   <div class="hero-eyebrow">Client Dashboard</div>
-  <h1>Mercury Lagos</h1>
-  <div class="hero-sub">Reservation &amp; Events Inbox &nbsp;<span>&middot;</span>&nbsp; Rooftop Bar &amp; Lounge &nbsp;<span>&middot;</span>&nbsp; Victoria Island</div>
+  <h1>{{ data.brand }}</h1>
+  <div class="hero-sub">{{ data.intro_label }} &nbsp;<span>&middot;</span>&nbsp; {{ data.tagline }}</div>
   <div class="powered-pill">
     <span class="powered-dot"></span>
     Powered by ReachNG
@@ -259,26 +259,13 @@
 <div class="content">
 
   <div class="stats-grid">
-    <div class="stat-card orange">
-      <div class="stat-label">Enquiries This Week</div>
-      <div class="stat-value" id="val-enquiries">0</div>
-      <div class="stat-change">WhatsApp inbound handled</div>
+    {% for s in data.stats %}
+    <div class="stat-card {{ s.tone }}">
+      <div class="stat-label">{{ s.label }}</div>
+      <div class="stat-value" data-target="{{ s.value_num }}" data-prefix="{{ s.value_prefix }}" data-suffix="{{ s.value_suffix }}">0</div>
+      <div class="stat-change">{{ s.change }}</div>
     </div>
-    <div class="stat-card green">
-      <div class="stat-label">Bookings Confirmed</div>
-      <div class="stat-value" id="val-confirmed">0</div>
-      <div class="stat-change">Tables &amp; events closed</div>
-    </div>
-    <div class="stat-card gold">
-      <div class="stat-label">Revenue Tracked</div>
-      <div class="stat-value" id="val-revenue">0</div>
-      <div class="stat-change">₦ from confirmed bookings</div>
-    </div>
-    <div class="stat-card blue">
-      <div class="stat-label">Avg. Response Time</div>
-      <div class="stat-value" id="val-response">0</div>
-      <div class="stat-change">Minutes (was 3+ hours)</div>
-    </div>
+    {% endfor %}
   </div>
 
   <div class="section-label">AI Settings</div>
@@ -308,7 +295,7 @@
         <div style="font-size:12px;color:var(--muted);margin-top:4px;">Sent instantly when a guest messages — only while Autopilot is OFF. Once per contact per 24h, so returning guests aren't spammed.</div>
       </div>
     </div>
-    <textarea id="holding-msg-demo" maxlength="800" style="width:100%;min-height:90px;border:1px solid var(--border-subtle);border-radius:8px;padding:12px;font-family:inherit;font-size:13px;color:#0a0a0a;resize:vertical;box-sizing:border-box;">Hi! Thanks for reaching out to Mercury — give us a few minutes and we'll be back with availability, pricing and the vibe for the night. 🥂</textarea>
+    <textarea id="holding-msg-demo" maxlength="800" style="width:100%;min-height:90px;border:1px solid var(--border-subtle);border-radius:8px;padding:12px;font-family:inherit;font-size:13px;color:#0a0a0a;resize:vertical;box-sizing:border-box;">{{ data.holding_message }}</textarea>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
       <span style="font-size:11px;color:var(--muted);" id="holding-char-count">0 / 800</span>
       <button onclick="demoSaveHolding()" style="background:#0a0a0a;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Save</button>
@@ -316,28 +303,26 @@
   </div>
 
   <div class="section-header">
-    <div class="section-label">Pending Approval</div>
-    <span class="pending-badge" id="pending-badge-label">3 drafts awaiting you</span>
+    <div class="section-label">{{ data.hitl_section_label }}</div>
+    <span class="pending-badge" id="pending-badge-label">{{ data.hitl_drafts|length }} drafts awaiting you</span>
   </div>
 
   <div class="hitl-queue" id="hitl-queue"></div>
 
-  <div class="section-label" style="margin-top:40px;">Venue Capacity — This Week</div>
-  <div id="capacity-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:40px;"></div>
+  {% if data.secondary_section %}
+  <div class="section-label" style="margin-top:40px;">{{ data.secondary_section.title }}</div>
+  <div id="secondary-section" style="margin-bottom:40px;"></div>
+  {% endif %}
 
-  <div class="section-label">Recent Activity</div>
+  <div class="section-label">{{ data.activity_label }}</div>
   <div class="activity-feed" id="activity-feed"></div>
 
-  <div class="section-label">Reservation Pipeline</div>
+  <div class="section-label">{{ data.pipeline_label }}</div>
   <div class="leads-table-wrap">
     <table class="leads-table">
       <thead>
         <tr>
-          <th>Guest / Enquiry</th>
-          <th>Type</th>
-          <th>Details</th>
-          <th>Status</th>
-          <th>Last Touch</th>
+          {% for col in data.pipeline_columns %}<th>{{ col }}</th>{% endfor %}
         </tr>
       </thead>
       <tbody id="pipeline-tbody"></tbody>
@@ -352,87 +337,46 @@
 </footer>
 
 <script>
-const DEMO = {
-  stats: { enquiries: 34, confirmed: 18, revenue_k: 2.4, response_mins: 2 },
+const DEMO = {{ data | tojson }};
+const SECONDARY = DEMO.secondary_section || null;
 
-  hitl: [
-    {
-      name: "Tunde Adeyemi",
-      initials: "TA",
-      time: "8 minutes ago",
-      tag: "reservation",
-      tag_label: "Table Booking",
-      inbound: "Hi, do you have space for 4 people this Saturday? What's the vibe like and is there a minimum spend?",
-      draft: "Hi Tunde! Yes, we have availability for 4 on Saturday from 8pm onwards. Our rooftop is lively with a DJ set from 10pm — great energy. Minimum spend is ₦50,000 per table, which covers drinks and small plates. Shall I hold a table for you? I'll just need a name and a quick confirmation.",
-    },
-    {
-      name: "Chisom Okafor",
-      initials: "CO",
-      time: "23 minutes ago",
-      tag: "event",
-      tag_label: "Birthday Event",
-      inbound: "Good evening. I want to plan a birthday dinner for about 25 people next month. Do you do private sections? What's the process?",
-      draft: "Good evening Chisom! We'd love to host your birthday celebration at Mercury. We have a private section on the rooftop that accommodates up to 35 guests with a dedicated bar area and stunning Lagos skyline views.\n\nFor private bookings of 25 guests, our minimum spend is ₦500,000 which includes a welcome drinks round, table service, and your own playlist slot with the DJ.\n\nTo secure the date, we'd need a 50% deposit. What date were you considering? I can check availability and send you a full proposal.",
-    },
-    {
-      name: "Emeka Nwosu",
-      initials: "EN",
-      time: "41 minutes ago",
-      tag: "enquiry",
-      tag_label: "Corporate Event",
-      inbound: "We're looking for a venue for a corporate team outing, around 40 people, cocktails and dinner. Do you cater for that sort of thing?",
-      draft: "Hi Emeka, Mercury is a great fit for corporate events — we've hosted several team outings and client dinners on the rooftop. For 40 guests we'd recommend a full private hire or a semi-private section depending on the evening.\n\nFull hire is available on weeknights and includes: full bar, canapés and sharing platters, dedicated host, and PA system if needed. Pricing starts from ₦1.2M for the space.\n\nWould a weeknight work for your team? I can walk you through the options and send a formal proposal.",
-    },
-  ],
+function buildSecondarySection() {
+  const container = document.getElementById("secondary-section");
+  if (!container || !SECONDARY) return;
+  const data = SECONDARY.data || [];
 
-  activity: [
-    { type: "confirmed", text: "<strong>Funke Balogun</strong> — Birthday takeover for 30 confirmed. ₦450,000 min spend. DJ slot secured.", time: "1 hour ago" },
-    { type: "replied",   text: "<strong>David Eze</strong> — Asked about bottle service options for Saturday. ReachNG sent the full menu.", time: "2 hours ago" },
-    { type: "confirmed", text: "<strong>Kemi Adebayo</strong> — Corporate mixer for 20, Thursday night. ₦380,000 confirmed.", time: "3 hours ago" },
-    { type: "sent",      text: "<strong>Seun Oladipo</strong> — Enquiry received at 11:43pm. ReachNG replied in 90 seconds.", time: "4 hours ago" },
-    { type: "confirmed", text: "<strong>Tobenna Obi</strong> — VIP table for 6, Saturday 10pm. ₦90,000 confirmed.", time: "5 hours ago" },
-    { type: "replied",   text: "<strong>Amaka Igwe</strong> — Asked about hosting a label event. ReachNG qualified and escalated to you.", time: "6 hours ago" },
-  ],
-
-  pipeline: [
-    { guest: "Funke Balogun",    type: "Birthday Takeover",  details: "30 guests · Sat 10 May · ₦450K",  status: "confirmed" },
-    { guest: "Kemi Adebayo",     type: "Corporate Mixer",    details: "20 guests · Thu 8 May · ₦380K",   status: "confirmed" },
-    { guest: "Tobenna Obi",      type: "VIP Table",          details: "6 guests · Sat 10 May · ₦90K",    status: "confirmed" },
-    { guest: "Tunde Adeyemi",    type: "Table Booking",      details: "4 guests · Sat 10 May",            status: "pending" },
-    { guest: "Chisom Okafor",    type: "Birthday Event",     details: "25 guests · TBC",                  status: "pending" },
-    { guest: "Emeka Nwosu",      type: "Corporate Event",    details: "40 guests · TBC",                  status: "replied" },
-    { guest: "Amaka Igwe",       type: "Label Night Enquiry","details": "50+ guests · TBC",               status: "replied" },
-    { guest: "Seun Oladipo",     type: "Table Booking",      details: "3 guests · Sun 11 May",            status: "new" },
-  ],
-};
-
-const CAPACITY = [
-  { day: "Mon",  date: "6 May",  pct: 0,   status: "closed", note: "Closed" },
-  { day: "Tue",  date: "7 May",  pct: 35,  status: "open",   note: "Plenty of space" },
-  { day: "Wed",  date: "8 May",  pct: 60,  status: "busy",   note: "Corporate mixer (20 pax)" },
-  { day: "Thu",  date: "9 May",  pct: 45,  status: "open",   note: "Moderate — walk-ins welcome" },
-  { day: "Fri",  date: "10 May", pct: 88,  status: "busy",   note: "Filling fast — 2 events in" },
-  { day: "Sat",  date: "11 May", pct: 100, status: "full",   note: "Birthday takeover — private" },
-  { day: "Sun",  date: "12 May", pct: 20,  status: "open",   note: "Open — light night" },
-];
-
-function buildCapacity() {
-  const grid = document.getElementById("capacity-grid");
-  grid.innerHTML = CAPACITY.map(d => `
-    <div class="cap-day ${d.status}">
-      <div class="cap-day-name">${d.day}</div>
-      <div class="cap-day-date">${d.date}</div>
-      <div class="cap-bar-wrap"><div class="cap-bar" style="width:0%" data-pct="${d.pct}"></div></div>
-      <div class="cap-status">${d.status === "closed" ? "Closed" : d.status === "full" ? "Full" : d.status === "busy" ? "Filling up" : "Available"}</div>
-      <div class="cap-note">${d.note}</div>
-    </div>
-  `).join("");
-  // Animate bars after render
-  setTimeout(() => {
-    grid.querySelectorAll(".cap-bar").forEach(bar => {
-      bar.style.width = bar.dataset.pct + "%";
-    });
-  }, 200);
+  if (SECONDARY.type === "capacity_grid") {
+    container.style.display = "grid";
+    container.style.gridTemplateColumns = "repeat(7, 1fr)";
+    container.style.gap = "8px";
+    container.innerHTML = data.map(d => `
+      <div class="cap-day ${d.status}">
+        <div class="cap-day-name">${d.day}</div>
+        <div class="cap-day-date">${d.date}</div>
+        <div class="cap-bar-wrap"><div class="cap-bar" style="width:0%" data-pct="${d.pct}"></div></div>
+        <div class="cap-status">${d.status === "closed" ? "Closed" : d.status === "full" ? "Full" : d.status === "busy" ? "Filling up" : "Available"}</div>
+        <div class="cap-note">${d.note}</div>
+      </div>
+    `).join("");
+    setTimeout(() => {
+      container.querySelectorAll(".cap-bar").forEach(bar => {
+        bar.style.width = bar.dataset.pct + "%";
+      });
+    }, 200);
+  } else {
+    // Generic list (viewings, tours, schedule, matters) — same row chrome
+    container.innerHTML = `
+      <div class="leads-table-wrap"><table class="leads-table"><tbody>
+        ${data.map(row => `
+          <tr>
+            <td style="font-weight:600;width:140px;">${row.day || row.time || ""}</td>
+            <td>${row.property || row.type || row.service || row.matter || ""}</td>
+            <td style="color:var(--muted);font-size:12px;">${row.buyer || row.registered || row.client || row.next || ""}</td>
+            <td><span class="status-badge status-${row.status || 'confirmed'}">${row.status || 'confirmed'}</span></td>
+          </tr>
+        `).join("")}
+      </tbody></table></div>`;
+  }
 }
 
 function animateCounter(el, target, duration, prefix, suffix) {
@@ -450,7 +394,7 @@ function animateCounter(el, target, duration, prefix, suffix) {
 
 function buildHITL() {
   const container = document.getElementById("hitl-queue");
-  container.innerHTML = DEMO.hitl.map((item, i) => `
+  container.innerHTML = (DEMO.hitl_drafts || []).map((item, i) => `
     <div class="hitl-card" id="hitl-${i}">
       <div class="hitl-card-header">
         <div class="hitl-sender">
@@ -516,7 +460,7 @@ function editDraft(i) {
   };
 }
 
-let pendingCount = 3;
+let pendingCount = (DEMO.hitl_drafts || []).length;
 function updatePendingBadge(delta) {
   pendingCount += delta;
   const badge = document.querySelector(".pending-badge");
@@ -532,7 +476,7 @@ function updatePendingBadge(delta) {
 
 function buildActivity() {
   const feed = document.getElementById("activity-feed");
-  feed.innerHTML = DEMO.activity.map(a => `
+  feed.innerHTML = (DEMO.activity || []).map(a => `
     <div class="activity-item">
       <span class="activity-icon ${a.type}"></span>
       <span class="activity-text">${a.text}</span>
@@ -543,24 +487,26 @@ function buildActivity() {
 
 function buildPipeline() {
   const tbody = document.getElementById("pipeline-tbody");
-  tbody.innerHTML = DEMO.pipeline.map(r => `
+  tbody.innerHTML = (DEMO.pipeline || []).map(r => `
     <tr>
-      <td style="font-weight:500;">${r.guest}</td>
-      <td style="color:var(--muted);font-size:12px;">${r.type}</td>
-      <td style="color:var(--muted);font-size:12px;">${r.details}</td>
+      <td style="font-weight:500;">${r.col1 || ""}</td>
+      <td style="color:var(--muted);font-size:12px;">${r.col2 || ""}</td>
+      <td style="color:var(--muted);font-size:12px;">${r.col3 || ""}</td>
       <td><span class="status-badge status-${r.status}">${r.status}</span></td>
-      <td style="color:var(--muted);font-size:12px;">Auto-handled by ReachNG</td>
+      <td style="color:var(--muted);font-size:12px;">${r.col5 || "Auto-handled by ReachNG"}</td>
     </tr>
   `).join("");
 }
 
 function init() {
-  const s = DEMO.stats;
-  animateCounter(document.getElementById("val-enquiries"), s.enquiries, 800);
-  animateCounter(document.getElementById("val-confirmed"), s.confirmed, 900);
-  animateCounter(document.getElementById("val-revenue"), s.revenue_k, 1000, "₦", "M");
-  animateCounter(document.getElementById("val-response"), s.response_mins, 700, "", " min");
-  buildCapacity();
+  // Animate stat counters from data-target attrs
+  document.querySelectorAll(".stat-value[data-target]").forEach((el, idx) => {
+    const target = parseFloat(el.dataset.target) || 0;
+    const prefix = el.dataset.prefix || "";
+    const suffix = el.dataset.suffix || "";
+    animateCounter(el, target, 800 + idx * 80, prefix, suffix);
+  });
+  buildSecondarySection();
   buildHITL();
   buildActivity();
   buildPipeline();

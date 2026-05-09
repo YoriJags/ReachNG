@@ -14,7 +14,9 @@ These are next up after current Phase 1.5 (Business Brief + BYO Leads) finishes.
 
 - [x] ~~**Holding Reply**~~ — shipped 2026-05-09. Schema + PATCH endpoint, webhook wire (Closer intake), Control Tower button, real portal textarea, demo portal textarea. Always-on (no off-hours guard), verbatim, 24h dedupe per contact via `holding_replies_sent` collection.
 - [ ] **Outreach dashboard redesign** — collapse 11 buttons → 5 tabs (Today / Clients / Sources / Conversations / System). Hard Brief gate on campaign launch. 2 days.
-- [ ] **Per-vertical demo portals** — `/portal/demo/estate`, `/portal/demo/school`, `/portal/demo/legal`. Mercury template clones with vertical-appropriate sample data. Half-day per vertical.
+- [x] ~~**Per-vertical demo portals**~~ — shipped 2026-05-09. 5 verticals live: `/portal/demo`, `/portal/demo/{hospitality,real_estate,education,professional_services,small_business}` plus aliases (mercury/estate/school/legal/smb). Same product, vertical-tailored sample data, same engine. `services/demo_datasets.py`.
+- [x] ~~**Generalise Closer (drop vertical=real_estate filter)**~~ — shipped 2026-05-09. Closer intake now fires for any client with `closer_enabled` regardless of vertical. Lead vertical inherited from client's vertical, not hard-coded.
+- [x] ~~**Vertical tag enforcement on client upsert**~~ — shipped 2026-05-09. `vertical` required + validated against `SUPPORTED_VERTICALS` whitelist. Lowercased and normalised on save.
 - [ ] **APIFY_API_TOKEN added to Railway env** — 5-minute user action, blocks lead enrichment quality
 - [ ] **HITL drafter reads `enrichment.decision_maker`** — replaces `[Partner Name]` fallback (last open item from Phase 1.4)
 - [ ] **Control Tower shows `enrichment.decision_maker` + `title`** on lead detail; add "Re-enrich" button (Phase 1.4 close-out)

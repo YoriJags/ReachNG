@@ -127,7 +127,7 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
         approval_id = queue_draft(
             contact_id=lead_id,                            # closer lead id doubles as contact id
             contact_name=contact_name,
-            vertical=lead.get("vertical") or "real_estate",
+            vertical=lead.get("vertical") or "general",
             channel="whatsapp",
             message=draft_text,
             phone=lead.get("contact_phone"),
