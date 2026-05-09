@@ -4,7 +4,21 @@
 
 PLAN.md = active. BACKLOG.md = queued. Promote items, don't duplicate them.
 
-Last updated: 2026-05-09
+Last updated: 2026-05-09 (after pressure test + SEO audit)
+
+---
+
+## P0 — "BURST HEAD" Launch Path (do this in order, total ~5 days)
+
+The five things that turn ReachNG from "this works" into "bro, you have to see this." Sequenced. Do them in order — each unlocks the next.
+
+- [ ] **1. Buy domain + build public marketing site** (2 days) — `reachng.ng` (or `.co` if `.ng` taken). Pages: `/`, `/how-it-works`, `/pricing`, `/about` (with Yori's face), `/contact`, plus 5 vertical landers (`/for-restaurants`, `/for-real-estate`, `/for-schools`, `/for-legal`, `/for-small-business`). Each vertical lander links to its demo portal. Build on existing FastAPI + Jinja stack — `templates/marketing/` + `api/marketing.py`. Reuse demo portal CSS variables for visual consistency. Add `robots.txt`, `sitemap.xml`, schema.org Organization + SoftwareApplication + FAQPage, OG cards per vertical, Twitter Card meta. **Without this, every other lever is set to zero — `/` currently 401s for prospects.**
+- [ ] **2. Concrete 3-tier pricing** (1 day) — Starter ₦80K, Growth ₦150K, Scale ₦300K + annual = 15% off. Build pricing page with feature-delta matrix. Anchor each price against pain ("a single missed Saturday booking is ₦50K — Starter pays for itself in 2 weeks"). Replace the vague ₦80K-400K range in PRODUCTS.md with the concrete tiers.
+- [ ] **3. Self-serve `/signup` flow + Paystack first-month** (2 days, was P2 → P0) — `/signup` form: business name, vertical, WhatsApp number, plan tier. Paystack Checkout for first month → webhook on success → auto-create client doc + send Unipile pairing link + email portal token. **Removes Yori as the bottleneck on hot demos.** Required: Paystack API integration, Unipile pairing automation, welcome email template.
+- [ ] **4. First paid client → public case study** (process, ~1 week after first paid client) — One screenshot, one pull-quote, one number ("18% → 3% no-shows in 30 days"). Lives at `/case-studies/[client]`. Becomes the social-proof anchor. Post the screenshot on Twitter/LinkedIn the day it goes live.
+- [ ] **5. Founder-public authority cadence** (process, ongoing 20 mins/day) — Yori posts 3×/week on Twitter + LinkedIn. Theme: "what the agent did this week" with screenshots. Reply-guy on threads from Iyin@Paystack, Tunde@Bumpa, Olu@Flutterwave. The Lagos AI-for-SME conversation is wide open; whoever talks loudest about it owns the category.
+
+**Total: ~5 days of build + ongoing process. Once these five are real, ReachNG is "ready to burst head".**
 
 ---
 
@@ -17,9 +31,9 @@ These are next up after current Phase 1.5 (Business Brief + BYO Leads) finishes.
 - [x] ~~**Per-vertical demo portals**~~ — shipped 2026-05-09. 5 verticals live: `/portal/demo`, `/portal/demo/{hospitality,real_estate,education,professional_services,small_business}` plus aliases (mercury/estate/school/legal/smb). Same product, vertical-tailored sample data, same engine. `services/demo_datasets.py`.
 - [x] ~~**Generalise Closer (drop vertical=real_estate filter)**~~ — shipped 2026-05-09. Closer intake now fires for any client with `closer_enabled` regardless of vertical. Lead vertical inherited from client's vertical, not hard-coded.
 - [x] ~~**Vertical tag enforcement on client upsert**~~ — shipped 2026-05-09. `vertical` required + validated against `SUPPORTED_VERTICALS` whitelist. Lowercased and normalised on save.
-- [ ] **APIFY_API_TOKEN added to Railway env** — 5-minute user action, blocks lead enrichment quality
-- [ ] **HITL drafter reads `enrichment.decision_maker`** — replaces `[Partner Name]` fallback (last open item from Phase 1.4)
-- [ ] **Control Tower shows `enrichment.decision_maker` + `title`** on lead detail; add "Re-enrich" button (Phase 1.4 close-out)
+- [ ] **HITL drafter reads `enrichment.decision_maker`** — replaces `[Partner Name]` fallback. Works once Lean Discovery Stack populates the field. (Phase 1.4 close-out)
+- [ ] **Control Tower shows `enrichment.decision_maker` + `title`** on lead detail + "Re-enrich" button. (Phase 1.4 close-out)
+- [ ] ~~**APIFY_API_TOKEN to Railway env**~~ — DEFERRED until 3 paying clients land. Lean Discovery Stack replaces Apify until then. Re-enable via `USE_APIFY=true` flag once revenue covers it.
 
 ## P0 — Nigerian Market Fluency Layer (1 day, ship before/with Business Brief)
 
@@ -73,6 +87,21 @@ User wants to run an SEO campaign across ReachNG, VIIBE, and Roomly in prep for 
 - [ ] **Roomly audit** — repo lives at `C:\Users\OAJAGUN\Documents\roomly`, separate from this workspace. Inspect first to know if web (SEO) or mobile (ASO).
 - [ ] **Cross-project assets** — Schema.org Person entity for Yori (E-E-A-T builder), shared blog stack, footer cross-links between domains as internal-network signal.
 - [ ] **Output:** `SEO_AUDIT.md` per project with: current state, 5 highest-impact fixes, target keywords (Lagos-specific where relevant), estimated effort, recommended order. Then user picks which project to ship first.
+
+## P0.5 — Pressure test follow-ups (do alongside P0 Burst Head path)
+
+Risks and gaps surfaced by the 2026-05-09 pressure test. Each is small but compounds.
+
+- [ ] **Auto-enforce WhatsApp warmup ramp at code level** — today the 10/25/50 ramp is documented in OPS_GUIDE but operator-trusted. Add `client.daily_send_limit` auto-set on creation: 10 for week 1, 25 for week 2, 50+ thereafter. Stops a fresh number from getting banned by accident. ½ day.
+- [ ] **Anthropic + Mongo + Railway budget alerts** — add monthly spend monitoring to `tools/system_sweep.py`. Flag in 7am brief if Anthropic spend > $20/mo, Mongo connections > 400, Railway memory > 400MB sustained. ½ day.
+- [ ] **Portal token rotation** — today every portal URL is permanent forever. Add `client.portal_token_rotated_at` and a "regenerate token" button. Use case: client leaves a partner who had the URL. ½ day.
+- [ ] **Audit log for client_doc edits** — every `clients` collection update writes to `client_audit_log` with who/what/when. Trust + debugging signal at scale. ½ day.
+- [ ] **HITL bulk-approve + draft regeneration** — "approve all 5 from this client" button + per-draft "regenerate shorter" / "regenerate warmer" actions. Reduces operator load by ~70%. 1 day.
+- [ ] **Empty-state copy on every dashboard tab** — when a client has 0 leads, 0 invoices, etc, show a helpful next-step copy not blank tables. ½ day.
+- [ ] **Mobile-first review of client portal** — verify portal.html renders cleanly at 375px viewport. Most Lagos clients view on phone. ½ day.
+- [ ] **Split `agent/brain.py`** — file is 770+ lines and growing. Extract into `agent/drafters/` package: `outreach.py`, `b2c.py`, `social.py`, `invoice.py`, `auto_reply.py`, `classifier.py`. ½ day, code hygiene.
+- [ ] **Referral mechanic** — ₦25K credit per referred sign-up that pays for 1 month. Each happy client becomes 3. Schema: `referral_code` per client + Paystack discount logic. 1 day.
+- [ ] **Integration test suite** — at first paying client, write 5 integration tests: HITL gate (draft never auto-sends), webhook routes (inbound creates Closer lead correctly), holding reply dedupes 24h, autopilot toggle works, portal token auth. 1 day.
 
 ## P1 — Quick wins (≤1 day each, high leverage)
 
