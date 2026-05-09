@@ -167,23 +167,28 @@ async def _handle_message(sender_phone: str, message_body: str, source: str | No
         "bursar_notified": False,
     }
 
-    # ── Closer intake (real-estate clients with closer_enabled) ────────────────
-    # `source` here is the Unipile account_id for inbound messages that arrived
-    # on a per-client WhatsApp line.
+    # ── Holding Reply — universal across all verticals ────────────────────────
+    # Fire instantly for any active client whose WhatsApp line received this
+    # inbound, regardless of vertical or product wired underneath. Gated by
+    # autopilot=OFF + holding_message set + 24h dedupe per contact.
+    matched_client = None
     try:
         if source and source not in ("meta",):
-            closer_client = _db()["clients"].find_one({
+            matched_client = _db()["clients"].find_one({
                 "whatsapp_account_id": source,
-                "closer_enabled": True,
-                "vertical": "real_estate",
                 "active": True,
             })
+            if matched_client:
+                await _maybe_send_holding_reply(matched_client, sender_phone)
+    except Exception as e:
+        log.warning("holding_reply_lookup_failed", error=str(e))
+
+    # ── Closer intake (real-estate clients with closer_enabled) ────────────────
+    try:
+        if matched_client and matched_client.get("closer_enabled") and matched_client.get("vertical") == "real_estate":
+            closer_client = matched_client
             if closer_client:
                 from services.closer import find_lead_by_contact, create_lead, append_thread_message
-                # Fire holding reply immediately so customer gets an ack while
-                # operator approves the real Closer draft. Gated by autopilot=OFF
-                # + holding_message set + 24h dedupe per contact.
-                await _maybe_send_holding_reply(closer_client, sender_phone)
                 client_id = str(closer_client["_id"])
                 existing = find_lead_by_contact(client_id, phone=sender_phone)
                 if existing:
