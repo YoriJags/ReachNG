@@ -540,6 +540,31 @@
 <div id="content">
   <div class="content">
 
+    <!-- Owner Brief — cash headline -->
+    <div class="section-label">Owner Brief — today</div>
+    <div id="owner-brief-card" style="background:linear-gradient(135deg,#181818 0%,#111 100%);border:1px solid #2a3340;border-radius:12px;padding:24px;margin-bottom:24px;">
+      <div id="ob-empty" style="display:none;font-size:13px;color:#777;">📭 No cash signals this morning — quiet pipeline.</div>
+
+      <div id="ob-headline" style="display:none;">
+        <div style="font-size:11px;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Likely collectible</div>
+        <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px;">
+          <div id="ob-collectible" style="font-size:36px;font-weight:700;color:#ff5500;letter-spacing:-1px;">₦0</div>
+          <div id="ob-count" style="font-size:13px;color:#999;">across 0 accounts</div>
+        </div>
+        <div id="ob-breakdown" style="font-size:12px;color:#777;margin-bottom:18px;"></div>
+      </div>
+
+      <div id="ob-signals" style="display:flex;flex-direction:column;gap:8px;">
+        <div id="ob-received"     style="display:none;font-size:13px;color:#5dd28a;">✅ <span id="ob-received-amt">₦0</span> landed overnight</div>
+        <div id="ob-hot"          style="display:none;font-size:13px;color:#ffb84d;">🔥 <span id="ob-hot-cnt">0</span> hot leads replied overnight — <strong style="color:#fff;">call first</strong></div>
+        <div id="ob-priceasked"   style="display:none;font-size:13px;color:#ff7a7a;">⚠️ <span id="ob-priceasked-cnt">0</span> asked for price, no quote sent yet</div>
+      </div>
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid #1e2530;font-size:11px;color:#555;">
+        Numbers refresh every load. The 8am WhatsApp brief uses the same signals.
+      </div>
+    </div>
+
     <!-- Stats -->
     <div class="stats-grid" id="stats-grid">
       <div class="stat-card orange">
@@ -814,6 +839,58 @@ function fmtNgn(n) {
   return "₦" + n;
 }
 
+function renderOwnerBrief(cash) {
+  const empty   = document.getElementById("ob-empty");
+  const headline = document.getElementById("ob-headline");
+  const recv    = document.getElementById("ob-received");
+  const hot     = document.getElementById("ob-hot");
+  const pa      = document.getElementById("ob-priceasked");
+
+  if (!cash) {
+    if (empty) empty.style.display = "";
+    return;
+  }
+
+  const total = cash.collectible_total_ngn || 0;
+  const count = cash.collectible_count || 0;
+  const received = cash.cash_received_overnight_ngn || 0;
+  const hotCnt = cash.hot_replies_overnight || 0;
+  const paCnt = cash.asked_price_no_quote || 0;
+
+  const hasAnything = total > 0 || received > 0 || hotCnt > 0 || paCnt > 0;
+  if (!hasAnything) {
+    empty.style.display = "";
+    return;
+  }
+  empty.style.display = "none";
+
+  if (total > 0) {
+    headline.style.display = "";
+    document.getElementById("ob-collectible").textContent = fmtNgn(total);
+    document.getElementById("ob-count").textContent =
+      `across ${count} account${count === 1 ? "" : "s"}`;
+    const bd = cash.breakdown || {};
+    const bits = [];
+    if (bd.rent && bd.rent.count)        bits.push(`${fmtNgn(bd.rent.amount_ngn)} rent (${bd.rent.count})`);
+    if (bd.debt && bd.debt.count)        bits.push(`${fmtNgn(bd.debt.amount_ngn)} debts (${bd.debt.count})`);
+    if (bd.school_fees && bd.school_fees.count) bits.push(`${fmtNgn(bd.school_fees.amount_ngn)} fees (${bd.school_fees.count})`);
+    document.getElementById("ob-breakdown").textContent = bits.join("  ·  ");
+  }
+
+  if (received > 0) {
+    recv.style.display = "";
+    document.getElementById("ob-received-amt").textContent = fmtNgn(received);
+  }
+  if (hotCnt > 0) {
+    hot.style.display = "";
+    document.getElementById("ob-hot-cnt").textContent = hotCnt;
+  }
+  if (paCnt > 0) {
+    pa.style.display = "";
+    document.getElementById("ob-priceasked-cnt").textContent = paCnt;
+  }
+}
+
 // ── Load ──────────────────────────────────────────────────────────────────────
 
 async function load() {
@@ -822,6 +899,8 @@ async function load() {
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = '';
+
+    renderOwnerBrief(data.cash);
 
     const s = data.stats || {};
     const contacted = s.contacted || 0;
