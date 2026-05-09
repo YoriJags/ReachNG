@@ -92,14 +92,41 @@ async def get_portal_data(token: str):
     # ROI
     roi = get_roi_summary(days=30, client_name=client_name)
 
+    # Cash signals — Owner Brief headline data
+    try:
+        from tools.cash_signals import cash_signals_for
+        cash = cash_signals_for(client_name)
+    except Exception:
+        cash = None
+
     return {
         "client": client_name,
         "vertical": vertical,
         "stats": stats,
         "roi": roi,
+        "cash": cash,
         "contacts": contacts,
         "autopilot": client.get("autopilot", False),
         "holding_message": client.get("holding_message", ""),
+    }
+
+
+@router.get("/owner-brief/{token}")
+async def get_owner_brief(token: str):
+    """
+    Cash-focused Owner Brief payload — what the portal renders as today's
+    money headline. Same numbers the 8am WhatsApp brief uses.
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from tools.cash_signals import cash_signals_for
+    from tools.morning_brief_client import compile_client_brief
+    name = client["name"]
+    return {
+        "client": name,
+        "cash": cash_signals_for(name),
+        "whatsapp_preview": compile_client_brief(name, portal_url=f"/portal/{token}"),
     }
 
 

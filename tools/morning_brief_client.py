@@ -11,6 +11,7 @@ This is the "hired help" proof-of-concept:
 """
 from datetime import datetime, timezone, timedelta
 from database import get_db
+from tools.cash_signals import cash_signals_for
 import httpx
 import structlog
 
@@ -129,55 +130,96 @@ def _capacity_line(cap: dict | None) -> str:
 
 def compile_client_brief(client_name: str, portal_url: str = "") -> str:
     """
-    Build the per-client WhatsApp morning brief.
-    Returns the full message string ready to send.
+    Build the per-client WhatsApp Owner Brief — cash-focused.
+
+    Headline order: ₦ collectible → hot leads → actions → ₦ landed overnight
+    → activity recap. Replaces the older activity-first brief.
     """
     now_lagos = datetime.now(timezone.utc) + _LAGOS
     day_str   = now_lagos.strftime("%A, %d %b")
     data      = _get_client_overnight(client_name)
+    cash      = cash_signals_for(client_name)
 
     cap_line  = _capacity_line(data["capacity_today"])
 
-    # Overnight activity block
-    activity_parts = []
-    if data["messages_sent"] or data["auto_sent"]:
-        total_out = data["messages_sent"] + data["auto_sent"]
-        auto_note = f" ({data['auto_sent']} sent automatically)" if data["auto_sent"] else ""
-        activity_parts.append(f"{total_out} messages sent{auto_note}")
-    if data["new_enquiries"]:
-        activity_parts.append(f"{data['new_enquiries']} new enquir{'y' if data['new_enquiries'] == 1 else 'ies'} came in")
-    if data["new_replies"]:
-        hot = f" — {data['interested_replies']} 🔥 interested" if data["interested_replies"] else ""
-        activity_parts.append(f"{data['new_replies']} repl{'y' if data['new_replies'] == 1 else 'ies'} received{hot}")
-    if data["confirmed_bookings"]:
-        val = f" ({_fmt_ngn(data['deal_value_ngn'])})" if data["deal_value_ngn"] else ""
-        activity_parts.append(f"{data['confirmed_bookings']} booking{'s' if data['confirmed_bookings'] != 1 else ''} confirmed{val}")
+    # ── Cash headline (the killer interface) ────────────────────────────
+    headline_lines: list[str] = []
 
-    if not activity_parts:
-        overnight_block = "Quiet night — no new activity."
-    else:
-        overnight_block = "\n".join(f"• {p}" for p in activity_parts)
+    if cash["collectible_total_ngn"] > 0:
+        bd = cash["breakdown"]
+        bits: list[str] = []
+        if bd["rent"]["count"]:
+            bits.append(f"{_fmt_ngn(bd['rent']['amount_ngn'])} rent ({bd['rent']['count']})")
+        if bd["debt"]["count"]:
+            bits.append(f"{_fmt_ngn(bd['debt']['amount_ngn'])} debts ({bd['debt']['count']})")
+        if bd["school_fees"]["count"]:
+            bits.append(f"{_fmt_ngn(bd['school_fees']['amount_ngn'])} fees ({bd['school_fees']['count']})")
+        breakdown = " · ".join(bits)
+        headline_lines.append(
+            f"💰 *{_fmt_ngn(cash['collectible_total_ngn'])} likely collectible* "
+            f"({cash['collectible_count']} accounts)"
+        )
+        if breakdown:
+            headline_lines.append(f"   {breakdown}")
 
-    # Approval nudge
+    if cash["cash_received_overnight_ngn"] > 0:
+        headline_lines.append(
+            f"✅ *{_fmt_ngn(cash['cash_received_overnight_ngn'])} landed overnight*"
+        )
+
+    if cash["hot_replies_overnight"]:
+        headline_lines.append(
+            f"🔥 *{cash['hot_replies_overnight']} hot lead"
+            f"{'s' if cash['hot_replies_overnight'] != 1 else ''} replied overnight* — call first"
+        )
+
+    if cash["asked_price_no_quote"]:
+        headline_lines.append(
+            f"⚠️ *{cash['asked_price_no_quote']} asked for price, no quote sent yet*"
+        )
+
+    if not headline_lines:
+        headline_lines.append("📭 No cash signals this morning — quiet pipeline.")
+
+    headline_block = "\n".join(headline_lines)
+
+    # ── Actions today ───────────────────────────────────────────────────
     if data["pending_approvals"]:
         approval_line = (
-            f"⚠️ *{data['pending_approvals']} draft{'s' if data['pending_approvals'] != 1 else ''} "
-            f"waiting for your approval*"
+            f"📝 *{data['pending_approvals']} draft"
+            f"{'s' if data['pending_approvals'] != 1 else ''} waiting for approval*"
         )
         if portal_url:
-            approval_line += f"\nTap to review: {portal_url}"
+            approval_line += f"\n   Tap to review: {portal_url}"
     else:
-        approval_line = "✅ Approval queue clear — nothing waiting"
+        approval_line = "✅ Approval queue clear"
 
+    # ── Overnight activity recap (compact, secondary) ───────────────────
+    activity_parts: list[str] = []
+    if data["messages_sent"] or data["auto_sent"]:
+        total_out = data["messages_sent"] + data["auto_sent"]
+        auto_note = f" ({data['auto_sent']} on autopilot)" if data["auto_sent"] else ""
+        activity_parts.append(f"{total_out} sent{auto_note}")
+    if data["new_enquiries"]:
+        activity_parts.append(f"{data['new_enquiries']} new enquir{'y' if data['new_enquiries'] == 1 else 'ies'}")
+    if data["new_replies"]:
+        activity_parts.append(f"{data['new_replies']} repl{'y' if data['new_replies'] == 1 else 'ies'}")
+    if data["confirmed_bookings"]:
+        val = f" ({_fmt_ngn(data['deal_value_ngn'])})" if data["deal_value_ngn"] else ""
+        activity_parts.append(f"{data['confirmed_bookings']} booking{'s' if data['confirmed_bookings'] != 1 else ''} closed{val}")
+
+    activity_recap = " · ".join(activity_parts) if activity_parts else "quiet night"
+
+    # ── Compose ─────────────────────────────────────────────────────────
     brief = f"""🌅 *Good morning, {client_name.split()[0]}!*
-{day_str} — ReachNG overnight report{cap_line}
+{day_str} — Owner Brief{cap_line}
 
-📬 *LAST NIGHT*
-{overnight_block}
+{headline_block}
 
 {approval_line}
 
-_Powered by ReachNG — your AI sales operator_"""
+_Overnight: {activity_recap}_
+_Powered by ReachNG — your AI sales engine_"""
 
     return brief.strip()
 
