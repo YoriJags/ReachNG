@@ -298,6 +298,14 @@
     margin-bottom: 16px;
   }
 
+  /* ── Business Brief ── */
+  .brief-section { padding: 16px 0; border-top: 1px solid #1e2530; }
+  .brief-section:first-of-type { border-top: none; padding-top: 8px; }
+  .brief-section-title { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #ff5500; margin-bottom: 12px; }
+  .brief-label { display: block; font-size: 11px; color: #777; margin: 12px 0 4px; }
+  .brief-input { width: 100%; padding: 10px 12px; background: #0a0a0a; border: 1px solid #1e2530; border-radius: 6px; color: #e8e8e8; font-size: 13px; font-family: inherit; resize: vertical; box-sizing: border-box; transition: 0.15s; }
+  .brief-input:focus { outline: none; border-color: #ff5500; }
+
   .activity-feed {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -585,6 +593,109 @@
       </div>
     </div>
 
+    <!-- Business Brief -->
+    <div class="section-label">Business Brief</div>
+    <div id="brief-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:24px;margin-bottom:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:20px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:240px;">
+          <div style="font-size:14px;font-weight:600;color:#e8e8e8;">Teach the agent your business</div>
+          <div style="font-size:12px;color:#555;margin-top:4px;">The richer your brief, the more the agent sounds like <em>you</em> — not a generic AI. Every section adds to the system prompt the AI sees on every draft.</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Brief health</div>
+          <div id="brief-health-pct" style="font-size:24px;font-weight:700;color:#ff5500;">—</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+        <button onclick="briefShowIntake()" style="background:#1e2530;color:#e8e8e8;border:1px solid #2a3340;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">✨ AI-assisted intake</button>
+        <button onclick="briefSave()" id="brief-save-btn" style="background:#ff5500;color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Save brief</button>
+        <span id="brief-save-status" style="font-size:11px;color:#555;align-self:center;"></span>
+      </div>
+
+      <!-- AI intake modal (hidden by default) -->
+      <div id="brief-intake-panel" style="display:none;background:#0a0a0a;border:1px solid #1e2530;border-radius:8px;padding:16px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:600;color:#e8e8e8;margin-bottom:8px;">Paste a website URL or free text — the agent will structure it.</div>
+        <input type="text" id="brief-intake-url" placeholder="https://yourwebsite.com (optional)" style="width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid #1e2530;border-radius:6px;color:#e8e8e8;font-size:13px;font-family:inherit;margin-bottom:8px;box-sizing:border-box;">
+        <textarea id="brief-intake-text" rows="4" placeholder="Or just describe your business in your own words. What you sell, who you sell to, your pricing, your tone, what you'd never say." style="width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid #1e2530;border-radius:6px;color:#e8e8e8;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+        <div style="margin-top:10px;display:flex;gap:8px;">
+          <button onclick="briefRunIntake()" id="brief-intake-btn" style="background:#ff5500;color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Run intake</button>
+          <button onclick="briefHideIntake()" style="background:transparent;color:#555;border:1px solid #1e2530;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
+          <span id="brief-intake-status" style="font-size:11px;color:#555;align-self:center;"></span>
+        </div>
+      </div>
+
+      <!-- Identity -->
+      <div class="brief-section">
+        <div class="brief-section-title">1. Identity</div>
+        <label class="brief-label">Trading name</label>
+        <input type="text" id="bf-trading_name" class="brief-input">
+        <label class="brief-label">One-liner — how you describe yourself</label>
+        <input type="text" id="bf-one_liner" class="brief-input" placeholder="e.g. Boutique luxury rentals across Banana Island, Ikoyi and Eko Atlantic">
+        <label class="brief-label">Founder story (1–2 sentences)</label>
+        <textarea id="bf-founder_story" class="brief-input" rows="2"></textarea>
+        <label class="brief-label">Geography (cities/areas, comma-separated)</label>
+        <input type="text" id="bf-geography" class="brief-input" placeholder="Lagos VI, Lekki, Ikoyi">
+        <label class="brief-label">Products / services (one per line)</label>
+        <textarea id="bf-products" class="brief-input" rows="3" placeholder="Birthday Takeover — ₦450K minimum spend
+Corporate Mixer — ₦380K, weeknights only
+VIP Table — ₦90K, Saturday primetime"></textarea>
+      </div>
+
+      <!-- Voice -->
+      <div class="brief-section">
+        <div class="brief-section-title">2. Voice & Tone</div>
+        <label class="brief-label">Tone overrides — leave blank to use vertical default</label>
+        <input type="text" id="bf-tone_overrides" class="brief-input" placeholder="e.g. warm and a bit cheeky, never corporate">
+        <label class="brief-label">Sign-off / signature</label>
+        <input type="text" id="bf-signature" class="brief-input" placeholder="— The Mercury team">
+        <label class="brief-label">USPs — what only YOU can claim (one per line)</label>
+        <textarea id="bf-usps" class="brief-input" rows="3"></textarea>
+        <label class="brief-label">Social proof — past wins to mention sparingly</label>
+        <textarea id="bf-social_proof" class="brief-input" rows="2"></textarea>
+      </div>
+
+      <!-- Guardrails -->
+      <div class="brief-section">
+        <div class="brief-section-title">3. Guardrails</div>
+        <label class="brief-label">Never say (one per line) — phrases the AI must avoid</label>
+        <textarea id="bf-never_say" class="brief-input" rows="3" placeholder="we guarantee
+no risk
+trust me
+discount only today"></textarea>
+        <label class="brief-label">Always say — phrases that should appear when relevant</label>
+        <textarea id="bf-always_say" class="brief-input" rows="2"></textarea>
+        <label class="brief-label">Red flags — signals to disqualify a lead fast</label>
+        <textarea id="bf-red_flags" class="brief-input" rows="2"></textarea>
+      </div>
+
+      <!-- Sales engine -->
+      <div class="brief-section">
+        <div class="brief-section-title">4. Sales Engine</div>
+        <label class="brief-label">ICP — your ideal customer</label>
+        <textarea id="bf-icp" class="brief-input" rows="2"></textarea>
+        <label class="brief-label">Not a fit — disqualifiers</label>
+        <textarea id="bf-not_a_fit" class="brief-input" rows="2"></textarea>
+        <label class="brief-label">Qualifying questions (one per line)</label>
+        <textarea id="bf-qualifying_questions" class="brief-input" rows="3"></textarea>
+        <label class="brief-label">Closing action — what counts as "ready"</label>
+        <input type="text" id="bf-closing_action" class="brief-input" placeholder="50% deposit paid via Paystack">
+        <label class="brief-label">Pricing rules — bands, negotiation limits</label>
+        <textarea id="bf-pricing_rules" class="brief-input" rows="2"></textarea>
+      </div>
+
+      <!-- Operations -->
+      <div class="brief-section">
+        <div class="brief-section-title">5. Operations</div>
+        <label class="brief-label">Brochure / menu / event-pack URL</label>
+        <input type="text" id="bf-brochure_url" class="brief-input" placeholder="https://...">
+        <label class="brief-label">Calendar / booking link</label>
+        <input type="text" id="bf-calendar_link" class="brief-input" placeholder="https://calendly.com/...">
+        <label class="brief-label">Payment terms</label>
+        <input type="text" id="bf-payment_terms" class="brief-input" placeholder="50% deposit, balance on day. Paystack.">
+      </div>
+    </div>
+
     <!-- Holding Reply -->
     <div id="holding-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
       <div style="margin-bottom:12px;">
@@ -775,6 +886,9 @@ async function load() {
     const apEnabled = data.autopilot === true;
     _setApState(apEnabled);
 
+    // Business Brief
+    briefLoad();
+
     // Holding reply
     const ta = document.getElementById("holding-msg");
     if (ta) {
@@ -823,6 +937,133 @@ async function portalToggleAutopilot(enabled) {
     // Revert toggle
     _setApState(!enabled);
     document.getElementById("ap-portal-toggle").checked = !enabled;
+  }
+}
+
+// ─── Business Brief ────────────────────────────────────────────────
+const BRIEF_TOKEN = "{{ token }}";  // portal.py passes the portal_token as `token`
+
+const BRIEF_FIELDS = [
+  ["bf-trading_name", "trading_name", "string"],
+  ["bf-one_liner", "one_liner", "string"],
+  ["bf-founder_story", "founder_story", "string"],
+  ["bf-geography", "geography", "csv"],
+  ["bf-products", "products_text", "lines"],   // converted to objects on save
+  ["bf-tone_overrides", "tone_overrides", "string"],
+  ["bf-signature", "signature", "string"],
+  ["bf-usps", "usps", "lines"],
+  ["bf-social_proof", "social_proof", "lines"],
+  ["bf-never_say", "never_say", "lines"],
+  ["bf-always_say", "always_say", "lines"],
+  ["bf-red_flags", "red_flags", "lines"],
+  ["bf-icp", "icp", "string"],
+  ["bf-not_a_fit", "not_a_fit", "string"],
+  ["bf-qualifying_questions", "qualifying_questions", "lines"],
+  ["bf-closing_action", "closing_action", "string"],
+  ["bf-pricing_rules", "pricing_rules", "string"],
+  ["bf-brochure_url", "brochure_url", "string"],
+  ["bf-calendar_link", "calendar_link", "string"],
+  ["bf-payment_terms", "payment_terms", "string"],
+];
+
+async function briefLoad() {
+  if (!BRIEF_TOKEN) return;
+  try {
+    const resp = await fetch(`/api/v1/portal-brief/${BRIEF_TOKEN}`);
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const brief = data.business_brief || {};
+    for (const [id, key, kind] of BRIEF_FIELDS) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      let val = brief[key === "products_text" ? "products" : key];
+      if (kind === "csv" && Array.isArray(val)) val = val.join(", ");
+      else if (kind === "lines" && Array.isArray(val)) {
+        if (key === "products_text") val = val.map(p => p.name ? `${p.name}${p.notes ? " — " + p.notes : ""}` : "").filter(Boolean).join("\n");
+        else val = val.join("\n");
+      }
+      el.value = val || "";
+    }
+    // Health (returned in same response payload)
+    const health = data.health || {};
+    const pct = Math.round((health.completeness || 0) * 100);
+    document.getElementById("brief-health-pct").textContent = pct + "%";
+    document.getElementById("brief-health-pct").style.color = pct >= 70 ? "#16a34a" : pct >= 40 ? "#ff5500" : "#777";
+  } catch(e) { console.warn("brief load failed", e); }
+}
+
+function briefCollect() {
+  const out = {};
+  for (const [id, key, kind] of BRIEF_FIELDS) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const raw = (el.value || "").trim();
+    if (!raw) { out[key === "products_text" ? "products" : key] = (kind === "string" ? "" : []); continue; }
+    if (kind === "string") out[key] = raw;
+    else if (kind === "csv") out[key] = raw.split(",").map(s => s.trim()).filter(Boolean);
+    else if (kind === "lines") {
+      const lines = raw.split("\n").map(s => s.trim()).filter(Boolean);
+      if (key === "products_text") {
+        out["products"] = lines.map(line => {
+          const [name, ...rest] = line.split("—");
+          return { name: name.trim(), notes: rest.join("—").trim() };
+        });
+      } else {
+        out[key] = lines;
+      }
+    }
+  }
+  return out;
+}
+
+async function briefSave() {
+  if (!BRIEF_TOKEN) return;
+  const btn = document.getElementById("brief-save-btn");
+  const status = document.getElementById("brief-save-status");
+  btn.disabled = true; status.textContent = "Saving…"; status.style.color = "#777";
+  try {
+    const payload = briefCollect();
+    const resp = await fetch(`/api/v1/portal-brief/${BRIEF_TOKEN}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    status.textContent = "Saved ✓"; status.style.color = "#16a34a";
+    setTimeout(() => { status.textContent = ""; }, 2500);
+    briefLoad();
+  } catch(e) {
+    status.textContent = "Save failed: " + e.message; status.style.color = "#dc2626";
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function briefShowIntake() { document.getElementById("brief-intake-panel").style.display = "block"; }
+function briefHideIntake() { document.getElementById("brief-intake-panel").style.display = "none"; }
+
+async function briefRunIntake() {
+  if (!BRIEF_TOKEN) return;
+  const url = document.getElementById("brief-intake-url").value.trim();
+  const text = document.getElementById("brief-intake-text").value.trim();
+  if (!url && !text) { alert("Add either a URL or some text first."); return; }
+  const btn = document.getElementById("brief-intake-btn");
+  const status = document.getElementById("brief-intake-status");
+  btn.disabled = true; status.textContent = "Running… this can take 10–20s"; status.style.color = "#777";
+  try {
+    const resp = await fetch(`/api/v1/portal-brief/${BRIEF_TOKEN}/intake`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: url || null, free_text: text || null, save: true }),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    status.textContent = "Done ✓ — review and save"; status.style.color = "#16a34a";
+    await briefLoad();
+    setTimeout(() => briefHideIntake(), 1200);
+  } catch(e) {
+    status.textContent = "Intake failed: " + e.message; status.style.color = "#dc2626";
+  } finally {
+    btn.disabled = false;
   }
 }
 
