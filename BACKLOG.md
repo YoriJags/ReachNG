@@ -45,9 +45,16 @@ The SDR engine (Yori's own outreach to Lagos SMEs) needs deeper Nigerian-market 
 - [ ] **Bring ALL existing verticals to gold standard** (~120+ lines each) — same depth as `real_estate.txt`. Includes the 6 thin ones (events, agriculture, auto, cooperatives, fitness, insurance) AND the medium ones (legal, fintech, recruitment, small_business, logistics, agency_sales) — every single vertical prompt gets the full treatment. No prompt left as a thin sketch.
 - [ ] **Lead-signal-injection rules** — each vertical prompt mandates referencing concrete signals from enrichment payload (Maps rating, decision_maker, place categories, IG handle).
 
-## ⚠️ REVERSED — Lean Discovery Stack killed in favour of Scout v1
+## Two parallel discovery tools, different audiences (clarified 2026-05-09 EOD)
 
-**2026-05-09 EOD:** Strategic review #3 (lead activation pivot, see `project_reachng_lead_activation_pivot.md`) made the case that "we find leads on the internet" is the wrong promise — fragile, legally murky, customer blames us when leads suck. Killed. Replaced with **ReachNG Scout v1** below — owned-data enrichment only, no internet lead-gen.
+The third strategic review's "don't promise lead-gen" applies to **clients**. We still need internal SDR tooling to find Lagos SMEs to pitch ReachNG to ourselves. Both tools build, distinct routing + visibility:
+
+| Tool | Audience | Input | Behaviour |
+|------|----------|-------|-----------|
+| **Scout v1** (below) | Client-facing | Client's own site + uploaded CSVs + competitor URLs they specify | Enriches existing leads, never finds cold ones. Promised in pricing tiers. |
+| **Lean Discovery Stack** (further below) | Internal — Yori only | DDG + VConnect + BusinessList + FinelibNG + IG bios + LinkedIn-via-Google | Cold-scrapes Lagos SMEs to feed ReachNG's own SDR pipeline. NEVER exposed to clients. NEVER mentioned as a feature. |
+
+Reaffirms `feedback_reachng_agent_scope.md`: discovery is OUR internal funnel only.
 
 ## P0 — ReachNG Scout v1 (owned-data research layer, 2 days)
 
@@ -81,7 +88,39 @@ The killer features per `project_reachng_lead_activation_pivot.md`:
 - [ ] **WhatsApp Sales Copilot view** (~1 day) — pipeline-card view of every inbound thread, with AI suggested next reply, hot/cold marker, and qualifying-question prompts. Lives at `/dashboard/copilot`.
 - [ ] **Owner Brief upgrade** (~1 day, also in genius_repositioning memo) — rebuild `scheduler.py::morning_brief` as cash-focused: collectible amount this week + hot replies overnight + actions today. Each item one-tap.
 
-## P0 — DELETED (was Lean Discovery Stack 2.5d)
+## P0 — Lean Discovery Stack — INTERNAL SDR ONLY (2.5 days)
+
+**Resurrected 2026-05-09 EOD.** Earlier reversal was too sweeping — third review's "don't promise lead-gen" applies to CLIENTS. We still need this for our own SDR pipeline to find Lagos SMEs to pitch ReachNG to.
+
+**Hard rule: this tool is internal only.** Never exposed to clients. Never mentioned as a feature. Never on the marketing site. Lives behind admin-auth at `/admin/discovery`. Per `feedback_reachng_agent_scope.md`.
+
+**Sources to stitch (cold internet scraping for OUR pipeline):**
+- DuckDuckGo HTML — web search
+- Google Maps Places API — name, phone, address, rating
+- VConnect (vconnect.com) — Lagos/Nigeria business directory
+- BusinessList.com.ng + FinelibNG + Nigeria Business Directory
+- Instagram public bios — website + WhatsApp from profile
+- LinkedIn public company pages — decision-maker via `site:linkedin.com/in {{biz}} CEO` Google search
+- Email pattern-guess + free MX SMTP verify
+
+**Build plan:**
+- **Day 1 (foundation):**
+  - [ ] `tools/sources/ddg.py` + `tools/sources/google_maps.py` (refactor from existing `discovery.py`)
+  - [ ] `tools/lean_discovery.py` orchestrator — parallel multi-source fan-out, dedupe, merge
+  - [ ] (`tools/page_extractor.py` already covered in Scout v1 — shared between both tools)
+- **Day 2 (Nigerian directories + decision-maker):**
+  - [ ] `tools/sources/vconnect.py` — scrape Lagos by category
+  - [ ] `tools/sources/businesslist.py` + `finelib.py`
+  - [ ] `tools/sources/instagram.py` — public bio + website link
+  - [ ] `tools/decision_maker.py` — Google → LinkedIn → BS4 → name + title
+- **Day 3 (½ day) — email finder + SDR integration:**
+  - [ ] `tools/email_finder.py` — pattern-guess + free MX SMTP HELO verify
+  - [ ] Wire `discover_lean_leads()` into `campaigns/base.py` (replaces Apify in our SDR funnel)
+  - [ ] Feature flags: `LEAN_DISCOVERY_ONLY=true` (default), `USE_APIFY=false` (re-enable when paid clients pay for it)
+  - [ ] Smoke-test on 3 verticals × 50 leads each → spot-check quality
+  - [ ] Admin-only UI at `/admin/discovery` — DO NOT add to client portal nav
+
+**Cost vs Apify:** ~$50/mo+ → ₦0 + ~₦150 per 100 leads in Haiku tokens.
 
 Replace paid Apify with a self-hosted free stack until we land 3+ paying clients. Apify gets re-enabled via feature flag once revenue covers it.
 
