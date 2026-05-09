@@ -1,15 +1,23 @@
 """
 WhatsApp Inbound Webhook — handles replies from both Unipile and Meta Cloud API.
 
+SECURITY: every POST is signature-validated before parsing or message handling.
+- Meta: X-Hub-Signature-256 header verified via HMAC-SHA256 with META_APP_SECRET.
+- Unipile: Unipile-Auth header matched against UNIPILE_WEBHOOK_SECRET.
+- Set WEBHOOK_DEV_BYPASS=true for local development only.
+
 Flow for every inbound message:
-1. Parse sender + body from Unipile or Meta payload
-2. Link to a student (school fees) or invoice (invoice chaser) by phone number
-3. Claude classifies the reply + generates a context-aware auto-reply
-4. Auto-reply sent back to debtor on WhatsApp
-5. Bursar/client forwarded a one-line notification on their WhatsApp
-6. Everything logged to inbound_messages collection
+1. Validate signature (reject 401 on failure in production)
+2. Parse sender + body from Unipile or Meta payload
+3. Link to a student (school fees) or invoice (invoice chaser) by phone number
+4. Claude classifies the reply + generates a context-aware auto-reply
+5. Auto-reply sent back to debtor on WhatsApp
+6. Bursar/client forwarded a one-line notification on their WhatsApp
+7. Everything logged to inbound_messages collection
 """
-from fastapi import APIRouter, Request, Response
+import hmac
+import hashlib
+from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import PlainTextResponse
 from datetime import datetime, timezone
 from database import get_db
@@ -92,6 +100,83 @@ def _parse_meta(payload: dict) -> list[tuple[str, str]]:
     return results
 
 
+# ─── Signature validation ────────────────────────────────────────────────────
+
+def _is_meta_payload_shape(headers: dict, body_bytes: bytes) -> bool:
+    """Heuristic — Meta posts always include x-hub-signature-256 (or fail-closed for prod)."""
+    return "x-hub-signature-256" in {k.lower() for k in headers.keys()}
+
+
+def _verify_meta_signature(body: bytes, sig_header: str, app_secret: str) -> bool:
+    """Validate Meta's x-hub-signature-256 header (sha256=<hex>) against HMAC-SHA256(body, app_secret)."""
+    if not sig_header or not sig_header.startswith("sha256="):
+        return False
+    expected = hmac.new(app_secret.encode("utf-8"), body, hashlib.sha256).hexdigest()
+    received = sig_header.split("=", 1)[1].strip()
+    return hmac.compare_digest(received, expected)
+
+
+def _verify_unipile_signature(unipile_auth_header: str, secret: str) -> bool:
+    """Unipile's webhook auth — exact-match the configured secret in the Unipile-Auth header."""
+    if not unipile_auth_header or not secret:
+        return False
+    return hmac.compare_digest(unipile_auth_header.strip(), secret.strip())
+
+
+async def _validate_webhook_request(request: Request) -> bytes:
+    """Verify webhook authenticity. Returns raw body bytes if valid; raises 401 otherwise.
+
+    Resolution order:
+      1. Dev bypass (WEBHOOK_DEV_BYPASS=true) — skip checks. Local only.
+      2. Meta signature header present → require META_APP_SECRET match.
+      3. Unipile-Auth header present → require UNIPILE_WEBHOOK_SECRET match.
+      4. Neither header present → reject (production) or warn (development).
+    """
+    settings = get_settings()
+    body = await request.body()
+
+    if settings.webhook_dev_bypass:
+        log.warning("webhook_signature_bypassed", reason="WEBHOOK_DEV_BYPASS=true")
+        return body
+
+    headers = {k.lower(): v for k, v in request.headers.items()}
+    is_production = (settings.app_env or "").lower() in ("production", "prod", "live")
+
+    meta_sig = headers.get("x-hub-signature-256")
+    unipile_auth = headers.get("unipile-auth") or headers.get("x-unipile-auth")
+
+    # Path 1 — Meta inbound
+    if meta_sig:
+        if not settings.meta_app_secret:
+            log.error("meta_webhook_secret_missing")
+            if is_production:
+                raise HTTPException(503, "Meta webhook secret not configured")
+            return body
+        if _verify_meta_signature(body, meta_sig, settings.meta_app_secret):
+            return body
+        log.warning("meta_webhook_signature_invalid")
+        raise HTTPException(401, "Invalid Meta signature")
+
+    # Path 2 — Unipile inbound
+    if unipile_auth:
+        if not settings.unipile_webhook_secret:
+            log.error("unipile_webhook_secret_missing")
+            if is_production:
+                raise HTTPException(503, "Unipile webhook secret not configured")
+            return body
+        if _verify_unipile_signature(unipile_auth, settings.unipile_webhook_secret):
+            return body
+        log.warning("unipile_webhook_signature_invalid")
+        raise HTTPException(401, "Invalid Unipile signature")
+
+    # Path 3 — no recognized signature header
+    if is_production:
+        log.warning("webhook_unsigned_post_rejected")
+        raise HTTPException(401, "Webhook signature missing")
+    log.warning("webhook_unsigned_dev_allowed")
+    return body
+
+
 # ─── Meta verification handshake ──────────────────────────────────────────────
 
 @router.get("/whatsapp")
@@ -114,10 +199,17 @@ async def whatsapp_verify(request: Request):
 async def whatsapp_inbound(request: Request):
     """
     Handles inbound WhatsApp replies from Unipile or Meta.
-    Always returns 200 — never retry-loops from either provider.
+    Always returns 200 to legit senders — never retry-loops from either provider.
+
+    Signature-validated: invalid Meta x-hub-signature-256 or wrong Unipile-Auth
+    header → 401. Unsigned POSTs → 401 in production, allowed in development
+    with a warning. Set WEBHOOK_DEV_BYPASS=true to skip checks entirely (local
+    only — never set in production).
     """
+    import json as _json
+    body_bytes = await _validate_webhook_request(request)
     try:
-        payload = await request.json()
+        payload = _json.loads(body_bytes) if body_bytes else {}
     except Exception:
         return {"ok": True}
 

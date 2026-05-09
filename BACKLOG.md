@@ -8,6 +8,37 @@ Last updated: 2026-05-09 (after pressure test + SEO audit)
 
 ---
 
+## P0 — STABILIZATION PASS (do BEFORE running customer data through it)
+
+External code review (GPT 5.5 in repo, 2026-05-09) flagged real concerns. Mostly accurate, sequenced here by actual severity. Total: ~2 days, must complete before going live with paying clients.
+
+- [ ] **🚨 CRITICAL: Validate webhook POST signatures** (~½ day)
+  - `api/webhooks.py:69` POST handler has NO signature validation today. Only the Meta GET handshake checks `WEBHOOK_VERIFY_TOKEN`.
+  - Add HMAC-SHA256 validation for Meta inbound (`x-hub-signature-256` header, app secret as key).
+  - Add Unipile signature validation (check Unipile docs for header name + signing scheme).
+  - Reject unsigned POSTs in production with 401.
+  - Allow a `WEBHOOK_DEV_BYPASS=true` env flag for local testing.
+  - Until this ships, anyone with the URL can POST fake inbound, trigger Closer drafts, burn Haiku tokens.
+- [ ] **⚠️ Rewrite README to match actual scope** (~½ day)
+  - Current: "Real Estate · Recruitment · Events"
+  - Actual: agentic employee for any Lagos SME, 16+ verticals, 12+ suites, marketing site, self-serve signup, Business Brief, demos.
+  - Reuse content from `templates/marketing/landing.html` + PRODUCTS.md + OPERATIONS_FLOW.md.
+- [ ] **⚠️ Per-job feature flags on scheduler** (~½ day)
+  - `scheduler.py` adds ~10 cron jobs unconditionally.
+  - Add `SCHEDULER_ENABLED` master env flag (default true).
+  - Add per-job env flags: `SCHED_MORNING_BRIEF`, `SCHED_REPLY_POLLING`, `SCHED_INVOICE_CHASE`, `SCHED_DEBT_COLLECTOR`, `SCHED_RENT_CHASE`, `SCHED_SCHOOL_FEES`, `SCHED_SIGNAL_LISTENER`, etc.
+  - Default true for shipped jobs, false for new jobs (dry-run by default).
+  - Log on startup which jobs are enabled vs disabled.
+- [ ] **⚠️ Smoke test suite** (~½ day, blocking before live ops)
+  - Create `tests/` directory + `pytest.ini` + `conftest.py`.
+  - 5 minimum-viable integration tests:
+    1. Webhook signature rejected when invalid
+    2. HITL gate — drafts never bypass approval
+    3. Portal token scoping — client A can't read client B's data
+    4. Signup → Paystack webhook → client provision happy path
+    5. Daily send limit enforced per client
+  - Wire `pytest` into a pre-deploy GitHub Action (later, P1).
+
 ## P0 — "BURST HEAD" Launch Path (do this in order, total ~5 days)
 
 The five things that turn ReachNG from "this works" into "bro, you have to see this." Sequenced. Do them in order — each unlocks the next.

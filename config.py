@@ -74,6 +74,18 @@ class Settings(BaseSettings):
     # WhatsApp inbound webhook verify token (Meta handshake) — set WEBHOOK_VERIFY_TOKEN in env
     webhook_verify_token: str | None = Field(default=None, env="WEBHOOK_VERIFY_TOKEN")
 
+    # Meta webhook signature secret — used to validate POST body via x-hub-signature-256.
+    # This is the App Secret from your Meta App's Basic Settings, NOT the verify token.
+    meta_app_secret: str | None = Field(default=None, env="META_APP_SECRET")
+
+    # Unipile webhook secret — sent by Unipile in the `Unipile-Auth` header on every POST.
+    # Configure the same value in your Unipile webhook settings.
+    unipile_webhook_secret: str | None = Field(default=None, env="UNIPILE_WEBHOOK_SECRET")
+
+    # Local development bypass — when true, webhook signature checks are skipped.
+    # MUST be false in production.
+    webhook_dev_bypass: bool = Field(default=False, env="WEBHOOK_DEV_BYPASS")
+
     # PostHog analytics
     posthog_api_key: str | None = Field(default=None, env="POSTHOG_API_KEY")
     posthog_host: str = Field(default="https://us.i.posthog.com", env="POSTHOG_HOST")
