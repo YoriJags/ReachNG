@@ -1,210 +1,150 @@
 # ReachNG
 
-AI-powered outreach machine for Lagos businesses.
+**The AI sales engine for WhatsApp-first businesses.**
 
-Three verticals running simultaneously: **Real Estate · Recruitment · Events**
+ReachNG activates the leads Lagos SMEs already have — old WhatsApp chats, dead spreadsheets, ignored IG DMs, forgotten form submissions — and follows up until they book, buy, or opt out. The same agent recovers unpaid invoices, rent and school fees. One Owner Brief every morning shows the cash about to land and who needs a call.
 
-**Stack:** FastAPI · FastMCP · Claude (Anthropic) · Google Maps Places API · Unipile (WhatsApp + Email) · MongoDB
-
----
-
-## How It Works
-
-```
-Google Maps Places API
-        ↓
-   Business Discovery
-        ↓
-   Claude (Sonnet)  ←→  FastMCP Tools
-        ↓
-Personalised Message per Contact
-        ↓
-  Unipile → WhatsApp / Email
-        ↓
-  MongoDB (tracks everything)
-        ↓
-  Follow-up at 48h if no reply
-```
-
-Runs automatically every night at 10pm Lagos time. Follow-ups trigger at 2pm the next day.
+> **Promise to clients:** "You already have leads. ReachNG makes sure none of them die quietly."
 
 ---
 
-## Quick Start
+## One engine, two modes
 
-### 1. Clone and set up environment
+| Mode | Audience | Job | Lives at |
+|------|----------|-----|----------|
+| **ReachNG for clients** | Paying SMEs | AI SDR that activates THEIR leads (CSV, WhatsApp, IG DMs, forms). Owner Brief shows cash about to land. | `/portal/{token}` |
+| **ReachNG Prospect OS** | Internal — Yori only | Scrapes evidence about Lagos SMEs (leakage signals), drafts angle-specific cold opens, feeds HITL queue. | `/admin/prospect-os` |
+
+Same `agent/brain.py`. Same HITL queue. Same playbook DB. Different front-ends.
+
+---
+
+## The four cash workflows
+
+1. **Activate Leads** — Lead Resurrection, Missed Opportunity Radar, Sales Copilot, follow-up sequences
+2. **Recover Money** — debt collector, invoice chaser, rent chase, school fees
+3. **Close Deals** — Closer brain, payment links, owner approval queue
+4. **Retain Customers** — birthday/renewal nudges, win-back campaigns, review requests
+
+Verticals stay as **demo language** (Mercury, Sapphire, Lagoon BIS, Adesina, Glow Studio). Internal architecture is workflow-first.
+
+---
+
+## KPIs every feature must move
+
+1. **Booked outcomes** — calls, deposits, payments. Not messages sent.
+2. **Onboarding speed** — CSV/WhatsApp chaos → live AI SDR in < 1 hour.
+3. **Reply rate per vertical × angle** — playbook quality.
+4. **₦ recovered + ₦ in qualified pipeline** — Owner Brief headline.
+5. **"Asked price" → paid deposit** conversion (Missed Opportunity Radar moat).
+
+If a feature doesn't move one of these, it doesn't ship.
+
+---
+
+## Stack
+
+- **Runtime**: Python 3.12 · FastAPI · Uvicorn · Jinja2
+- **DB**: MongoDB Atlas (pymongo)
+- **LLM**: Claude Haiku 4.5 for drafts (`claude-haiku-4-5-20251001`)
+- **Messaging**: Unipile (per-client WhatsApp) + Meta Cloud API
+- **Payments**: Paystack (NGN, kobo)
+- **Scheduler**: APScheduler CronTrigger, `Africa/Lagos`
+- **Deployment**: Railway, auto-deploy from `main`
+
+---
+
+## Quick start
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/reachng.git
-cd reachng
+git clone https://github.com/YoriJags/ReachNG.git
+cd ReachNG
 python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+.venv\Scripts\activate          # Windows
 pip install -r requirements.txt
-cp .env.example .env
-```
-
-### 2. Fill in your API keys (see API Setup below)
-
-```bash
-nano .env
-```
-
-### 3. Run the server
-
-```bash
+copy .env.example .env          # fill in keys
 python main.py
 ```
 
-Open `http://localhost:8000/docs` to see the full API.
+Open `http://localhost:8000/docs` for the API, `http://localhost:8000/` for the marketing site, `http://localhost:8000/portal/demo` for a live demo.
 
 ---
 
-## API Setup
+## Environment
 
-### Claude (Anthropic) — Already have this
-1. Go to console.anthropic.com → API Keys
-2. Copy your key into `ANTHROPIC_API_KEY`
+Required:
 
-### Google Maps Places API
-1. Go to console.cloud.google.com
-2. Create a project → Enable **Places API**
-3. Create an API key → Restrict to Places API
-4. Copy into `GOOGLE_MAPS_API_KEY`
-5. Free tier: 28,500 requests/month — enough for hundreds of campaigns
+- `ANTHROPIC_API_KEY`
+- `MONGODB_URI`
+- `UNIPILE_API_KEY`, `UNIPILE_DSN`
+- `PAYSTACK_SECRET_KEY`
+- `META_APP_SECRET` (webhook signature validation)
+- `UNIPILE_WEBHOOK_SECRET`
+- `DASHBOARD_USER`, `DASHBOARD_PASS`
+- `APP_ENV=production` (enforces webhook signatures)
 
-### Unipile (WhatsApp + Email)
-1. Sign up at unipile.com (free trial available)
-2. Connect your WhatsApp account (scan QR code in dashboard)
-3. Connect your email account (Gmail/Outlook OAuth)
-4. Go to Settings → API Keys → copy key into `UNIPILE_API_KEY`
-5. Copy your DSN (e.g. `api4.unipile.com:13465`) into `UNIPILE_DSN`
-6. Get Account IDs from the Accounts tab in dashboard
+Optional discovery: `GOOGLE_MAPS_API_KEY`, `APOLLO_API_KEY`.
 
-### MongoDB
-1. Use your existing MongoDB Atlas cluster (or create free tier at mongodb.com/atlas)
-2. Create a database called `reachng`
-3. Copy connection string into `MONGODB_URI`
+Never hardcode — always via `config.get_settings()`. Never log PII.
 
 ---
 
-## Running Campaigns
+## Pricing (Cash Desk)
 
-### Via REST API
+| Plan | Base | Variable | Best for |
+|------|------|----------|----------|
+| Cash Desk Starter | ₦80,000/mo | — | Solo operator, 1 channel |
+| Cash Desk Growth | ₦150,000/mo | + 2% recovered | 2–5 staff, multi-channel |
+| Cash Desk Scale | ₦300,000/mo | + 3% recovered | Priority operator, dedicated playbook tuning |
 
-**Dry run first — always preview before sending:**
-```bash
-curl -X POST http://localhost:8000/api/v1/campaigns/run \
-  -H "Content-Type: application/json" \
-  -d '{"vertical": "real_estate", "max_contacts": 10, "dry_run": true}'
-```
-
-**Go live:**
-```bash
-curl -X POST http://localhost:8000/api/v1/campaigns/run \
-  -H "Content-Type: application/json" \
-  -d '{"vertical": "real_estate", "max_contacts": 20, "dry_run": false}'
-```
-
-**Run all three verticals:**
-```bash
-curl -X POST http://localhost:8000/api/v1/campaigns/run-all \
-  -H "Content-Type: application/json" \
-  -d '{"max_per_vertical": 15, "dry_run": false}'
-```
-
-**Check stats:**
-```bash
-curl http://localhost:8000/api/v1/campaigns/stats
-curl http://localhost:8000/api/v1/campaigns/stats?vertical=real_estate
-```
-
-**Check daily limit:**
-```bash
-curl http://localhost:8000/api/v1/campaigns/daily-limit
-```
-
-### Via MCP (Claude Desktop)
-
-Add to your `claude_desktop_config.json`:
-```json
-{
-  "mcpServers": {
-    "reachng": {
-      "url": "http://localhost:8000/mcp"
-    }
-  }
-}
-```
-
-Then ask Claude:
-- *"Check the daily limit and run a dry run for real estate with 10 contacts"*
-- *"Run follow-ups for all verticals"*
-- *"How many contacts have replied this week?"*
+Annual: 15% off. Self-serve signup at `/signup` with Paystack auto-provisioning.
 
 ---
 
-## Campaign Settings
+## Key files
 
-| Setting | Default | Description |
-|---|---|---|
-| `DAILY_SEND_LIMIT` | 50 | Max messages per day across all verticals |
-| `FOLLOWUP_DELAY_HOURS` | 48 | Hours before follow-up is sent |
-| `MAX_FOLLOWUP_ATTEMPTS` | 2 | Max follow-ups per contact |
-
-Start conservative (20–30/day) and increase as you verify delivery rates.
-
----
-
-## Verticals
-
-| Vertical | Channel | Target | Value prop |
-|---|---|---|---|
-| Real Estate | WhatsApp | Developers, agents | Qualified buyer conversations |
-| Recruitment | Email | HR firms, staffing agencies | Faster candidate sourcing |
-| Events | WhatsApp | Promoters, venue owners | RSVPs and bookings |
-
----
-
-## Contact Status Flow
-
-```
-not_contacted → contacted → replied → converted
-                          → opted_out (never contacted again)
-```
-
-Mark contacts manually via API:
-```bash
-curl -X PATCH http://localhost:8000/api/v1/contacts/{id}/replied
-curl -X PATCH http://localhost:8000/api/v1/contacts/{id}/converted
-curl -X PATCH http://localhost:8000/api/v1/contacts/{id}/opted-out
-```
+| File | Purpose |
+|------|---------|
+| `agent/brain.py` | Drafting brain — universal across verticals |
+| `agent/prompts/_nigerian_context.txt` | Universal Lagos market layer (rails, regulators, seasons, social cues) |
+| `agent/prompts/{vertical}.txt` | 16 vertical playbooks |
+| `tools/hitl.py` | `queue_draft()` — every outbound message routes through here |
+| `services/closer/` | Universal Closer brain |
+| `services/debt_collector/` | Money recovery |
+| `services/estate/rent_roll.py` | Rent chase |
+| `api/invoice_chaser.py` | Invoice follow-up |
+| `api/school_fees.py` | School fee chase |
+| `api/webhooks.py` | Inbound WhatsApp + holding reply + signature validation |
+| `api/marketing.py` | Public marketing site, `/signup`, Paystack webhook |
+| `services/brief/` | Business Brief layer |
+| `scheduler.py::morning_brief` | Owner Brief (being upgraded to cash-focused) |
+| `templates/portal_demo.html` + `services/demo_datasets.py` | 5 vertical demos |
 
 ---
 
-## Pricing Model (Sell This)
+## HITL rule (non-negotiable)
 
-| Package | Price | What they get |
-|---|---|---|
-| Starter | ₦150,000/mo | 500 messages, 1 channel, monthly report |
-| Growth | ₦350,000/mo | 2,000 messages, 2 channels, follow-ups |
-| Done-for-You | ₦750,000 setup + ₦200,000/mo | Full campaign, copywriting, weekly call |
-
-Your cost per client: ~₦30–50k/mo in API costs. **Margin: 80%+**
+All outbound drafts route through `tools/hitl.py::queue_draft()`. The owner approves in the dashboard before anything leaves Unipile. Your number, your voice, zero AI surprises.
 
 ---
 
-## Deployment (Railway)
+## Anti-patterns (locked)
 
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-railway login
-railway init
-railway up
-```
-
-Set all environment variables in Railway dashboard under Variables.
+- Never promise lead-gen to clients ("we activate yours")
+- Never expose Prospect OS as a feature
+- Never quote dollars (naira always)
+- Never run the cold scraper for clients (only internal)
+- No feature ships without moving a KPI
+- Never log PII (phone, email, names)
 
 ---
 
-*Built for Lagos businesses.*
+## Deployment
+
+Railway auto-deploys from `main`. Production URL: `https://reachng-production.up.railway.app`.
+
+Set all env vars under Variables. Webhook signatures are enforced when `APP_ENV=production`.
+
+---
+
+*Built in Lagos · for Lagos SMEs.*
