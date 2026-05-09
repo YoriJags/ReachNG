@@ -130,6 +130,143 @@ async def get_owner_brief(token: str):
     }
 
 
+# ─── Lead Resurrection (token-auth wrapper around /b2c upload + run) ─────────
+
+@router.get("/upload-leads/{token}", response_class=HTMLResponse)
+async def upload_leads_page(token: str, request: Request):
+    """Lead Resurrection — upload an old CSV of leads, agent revives them."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    templates = request.app.state.templates
+    # Recent imports for this client — shows the resurrection history
+    imports = list(
+        get_db()["lead_imports"]
+        .find({"client_name": client["name"]}, {"_id": 0})
+        .sort("uploaded_at", -1)
+        .limit(10)
+    )
+    for im in imports:
+        if hasattr(im.get("uploaded_at"), "isoformat"):
+            im["uploaded_at"] = im["uploaded_at"].isoformat()
+    return templates.TemplateResponse(
+        request,
+        "portal_upload_leads.html",
+        {
+            "token": token,
+            "client_name": client["name"],
+            "vertical": client.get("vertical") or "general",
+            "imports": imports,
+        },
+    )
+
+
+@router.post("/upload-leads/{token}")
+async def upload_leads_submit(
+    token: str,
+    request: Request,
+):
+    """Portal-authenticated Lead Resurrection upload.
+
+    Wraps tools.csv_import.parse_and_import_csv with the same NDPR
+    consent guard as the admin /b2c/upload endpoint, but auth is by
+    portal token instead of admin basic-auth.
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+
+    from fastapi import UploadFile
+    from tools.csv_import import parse_and_import_csv
+    from api.b2c import _record_import, _enforce_byo_enabled, _MAX_CSV_BYTES
+
+    form = await request.form()
+    file = form.get("file")
+    consent = str(form.get("consent_attestation", "")).lower() in ("true", "on", "1", "yes")
+    campaign_tag = form.get("campaign_tag") or "lead_resurrection"
+
+    if not consent:
+        raise HTTPException(
+            422,
+            "Consent attestation required. Tick the box confirming every contact "
+            "in the file has a lawful basis under NDPR.",
+        )
+    if not isinstance(file, UploadFile) or not file.filename or not file.filename.endswith(".csv"):
+        raise HTTPException(400, "Upload a .csv file")
+
+    content = await file.read()
+    if len(content) > _MAX_CSV_BYTES:
+        raise HTTPException(413, f"CSV too large. Max {_MAX_CSV_BYTES // 1024}KB.")
+    if not content:
+        raise HTTPException(400, "Empty file")
+
+    _enforce_byo_enabled(client)
+
+    vertical = client.get("vertical") or "general"
+    try:
+        stats = parse_and_import_csv(
+            csv_bytes=content,
+            client_name=client["name"],
+            vertical=vertical,
+            campaign_tag=campaign_tag,
+        )
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
+
+    import_id = _record_import(
+        client_doc=client,
+        filename=file.filename,
+        file_bytes=content,
+        consent_attestation=True,
+        uploader=f"portal:{client['name']}",
+        request=request,
+        stats=stats,
+        vertical=vertical,
+        campaign_tag=campaign_tag,
+    )
+
+    return {
+        "success": True,
+        "client": client["name"],
+        "vertical": vertical,
+        "import_id": import_id,
+        "campaign_tag": campaign_tag,
+        **stats,
+    }
+
+
+@router.post("/run-resurrection/{token}")
+async def run_resurrection(token: str, request: Request):
+    """Trigger a Lead Resurrection campaign on uploaded leads.
+
+    HITL mode is forced ON — every revival message lands in the approval
+    queue so the owner sees what's about to go out before any of it sends.
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+
+    body = {}
+    if request.headers.get("content-type", "").startswith("application/json"):
+        body = await request.json()
+    max_contacts = max(1, min(200, int(body.get("max_contacts", 50))))
+    dry_run = bool(body.get("dry_run", True))
+
+    from api.b2c import run_b2c_campaign, RunB2CRequest
+    from fastapi import BackgroundTasks
+    payload = RunB2CRequest(
+        vertical=client.get("vertical") or "general",
+        max_contacts=max_contacts,
+        dry_run=dry_run,
+        hitl_mode=True,
+    )
+    return await run_b2c_campaign(
+        client_name=client["name"],
+        body=payload,
+        background_tasks=BackgroundTasks(),
+    )
+
+
 @router.get("/demo", response_class=HTMLResponse)
 async def demo_portal(request: Request):
     """Public demo portal — defaults to hospitality (Mercury). Same product, vertical-tailored sample data."""
