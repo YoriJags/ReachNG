@@ -585,6 +585,19 @@
       </div>
     </div>
 
+    <!-- Holding Reply -->
+    <div id="holding-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
+      <div style="margin-bottom:12px;">
+        <div style="font-size:14px;font-weight:600;color:#e8e8e8;">Holding Reply</div>
+        <div style="font-size:12px;color:#555;margin-top:4px;">Auto-fires when a customer messages, while we prepare the real reply. Sent only while Autopilot is OFF, max once per contact per 24h.</div>
+      </div>
+      <textarea id="holding-msg" maxlength="800" placeholder="e.g. Hi! Thanks for reaching out — we'll be right with you with full details." style="width:100%;min-height:90px;background:#0a0a0a;border:1px solid #1e2530;border-radius:8px;padding:12px;font-family:inherit;font-size:13px;color:#e8e8e8;resize:vertical;box-sizing:border-box;"></textarea>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <span style="font-size:11px;color:#555;" id="holding-count">0 / 800</span>
+        <button onclick="portalSaveHolding()" style="background:#ff5500;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Save</button>
+      </div>
+    </div>
+
     <!-- Outreach activity table -->
     <div class="section-label">Outreach Activity</div>
     <div class="leads-table-wrap">
@@ -762,6 +775,16 @@ async function load() {
     const apEnabled = data.autopilot === true;
     _setApState(apEnabled);
 
+    // Holding reply
+    const ta = document.getElementById("holding-msg");
+    if (ta) {
+      ta.value = data.holding_message || "";
+      const out = document.getElementById("holding-count");
+      const updateCount = () => { if (out) out.textContent = `${ta.value.length} / 800`; };
+      ta.addEventListener("input", updateCount);
+      updateCount();
+    }
+
   } catch(err) {
     document.getElementById("loading").innerHTML =
       '<div style="color:#ff4444;font-size:13px;">Error loading dashboard. Please refresh.</div>';
@@ -800,6 +823,26 @@ async function portalToggleAutopilot(enabled) {
     // Revert toggle
     _setApState(!enabled);
     document.getElementById("ap-portal-toggle").checked = !enabled;
+  }
+}
+
+async function portalSaveHolding() {
+  const ta = document.getElementById("holding-msg");
+  if (!ta) return;
+  const btn = event.target;
+  const orig = btn.textContent;
+  try {
+    const resp = await fetch(`/api/v1/clients/{{ client_name }}/holding-message`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ holding_message: ta.value }),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    btn.textContent = "Saved ✓";
+    btn.style.background = "#16a34a";
+    setTimeout(() => { btn.textContent = orig; btn.style.background = "#ff5500"; }, 1500);
+  } catch(e) {
+    alert("Could not save holding reply: " + e.message);
   }
 }
 

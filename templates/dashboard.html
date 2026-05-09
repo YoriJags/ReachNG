@@ -4409,6 +4409,7 @@ async function loadControlTower() {
               </label>
               <span style="font-size:10px;color:#6a8aaa;">${c.signal_listening ? 'Signals' : 'No sig'}</span>
             </div>
+            <button class="ct-btn" onclick="openHoldingMessage('${c.name}', \`${(c.holding_message||'').replace(/`/g,'\\`').replace(/\$/g,'\\$')}\`)" title="Edit holding reply — auto-fires while real draft is being prepared">${c.holding_message ? 'Holding ✓' : 'Set Holding'}</button>
           </div>
         </div>`;
       }).join("");
@@ -4728,6 +4729,26 @@ async function toggleSignalListening(name, enabled) {
     showToast(enabled ? `${name}: Signal Listening ON` : `${name}: Signal Listening OFF`);
   } catch(e) {
     alert("Toggle failed: " + e.message);
+  }
+}
+
+async function openHoldingMessage(name, current) {
+  const msg = prompt(
+    `Holding Reply for ${name}\n\nThis message auto-fires the moment a customer messages, while the real AI draft is being prepared. Sent only when Autopilot is OFF, once per contact per 24h.\n\nLeave blank to disable. Max 800 chars.`,
+    current || ""
+  );
+  if (msg === null) return;
+  try {
+    const resp = await fetch(`/api/v1/clients/${encodeURIComponent(name)}/holding-message`, {
+      method: "PATCH",
+      headers: { ...authHeaders(), "Content-Type": "application/json" },
+      body: JSON.stringify({ holding_message: msg }),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    showToast(msg ? `${name}: Holding reply saved` : `${name}: Holding reply cleared`);
+    loadControlTower();
+  } catch(e) {
+    alert("Save failed: " + e.message);
   }
 }
 

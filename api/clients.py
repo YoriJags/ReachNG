@@ -82,6 +82,7 @@ class ClientUpsert(BaseModel):
     owner_phone: Optional[str] = None       # Client's WhatsApp number — receives morning brief
     signal_listening: bool = False          # Opt-in: monitor social for buyer intent signals
     signal_queries: list[str] = []          # Client-specific DDG queries for signal listener
+    holding_message: str = ""               # Auto-fired instantly to inbound while real draft is being prepared (empty = disabled)
 
 
 class PaymentUpdate(BaseModel):
@@ -220,6 +221,7 @@ async def upsert_client(payload: ClientUpsert):
     set_doc["signal_listening"] = payload.signal_listening
     if payload.signal_queries:
         set_doc["signal_queries"] = payload.signal_queries
+    set_doc["holding_message"] = payload.holding_message
 
     result = clients.update_one(
         {"name": {"$regex": f"^{re.escape(payload.name)}$", "$options": "i"}},
@@ -425,6 +427,27 @@ async def set_signal_listening(name: str, enabled: bool):
     if result.matched_count == 0:
         raise HTTPException(404, f"Client '{name}' not found")
     return {"success": True, "client": name, "signal_listening": enabled}
+
+
+class HoldingMessageUpdate(BaseModel):
+    holding_message: str
+
+
+@router.patch("/{name}/holding-message")
+async def set_holding_message(name: str, payload: HoldingMessageUpdate):
+    """Update the holding reply auto-fired to inbound while real draft is prepared.
+    Empty string disables the feature.
+    """
+    msg = (payload.holding_message or "").strip()
+    if len(msg) > 800:
+        raise HTTPException(400, "Holding message too long — keep under 800 characters")
+    result = get_clients().update_one(
+        {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}},
+        {"$set": {"holding_message": msg, "updated_at": datetime.now(timezone.utc)}},
+    )
+    if result.matched_count == 0:
+        raise HTTPException(404, f"Client '{name}' not found")
+    return {"success": True, "client": name, "holding_message": msg}
 
 
 @router.delete("/{name}")

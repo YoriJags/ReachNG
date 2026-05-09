@@ -24,6 +24,50 @@ def _db():
     return get_db()
 
 
+async def _maybe_send_holding_reply(client: dict, sender_phone: str) -> bool:
+    """Fire client.holding_message instantly if:
+      - autopilot is OFF (when ON, AI replies fast — no need)
+      - holding_message is set (non-empty)
+      - last holding reply to THIS contact was >24h ago (or never)
+
+    Returns True if a holding reply was sent.
+    """
+    if client.get("autopilot"):
+        return False
+    msg = (client.get("holding_message") or "").strip()
+    if not msg:
+        return False
+
+    holding_log = _db()["holding_replies_sent"]
+    cutoff = datetime.now(timezone.utc).timestamp() - 24 * 3600
+    recent = holding_log.find_one({
+        "client_id": str(client["_id"]),
+        "phone": sender_phone,
+        "sent_at": {"$gte": datetime.fromtimestamp(cutoff, tz=timezone.utc)},
+    })
+    if recent:
+        return False
+
+    try:
+        from tools.outreach import send_whatsapp_for_client
+        await send_whatsapp_for_client(
+            phone=sender_phone,
+            message=msg,
+            client_doc=client,
+        )
+        holding_log.insert_one({
+            "client_id": str(client["_id"]),
+            "client_name": client["name"],
+            "phone": sender_phone,
+            "sent_at": datetime.now(timezone.utc),
+        })
+        log.info("holding_reply_sent", client=client["name"])
+        return True
+    except Exception as e:
+        log.warning("holding_reply_failed", client=client.get("name"), error=str(e))
+        return False
+
+
 def _parse_unipile(payload: dict) -> tuple[str | None, str, str | None]:
     data = payload.get("data", {})
     sender = data.get("from") or payload.get("from")
@@ -136,6 +180,10 @@ async def _handle_message(sender_phone: str, message_body: str, source: str | No
             })
             if closer_client:
                 from services.closer import find_lead_by_contact, create_lead, append_thread_message
+                # Fire holding reply immediately so customer gets an ack while
+                # operator approves the real Closer draft. Gated by autopilot=OFF
+                # + holding_message set + 24h dedupe per contact.
+                await _maybe_send_holding_reply(closer_client, sender_phone)
                 client_id = str(closer_client["_id"])
                 existing = find_lead_by_contact(client_id, phone=sender_phone)
                 if existing:

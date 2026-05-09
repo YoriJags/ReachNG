@@ -12,11 +12,7 @@ Last updated: 2026-05-09
 
 These are next up after current Phase 1.5 (Business Brief + BYO Leads) finishes.
 
-- [ ] **Holding Reply** — auto-fires the moment a customer messages, while real draft is being prepared. Half-day build.
-  - `clients.holding_message` field
-  - Portal + admin textarea
-  - Wire into inbound webhook: if autopilot OFF AND no holding reply sent in 24h → fire via `tools/messaging.py` before HITL queue
-  - Open Q: off-hours-only (recommend) vs always; verbatim (recommend) vs Haiku-personalised
+- [x] ~~**Holding Reply**~~ — shipped 2026-05-09. Schema + PATCH endpoint, webhook wire (Closer intake), Control Tower button, real portal textarea, demo portal textarea. Always-on (no off-hours guard), verbatim, 24h dedupe per contact via `holding_replies_sent` collection.
 - [ ] **Outreach dashboard redesign** — collapse 11 buttons → 5 tabs (Today / Clients / Sources / Conversations / System). Hard Brief gate on campaign launch. 2 days.
 - [ ] **Per-vertical demo portals** — `/portal/demo/estate`, `/portal/demo/school`, `/portal/demo/legal`. Mercury template clones with vertical-appropriate sample data. Half-day per vertical.
 - [ ] **APIFY_API_TOKEN added to Railway env** — 5-minute user action, blocks lead enrichment quality

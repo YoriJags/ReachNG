@@ -1,3 +1,6 @@
+﻿---
+tags: [reachng]
+---
 # Verticals
 
 [[Home]] | [[Campaign Flow]] | [[Ideas Pipeline]]

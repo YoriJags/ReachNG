@@ -99,6 +99,7 @@ async def get_portal_data(token: str):
         "roi": roi,
         "contacts": contacts,
         "autopilot": client.get("autopilot", False),
+        "holding_message": client.get("holding_message", ""),
     }
 
 

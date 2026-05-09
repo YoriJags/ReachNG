@@ -300,6 +300,21 @@
     </div>
   </div>
 
+  <div class="section-label">Holding Reply</div>
+  <div style="background:#fff;border:1px solid var(--border-subtle);border-radius:10px;padding:20px 24px;margin-bottom:32px;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:12px;">
+      <div>
+        <div style="font-size:14px;font-weight:600;color:#0a0a0a;">Auto-reply while we draft your real response</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Sent instantly when a guest messages — only while Autopilot is OFF. Once per contact per 24h, so returning guests aren't spammed.</div>
+      </div>
+    </div>
+    <textarea id="holding-msg-demo" maxlength="800" style="width:100%;min-height:90px;border:1px solid var(--border-subtle);border-radius:8px;padding:12px;font-family:inherit;font-size:13px;color:#0a0a0a;resize:vertical;box-sizing:border-box;">Hi! Thanks for reaching out to Mercury — give us a few minutes and we'll be back with availability, pricing and the vibe for the night. 🥂</textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+      <span style="font-size:11px;color:var(--muted);" id="holding-char-count">0 / 800</span>
+      <button onclick="demoSaveHolding()" style="background:#0a0a0a;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Save</button>
+    </div>
+  </div>
+
   <div class="section-header">
     <div class="section-label">Pending Approval</div>
     <span class="pending-badge" id="pending-badge-label">3 drafts awaiting you</span>
@@ -580,6 +595,24 @@ function demoToggleAutopilot(enabled) {
     badge.textContent = "3 drafts awaiting you";
   }
 }
+
+function demoSaveHolding() {
+  const ta = document.getElementById("holding-msg-demo");
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = "Saved ✓";
+  btn.style.background = "#16a34a";
+  setTimeout(() => { btn.textContent = orig; btn.style.background = "#0a0a0a"; }, 1500);
+}
+
+(function wireHoldingCounter(){
+  const ta = document.getElementById("holding-msg-demo");
+  const out = document.getElementById("holding-char-count");
+  if (!ta || !out) return;
+  const update = () => { out.textContent = `${ta.value.length} / 800`; };
+  ta.addEventListener("input", update);
+  update();
+})();
 
 init();
 </script>

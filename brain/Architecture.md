@@ -1,3 +1,6 @@
+﻿---
+tags: [reachng]
+---
 # Architecture
 
 [[Home]] | [[Campaign Flow]] | [[Integrations]] | [[API Reference]]
