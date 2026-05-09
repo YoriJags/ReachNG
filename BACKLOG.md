@@ -52,7 +52,7 @@ The third strategic review's "don't promise lead-gen" applies to **clients**. We
 | Tool | Audience | Input | Behaviour |
 |------|----------|-------|-----------|
 | **Scout v1** (below) | Client-facing | Client's own site + uploaded CSVs + competitor URLs they specify | Enriches existing leads, never finds cold ones. Promised in pricing tiers. |
-| **Lean Discovery Stack** (further below) | Internal — Yori only | DDG + VConnect + BusinessList + FinelibNG + IG bios + LinkedIn-via-Google | Cold-scrapes Lagos SMEs to feed ReachNG's own SDR pipeline. NEVER exposed to clients. NEVER mentioned as a feature. |
+| **ReachNG Prospect OS** (further below) | Internal — Yori only | Maps + DDG + VConnect + BusinessList + FinelibNG + IG bios | Scrapes EVIDENCE (not just leads) — businesses + leakage signals — to feed our own SDR pipeline. NEVER exposed to clients. NEVER mentioned as a feature. Full spec in `project_reachng_prospect_os.md`. |
 
 Reaffirms `feedback_reachng_agent_scope.md`: discovery is OUR internal funnel only.
 
@@ -88,39 +88,50 @@ The killer features per `project_reachng_lead_activation_pivot.md`:
 - [ ] **WhatsApp Sales Copilot view** (~1 day) — pipeline-card view of every inbound thread, with AI suggested next reply, hot/cold marker, and qualifying-question prompts. Lives at `/dashboard/copilot`.
 - [ ] **Owner Brief upgrade** (~1 day, also in genius_repositioning memo) — rebuild `scheduler.py::morning_brief` as cash-focused: collectible amount this week + hot replies overnight + actions today. Each item one-tap.
 
-## P0 — Lean Discovery Stack — INTERNAL SDR ONLY (2.5 days)
+## P0 — ReachNG Prospect OS (internal SDR engine, ~3 days MVP)
 
-**Resurrected 2026-05-09 EOD.** Earlier reversal was too sweeping — third review's "don't promise lead-gen" applies to CLIENTS. We still need this for our own SDR pipeline to find Lagos SMEs to pitch ReachNG to.
+**Renamed + sharpened 2026-05-09 EOD** per strategic review #4. Full architecture spec in `project_reachng_prospect_os.md`.
 
-**Hard rule: this tool is internal only.** Never exposed to clients. Never mentioned as a feature. Never on the marketing site. Lives behind admin-auth at `/admin/discovery`. Per `feedback_reachng_agent_scope.md`.
+**Core framing shift: scrape EVIDENCE, not leads.** Each prospect record carries the leakage signal that will become the cold-message opening line ("I noticed your IG comments are full of unanswered price questions...").
 
-**Sources to stitch (cold internet scraping for OUR pipeline):**
-- DuckDuckGo HTML — web search
-- Google Maps Places API — name, phone, address, rating
-- VConnect (vconnect.com) — Lagos/Nigeria business directory
-- BusinessList.com.ng + FinelibNG + Nigeria Business Directory
-- Instagram public bios — website + WhatsApp from profile
-- LinkedIn public company pages — decision-maker via `site:linkedin.com/in {{biz}} CEO` Google search
-- Email pattern-guess + free MX SMTP verify
+**Hard rule: internal only.** Never client-facing. Never in pricing. Never on marketing. Lives at `/admin/prospect-os`. Per `feedback_reachng_agent_scope.md`.
 
-**Build plan:**
-- **Day 1 (foundation):**
-  - [ ] `tools/sources/ddg.py` + `tools/sources/google_maps.py` (refactor from existing `discovery.py`)
-  - [ ] `tools/lean_discovery.py` orchestrator — parallel multi-source fan-out, dedupe, merge
-  - [ ] (`tools/page_extractor.py` already covered in Scout v1 — shared between both tools)
-- **Day 2 (Nigerian directories + decision-maker):**
-  - [ ] `tools/sources/vconnect.py` — scrape Lagos by category
-  - [ ] `tools/sources/businesslist.py` + `finelib.py`
-  - [ ] `tools/sources/instagram.py` — public bio + website link
-  - [ ] `tools/decision_maker.py` — Google → LinkedIn → BS4 → name + title
-- **Day 3 (½ day) — email finder + SDR integration:**
-  - [ ] `tools/email_finder.py` — pattern-guess + free MX SMTP HELO verify
-  - [ ] Wire `discover_lean_leads()` into `campaigns/base.py` (replaces Apify in our SDR funnel)
-  - [ ] Feature flags: `LEAN_DISCOVERY_ONLY=true` (default), `USE_APIFY=false` (re-enable when paid clients pay for it)
-  - [ ] Smoke-test on 3 verticals × 50 leads each → spot-check quality
-  - [ ] Admin-only UI at `/admin/discovery` — DO NOT add to client portal nav
+**Architecture — 8-stage pipeline (`services/prospect_os/`):**
 
-**Cost vs Apify:** ~$50/mo+ → ₦0 + ~₦150 per 100 leads in Haiku tokens.
+1. **Query Planner** — vertical × city × neighborhood × buying-pain seeds
+2. **Source Adapters** — `tools/sources/{maps,ddg,vconnect,businesslist,finelib,instagram}.py` — plugin pattern, normalized output
+3. **Crawler** — httpx + BS4 by default (Playwright deferred — too heavy for Railway today)
+4. **Extractor** — Haiku + rules → structured biz data + evidence flags
+5. **Verifier** — phone normalize (E.164), dedup, junk reject
+6. **Scorer** — `likely_to_need_reachng_score` + `likely_reachable_score` (rule-based v1, ML in v2)
+7. **Outreach Brain** — angle-specific drafts tied to scraped evidence (uses existing `agent/brain.py`)
+8. **Feedback Loop** — every reply/no-reply updates Scorer weights. **THE MOAT.**
+
+**MVP day-1 sequence (ship these first):**
+- [ ] `services/prospect_os/__init__.py` + module skeleton
+- [ ] `services/prospect_os/query_planner.py` — vertical × city seeds, simple round-robin
+- [ ] `tools/sources/maps.py` (refactor existing `tools/discovery.py`)
+- [ ] `tools/sources/ddg.py` (already partly in `client_signal_listener.py`)
+- [ ] `tools/sources/vconnect.py`
+- [ ] `tools/sources/businesslist.py`
+- [ ] `tools/page_extractor.py` (shared with Scout v1) — httpx + BS4 + Haiku → `{name, phone, whatsapp, email, location, socials, website, evidence_flags}`
+- [ ] `services/prospect_os/scorer.py` — rule-based v1 (has_whatsapp + has_ig + active_30d + high_ticket_category + visible_owner)
+- [ ] Admin route `/admin/prospect-os` — query manager + scored prospect list + evidence viewer
+
+**Day 2-3:**
+- [ ] `services/prospect_os/verifier.py` — phone normalize + dedup
+- [ ] `services/prospect_os/outreach_brain.py` — angle-specific draft templates per evidence pattern (e.g. "comments_with_price_questions" → "I noticed your IG comments are full of price questions — bet that's eating your time...")
+- [ ] Wire Prospect OS leads into existing HITL queue with `source="prospect_os"`
+- [ ] Feature flag: `USE_APIFY=false` (re-enable when revenue covers it)
+
+**Deferred to v2 (build after first reply data):**
+- [ ] Stage 8 Feedback Loop — train Scorer on reply outcomes
+- [ ] `tools/sources/instagram.py` — public bio extraction (more fragile)
+- [ ] `tools/decision_maker.py` — LinkedIn-via-Google decision-maker resolution
+- [ ] `tools/email_finder.py` — pattern-guess + MX SMTP verify
+- [ ] Playwright crawler (only if a specific source forces it)
+
+**Cost vs Apify:** ~$50/mo+ → ₦0 infra + ~₦1.50 Haiku per prospect (~₦1500 / 1000 prospects).
 
 Replace paid Apify with a self-hosted free stack until we land 3+ paying clients. Apify gets re-enabled via feature flag once revenue covers it.
 
