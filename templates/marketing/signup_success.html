@@ -1,0 +1,44 @@
+{% extends "marketing/_base.html" %}
+
+{% block title %}Welcome to ReachNG{% endblock %}
+{% block description %}Welcome to ReachNG. Your portal is ready.{% endblock %}
+
+{% block content %}
+
+<section class="hero" style="padding: 100px 24px 60px;">
+
+  {% if portal_path %}
+    <div class="eyebrow" style="background: rgba(22,163,74,0.12); color: #16a34a; border-color: rgba(22,163,74,0.3);">✓ Payment confirmed</div>
+    <h1>Welcome{% if business %}, {{ business }}{% endif %} 🎉</h1>
+    <p class="sub">Your portal is live and your subscription is active. Bookmark the link below — it's your home for everything.</p>
+
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 560px; margin: 32px auto 24px; text-align: left;">
+      <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Your portal</div>
+      <a href="{{ portal_path }}" style="font-family: 'SF Mono', Menlo, monospace; font-size: 13px; color: var(--orange); word-break: break-all; display: block; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; text-decoration: none;">{{ request.base_url }}{{ portal_path[1:] }}</a>
+    </div>
+
+    <a href="{{ portal_path }}" class="btn btn-primary" style="font-size: 16px; padding: 14px 28px;">Open my portal →</a>
+
+    <div style="max-width: 600px; margin: 56px auto 0; text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px;">
+      <h2 style="font-size: 18px; color: var(--text-strong); margin: 0 0 16px;">What happens next</h2>
+      <ol style="color: var(--muted-strong); font-size: 14px; line-height: 1.8; padding-left: 20px; margin: 0;">
+        <li><strong style="color: var(--text-strong);">Open your portal</strong> and fill your Business Brief (5 minutes — there's an "AI-assisted intake" button if you want to paste your website URL).</li>
+        <li><strong style="color: var(--text-strong);">We'll WhatsApp you</strong> within 30 minutes for a quick 10-minute pairing call to connect your business WhatsApp number.</li>
+        <li><strong style="color: var(--text-strong);">First drafts start arriving</strong> in your portal as soon as your number receives an inbound message.</li>
+        <li><strong style="color: var(--text-strong);">You approve every message before it sends</strong> until you're comfortable flipping on Autopilot.</li>
+      </ol>
+    </div>
+
+  {% else %}
+    <div class="eyebrow">Status</div>
+    <h1>{% if error %}{{ error }}{% else %}Verifying your payment…{% endif %}</h1>
+    <p class="sub">If you've just paid, your portal will be ready in under 60 seconds. We'll WhatsApp the link to {% if business %}you{% else %}the number you signed up with{% endif %} once it's provisioned.</p>
+    <p style="margin-top: 32px; color: var(--muted); font-size: 13px;">Reference: <code style="background: var(--surface); padding: 2px 8px; border-radius: 4px;">{{ reference or "—" }}</code></p>
+    <div style="margin-top: 24px;">
+      <a href="/" class="btn btn-ghost">Back to home</a>
+      <a href="/contact" class="btn btn-primary" style="margin-left: 12px;">Contact us</a>
+    </div>
+  {% endif %}
+</section>
+
+{% endblock %}

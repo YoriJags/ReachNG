@@ -1,0 +1,183 @@
+{% extends "marketing/_base.html" %}
+
+{% block title %}Get started — ReachNG{% endblock %}
+{% block description %}Sign up for ReachNG. Pay via Paystack, get your portal in 60 seconds.{% endblock %}
+
+{% block content %}
+
+<section class="hero" style="padding: 80px 24px 40px;">
+  <div class="eyebrow">Self-serve signup · Paid via Paystack</div>
+  <h1>Get started in 2 minutes.</h1>
+  <p class="sub">Pick your plan, pay your first month via Paystack, and your portal is ready before the page loads. No "sales call required."</p>
+</section>
+
+<section style="padding-top: 0;">
+  <div class="inner" style="max-width: 720px;">
+
+    <form id="signup-form" style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 32px;">
+
+      <!-- Plan picker -->
+      <div style="margin-bottom: 28px;">
+        <label style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 12px;">Pick your plan</label>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+          {% for key, p in plans.items() %}
+          <label class="plan-pick" data-plan="{{ key }}" style="cursor: pointer;">
+            <input type="radio" name="plan" value="{{ key }}" {% if selected_plan == key %}checked{% endif %} style="display:none;">
+            <div class="plan-card" style="border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; transition: 0.15s;">
+              <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 700;">{{ p.label }}</div>
+              <div style="font-size: 24px; font-weight: 700; color: var(--text-strong); margin-top: 6px; letter-spacing: -0.5px;">₦{{ "{:,}".format(p.ngn) }}<span style="font-size: 11px; color: var(--muted); font-weight: 400;">/mo</span></div>
+            </div>
+          </label>
+          {% endfor %}
+        </div>
+        <label style="display: flex; align-items: center; gap: 10px; margin-top: 16px; cursor: pointer; font-size: 13px; color: var(--muted-strong);">
+          <input type="checkbox" name="annual" id="annual-toggle" style="cursor: pointer;">
+          <span>Pay annually — <strong style="color: var(--orange);">save 15%</strong> (12 months × selected plan, billed once)</span>
+        </label>
+      </div>
+
+      <!-- Business -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div>
+          <label class="signup-label">Business name</label>
+          <input type="text" name="business_name" required class="signup-input">
+        </div>
+        <div>
+          <label class="signup-label">Vertical</label>
+          <select name="vertical" required class="signup-input">
+            <option value="">— Select —</option>
+            <option value="hospitality">Restaurants / Bars / Hotels</option>
+            <option value="real_estate">Real estate</option>
+            <option value="education">Schools / Education</option>
+            <option value="professional_services">Legal / Professional services</option>
+            <option value="small_business">Beauty / Wellness / Small biz</option>
+            <option value="fitness">Fitness / Gyms</option>
+            <option value="events">Events / Caterers / Vendors</option>
+            <option value="auto">Automotive / Dealers</option>
+            <option value="cooperatives">Cooperatives / Microfinance</option>
+            <option value="legal">Legal (specifically)</option>
+            <option value="insurance">Insurance / Brokers</option>
+            <option value="recruitment">Recruitment / HR firms</option>
+            <option value="general">Something else / general</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Owner -->
+      <div style="margin-bottom: 16px;">
+        <label class="signup-label">Your name</label>
+        <input type="text" name="owner_name" required class="signup-input">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+        <div>
+          <label class="signup-label">WhatsApp number</label>
+          <input type="tel" name="owner_phone" placeholder="+234..." required class="signup-input">
+        </div>
+        <div>
+          <label class="signup-label">Email (for receipt)</label>
+          <input type="email" name="owner_email" required class="signup-input">
+        </div>
+      </div>
+
+      <div id="signup-summary" style="background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; font-size: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: var(--muted);">You'll pay today</span>
+          <strong id="summary-amount" style="font-size: 20px; color: var(--text-strong); font-weight: 700; letter-spacing: -0.3px;">₦150,000</strong>
+        </div>
+        <div style="font-size: 12px; color: var(--muted); margin-top: 4px;" id="summary-note">Growth plan — 1 month. Renews automatically. Cancel anytime.</div>
+      </div>
+
+      <button type="submit" id="signup-submit" class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 16px;">Continue to Paystack →</button>
+      <p style="text-align: center; font-size: 11px; color: var(--muted); margin: 12px 0 0;">Secured by Paystack · Card · Bank transfer · USSD</p>
+
+      <div id="signup-error" style="display:none; background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); color: #ff6b6b; padding: 12px 16px; border-radius: 6px; margin-top: 16px; font-size: 13px;"></div>
+    </form>
+
+    <p style="text-align: center; margin-top: 24px; font-size: 13px; color: var(--muted);">
+      Prefer a 15-minute walkthrough first? <a href="/contact">Book a call</a>.
+    </p>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .signup-label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .signup-input {
+    width: 100%; padding: 12px 14px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-size: 14px; font-family: inherit; box-sizing: border-box;
+    transition: 0.15s;
+  }
+  .signup-input:focus { outline: none; border-color: var(--orange); }
+
+  .plan-pick input:checked + .plan-card { border-color: var(--orange); background: rgba(255,85,0,0.06); }
+  .plan-pick:hover .plan-card { border-color: var(--border-strong); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const PLANS = {
+    starter: { label: "Starter", ngn: 80000 },
+    growth:  { label: "Growth",  ngn: 150000 },
+    scale:   { label: "Scale",   ngn: 300000 },
+  };
+
+  function updateSummary() {
+    const plan = document.querySelector('input[name="plan"]:checked').value;
+    const annual = document.getElementById("annual-toggle").checked;
+    const p = PLANS[plan];
+    const amount = annual ? Math.round(p.ngn * 12 * 0.85) : p.ngn;
+    const monthly = annual ? Math.round(amount / 12) : p.ngn;
+    document.getElementById("summary-amount").textContent = "₦" + amount.toLocaleString();
+    document.getElementById("summary-note").textContent = annual
+      ? `${p.label} plan — 12 months prepaid (effective ₦${monthly.toLocaleString()}/mo, save 15%). Renews after 12 months.`
+      : `${p.label} plan — 1 month. Renews automatically. Cancel anytime.`;
+  }
+
+  document.querySelectorAll('input[name="plan"], #annual-toggle').forEach(el => {
+    el.addEventListener("change", updateSummary);
+  });
+  updateSummary();
+
+  document.getElementById("signup-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const submit = document.getElementById("signup-submit");
+    const errBox = document.getElementById("signup-error");
+    errBox.style.display = "none";
+    submit.disabled = true;
+    submit.textContent = "Securing slot…";
+
+    const data = new FormData(form);
+    const payload = {
+      business_name: data.get("business_name"),
+      vertical:      data.get("vertical"),
+      owner_name:    data.get("owner_name"),
+      owner_phone:   data.get("owner_phone"),
+      owner_email:   data.get("owner_email"),
+      plan:          data.get("plan"),
+      annual:        data.get("annual") === "on",
+    };
+
+    try {
+      const resp = await fetch("/api/v1/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await resp.json();
+      if (!resp.ok) throw new Error(result.detail || "Signup failed");
+      window.location.href = result.authorization_url;
+    } catch(err) {
+      errBox.textContent = err.message;
+      errBox.style.display = "block";
+      submit.disabled = false;
+      submit.textContent = "Continue to Paystack →";
+    }
+  });
+</script>
+{% endblock %}
