@@ -45,7 +45,43 @@ The SDR engine (Yori's own outreach to Lagos SMEs) needs deeper Nigerian-market 
 - [ ] **Bring ALL existing verticals to gold standard** (~120+ lines each) — same depth as `real_estate.txt`. Includes the 6 thin ones (events, agriculture, auto, cooperatives, fitness, insurance) AND the medium ones (legal, fintech, recruitment, small_business, logistics, agency_sales) — every single vertical prompt gets the full treatment. No prompt left as a thin sketch.
 - [ ] **Lead-signal-injection rules** — each vertical prompt mandates referencing concrete signals from enrichment payload (Maps rating, decision_maker, place categories, IG handle).
 
-## P0 — Lean Discovery Stack (Apify rival, 2.5 days)
+## ⚠️ REVERSED — Lean Discovery Stack killed in favour of Scout v1
+
+**2026-05-09 EOD:** Strategic review #3 (lead activation pivot, see `project_reachng_lead_activation_pivot.md`) made the case that "we find leads on the internet" is the wrong promise — fragile, legally murky, customer blames us when leads suck. Killed. Replaced with **ReachNG Scout v1** below — owned-data enrichment only, no internet lead-gen.
+
+## P0 — ReachNG Scout v1 (owned-data research layer, 2 days)
+
+Internal research that enriches and activates leads the client ALREADY HAS. Does NOT scrape the internet for cold leads.
+
+**Capabilities:**
+- Crawl the client's own website (their services, prices, locations) → feeds Business Brief auto-fill
+- Enrich uploaded CSV/contact lists (look up domains they provided, extract decision-maker from each company's site)
+- Monitor specific competitor pages the client asks us to watch
+- Detect new competitor offers / vacancies / events / listings (alerts the client)
+- Summarise "who this business should target" from their existing customer data
+
+**What Scout does NOT do (intentional):**
+- Scrape LinkedIn / IG / FB / Twitter / TikTok
+- Crawl protected platforms
+- Generate cold contact lists from the internet
+
+**Build plan:**
+- [ ] `tools/page_extractor.py` — httpx async + BS4 + Haiku structured extract per URL → `{name, phone, email, address, description, social_links, decision_maker, confidence}` (was already scoped, now scoped to OWNED URLs only)
+- [ ] `tools/scout.py` orchestrator — accepts a list of URLs + extraction intent, returns merged structured data
+- [ ] Wire into BYO Leads CSV ingest — when user uploads `[name, domain]`, Scout enriches each row before drafts get queued
+- [ ] Wire into Business Brief AI intake — already partly done; deepen with Scout's site crawl
+- [ ] Competitor watch — `clients.competitor_urls` field + scheduled diff job, alerts to Owner Brief
+
+## P0 — Lead Activation features (genius wedge, 3-4 days)
+
+The killer features per `project_reachng_lead_activation_pivot.md`:
+
+- [ ] **Lead Resurrection flow** (~1.5 days) — `/portal/upload-leads` page, CSV upload UI, segments uploaded list (active/dormant/cold), generates reactivation campaigns, each lead gets a tailored re-engagement message in HITL queue. Repositions existing BYO Leads infra.
+- [ ] **Missed Opportunity Radar** (~1 day) — new dashboard widget. Queries: "asked price + no follow-up", "hot lead untouched > 3 days", "said 'send details' + nothing sent". Each row = one-tap action.
+- [ ] **WhatsApp Sales Copilot view** (~1 day) — pipeline-card view of every inbound thread, with AI suggested next reply, hot/cold marker, and qualifying-question prompts. Lives at `/dashboard/copilot`.
+- [ ] **Owner Brief upgrade** (~1 day, also in genius_repositioning memo) — rebuild `scheduler.py::morning_brief` as cash-focused: collectible amount this week + hot replies overnight + actions today. Each item one-tap.
+
+## P0 — DELETED (was Lean Discovery Stack 2.5d)
 
 Replace paid Apify with a self-hosted free stack until we land 3+ paying clients. Apify gets re-enabled via feature flag once revenue covers it.
 
