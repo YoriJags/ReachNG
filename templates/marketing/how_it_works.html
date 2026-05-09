@@ -1,0 +1,78 @@
+{% extends "marketing/_base.html" %}
+
+{% block title %}How ReachNG works — three steps, no surprises{% endblock %}
+{% block description %}You bring leads → the agent drafts → you approve. ReachNG handles inbound + back-office for Lagos SMEs in three simple steps.{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="eyebrow">No magic · Just three steps</div>
+  <h1>How ReachNG actually works.</h1>
+  <p class="sub">No mystery. No "AI black box." Three repeatable steps that take the work off your plate without taking control.</p>
+</section>
+
+<section style="padding-top: 0;">
+  <div class="inner" style="max-width: 920px;">
+
+    <!-- Step 1 -->
+    <div style="margin: 60px 0; display: grid; grid-template-columns: 80px 1fr; gap: 32px; align-items: start;">
+      <div style="font-size: 64px; font-weight: 700; color: var(--orange); line-height: 1; letter-spacing: -2px;">01</div>
+      <div>
+        <h2 style="font-size: 28px; font-weight: 700; color: var(--text-strong); margin: 0 0 12px; letter-spacing: -0.4px;">You bring leads. The agent picks them up.</h2>
+        <p style="color: var(--muted-strong); font-size: 16px; line-height: 1.7; margin: 0 0 12px;">Inbound DM on WhatsApp? IG message? Web form? CSV upload? Referral handoff? It all funnels into ReachNG. The moment a lead lands, it's logged with full context — name, source, vertical, the actual message — and routed to the agent.</p>
+        <p style="color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0;">We integrate with Unipile (per-client WhatsApp), Meta Cloud API, custom webhooks for your forms, and BYO CSVs. Whatever already feeds your pipeline today.</p>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div style="margin: 60px 0; display: grid; grid-template-columns: 80px 1fr; gap: 32px; align-items: start;">
+      <div style="font-size: 64px; font-weight: 700; color: var(--orange); line-height: 1; letter-spacing: -2px;">02</div>
+      <div>
+        <h2 style="font-size: 28px; font-weight: 700; color: var(--text-strong); margin: 0 0 12px; letter-spacing: -0.4px;">The agent drafts a reply that sounds like you.</h2>
+        <p style="color: var(--muted-strong); font-size: 16px; line-height: 1.7; margin: 0 0 12px;">Trained on a layered prompt — your business brief (your tone, never-say list, pricing rules) + your vertical's playbook (how Lagos restaurants speak vs how Lagos schools speak) + Nigerian market context (Paystack, Detty December, "send your account details") + the actual message. The draft is in your voice, in seconds.</p>
+        <p style="color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0;">Crucially: the agent <strong style="color:var(--text-strong);">does not send the message</strong>. It queues the draft for your approval. You can approve, edit, or skip — every single one.</p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div style="margin: 60px 0; display: grid; grid-template-columns: 80px 1fr; gap: 32px; align-items: start;">
+      <div style="font-size: 64px; font-weight: 700; color: var(--orange); line-height: 1; letter-spacing: -2px;">03</div>
+      <div>
+        <h2 style="font-size: 28px; font-weight: 700; color: var(--text-strong); margin: 0 0 12px; letter-spacing: -0.4px;">You tap approve. It sends from your number.</h2>
+        <p style="color: var(--muted-strong); font-size: 16px; line-height: 1.7; margin: 0 0 12px;">One tap in your dashboard (or on your phone). The message goes out from <strong style="color:var(--text-strong);">your own WhatsApp number</strong>, with your branding intact. The customer thinks you typed it. Because you approved it, you might as well have.</p>
+        <p style="color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0;">As the customer replies back, the agent threads the conversation, drafts the next move, and queues again. Every step keeps you in control — every step saves you 90% of the typing.</p>
+      </div>
+    </div>
+
+    <!-- After-Sale -->
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 32px; margin-top: 60px;">
+      <div class="section-label" style="text-align: left; margin-bottom: 8px;">After they sign</div>
+      <h2 style="font-size: 26px; font-weight: 700; color: var(--text-strong); margin: 0 0 16px; letter-spacing: -0.3px;">Same agent runs the back-office.</h2>
+      <p style="color: var(--muted-strong); font-size: 16px; line-height: 1.7; margin: 0 0 20px;">Once a lead becomes a paying customer, the same agent picks up the operational work. Real estate clients get rent chase + KYC vault + lawyer bundle. HR clients get full Nigerian payroll (PAYE / CRA / PENCOM / NHF), leave, attendance, probation. Restaurants get capacity protection + no-show deposits. Every back-office task that used to eat your evenings, just handled.</p>
+      <p style="color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0;">Our pricing doesn't change. The Growth tier includes the operations suite matched to your vertical — no extra fee.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Autopilot -->
+<section style="background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="inner" style="max-width: 760px;">
+    <div class="section-label">Optional · Once you trust it</div>
+    <h2 class="section-h2">Flip on Autopilot for messages you'd always send anyway.</h2>
+    <p class="section-sub">After a few weeks of approving drafts, you'll notice 80% are messages you'd send word-for-word. Flip the Autopilot toggle in your portal — the agent sends those low-risk replies directly. Anything risky (complaints, disputes, high-value events) still routes to your approval queue. Best of both.</p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="text-align: center;">
+  <div class="inner">
+    <h2 class="section-h2">See it in action.</h2>
+    <div class="hero-ctas">
+      <a href="/portal/demo" class="btn btn-primary" target="_blank">Open the live demo</a>
+      <a href="/pricing" class="btn btn-ghost">See pricing</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

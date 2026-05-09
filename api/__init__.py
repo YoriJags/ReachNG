@@ -37,6 +37,7 @@ from .closer import router as closer_router, public_router as closer_public_rout
 from .brief import router as brief_router, public_router as brief_public_router
 from .legal import router as legal_router, public_router as legal_public_router
 from .client_signals import router as client_signals_router
+from .marketing import router as marketing_router
 
 __all__ = [
     "campaigns_router", "contacts_router", "clients_router",
@@ -57,4 +58,5 @@ __all__ = [
     "brief_router", "brief_public_router",
     "legal_router", "legal_public_router",
     "client_signals_router",
+    "marketing_router",
 ]

@@ -1,0 +1,91 @@
+{% extends "marketing/_base.html" %}
+
+{% block title %}Contact ReachNG — book a 15-minute call{% endblock %}
+{% block description %}Get in touch via WhatsApp, email or by booking a 15-minute walkthrough call. Lagos response time: under 30 minutes during business hours.{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="eyebrow">Lagos-based · Real humans</div>
+  <h1>Talk to us.</h1>
+  <p class="sub">The fastest way to know if ReachNG fits is a 15-minute call where we run the agent on a business exactly like yours. No deck. No "demo environment." Live, on a real Lagos venue.</p>
+</section>
+
+<section style="padding-top: 0;">
+  <div class="inner" style="max-width: 720px;">
+
+    <div class="grid-2" style="gap: 24px; margin-top: 32px;">
+      <a href="https://wa.me/2348000000000" class="card" style="display:block; text-decoration:none; color:inherit; text-align: center; padding: 32px 24px;" rel="noopener">
+        <div style="font-size: 40px; margin-bottom: 12px;">💬</div>
+        <h3 style="font-size: 18px; margin-bottom: 8px;">WhatsApp</h3>
+        <p style="color: var(--muted-strong); font-size: 14px; margin: 0;">Message us directly. We reply within 30 minutes during business hours.</p>
+        <p style="color: var(--orange); font-size: 13px; margin-top: 16px; font-weight: 600;">+234 — open WhatsApp →</p>
+      </a>
+
+      <a href="mailto:hello@reachng.ng?subject=ReachNG%20enquiry" class="card" style="display:block; text-decoration:none; color:inherit; text-align: center; padding: 32px 24px;">
+        <div style="font-size: 40px; margin-bottom: 12px;">✉️</div>
+        <h3 style="font-size: 18px; margin-bottom: 8px;">Email</h3>
+        <p style="color: var(--muted-strong); font-size: 14px; margin: 0;">For longer questions, RFPs, or just an introduction.</p>
+        <p style="color: var(--orange); font-size: 13px; margin-top: 16px; font-weight: 600;">hello@reachng.ng</p>
+      </a>
+
+      <a href="#calendly-placeholder" class="card" style="display:block; text-decoration:none; color:inherit; text-align: center; padding: 32px 24px;">
+        <div style="font-size: 40px; margin-bottom: 12px;">📅</div>
+        <h3 style="font-size: 18px; margin-bottom: 8px;">Book a call</h3>
+        <p style="color: var(--muted-strong); font-size: 14px; margin: 0;">15-minute walkthrough. We run the agent live on your industry's data.</p>
+        <p style="color: var(--orange); font-size: 13px; margin-top: 16px; font-weight: 600;">Pick a slot →</p>
+      </a>
+
+      <a href="https://twitter.com/reachng_" class="card" style="display:block; text-decoration:none; color:inherit; text-align: center; padding: 32px 24px;" rel="noopener">
+        <div style="font-size: 40px; margin-bottom: 12px;">🐦</div>
+        <h3 style="font-size: 18px; margin-bottom: 8px;">Follow us</h3>
+        <p style="color: var(--muted-strong); font-size: 14px; margin: 0;">Twitter for product updates, customer wins, and Lagos SME insights.</p>
+        <p style="color: var(--orange); font-size: 13px; margin-top: 16px; font-weight: 600;">@reachng_</p>
+      </a>
+    </div>
+
+    <!-- Lightweight contact form -->
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 32px; margin-top: 48px;">
+      <h2 style="font-size: 22px; font-weight: 700; color: var(--text-strong); margin: 0 0 20px; letter-spacing: -0.3px;">Or drop us a line right here</h2>
+      <form action="/api/v1/contact" method="POST" style="display: grid; gap: 16px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em;">Your name</label>
+            <input type="text" name="name" required style="width:100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 14px; font-family: inherit;">
+          </div>
+          <div>
+            <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em;">Business name</label>
+            <input type="text" name="business" required style="width:100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 14px; font-family: inherit;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em;">WhatsApp number</label>
+            <input type="tel" name="phone" placeholder="+234..." required style="width:100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 14px; font-family: inherit;">
+          </div>
+          <div>
+            <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em;">Vertical</label>
+            <select name="vertical" required style="width:100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 14px; font-family: inherit;">
+              <option value="">— Select —</option>
+              <option value="hospitality">Restaurants / Bars / Hotels</option>
+              <option value="real_estate">Real estate</option>
+              <option value="education">Schools / Education</option>
+              <option value="professional_services">Legal / Professional services</option>
+              <option value="small_business">Beauty / Wellness / Small biz</option>
+              <option value="other">Something else</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em;">What's eating your time?</label>
+          <textarea name="message" rows="4" placeholder="e.g. We're losing 5+ bookings a week to slow WhatsApp response..." style="width:100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 14px; font-family: inherit; resize: vertical;"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 4px;">Send →</button>
+        <p style="font-size: 12px; color: var(--muted); margin: 0; text-align: center;">We reply within 30 minutes during Lagos business hours.</p>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

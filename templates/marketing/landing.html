@@ -1,0 +1,198 @@
+{% extends "marketing/_base.html" %}
+
+{% block title %}ReachNG — An agentic employee for Nigerian SMEs{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "ReachNG",
+  "operatingSystem": "Web · WhatsApp · iOS · Android",
+  "applicationCategory": "BusinessApplication",
+  "description": "AI sales agent + back-office for Nigerian SMEs. Drafts replies, qualifies leads, follows up, takes deposits, runs payroll/rent/invoices.",
+  "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "NGN",
+    "lowPrice": "80000",
+    "highPrice": "300000",
+    "offerCount": "3"
+  },
+  "areaServed": "Nigeria"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── Hero ─────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="eyebrow">Built in Lagos · for Lagos SMEs</div>
+  <h1>The AI hire that does the parts of running your business <em>you keep meaning to fix</em>.</h1>
+  <p class="sub">Inbound DMs sit unanswered for 3 hours. Saturdays disappear chasing unqualified buyers. Invoices get paid two weeks late. <strong style="color:var(--text-strong);">ReachNG handles all of it.</strong> You bring the leads, we draft the replies, you approve every message before it sends.</p>
+  <div class="hero-ctas">
+    <a href="/portal/demo" class="btn btn-primary" target="_blank">See a live demo →</a>
+    <a href="/how-it-works" class="btn btn-ghost">How it works</a>
+  </div>
+  <p style="margin-top: 28px; font-size: 12px; color: var(--muted); letter-spacing: 0.04em;">No credit card · Real Lagos sample data · 90 seconds to feel it</p>
+</section>
+
+<!-- ── Pain ─────────────────────────────────────────────── -->
+<section style="background: var(--bg-2); border-bottom: 1px solid var(--border);">
+  <div class="inner">
+    <div class="section-label">The Lagos SME pain</div>
+    <h2 class="section-h2">Every WhatsApp at 11pm that goes unanswered until morning is a customer walked across to the next venue.</h2>
+    <p class="section-sub">It's not a lead-generation problem. It's a <strong style="color:var(--text-strong)">response-speed</strong> problem. And it's costing you ₦1M+ a month in walked-past business.</p>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="tag">Restaurants &amp; venues</div>
+        <h3>5–8 bookings leak per week</h3>
+        <p>Average ticket ₦40K–₦80K. Detty December multiplies inbound by 4–5×. Your "social media manager" answers in hours, not minutes. Tables walk.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Real estate</div>
+        <h3>Saturdays burned on unqualified viewings</h3>
+        <p>You drive to Ajah for a buyer who never had the budget. Meanwhile the buyer who DID DM at 9pm Friday booked elsewhere by Saturday morning.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Schools</div>
+        <h3>Admissions enquiries die in WhatsApp</h3>
+        <p>Diaspora parents asking for the prospectus get nothing for 24 hours. By Monday they've contacted three other schools.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Beauty &amp; wellness</div>
+        <h3>18% no-show rate. Wasted slots.</h3>
+        <p>"I'll book tomorrow" never gets followed up. The chair sits empty Saturday afternoon. The deposit conversation never happens.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Legal &amp; professional</div>
+        <h3>Cold enquiries get no response till Monday</h3>
+        <p>The retainer-sized client emails Friday evening, hears nothing till the office opens — and has hired your competitor by Tuesday.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Every Lagos SME</div>
+        <h3>Founder is the bottleneck</h3>
+        <p>You answer DMs. You draft invoices. You chase rent. You should be growing the business — instead you're a glorified WhatsApp typist.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Solution ─────────────────────────────────────────────── -->
+<section>
+  <div class="inner">
+    <div class="section-label">What ReachNG does</div>
+    <h2 class="section-h2">An agent that closes, then operates.</h2>
+    <p class="section-sub">Not another chatbot. Not another CRM. A single AI hire that takes inbound work off your plate end-to-end — and then runs the back-office once a deal closes.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="tag">Phase 1 · Closes &amp; nurtures</div>
+        <h3>Every inbound message handled in under 2 minutes</h3>
+        <p>WhatsApp, IG DM, web form, referral — every enquiry gets a warm, personalised, vertical-aware reply. The agent qualifies, sends pricing/menus/event packs, takes the deposit via Paystack, books the call/viewing/table. <strong style="color:var(--text-strong)">You approve every message before it sends</strong> — your number, your voice, zero AI surprises.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Phase 2 · Operates the back-office</div>
+        <h3>Once they're a customer, the agent keeps working</h3>
+        <p>Same agent runs rent chase (real estate), payroll PAYE/PENCOM/NHF (HR clients), invoice follow-up (every business), KYC vault (premium leads), lawyer handover bundle (closing deals), capacity protection (hospitality). The work that used to eat your evenings just... happens.</p>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 56px;">
+      <a href="/portal/demo" class="btn btn-primary" target="_blank">See it on a live Lagos demo →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Trust / Differentiators ─────────────────────────────────────────────── -->
+<section style="background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="inner">
+    <div class="section-label">Why it works in Nigeria</div>
+    <h2 class="section-h2">Built for how Lagos actually does business.</h2>
+    <p class="section-sub">Most "AI" tools are built for San Francisco SaaS. ReachNG is built for the WhatsApp-first, Paystack-paid, Detty-December reality you actually run a business in.</p>
+
+    <div class="grid-3">
+      <div class="card">
+        <h3>🇳🇬 WhatsApp-native</h3>
+        <p>Every message goes from your own WhatsApp number — not ours. Customers see your brand, your name, your tone. No "this message was sent by an AI" footer.</p>
+      </div>
+      <div class="card">
+        <h3>👤 Human-in-the-loop, always</h3>
+        <p>The agent drafts. You approve, edit or skip. Nothing leaves your number without your green light. <strong style="color:var(--text-strong)">Trust built in.</strong></p>
+      </div>
+      <div class="card">
+        <h3>₦ Naira pricing &amp; Paystack</h3>
+        <p>Deposits go through Paystack to your account. We never hold client funds. Every pricing conversation is in naira, not dollars.</p>
+      </div>
+      <div class="card">
+        <h3>📍 Lagos-aware drafting</h3>
+        <p>The agent knows about Detty December surge, owambe season, school resumption, the difference between a Banana Island buyer and a Mushin one. It writes like someone who lives here.</p>
+      </div>
+      <div class="card">
+        <h3>🔒 Your data stays yours</h3>
+        <p>Every client gets isolated data. No "shared model." Bank-grade encryption on portal tokens, audit log on every change.</p>
+      </div>
+      <div class="card">
+        <h3>🛡️ NDPR compliant</h3>
+        <p>Consent attestation on every campaign. Audit trail. Opt-out automatic. We won't get you sued.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Verticals ─────────────────────────────────────────────── -->
+<section>
+  <div class="inner">
+    <div class="section-label">Pick the demo for your business</div>
+    <h2 class="section-h2">See yourself in the product in 90 seconds.</h2>
+    <p class="section-sub">Same engine, vertical-tailored sample data. Click any demo to see exactly how the agent would run your inbound.</p>
+
+    <div class="grid-3">
+      <a href="/portal/demo/hospitality" class="card" style="display:block; text-decoration:none; color:inherit;">
+        <div class="tag">Hospitality</div>
+        <h3>Mercury Lagos →</h3>
+        <p>Rooftop bar in VI. 34 enquiries/week, 18 bookings confirmed, ₦2.4M tracked.</p>
+      </a>
+      <a href="/portal/demo/real-estate" class="card" style="display:block; text-decoration:none; color:inherit;">
+        <div class="tag">Real estate</div>
+        <h3>Sapphire Estates →</h3>
+        <p>Luxury agency in Banana Island. 47 buyer enquiries, 12 viewings booked, ₦4.8B pipeline.</p>
+      </a>
+      <a href="/portal/demo/school" class="card" style="display:block; text-decoration:none; color:inherit;">
+        <div class="tag">Education</div>
+        <h3>Lagoon British International →</h3>
+        <p>International school in Lekki. 89 admissions enquiries this term, 31 tours booked.</p>
+      </a>
+      <a href="/portal/demo/legal" class="card" style="display:block; text-decoration:none; color:inherit;">
+        <div class="tag">Legal &amp; professional</div>
+        <h3>Adesina &amp; Co. Solicitors →</h3>
+        <p>Lagos commercial firm. 22 new client enquiries, 9 paid consultations booked.</p>
+      </a>
+      <a href="/portal/demo/smb" class="card" style="display:block; text-decoration:none; color:inherit;">
+        <div class="tag">Small business</div>
+        <h3>Glow Studio Lagos →</h3>
+        <p>Beauty &amp; wellness in Lekki. 142 DMs/week, 58 bookings, no-show rate down to 4%.</p>
+      </a>
+      <a href="/contact" class="card" style="display:block; text-decoration:none; color:inherit;">
+        <div class="tag">Don't see your vertical?</div>
+        <h3>We probably handle it →</h3>
+        <p>The engine is vertical-agnostic. Tell us your business and we'll show you the closest fit, or build the demo for you.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Final CTA ─────────────────────────────────────────────── -->
+<section style="background: linear-gradient(180deg, transparent 0%, rgba(255,85,0,0.06) 100%); text-align: center;">
+  <div class="inner">
+    <h2 class="section-h2" style="margin-bottom: 28px;">Stop being a glorified WhatsApp typist.</h2>
+    <p class="section-sub" style="margin-bottom: 36px;">Every day you don't have ReachNG is another ₦40K–₦80K booking that walked. Get on a 15-minute call and we'll show you the agent running on a venue exactly like yours.</p>
+    <div class="hero-ctas">
+      <a href="/contact" class="btn btn-primary">Book a 15-min call</a>
+      <a href="/pricing" class="btn btn-ghost">See pricing</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

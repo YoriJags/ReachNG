@@ -1,0 +1,50 @@
+{% extends "marketing/_base.html" %}
+
+{% block title %}About ReachNG — built in Lagos, for Lagos SMEs{% endblock %}
+{% block description %}Why ReachNG exists, who built it, and why we're betting on Nigerian SMEs.{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="eyebrow">Built in Lagos</div>
+  <h1>We're building <em>the AI hire</em> Nigerian SMEs actually need.</h1>
+  <p class="sub">Not another chatbot. Not another CRM. An agent that takes over the boring, expensive, time-eating work — drafting replies, qualifying leads, chasing rent, running payroll — so founders can do the work only they can do.</p>
+</section>
+
+<section style="padding-top: 0;">
+  <div class="inner" style="max-width: 760px;">
+
+    <div style="margin: 40px 0;">
+      <h2 style="font-size: 28px; font-weight: 700; color: var(--text-strong); margin: 0 0 16px; letter-spacing: -0.4px;">The problem we're attacking</h2>
+      <p style="color: var(--muted-strong); font-size: 16px; line-height: 1.7;">Every Lagos SME we've ever sat with has the same story. Inbound DMs at 11pm go unanswered until morning. Saturdays disappear chasing buyers who never had the budget. Invoices get paid two weeks late because nobody chased on day 7. The founder is the bottleneck, but the founder also has to grow the business.</p>
+      <p style="color: var(--muted-strong); font-size: 16px; line-height: 1.7;">Existing tools didn't fit. Foreign SaaS products are built for San Francisco — they speak in dollars, integrate with Stripe, and don't understand owambe season or Detty December. Local tools were either too generic (yet another CRM) or too narrow (just an SMS sender). And every "AI" tool we tried promised the moon and delivered something that embarrassed the founder when it sent a tone-deaf message at midnight.</p>
+      <p style="color: var(--muted-strong); font-size: 16px; line-height: 1.7;">So we built the thing we wanted to use. An agent that sounds Lagosian. That uses Paystack, not Stripe. That speaks naira, references Banana Island and Mushin differently, and respects how Lagos buyers actually behave. And — most importantly — that <strong style="color:var(--text-strong);">never sends without your approval</strong>, until you trust it enough to flip the switch.</p>
+    </div>
+
+    <div style="margin: 60px 0;">
+      <h2 style="font-size: 28px; font-weight: 700; color: var(--text-strong); margin: 0 0 16px; letter-spacing: -0.4px;">Who's behind it</h2>
+      <p style="color: var(--muted-strong); font-size: 16px; line-height: 1.7;">ReachNG is built by <strong style="color:var(--text-strong);">Oluyori Ajagun</strong>, a Lagos-based founder with a back-office and risk background. The product is opinionated because it's built by someone who's lived inside the operational pain it solves — not by someone who read about it in a research deck.</p>
+      <p style="color: var(--muted-strong); font-size: 16px; line-height: 1.7;">Every line of code, every prompt, every piece of pricing logic is ours. We use Anthropic's Claude as the underlying language model, Unipile for WhatsApp, MongoDB Atlas for data, Paystack for payments. The architecture is documented openly in our internal flow diagrams — clients on the Scale plan get a tour.</p>
+    </div>
+
+    <div style="margin: 60px 0;">
+      <h2 style="font-size: 28px; font-weight: 700; color: var(--text-strong); margin: 0 0 16px; letter-spacing: -0.4px;">What we believe</h2>
+      <ul style="color: var(--muted-strong); font-size: 16px; line-height: 1.9; padding-left: 20px;">
+        <li><strong style="color:var(--text-strong);">The agent does the work, the dashboard is just where the human approves it.</strong> We're not selling another SaaS to log into.</li>
+        <li><strong style="color:var(--text-strong);">Trust is built one approved message at a time.</strong> Autopilot is earned, not defaulted.</li>
+        <li><strong style="color:var(--text-strong);">Pain points beat verticals.</strong> If you're a Lagos SME losing customers to slow inbound, we serve you — restaurant or law firm or beauty studio.</li>
+        <li><strong style="color:var(--text-strong);">Naira-first, Paystack-paid.</strong> No dollar pricing. No "talk to sales" walls. No hidden fees.</li>
+        <li><strong style="color:var(--text-strong);">Every minute saved is a minute the founder gets back.</strong> That's the only metric that matters.</li>
+      </ul>
+    </div>
+
+    <div style="margin: 60px 0;">
+      <h2 style="font-size: 28px; font-weight: 700; color: var(--text-strong); margin: 0 0 16px; letter-spacing: -0.4px;">Get in touch</h2>
+      <p style="color: var(--muted-strong); font-size: 16px; line-height: 1.7;">If this resonates — or if you've got a sharp question about how it'd work for your specific business — we'd love to hear. The fastest way to a 15-minute call is the contact page. We'll show you the agent running on a venue exactly like yours.</p>
+      <a href="/contact" class="btn btn-primary" style="margin-top: 16px; display: inline-block;">Book a call</a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

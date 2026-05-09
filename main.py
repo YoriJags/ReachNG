@@ -27,7 +27,7 @@ from posthog import Posthog
 from database import ensure_indexes
 from services.data_liberation.store import ensure_data_indexes
 from scheduler import setup_scheduler
-from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, approvals_public_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, b2c_public_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router, legal_review_router, loan_officer_router, debt_collector_router, market_credit_router, product_auth_router, material_check_router, fuel_reprice_router, float_optimizer_router, fx_salary_router, moonlighting_router, salary_erosion_router, fx_lock_router, hr_suite_router, estate_router, portal_estate_router, portal_talent_router, closer_router, closer_public_router, brief_router, brief_public_router, legal_router, legal_public_router, client_signals_router
+from api import campaigns_router, contacts_router, clients_router, dashboard_router, data_router, approvals_router, approvals_public_router, roi_router, social_router, hooks_router, portal_router, ab_router, referrals_router, competitors_router, invoices_router, b2c_router, b2c_public_router, invoice_chaser_router, school_fees_router, webhooks_router, plans_router, legal_review_router, loan_officer_router, debt_collector_router, market_credit_router, product_auth_router, material_check_router, fuel_reprice_router, float_optimizer_router, fx_salary_router, moonlighting_router, salary_erosion_router, fx_lock_router, hr_suite_router, estate_router, portal_estate_router, portal_talent_router, closer_router, closer_public_router, brief_router, brief_public_router, legal_router, legal_public_router, client_signals_router, marketing_router
 from api.venue_capacity import router as venue_capacity_router, ensure_capacity_indexes
 from api.paystack import router as paystack_router
 from api.fleet_dispatcher import router as fleet_dispatcher_router
@@ -245,20 +245,9 @@ app.include_router(dashboard_router, **_auth)
 app.mount("/mcp", mcp.http_app())
 
 
-@app.get("/")
-async def root(request: Request):
-    # Browsers land on the dashboard; API/health probes get JSON.
-    accept = (request.headers.get("accept") or "").lower()
-    if "text/html" in accept:
-        return RedirectResponse(url="/dashboard", status_code=302)
-    return {
-        "service": "ReachNG",
-        "status": "running",
-        "verticals": ["real_estate", "recruitment", "events"],
-        "docs": "/docs",
-        "mcp": "/mcp",
-        "dashboard": "/dashboard",
-    }
+# Public marketing site (landing, pricing, how-it-works, about, contact, vertical landers,
+# robots.txt, sitemap.xml). Mounted before any catch-alls. The marketing router owns "/".
+app.include_router(marketing_router)
 
 
 @app.get("/health")

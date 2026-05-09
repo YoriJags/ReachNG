@@ -1,0 +1,157 @@
+{% extends "marketing/_base.html" %}
+
+{% block title %}Pricing — ReachNG{% endblock %}
+{% block description %}ReachNG pricing — Starter ₦80,000, Growth ₦150,000, Scale ₦300,000 per month. Annual = save 15%. Built for Lagos SMEs of every size.{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "How much does ReachNG cost?", "acceptedAnswer": {"@type": "Answer", "text": "Three tiers: Starter ₦80,000/month, Growth ₦150,000/month, Scale ₦300,000/month. Annual prepay saves 15%."}},
+    {"@type": "Question", "name": "Is there a free trial?", "acceptedAnswer": {"@type": "Answer", "text": "First month is run as a guided pilot at the Starter price. If it doesn't measurably reduce response time + leakage in 30 days, you don't continue."}},
+    {"@type": "Question", "name": "What's included?", "acceptedAnswer": {"@type": "Answer", "text": "Starter includes the agent + drafts + HITL approval + your WhatsApp number paired via Unipile. Growth adds operations (rent chase, payroll, invoice chasers — the suite matched to your vertical). Scale adds bespoke modules + multi-location coordination + priority operator support."}},
+    {"@type": "Question", "name": "Do you take a cut of my revenue?", "acceptedAnswer": {"@type": "Answer", "text": "No. ReachNG never holds your funds. All deposits and payments go through your own Paystack account into your bank. We charge only the monthly SaaS fee."}}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<section class="hero" style="padding: 80px 24px 60px;">
+  <div class="eyebrow">Concrete naira pricing · No surprises</div>
+  <h1>Pay for the agent. Not for hype.</h1>
+  <p class="sub">Three tiers. Pick the one that matches your inbound volume. Pay monthly, or save 15% on annual prepay.</p>
+</section>
+
+<section style="padding-top: 0;">
+  <div class="inner">
+    <div class="grid-3" style="gap: 24px;">
+
+      <!-- Starter -->
+      <div class="card" style="display:flex; flex-direction:column;">
+        <div class="tag">Tier 1</div>
+        <h3 style="font-size: 24px;">Starter</h3>
+        <div style="font-size: 40px; font-weight: 700; color: var(--text-strong); margin: 8px 0; letter-spacing:-1px;">
+          ₦80,000<span style="font-size:14px; font-weight:400; color:var(--muted);">/month</span>
+        </div>
+        <p style="margin: 0 0 16px;">For solo founders &amp; small venues handling under 100 inbound messages a week.</p>
+        <ul style="list-style: none; padding: 0; margin: 0 0 24px; font-size: 14px; color: var(--muted-strong); line-height: 2;">
+          <li>✓ AI drafts every reply, you approve before send</li>
+          <li>✓ Your WhatsApp number paired via Unipile</li>
+          <li>✓ Holding reply (instant ack)</li>
+          <li>✓ Up to 50 outbound/day</li>
+          <li>✓ Unlimited inbound</li>
+          <li>✓ One vertical primer</li>
+          <li>✓ Email + WhatsApp support</li>
+        </ul>
+        <a href="/contact?plan=starter" class="btn btn-ghost" style="margin-top:auto; text-align:center;">Start with Starter</a>
+      </div>
+
+      <!-- Growth -->
+      <div class="card" style="display:flex; flex-direction:column; border-color: var(--orange); position: relative;">
+        <div style="position: absolute; top: -12px; right: 24px; background: var(--orange); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 999px; letter-spacing: 0.1em;">MOST POPULAR</div>
+        <div class="tag">Tier 2</div>
+        <h3 style="font-size: 24px;">Growth</h3>
+        <div style="font-size: 40px; font-weight: 700; color: var(--text-strong); margin: 8px 0; letter-spacing:-1px;">
+          ₦150,000<span style="font-size:14px; font-weight:400; color:var(--muted);">/month</span>
+        </div>
+        <p style="margin: 0 0 16px;">For SMEs with active inbound, multiple staff, and back-office work to automate.</p>
+        <ul style="list-style: none; padding: 0; margin: 0 0 24px; font-size: 14px; color: var(--muted-strong); line-height: 2;">
+          <li>✓ Everything in Starter</li>
+          <li>✓ Up to 200 outbound/day</li>
+          <li>✓ Vertical operations suite included<br><span style="font-size:12px; color:var(--muted);">(rent chase / payroll / invoice chase / KYC vault — matched to your vertical)</span></li>
+          <li>✓ Autopilot mode for safe replies</li>
+          <li>✓ Signal listening (buyer-intent monitoring)</li>
+          <li>✓ Custom Business Brief layer</li>
+          <li>✓ ROI dashboard + monthly reports</li>
+        </ul>
+        <a href="/contact?plan=growth" class="btn btn-primary" style="margin-top:auto; text-align:center;">Get Growth</a>
+      </div>
+
+      <!-- Scale -->
+      <div class="card" style="display:flex; flex-direction:column;">
+        <div class="tag">Tier 3</div>
+        <h3 style="font-size: 24px;">Scale</h3>
+        <div style="font-size: 40px; font-weight: 700; color: var(--text-strong); margin: 8px 0; letter-spacing:-1px;">
+          ₦300,000<span style="font-size:14px; font-weight:400; color:var(--muted);">/month</span>
+        </div>
+        <p style="margin: 0 0 16px;">For multi-location groups, premium agencies, and businesses with bespoke ops needs.</p>
+        <ul style="list-style: none; padding: 0; margin: 0 0 24px; font-size: 14px; color: var(--muted-strong); line-height: 2;">
+          <li>✓ Everything in Growth</li>
+          <li>✓ Unlimited outbound</li>
+          <li>✓ Multi-location coordination</li>
+          <li>✓ Bespoke modules (built in &lt;2 weeks)</li>
+          <li>✓ Multi-vertical support</li>
+          <li>✓ Priority human operator (4hr response)</li>
+          <li>✓ Quarterly business review call</li>
+          <li>✓ Custom integrations (your CRM, POS, etc.)</li>
+        </ul>
+        <a href="/contact?plan=scale" class="btn btn-ghost" style="margin-top:auto; text-align:center;">Talk to us</a>
+      </div>
+
+    </div>
+
+    <p style="text-align: center; margin-top: 32px; font-size: 14px; color: var(--muted);">
+      💡 <strong style="color:var(--text-strong);">Annual prepay saves 15%</strong> — Starter ₦816K/yr · Growth ₦1.53M/yr · Scale ₦3.06M/yr
+    </p>
+    <p style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--muted);">
+      All prices in naira. Paid via Paystack. Cancel anytime.
+    </p>
+  </div>
+</section>
+
+<!-- ── Anchor: cost of NOT having it ─────────────────────────────────────────────── -->
+<section style="background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="inner" style="max-width: 720px;">
+    <div class="section-label">Worth it?</div>
+    <h2 class="section-h2">A single missed Saturday booking is ₦50,000.</h2>
+    <p class="section-sub">Starter pays for itself in 2 walked-in tables. Growth pays for itself in 3. The math isn't tight.</p>
+    <table style="width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 32px 0;">
+      <thead>
+        <tr style="background: var(--surface-2);">
+          <th style="text-align: left; padding: 14px 20px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;">If you lose…</th>
+          <th style="text-align: right; padding: 14px 20px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;">…each month, that's</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 14px;">
+        <tr style="border-top: 1px solid var(--border);"><td style="padding: 12px 20px;">2 reservations/week to slow response</td><td style="text-align:right; padding: 12px 20px; color: var(--text-strong); font-weight: 600;">~₦400,000</td></tr>
+        <tr style="border-top: 1px solid var(--border);"><td style="padding: 12px 20px;">1 viewing/week to no PoF qualifying</td><td style="text-align:right; padding: 12px 20px; color: var(--text-strong); font-weight: 600;">~₦5,000,000+ in commission</td></tr>
+        <tr style="border-top: 1px solid var(--border);"><td style="padding: 12px 20px;">3 admissions/term to slow follow-up</td><td style="text-align:right; padding: 12px 20px; color: var(--text-strong); font-weight: 600;">~₦24,000,000/yr</td></tr>
+        <tr style="border-top: 1px solid var(--border);"><td style="padding: 12px 20px;">10 invoices/month paid late</td><td style="text-align:right; padding: 12px 20px; color: var(--text-strong); font-weight: 600;">~₦2,000,000 in cashflow</td></tr>
+      </tbody>
+    </table>
+    <p style="text-align:center; color: var(--muted); font-size: 13px;">Numbers based on Lagos SME averages. Your mileage will be better.</p>
+  </div>
+</section>
+
+<!-- ── FAQ ─────────────────────────────────────────────── -->
+<section>
+  <div class="inner" style="max-width: 760px;">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-h2">Common questions.</h2>
+    <div class="grid-2" style="grid-template-columns: 1fr; gap: 16px; margin-top: 40px;">
+      <div class="card"><h3>Is there a free trial?</h3><p>First month is run as a guided pilot at the Starter price. If it doesn't measurably reduce your response time and booking leakage in 30 days, you don't continue.</p></div>
+      <div class="card"><h3>Do you take a cut of my revenue?</h3><p>No. ReachNG never holds your funds. All deposits and payments go through your own Paystack account directly into your bank. We charge only the monthly SaaS fee.</p></div>
+      <div class="card"><h3>Will my customers know they're talking to AI?</h3><p>Only if you tell them. The agent writes in your tone, sends from your number, and asks you to approve every message. Most clients run it for weeks before any customer suspects.</p></div>
+      <div class="card"><h3>What if WhatsApp bans my number?</h3><p>We enforce a warmup ramp on all new numbers (10/day → 25 → 50). Plus we send within Unipile's compliance limits. The risk is far lower than blasting yourself.</p></div>
+      <div class="card"><h3>Do I need any tech skills?</h3><p>No. Setup is one 30-minute pairing call where we connect your WhatsApp via Unipile. After that you log in to your portal, approve drafts, and watch the pipeline.</p></div>
+      <div class="card"><h3>What if I want to cancel?</h3><p>Cancel anytime, take your data with you. We'll export everything (leads, threads, payments) to CSV and disconnect your WhatsApp pairing.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ─────────────────────────────────────────────── -->
+<section style="text-align: center; background: linear-gradient(180deg, transparent 0%, rgba(255,85,0,0.06) 100%);">
+  <div class="inner">
+    <h2 class="section-h2">Ready to stop leaking inbound?</h2>
+    <div class="hero-ctas">
+      <a href="/contact" class="btn btn-primary">Book a 15-min call</a>
+      <a href="/portal/demo" class="btn btn-ghost" target="_blank">See live demo first</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
