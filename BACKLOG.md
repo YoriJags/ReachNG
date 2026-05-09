@@ -31,6 +31,39 @@ The SDR engine (Yori's own outreach to Lagos SMEs) needs deeper Nigerian-market 
 - [ ] **Bring ALL existing verticals to gold standard** (~120+ lines each) — same depth as `real_estate.txt`. Includes the 6 thin ones (events, agriculture, auto, cooperatives, fitness, insurance) AND the medium ones (legal, fintech, recruitment, small_business, logistics, agency_sales) — every single vertical prompt gets the full treatment. No prompt left as a thin sketch.
 - [ ] **Lead-signal-injection rules** — each vertical prompt mandates referencing concrete signals from enrichment payload (Maps rating, decision_maker, place categories, IG handle).
 
+## P0 — Lean Discovery Stack (Apify rival, 2.5 days)
+
+Replace paid Apify with a self-hosted free stack until we land 3+ paying clients. Apify gets re-enabled via feature flag once revenue covers it.
+
+**Sources to stitch (all free / public):**
+- DuckDuckGo HTML (already in stack via signal listener) — web search
+- Google Maps Places API (already in `tools/discovery.py`) — name, phone, address, rating
+- VConnect (vconnect.com) — Lagos/Nigeria business directory
+- BusinessList.com.ng + FinelibNG + Nigeria Business Directory — backup directories
+- Instagram public bios — website + WhatsApp from profile
+- Company website "About/Team/Contact" pages — decision-maker via Haiku extraction
+- LinkedIn public company pages — decision-maker via `site:linkedin.com/in {{biz}} CEO` Google search
+- Email pattern-guess (firstname@domain) + free MX SMTP verify
+
+**Build plan:**
+- **Day 1 (foundation):**
+  - [ ] `tools/page_extractor.py` — httpx async + BS4 + Haiku structured extract per URL → `{name, phone, email, address, description, social_links, decision_maker, confidence}` (was deferred at P2 — promoted to P0)
+  - [ ] `tools/lean_discovery.py` orchestrator — parallel multi-source fan-out, dedupe, merge
+  - [ ] `tools/sources/ddg.py` + `tools/sources/google_maps.py` (refactor from existing discovery.py)
+- **Day 2 (Nigerian directories + decision-maker):**
+  - [ ] `tools/sources/vconnect.py` — scrape Lagos by category
+  - [ ] `tools/sources/businesslist.py` + `finelib.py`
+  - [ ] `tools/sources/instagram.py` — public bio + website link
+  - [ ] `tools/decision_maker.py` — Google → LinkedIn → BS4 → name + title
+- **Day 3 (half-day) — email finder + integration:**
+  - [ ] `tools/email_finder.py` — pattern-guess + free MX SMTP HELO verify
+  - [ ] Wire `discover_lean_leads()` into `campaigns/base.py` parallel to Apify
+  - [ ] Feature flags: `LEAN_DISCOVERY_ONLY=true` (default), `USE_APIFY=false`
+  - [ ] Smoke-test on 3 verticals × 50 leads each → spot-check quality
+
+**Cost vs Apify:** ~$50/mo+ → ₦0 + ~₦150 per 100 leads in Haiku tokens.
+**Trade-off accepted:** medium reliability (scraping breaks occasionally; fallback chain handles), pattern-guessed emails (good enough for cold), ~30 mins/month maintenance when a source breaks.
+
 ## P0 — Cross-project SEO audit (~1 hour, blocks SEO campaign decision)
 
 User wants to run an SEO campaign across ReachNG, VIIBE, and Roomly in prep for prelaunch. Each project is at very different SEO maturity — need a per-project audit before committing budget or scope.
