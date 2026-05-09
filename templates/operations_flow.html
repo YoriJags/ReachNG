@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReachNG — Operations Flow</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --border: #1e1e1e;
+    --text: #e8e8e8;
+    --muted: #777;
+    --orange: #ff5500;
+    --accent: #ff8c42;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  header {
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,10,0.96);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+  }
+  .logo { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+  .logo span { color: var(--orange); }
+  .subtitle { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  nav.toc {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  nav.toc a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: 0.15s;
+  }
+  nav.toc a:hover {
+    color: var(--orange);
+    border-color: var(--orange);
+  }
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px;
+  }
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 60px 0 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2 .num {
+    color: var(--orange);
+    font-weight: 700;
+    margin-right: 12px;
+  }
+  .section-intro {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0 0 24px;
+  }
+  .diagram-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+  }
+  .mermaid {
+    text-align: center;
+    min-height: 200px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  th {
+    background: #181818;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  td:first-child { font-weight: 500; color: var(--text); }
+  td code {
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    color: var(--accent);
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .legend {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .legend strong { color: var(--text); }
+  footer {
+    margin: 80px 0 40px;
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  @media (max-width: 768px) {
+    header { padding: 16px 20px; flex-direction: column; gap: 12px; align-items: flex-start; }
+    nav.toc { width: 100%; }
+    main { padding: 20px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 18px; }
+    .diagram-wrap { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Reach<span>NG</span> — Operations Flow</div>
+    <div class="subtitle">Two parallel pipelines, one shared brain. Last updated: 2026-05-09</div>
+  </div>
+  <nav class="toc">
+    <a href="#pipelines">Pipelines</a>
+    <a href="#prompt-stack">Prompt Stack</a>
+    <a href="#vertical-routing">Verticals</a>
+    <a href="#inbound">Inbound</a>
+    <a href="#state">State</a>
+    <a href="#code-map">Code Map</a>
+  </nav>
+</header>
+
+<main>
+
+<h1>How ReachNG works</h1>
+<p class="section-intro">
+  Two parallel pipelines share the same Haiku model and the same human-in-the-loop approval gate.
+  <strong style="color:var(--orange);">SDR pipeline</strong> = our own outreach to Lagos SMEs.
+  <strong style="color:var(--accent);">Client pipeline</strong> = a paying client's customers reaching them.
+</p>
+
+<div class="legend">
+  <div><strong style="color:#ff5500;">Orange</strong> = our own SDR funnel</div>
+  <div><strong style="color:#3b82f6;">Blue</strong> = paying client's customer flow</div>
+  <div><strong style="color:#16a34a;">Green</strong> = approved + sent</div>
+  <div><strong style="color:#dc2626;">Red</strong> = missing / to build</div>
+</div>
+
+<h2 id="pipelines"><span class="num">01</span> The two pipelines side-by-side</h2>
+<p class="section-intro">Both end in the same HITL queue. The drafting brain is the same Haiku model — only the system prompt differs.</p>
+<div class="diagram-wrap">
+  <pre class="mermaid">
+flowchart LR
+    subgraph SDR["🟠 SDR PIPELINE — Our outreach to Lagos SMEs"]
+        D1[Maps / Apollo / Apify Discovery]
+        D2[Apify Enrich<br/>decision_maker, title]
+        D3[Vertical Classify<br/>real_estate / hospitality / etc]
+        D4[Haiku Draft<br/>vertical prompt + signals]
+        D5[HITL Queue]
+        D6{Yori<br/>approves?}
+        D7[Send via Unipile<br/>email or WhatsApp]
+        D8[Inbound Reply Webhook]
+        D9[Reply Classifier]
+        D10[Auto-draft next move]
+
+        D1 --> D2 --> D3 --> D4 --> D5 --> D6
+        D6 -->|approve| D7
+        D6 -->|edit| D7
+        D6 -->|skip| D5
+        D7 --> D8 --> D9 --> D10 --> D5
+    end
+
+    subgraph CLIENT["🔵 CLIENT PIPELINE — Customer reaches paying client"]
+        C1[Customer<br/>WhatsApp inbound]
+        C2[Webhook lookup<br/>by whatsapp_account_id]
+        C3{Active client?}
+        C4{Holding Reply<br/>set + Autopilot OFF<br/>+ no send 24h?}
+        C5[Send Holding Reply<br/>instantly]
+        C6{closer_enabled?}
+        C7[Closer Brain<br/>create lead + draft]
+        C8{Autopilot ON<br/>and safe?}
+        C9[Auto-send via Unipile]
+        C10[HITL Queue]
+        C11{Client approves?}
+        C12[Send from client's<br/>WhatsApp number]
+
+        C1 --> C2 --> C3
+        C3 -->|yes| C4
+        C3 -->|no| Z[Log + ignore]
+        C4 -->|yes| C5
+        C4 -->|no| C6
+        C5 --> C6
+        C6 -->|yes| C7 --> C8
+        C8 -->|yes| C9
+        C8 -->|no| C10 --> C11
+        C11 -->|approve| C12
+        C11 -->|edit| C12
+    end
+
+    SDR -.shares.-> BRAIN[(🧠 Same Haiku model<br/>Same HITL gate<br/>Different prompt stack)]
+    CLIENT -.shares.-> BRAIN
+  </pre>
+</div>
+
+<h2 id="prompt-stack"><span class="num">02</span> The drafting prompt stack</h2>
+<p class="section-intro">Layered system prompt that wraps every Haiku call. Each layer adds context the layer above doesn't have.</p>
+<div class="diagram-wrap">
+  <pre class="mermaid">
+flowchart TD
+    A[1. system.txt<br/>ReachNG product catalog<br/>principles + message rules]
+    B[2. _nigerian_context.txt<br/>payment rails, regulators<br/>seasonal triggers, honorifics]
+    C[3. self_brief.txt or client_brief<br/>SDR mode → ReachNG voice<br/>Client mode → Business Brief]
+    D[4. vertical_primer.txt<br/>real_estate / hospitality /<br/>education / legal / etc.]
+    E[5. lead_context_signals<br/>Maps rating, decision_maker<br/>IG handle, place categories]
+    F[6. user_message<br/>actual prospect/customer text]
+    G((Haiku 4.5))
+    H[draft]
+
+    A --> B --> C --> D --> E --> F --> G --> H
+  </pre>
+</div>
+
+<h2 id="vertical-routing"><span class="num">03</span> Vertical routing — which prompt fires</h2>
+<p class="section-intro">Every lead has a <code>vertical</code> tag. The drafter loads <code>agent/prompts/{vertical}.txt</code>.</p>
+<div class="diagram-wrap">
+  <pre class="mermaid">
+flowchart LR
+    Lead[New lead] --> V{vertical tag}
+    V -->|real_estate ⭐| R[real_estate.txt<br/>146 lines GOLD]
+    V -->|hospitality 🆕| HO[hospitality.txt<br/>NEW gold standard]
+    V -->|education 🆕| ED[education.txt<br/>missing — to build]
+    V -->|professional_services 🆕| PS[professional_services.txt<br/>missing — to build]
+    V -->|clinics 🆕| CL[clinics.txt<br/>missing — to build]
+    V -->|small_business| SB[small_business.txt<br/>71 → 120+ lines]
+    V -->|legal| L[legal.txt<br/>52 → 120+ lines]
+    V -->|fintech| F[fintech.txt<br/>51 → 120+ lines]
+    V -->|fitness| FI[fitness.txt<br/>47 → 120+ lines]
+    V -->|recruitment| RC[recruitment.txt<br/>61 → 120+ lines]
+    V -->|logistics| LO[logistics.txt<br/>70 → 120+ lines]
+    V -->|events| E[events.txt<br/>40 → 120+ lines]
+    V -->|auto| AU[auto.txt<br/>47 → 120+ lines]
+    V -->|insurance| I[insurance.txt<br/>47 → 120+ lines]
+    V -->|cooperatives| CO[cooperatives.txt<br/>47 → 120+ lines]
+    V -->|agriculture| AG[agriculture.txt<br/>40 → 120+ lines]
+    V -->|agency_sales| AS[agency_sales.txt<br/>86 → 120+ lines]
+
+    R --> Draft((Haiku draft))
+    HO --> Draft
+    ED --> Draft
+    PS --> Draft
+    SB --> Draft
+    L --> Draft
+    F --> Draft
+    FI --> Draft
+    RC --> Draft
+    LO --> Draft
+    E --> Draft
+    AU --> Draft
+    I --> Draft
+    CO --> Draft
+    AG --> Draft
+    AS --> Draft
+    CL --> Draft
+  </pre>
+</div>
+
+<h2 id="inbound"><span class="num">04</span> Inbound message routing — what happens when a customer messages</h2>
+<p class="section-intro">Single picture of every WhatsApp inbound, end-to-end.</p>
+<div class="diagram-wrap">
+  <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor C as Customer
+    participant U as Unipile
+    participant W as /webhooks/whatsapp
+    participant DB as MongoDB
+    participant H as Holding Reply
+    participant CL as Closer Brain
+    participant Q as HITL Queue
+    actor Y as Client / Yori
+
+    C->>U: WhatsApp message
+    U->>W: POST inbound payload
+    W->>DB: Find client by whatsapp_account_id
+    alt no active client
+        W->>DB: Log inbound, return
+    else active client
+        W->>DB: Check holding_message + autopilot off + no send 24h
+        opt all three true
+            W->>H: Fire holding_message
+            H->>U: Send instantly
+            U->>C: "Thanks, we'll be back shortly"
+            W->>DB: Log holding_replies_sent
+        end
+        opt closer_enabled
+            W->>CL: create_lead + draft_next_move
+            CL->>Q: queue_draft (HITL)
+        end
+        Q->>Y: Show in admin dashboard
+        Y->>Q: approve / edit / skip
+        Q->>U: Send approved draft
+        U->>C: Real reply
+    end
+  </pre>
+</div>
+
+<h2 id="state"><span class="num">05</span> Operational state — what each toggle controls</h2>
+<p class="section-intro">Per-client toggles in the Control Tower change which path inbound takes.</p>
+<div class="diagram-wrap">
+  <pre class="mermaid">
+stateDiagram-v2
+    [*] --> Inactive: client created
+    Inactive --> ManualHITL: payment_status = paid
+    ManualHITL --> Autopilot: toggle ON
+    Autopilot --> ManualHITL: toggle OFF
+    ManualHITL --> SignalListening: toggle ON
+    SignalListening --> ManualHITL: toggle OFF
+
+    state ManualHITL {
+        [*] --> Drafting
+        Drafting --> Queued
+        Queued --> Sent: client approves
+        Queued --> Skipped: client skips
+        Sent --> [*]
+    }
+
+    state Autopilot {
+        [*] --> AutoDrafting
+        AutoDrafting --> SafetyCheck
+        SafetyCheck --> AutoSent: low risk
+        SafetyCheck --> Queued: high risk → HITL
+    }
+  </pre>
+</div>
+
+<h2 id="code-map"><span class="num">06</span> Where each piece of code lives</h2>
+<p class="section-intro">For navigating the codebase fast.</p>
+<table>
+  <thead>
+    <tr><th>Concern</th><th>File</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Discovery (Maps)</td><td><code>tools/discovery.py</code></td></tr>
+    <tr><td>Discovery (Apify)</td><td><code>tools/apify_discovery.py</code> + <code>tools/apify_enrich.py</code></td></tr>
+    <tr><td>SDR drafting brain</td><td><code>agent/brain.py::generate_outreach_message()</code></td></tr>
+    <tr><td>Vertical prompts</td><td><code>agent/prompts/{vertical}.txt</code></td></tr>
+    <tr><td>Nigerian market context (universal layer)</td><td><code>agent/prompts/_nigerian_context.txt</code></td></tr>
+    <tr><td>HITL queue</td><td><code>tools/hitl.py::queue_draft()</code></td></tr>
+    <tr><td>Inbound webhook</td><td><code>api/webhooks.py</code></td></tr>
+    <tr><td>Holding reply</td><td><code>api/webhooks.py::_maybe_send_holding_reply()</code></td></tr>
+    <tr><td>Closer brain</td><td><code>services/closer/brain.py::draft_next_move()</code></td></tr>
+    <tr><td>Universal sender</td><td><code>tools/outreach.py::send_whatsapp_for_client()</code></td></tr>
+    <tr><td>Demo portals</td><td><code>services/demo_datasets.py</code> + <code>templates/portal_demo.html</code></td></tr>
+    <tr><td>Admin dashboard</td><td><code>templates/dashboard.html</code></td></tr>
+    <tr><td>Client portal</td><td><code>templates/portal.html</code></td></tr>
+    <tr><td>Business Brief (next session)</td><td><code>services/brief/</code></td></tr>
+  </tbody>
+</table>
+
+<footer>
+  ReachNG · Internal documentation. Source: <code>OPERATIONS_FLOW.md</code> + this rendered viewer.
+</footer>
+
+</main>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      darkMode: true,
+      background: '#141414',
+      primaryColor: '#1a1a1a',
+      primaryTextColor: '#e8e8e8',
+      primaryBorderColor: '#2a2a2a',
+      lineColor: '#666',
+      secondaryColor: '#0c4a6e',
+      tertiaryColor: '#1a1a1a',
+      mainBkg: '#1a1a1a',
+      nodeBorder: '#2a2a2a',
+      clusterBkg: '#0a0a0a',
+      clusterBorder: '#2a2a2a',
+      textColor: '#e8e8e8',
+      fontSize: '13px'
+    },
+    flowchart: {
+      curve: 'basis',
+      padding: 20
+    },
+    sequence: {
+      actorMargin: 60,
+      messageMargin: 35
+    }
+  });
+</script>
+
+</body>
+</html>

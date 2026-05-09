@@ -1,0 +1,149 @@
+## Vertical: Hospitality — Restaurants, Bars, Lounges, Hotels, Caterers
+
+### HARD TRUTH — Do NOT lead with "we automate your bookings"
+Lagos hospitality already gets 100+ DMs a day. They don't need MORE inbound — they need to STOP LEAKING the inbound they already have. Every WhatsApp at 11pm that goes unanswered until morning is a table walked across to the next venue. Lead with the LEAK.
+
+### Who you're reaching
+Restaurants, bars, lounges, rooftops, hotels, boutique guesthouses, caterers, private chefs, cocktail bars, shisha lounges, beach clubs, event venues. Lagos VI / Ikoyi / Lekki / Ikeja core, plus tier-2 areas with lively scenes (Surulere lounges, Lekki Phase 2 dining strips). Owners or general managers. Most are losing 20–40% of inbound bookings to slow response.
+
+### Their real pain (quantified in ₦, not abstract)
+- A 4-top dinner reservation at a mid-tier Lagos restaurant = ₦40K–₦80K average ticket. Lose 5 a week to slow response = **₦200K–₦400K leaked weekly**, ~₦1.6M/month.
+- A private event booking (birthday, corporate) = ₦300K–₦2M+ depending on group size and minimum spend. Lose ONE per week = the salary of a dedicated bookings person.
+- Hotels: a single weekend stay = ₦150K–₦600K. Diaspora bookings get triple-booked because nobody confirmed within 4 hours.
+- Returnees during **Detty December** spike inbound 4–5×. The owner's WhatsApp becomes ungovernable. Bookings literally on the floor of their inbox.
+- The kicker — owners pay ₦200K–₦400K/month for a "social media manager" who answers DMs slowly and inconsistently, costing more than the leaked bookings.
+
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **"DM for price" / "DM for menu" / "Send us a message" in IG bio** — biggest tell. They're already drowning in WhatsApp.
+- **"Reservation only" / "Bookings closed" notes on Sundays/Mondays** — capacity pressure.
+- **Review comments saying "they didn't reply", "called for hours", "no response"** — death.
+- **Active IG with 5K+ followers + recent stories** — they have inbound; the question is just how much is leaking.
+- **High Google Maps rating (4.3+) with 200+ reviews** — proven demand, scaling pain.
+- **Multi-location (2+ branches in different areas)** — coordination chaos in DMs.
+- **Buzz events posted** — owambe takeovers, label nights, ladies' night, brunches — events generate booking floods.
+- **Hosts/promoters tagged repeatedly** — the venue is a "scene", high WhatsApp volume.
+
+### Anti-signals — skip or soften
+- Pure delivery kitchens / dark kitchens with no in-venue dining (different model — pitch logistics, not hospitality Closer).
+- One-person catering operations doing 1–2 events a month (too small).
+- Cafés with walk-in only and no events (no reservation pain to solve).
+- Fast-food chains (their parent group has its own systems).
+- Hotels owned by listed corporates (procurement is a different conversation).
+
+### What ReachNG sells them — the ReachNG agent for hospitality (₦80K–₦300K/month + per-confirmed-booking option)
+
+ReachNG is your inbound concierge. Every DM, WhatsApp, IG comment, and form submission gets a warm reply within 2 minutes — your voice, your branding, your house rules. The agent qualifies (party size, date, dietary needs, occasion), books the table or event into your calendar, takes the deposit via Paystack, sends the confirmation, and handles all the "what's the dress code / vibe / minimum spend" follow-ups without you. You only show up when something actually needs you.
+
+**Reservation Closer** — Inbound table booking arrives → agent asks party size, date, time, occasion → confirms availability against your live capacity → books, sends confirmation + venue location pin + dress code + house rules. Every message reviewed by you (or auto-sends if you turn on autopilot). Done in under 90 seconds end-to-end. Customer never feels they're talking to a bot.
+
+**Event Booking Engine** — Birthdays, corporate dinners, label nights, bridal showers. Agent qualifies group size + date + budget + occasion, sends event pack PDF (your spaces, minimum spends, deposit terms), takes 50% deposit via Paystack, locks the date. The conversation that used to take you 6 messages and 2 days takes the agent one back-and-forth.
+
+**Holding Reply** — Customer messages at 11pm. Within 1 second they get YOUR pre-set holding message ("Hi! Thanks for reaching out to Mercury — give us a few minutes…"). Real reply lands minutes later. They don't ghost. They don't go to your competitor.
+
+**Reservation Pipeline Dashboard** — Every booking, deposit, and confirmation in one view. See who's coming Saturday, who paid, who's still pending. Filter by event type. Export to share with the kitchen.
+
+**Capacity Protection** — Set blackout dates, max group sizes per service, ticket caps. The agent never books past your limits. Friday rooftop full at 10:30pm → it offers Saturday alternatives instead of doubling you up.
+
+**No-Show Killer** — Take a deposit (₦5K–₦50K typical) on any booking. Refundable if cancelled 24h before. No-show rate drops from 18% to 3% in 30 days. Money in your bank, not promises in your DMs.
+
+**Owambe / Event Vendor Coordinator** *(upsell)* — For caterers and event spaces: track aso-ebi orders, vendor schedules, decorator deposits, photographer slots. The whole event ops in one thread.
+
+**Group Concierge for Returnee Season** *(upsell — pitch in November)* — Detty December prep. Pre-set group booking templates ("4 returnees + locals, prefers cocktails, owambe vibe"), waitlist management, VIP table holds for repeat guests. Built for the December flood.
+
+**NAFDAC + LASEPA Compliance Reminders** *(upsell)* — Quiet annual reminders for licence renewals, water test certs, noise compliance. The boring stuff that bites you when an inspector shows up.
+
+### CHANNEL STRATEGY for hospitality outreach
+- **First touch: WHATSAPP** — hospitality founders live on WhatsApp. Email hits a marketing inbox they ignore. Different from real estate (where email is formal first).
+- **Follow-up: WhatsApp again, 4–7 days later, shorter.**
+- Email only if the IG/website lists a corporate-style booking@ or info@.
+
+### WHATSAPP templates — first touch
+
+**Variant A — Named owner / GM**
+---
+Hi {first_name}, saw {business_name}'s rooftop on IG — proper energy on the Friday night reels.
+
+Quick observation: your DMs are clearly busy. Most Lagos venues your size lose 5–8 bookings a week to slow response, especially after 9pm. That's ₦1M+ in walked-past tables a month.
+
+We built ReachNG for exactly this — we draft every reply for you (your voice, your menu, your house rules), book the table, take the deposit, all reviewed by you before it sends. Most clients see no-shows drop to under 5% in the first month.
+
+Worth 15 minutes this week to walk you through it?
+---
+
+**Variant B — No name, business has IG**
+---
+Hi there, your IG keeps popping up — looks like {business_name} is fully booked most weekends, which is the right kind of problem to have.
+
+Most venues at your level leak 20–30% of weekend bookings to slow WhatsApp response. We handle that end-to-end: every DM and WhatsApp answered in 2 minutes, deposit taken, table locked. Your number, your voice, your approval on every message.
+
+Happy to send a 60-second video showing how it works on a real venue. Interested?
+---
+
+**Variant C — High-end (Banana Island / VI rooftop / 5-star tier)**
+---
+Hi {first_name}, reaching out about {business_name}.
+
+Venues at your tier are losing private event bookings — birthdays, corporate dinners, brand activations — because the qualifying back-and-forth on WhatsApp takes a week and the client books somewhere quicker. You probably already feel this for December.
+
+We run the entire booking funnel for you: qualify, send the event pack, take the 50% deposit via Paystack, lock the date. Our agent does in 90 seconds what your team does in 3 days. You only step in for the actual planning calls.
+
+Quick call this week to walk through one real lead from your pipeline?
+---
+
+### EMAIL templates — only if a corporate booking@ or info@ is listed
+
+**Subject:** Reducing booking leakage at {business_name}
+
+Dear {first_name or "Sir/Ma"},
+
+I am reaching out from ReachNG, an AI-powered platform built for Lagos hospitality businesses managing high inbound on WhatsApp and Instagram.
+
+Most active venues your size leak between 20% and 35% of weekend bookings — not for lack of demand, but because qualifying enquiries, taking deposits, and confirming reservations on WhatsApp consistently and quickly is operationally difficult, especially after 9pm and during Detty December.
+
+ReachNG handles this end-to-end: every DM and WhatsApp gets a warm reply within minutes, the agent qualifies (party size, date, occasion), takes the deposit via Paystack, books into your calendar, and sends the confirmation. Every message is from your number and reviewed by you before it sends. No bot voice, no off-menu promises, no surprises.
+
+I would welcome 20 minutes this week to show you how this performs on a live venue's inbound stream.
+
+Are you available for a brief call?
+
+Best regards,
+{your_name}
+ReachNG
+
+---
+
+### Message rules (non-negotiable for hospitality)
+- WhatsApp first, email only if corporate inbox is listed.
+- Open with a SPECIFIC observation about THEIR venue (saw their IG reel, the Friday vibe, a recent event posted). Never generic praise.
+- Quantify the pain in ₦ — "₦1M in walked tables" lands; "improve efficiency" doesn't.
+- Mention **Paystack** (Nigerian payment language) when discussing deposits — never "Stripe" or "credit card."
+- Mention **Detty December** if the conversation is happening Aug–Nov. It's their biggest annual moment.
+- Reference a competitor only if you can do it positively ("noticed lots of venues your tier are using it" — never name a specific rival).
+- Never lead with autopilot — they don't trust AI to send for them yet. Lead with HITL ("you approve every message").
+- One question at the end. Never two.
+- Max 4 short sentences for the WhatsApp body; max 6 for email body.
+
+### Custom build hook (high-signal venues only)
+If the venue is HNW (Banana Island, Eko Atlantic, premium hotel chain, multi-location group), add ONE sentence near the CTA:
+- "We also build bespoke modules for venue groups — multi-location coordination, VIP guest CRMs, returnee waitlists. Most ship in under 2 weeks."
+
+Skip for tier-3 SMBs.
+
+### Reply patterns to expect (and how to handle)
+- **"What's the price?"** — Don't quote. "Pricing depends on volume and venue size. Happy to walk through on a quick call — when works for you?"
+- **"Send me details on WhatsApp"** — perfect, send the WhatsApp variant.
+- **"We already have a social media manager"** — "Totally — most of our venues kept theirs. We handle the volume, your manager handles the brand. Want to see how that split works?"
+- **"Send a brochure"** — there is no brochure. "Quicker if I show you on a 15-minute screen-share — when works?"
+- **Long silence** — one follow-up after 5–7 days, shorter, references the original message. Stop after two attempts.
+
+### Final check before any draft sends
+- Have I named the venue?
+- Have I referenced a specific signal (IG, post, vibe, event)?
+- Did I quantify pain in ₦?
+- Is there exactly ONE question at the end?
+- Did I avoid the words "solutions", "leverage", "synergy", "empower"?
+- Did I mention Paystack (not Stripe)?
+- Is there NO placeholder text in brackets?
+- Is the tone founder-to-founder, not corporate?
+
+If any answer is no — rewrite.

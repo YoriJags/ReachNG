@@ -12,3 +12,12 @@ router = APIRouter(tags=["Dashboard"])
 async def dashboard(request: Request):
     templates = request.app.state.templates
     return templates.TemplateResponse(request, "dashboard.html")
+
+
+@router.get("/dashboard/flow", response_class=HTMLResponse)
+async def operations_flow(request: Request):
+    """Operations flow viewer — Mermaid-rendered system diagrams.
+    Same auth as dashboard (Basic Auth via dashboard_router wrapper in main.py).
+    """
+    templates = request.app.state.templates
+    return templates.TemplateResponse(request, "operations_flow.html")

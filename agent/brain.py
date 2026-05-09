@@ -23,6 +23,14 @@ def _load_prompt(filename: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _nigerian_context() -> str:
+    """Universal Nigerian-market base layer. Injected under system.txt for every
+    outbound draft so messages sound like they were written by someone living in
+    Lagos, regardless of vertical.
+    """
+    return _load_prompt("_nigerian_context.txt")
+
+
 def _get_client() -> anthropic.Anthropic:
     return anthropic.Anthropic(api_key=get_settings().anthropic_api_key)
 
@@ -149,13 +157,14 @@ No explanations. No preamble. Just the message.
 """
 
     client = _get_client()
-    # Layer order: ReachNG self-brief (voice) → vertical pitch primer (what we
-    # know about their industry) → base system prompt. All three get sent so
-    # Claude has a full picture before drafting.
+    # Layer order: system (product catalog + principles) → Nigerian context
+    # (universal market layer) → self-brief (ReachNG voice) → vertical primer
+    # (industry-specific). Stack rendered so Haiku has the full picture.
+    ng_context = _nigerian_context()
     layered_system = (
-        f"{self_brief}\n\n{vertical_context}{framing_rule}{extras_rule}\n\n{system}"
+        f"{self_brief}\n\n{ng_context}\n\n{vertical_context}{framing_rule}{extras_rule}\n\n{system}"
         if self_brief else
-        f"{system}\n\n{vertical_context}{framing_rule}{extras_rule}"
+        f"{system}\n\n{ng_context}\n\n{vertical_context}{framing_rule}{extras_rule}"
     )
 
     response = client.messages.create(
@@ -213,6 +222,7 @@ def generate_b2c_message(
     Returns {"message": str} for WhatsApp or {"subject": str, "message": str} for email.
     """
     base_system = _load_prompt("system.txt")
+    ng_context = _nigerian_context()
 
     # Prefer the structured brief context when we know the client.
     brief_system: Optional[str] = None
@@ -224,7 +234,7 @@ def generate_b2c_message(
         except Exception as exc:
             log.warning("brief_context_fetch_failed", client=client_name, error=str(exc))
 
-    system = (brief_system + "\n\n" + base_system) if brief_system else base_system
+    system = (brief_system + "\n\n" + ng_context + "\n\n" + base_system) if brief_system else (ng_context + "\n\n" + base_system)
 
     notes_block = f"\nCustomer notes: {notes}" if notes else ""
     tags_block  = f"\nCustomer tags/segments: {', '.join(tags)}" if tags else ""
@@ -557,7 +567,7 @@ No explanations. No preamble. Just the message.
     response = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=400,
-        system=f"{system}\n\n{vertical_context}",
+        system=f"{system}\n\n{_nigerian_context()}\n\n{vertical_context}",
         messages=[{"role": "user", "content": user_prompt}],
     )
 
