@@ -21,6 +21,16 @@ These are next up after current Phase 1.5 (Business Brief + BYO Leads) finishes.
 - [ ] **HITL drafter reads `enrichment.decision_maker`** — replaces `[Partner Name]` fallback (last open item from Phase 1.4)
 - [ ] **Control Tower shows `enrichment.decision_maker` + `title`** on lead detail; add "Re-enrich" button (Phase 1.4 close-out)
 
+## P0 — Nigerian Market Fluency Layer (1 day, ship before/with Business Brief)
+
+The SDR engine (Yori's own outreach to Lagos SMEs) needs deeper Nigerian-market context. Audit revealed: only `real_estate.txt` (146 lines) is at gold-standard depth. Most others are 40–70 lines and weak on specific cultural/regulatory/seasonal cues.
+
+- [ ] **Create `agent/prompts/_nigerian_context.txt`** — shared base layer injected under `system.txt`. Covers: payment rails (Paystack/Flutterwave/OPay/Moniepoint/Palmpay/GTB), regulators by relevance (FIRS/CBN/CAC/NIMC/NDIC/NAFDAC/SON/LASRRA/LIRS), seasonal triggers (Detty December, school resumption Jan+Sept, owambe season, NYSC postings, FIRS deadlines), social cues (Aso-ebi, honorifics Mr/Mrs/Aunty/Engineer/Chief, "well done", "epp"), city tier tonality (Lagos > Abuja > PH > Ibadan/Kano), pain-language register ("light off", "fuel finished", "MoMo", "POD").
+- [ ] **Wire into `agent/brain.py::generate_outreach_message()`** — load + concatenate after self_brief, before vertical prompt.
+- [ ] **Add 4 missing vertical prompts** at 120-line depth: `hospitality.txt`, `education.txt`, `professional_services.txt`, `clinics.txt`. Each must include: who they are, real Nigerian pain quantified in ₦, ReachNG's specific solution, channel strategy (email vs WhatsApp), email + WhatsApp templates, message rules, named signals to reference (e.g. "DM for price" tell for hospitality).
+- [ ] **Audit + deepen 6 thin prompts** (events, agriculture, auto, cooperatives, fitness, insurance) — bring each to 80+ lines with vertical-specific Nigerian regulatory + cultural cues.
+- [ ] **Lead-signal-injection rules** — each vertical prompt mandates referencing concrete signals from enrichment payload (Maps rating, decision_maker, place categories, IG handle).
+
 ## P1 — Quick wins (≤1 day each, high leverage)
 
 - [ ] **PayNudge** — Google Sheets source + Paystack pay-link on existing `services/debt_collector/`. 1 day.
