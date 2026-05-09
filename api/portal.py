@@ -111,6 +111,20 @@ async def get_portal_data(token: str):
     }
 
 
+@router.get("/missed-opportunities/{token}")
+async def get_missed_opportunities(token: str, days: int = 30):
+    """List of leads who asked for price but never got a quote — Radar v1."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from tools.cash_signals import missed_opportunities_for
+    return {
+        "client": client["name"],
+        "days": days,
+        "missed": missed_opportunities_for(client["name"], days=days),
+    }
+
+
 @router.get("/owner-brief/{token}")
 async def get_owner_brief(token: str):
     """

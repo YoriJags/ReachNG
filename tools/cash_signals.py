@@ -119,16 +119,95 @@ def _hot_replies(client_name: str, since: datetime) -> int:
     })
 
 
-def _asked_price_no_quote(client_name: str) -> int:
-    """Missed Opportunity Radar v0 — pending_approvals tagged price-asked."""
+_PRICE_TOKENS = (
+    "how much", "price", "pricing", "rate", "rates", "cost", "costs", "fee", "fees",
+    "quote", "tariff", "package", "packages", "naira", "₦", "ngn",
+    "send me your", "send your", "drop your price",
+)
+
+
+def _looks_like_price_ask(text: str) -> bool:
+    if not text:
+        return False
+    t = text.lower()
+    return any(tok in t for tok in _PRICE_TOKENS)
+
+
+def missed_opportunities_for(
+    client_name: str,
+    days: int = 30,
+    grace_hours: int = 6,
+    limit: int = 20,
+) -> list[dict]:
+    """
+    Missed Opportunity Radar — leads who asked for price but never got a quote.
+
+    Detection:
+      1. Find replies in last `days` whose body looks like a price ask.
+      2. Resolve contact_id → client_name (via contacts.client_name).
+      3. Filter to this client.
+      4. Mark missed if no outreach_log entry to that contact since the reply
+         (with `grace_hours` window so a same-hour follow-up doesn't count
+         as missed yet).
+
+    Returns a list of {contact_id, contact_name, channel, reply_text,
+    reply_at, hours_since_ask}.
+    """
     db = get_db()
-    if "pending_approvals" not in db.list_collection_names():
-        return 0
-    return db["pending_approvals"].count_documents({
-        "client_name": client_name,
-        "status": "pending",
-        "tags": "price_asked",
-    })
+    if "replies" not in db.list_collection_names():
+        return []
+
+    since = datetime.now(timezone.utc) - timedelta(days=days)
+    contacts_col = db["contacts"]
+    outreach_col = db["outreach_log"] if "outreach_log" in db.list_collection_names() else None
+
+    cursor = db["replies"].find(
+        {"received_at": {"$gte": since}},
+        {"text": 1, "summary": 1, "contact_id": 1, "contact_name": 1, "channel": 1, "received_at": 1},
+    ).sort("received_at", -1).limit(500)
+
+    out: list[dict] = []
+    now = datetime.now(timezone.utc)
+
+    for r in cursor:
+        body = (r.get("text") or "") + " " + (r.get("summary") or "")
+        if not _looks_like_price_ask(body):
+            continue
+        cid = r.get("contact_id")
+        if not cid:
+            continue
+        contact = contacts_col.find_one(
+            {"_id": cid},
+            {"client_name": 1, "name": 1, "phone": 1, "vertical": 1},
+        )
+        if not contact or contact.get("client_name") != client_name:
+            continue
+
+        reply_at = r["received_at"]
+        cutoff = reply_at + timedelta(hours=grace_hours)
+        if outreach_col is not None and outreach_col.find_one(
+            {"contact_id": cid, "sent_at": {"$gte": cutoff}}, {"_id": 1}
+        ):
+            continue  # we did follow up
+
+        hours = max(0.0, (now - reply_at).total_seconds() / 3600.0)
+        out.append({
+            "contact_id":   str(cid),
+            "contact_name": contact.get("name") or r.get("contact_name") or "",
+            "phone":        contact.get("phone") or "",
+            "channel":      r.get("channel") or "",
+            "reply_text":   (r.get("text") or "")[:200],
+            "reply_at":     reply_at.isoformat(),
+            "hours_since":  round(hours, 1),
+        })
+        if len(out) >= limit:
+            break
+    return out
+
+
+def _asked_price_no_quote(client_name: str) -> int:
+    """Missed Opportunity Radar count — uses the radar list above."""
+    return len(missed_opportunities_for(client_name, limit=999))
 
 
 def cash_signals_for(client_name: str, hours: int = 14) -> dict[str, Any]:

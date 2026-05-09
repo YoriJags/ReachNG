@@ -566,6 +566,20 @@
       </div>
     </div>
 
+    <!-- Missed Opportunity Radar -->
+    <div class="section-label">Missed Opportunity Radar</div>
+    <div id="radar-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#e8e8e8;">Asked for price · no quote sent</div>
+          <div style="font-size:12px;color:#555;margin-top:2px;">Conversations the agent flagged as price-asking that haven't had a follow-up. Last 30 days.</div>
+        </div>
+        <div id="radar-count" style="font-size:24px;font-weight:700;color:#ff7a7a;">—</div>
+      </div>
+      <div id="radar-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <div id="radar-empty" style="display:none;font-size:13px;color:#5dd28a;padding:8px 0;">✅ No missed opportunities — every price-asker has been followed up.</div>
+    </div>
+
     <!-- Stats -->
     <div class="stats-grid" id="stats-grid">
       <div class="stat-card orange">
@@ -892,6 +906,45 @@ function renderOwnerBrief(cash) {
   }
 }
 
+async function loadRadar() {
+  const list = document.getElementById("radar-list");
+  const empty = document.getElementById("radar-empty");
+  const count = document.getElementById("radar-count");
+  if (!list) return;
+  try {
+    const r = await fetch(`/portal/missed-opportunities/{{ token }}`).then(x => x.json());
+    const items = r.missed || [];
+    count.textContent = items.length;
+    if (!items.length) {
+      list.innerHTML = "";
+      empty.style.display = "";
+      count.style.color = "#5dd28a";
+      return;
+    }
+    empty.style.display = "none";
+    count.style.color = "#ff7a7a";
+    list.innerHTML = items.map(m => {
+      const ago = m.hours_since < 24
+        ? `${Math.round(m.hours_since)}h ago`
+        : `${Math.round(m.hours_since / 24)}d ago`;
+      const safeText = (m.reply_text || "").replace(/[<>]/g, "");
+      const phone = m.phone || "";
+      const waLink = phone ? `https://wa.me/${phone.replace(/[^0-9]/g, "")}` : "";
+      return `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:12px;background:#0a0a0a;border:1px solid #1e2530;border-radius:8px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;color:#e8e8e8;">${m.contact_name || phone || "Unknown contact"}</div>
+            <div style="font-size:12px;color:#999;margin-top:3px;font-style:italic;">"${safeText.slice(0, 140)}${safeText.length > 140 ? "…" : ""}"</div>
+            <div style="font-size:11px;color:#555;margin-top:4px;">${ago}${m.channel ? " · " + m.channel : ""}</div>
+          </div>
+          ${waLink ? `<a href="${waLink}" target="_blank" style="background:#1e2530;color:#5dd28a;text-decoration:none;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;align-self:center;">Send quote →</a>` : ""}
+        </div>`;
+    }).join("");
+  } catch (e) {
+    list.innerHTML = `<div style="font-size:12px;color:#777;">Could not load radar.</div>`;
+  }
+}
+
 // ── Load ──────────────────────────────────────────────────────────────────────
 
 async function load() {
@@ -902,6 +955,7 @@ async function load() {
     document.getElementById('content').style.display = '';
 
     renderOwnerBrief(data.cash);
+    loadRadar();
 
     const s = data.stats || {};
     const contacted = s.contacted || 0;
