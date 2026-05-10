@@ -165,3 +165,41 @@ def sales_copilot_for(client_name: str, days: int = 14, limit: int = 12) -> dict
         "total": len(threads),
     }
     return {"summary": summary, "threads": threads}
+
+
+def operator_copilot(days: int = 14, per_client_limit: int = 8) -> dict[str, Any]:
+    """
+    Cross-client Sales Copilot for the admin/operator dashboard.
+
+    Returns one bucket per active client with the same thread shape as
+    sales_copilot_for(), plus a roll-up summary. Operator approve/skip
+    controls hit /api/v1/approvals/{id}/approve|skip (admin-auth).
+    """
+    db = get_db()
+    clients_col = db["clients"]
+    clients = list(clients_col.find(
+        {"active": True},
+        {"name": 1, "vertical": 1},
+    ).sort("name", 1))
+
+    buckets: list[dict[str, Any]] = []
+    roll = {"hot": 0, "warm": 0, "drafts": 0, "total": 0}
+    for c in clients:
+        name = c.get("name") or ""
+        if not name:
+            continue
+        pack = sales_copilot_for(name, days=days, limit=per_client_limit)
+        if pack["summary"]["total"] == 0:
+            continue
+        buckets.append({
+            "client": name,
+            "vertical": c.get("vertical") or "general",
+            "summary": pack["summary"],
+            "threads": pack["threads"],
+        })
+        for k in roll:
+            roll[k] += pack["summary"].get(k, 0)
+
+    # Surface noisiest clients first (most pending action)
+    buckets.sort(key=lambda b: (-b["summary"]["hot"], -b["summary"]["drafts"], -b["summary"]["total"]))
+    return {"summary": roll, "clients": buckets, "days": days}

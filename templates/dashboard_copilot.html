@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Copilot — Operator</title>
+<style>
+  :root {
+    --bg:#050505; --surface:#0d0d0d; --border:#1a1a1a; --border-soft:#111;
+    --text:#f2f2f2; --muted:#777; --dim:#444;
+    --orange:#ff5c00; --green:#00e5a0; --gold:#f5c842; --red:#ff7a7a; --blue:#4488ff;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; min-height:100vh; -webkit-font-smoothing:antialiased; }
+  .topbar { display:flex; justify-content:space-between; align-items:center; padding:14px 32px; border-bottom:1px solid var(--border-soft); position:sticky; top:0; background:rgba(5,5,5,.95); backdrop-filter:blur(10px); z-index:10; }
+  .topbar a { color:var(--muted); text-decoration:none; font-size:12px; letter-spacing:.1em; text-transform:uppercase; }
+  .topbar a:hover { color:var(--text); }
+  .wrap { max-width:1280px; margin:0 auto; padding:48px 32px 80px; }
+  h1 { font-size:36px; font-weight:800; letter-spacing:-1px; margin-bottom:8px; }
+  .lede { color:var(--muted); font-size:14px; max-width:760px; margin-bottom:36px; }
+  .roll { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:32px; }
+  .roll-item { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 24px; min-width:140px; }
+  .roll-v { font-size:28px; font-weight:800; letter-spacing:-.5px; font-variant-numeric:tabular-nums; }
+  .roll-l { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-top:4px; }
+  .roll-item.hot .roll-v { color:var(--gold); }
+  .roll-item.warm .roll-v { color:var(--green); }
+  .roll-item.drafts .roll-v { color:var(--orange); }
+  .roll-item.total .roll-v { color:var(--blue); }
+
+  .bucket { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px; margin-bottom:20px; }
+  .bucket-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:14px; flex-wrap:wrap; padding-bottom:14px; border-bottom:1px solid var(--border); }
+  .bucket-name { font-size:18px; font-weight:700; }
+  .bucket-name .vert { color:var(--muted); font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.1em; margin-left:10px; }
+  .pill { display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; border-radius:999px; padding:5px 9px; margin-left:6px; }
+  .pill.hot { color:var(--gold); background:#1a1204; border:1px solid #3a2608; }
+  .pill.warm { color:var(--green); background:#07160f; border:1px solid #123522; }
+  .pill.drafts { color:var(--orange); background:#1c0d04; border:1px solid #3a1d08; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
+  .card { background:#0a0a0a; border:1px solid var(--border); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+  .card-h { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .card-name { font-size:13px; font-weight:700; }
+  .card-meta { font-size:11px; color:var(--muted); margin-top:3px; }
+  .card-quote { font-size:12px; color:#999; line-height:1.45; font-style:italic; }
+  .card-next { font-size:12px; color:#fff; line-height:1.45; }
+  .card-next b { color:var(--orange); }
+  .card-draft { background:#07120d; border:1px solid #123522; border-radius:8px; padding:10px; font-size:12px; color:#a9e9c4; line-height:1.45; }
+  .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:auto; }
+  .btn { border:none; border-radius:6px; padding:7px 11px; font-size:11px; font-weight:700; cursor:pointer; }
+  .btn-approve { background:#00a86b; color:#03140d; }
+  .btn-skip { background:#1e2530; color:#999; border:1px solid #2a3340; }
+  .btn-wa { background:#1e2530; color:var(--green); text-decoration:none; padding:7px 11px; border-radius:6px; font-size:11px; font-weight:700; }
+  .pri { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; border-radius:999px; padding:4px 8px; }
+  .pri.hot    { color:var(--gold);   background:#1a1204; border:1px solid #3a2608; }
+  .pri.warm   { color:var(--green);  background:#07160f; border:1px solid #123522; }
+  .pri.watch  { color:var(--muted);  background:#151515; border:1px solid #1a1a1a; }
+  .pri.closed { color:var(--red);    background:#1c0909; border:1px solid #3a1010; }
+  .empty { color:var(--green); font-size:13px; padding:14px 0; }
+  .err { color:var(--red); font-size:13px; padding:14px 0; }
+  .loading { color:var(--muted); font-size:13px; padding:14px 0; }
+  .controls { display:flex; gap:12px; align-items:center; margin-bottom:20px; }
+  .controls label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; }
+  .controls input { background:#0a0a0a; border:1px solid var(--border); border-radius:6px; color:var(--text); padding:6px 10px; font-size:13px; width:80px; }
+  .controls button { background:var(--orange); color:#fff; border:none; border-radius:6px; padding:7px 14px; font-size:12px; font-weight:600; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);">REACH<span style="color:var(--orange);">NG</span> · OPERATOR</div>
+  <div><a href="/dashboard">← Dashboard</a> &nbsp;·&nbsp; <a href="/dashboard/flow">Flow</a></div>
+</div>
+
+<div class="wrap">
+  <h1>Sales Copilot — Operator</h1>
+  <p class="lede">Every active client's inbound threads that need a next move. Hot replies, pending drafts, warm questions. Approve drafts and they go out from the client's number via Unipile.</p>
+
+  <div class="controls">
+    <label for="days">Window (days)</label>
+    <input type="number" id="days" min="1" max="60" value="14">
+    <label for="limit">Per client</label>
+    <input type="number" id="limit" min="1" max="20" value="8">
+    <button onclick="load()">Refresh</button>
+  </div>
+
+  <div class="roll" id="roll"></div>
+  <div id="body"><div class="loading">Loading copilot…</div></div>
+</div>
+
+<script>
+function esc(s) {
+  return String(s || "").replace(/[&<>"']/g, ch => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[ch]));
+}
+function relTime(iso) {
+  if (!iso) return "";
+  const d = new Date(iso); if (isNaN(d)) return "";
+  const s = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (s < 60) return s + "s ago";
+  if (s < 3600) return Math.floor(s/60) + "m ago";
+  if (s < 86400) return Math.floor(s/3600) + "h ago";
+  return Math.floor(s/86400) + "d ago";
+}
+function pill(cls, label) { return `<span class="pri ${esc(cls)}">${esc(label)}</span>`; }
+
+async function load() {
+  const days = document.getElementById("days").value || 14;
+  const limit = document.getElementById("limit").value || 8;
+  const body = document.getElementById("body");
+  const roll = document.getElementById("roll");
+  body.innerHTML = `<div class="loading">Loading copilot…</div>`;
+  try {
+    const r = await fetch(`/api/v1/copilot/operator?days=${days}&per_client_limit=${limit}`);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json();
+    const s = data.summary || {};
+    roll.innerHTML = `
+      <div class="roll-item hot"><div class="roll-v">${s.hot || 0}</div><div class="roll-l">Hot</div></div>
+      <div class="roll-item warm"><div class="roll-v">${s.warm || 0}</div><div class="roll-l">Warm</div></div>
+      <div class="roll-item drafts"><div class="roll-v">${s.drafts || 0}</div><div class="roll-l">Drafts pending</div></div>
+      <div class="roll-item total"><div class="roll-v">${s.total || 0}</div><div class="roll-l">Threads</div></div>`;
+
+    const buckets = data.clients || [];
+    if (!buckets.length) {
+      body.innerHTML = `<div class="empty">✅ No inbound threads need action across your clients right now.</div>`;
+      return;
+    }
+    body.innerHTML = buckets.map(b => `
+      <div class="bucket">
+        <div class="bucket-head">
+          <div class="bucket-name">${esc(b.client)}<span class="vert">${esc(b.vertical)}</span></div>
+          <div>
+            <span class="pill hot">${b.summary.hot} hot</span>
+            <span class="pill warm">${b.summary.warm} warm</span>
+            <span class="pill drafts">${b.summary.drafts} drafts</span>
+          </div>
+        </div>
+        <div class="grid">
+          ${(b.threads || []).map(t => threadCard(t)).join("")}
+        </div>
+      </div>
+    `).join("");
+  } catch (e) {
+    body.innerHTML = `<div class="err">Could not load copilot: ${esc(e.message || e)}</div>`;
+  }
+}
+
+function threadCard(t) {
+  const phone = t.phone || "";
+  const wa = phone ? `https://wa.me/${phone.replace(/[^0-9]/g, "")}` : "";
+  const ago = t.received_at ? relTime(t.received_at) : "";
+  const draft = t.draft_preview
+    ? `<div class="card-draft">${esc(t.draft_preview)}</div>` : "";
+  const approve = t.approval_id
+    ? `<button class="btn btn-approve" onclick="approve('${esc(t.approval_id)}', this)">Approve draft</button>
+       <button class="btn btn-skip" onclick="skip('${esc(t.approval_id)}', this)">Skip</button>` : "";
+  return `
+    <div class="card">
+      <div class="card-h">
+        <div style="min-width:0;">
+          <div class="card-name">${esc(t.contact_name)}</div>
+          <div class="card-meta">${esc(t.channel || "whatsapp")}${ago ? " · " + esc(ago) : ""}</div>
+        </div>
+        ${pill(t.priority, t.intent || t.priority)}
+      </div>
+      <div class="card-quote">"${esc((t.reply_text || t.summary || "").slice(0, 220))}"</div>
+      <div class="card-next"><b>Next:</b> ${esc(t.suggested_action)}</div>
+      ${draft}
+      <div class="actions">
+        ${approve}
+        ${wa ? `<a class="btn-wa" target="_blank" href="${wa}">Open WhatsApp →</a>` : ""}
+      </div>
+    </div>`;
+}
+
+async function approve(id, btn) {
+  btn.disabled = true; btn.textContent = "Sending…";
+  try {
+    const r = await fetch(`/api/v1/approvals/${id}/approve`, { method: "POST" });
+    if (!r.ok) throw new Error();
+    btn.textContent = "Sent"; setTimeout(load, 700);
+  } catch { btn.disabled = false; btn.textContent = "Try again"; }
+}
+async function skip(id, btn) {
+  btn.disabled = true; btn.textContent = "Skipping…";
+  try {
+    const r = await fetch(`/api/v1/approvals/${id}/skip`, { method: "POST" });
+    if (!r.ok) throw new Error();
+    btn.textContent = "Skipped"; setTimeout(load, 700);
+  } catch { btn.disabled = false; btn.textContent = "Try again"; }
+}
+
+load();
+</script>
+
+</body>
+</html>

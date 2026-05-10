@@ -21,3 +21,17 @@ async def operations_flow(request: Request):
     """
     templates = request.app.state.templates
     return templates.TemplateResponse(request, "operations_flow.html")
+
+
+@router.get("/dashboard/copilot", response_class=HTMLResponse)
+async def operator_copilot_page(request: Request):
+    """Cross-client Sales Copilot — admin/operator surface."""
+    templates = request.app.state.templates
+    return templates.TemplateResponse(request, "dashboard_copilot.html")
+
+
+@router.get("/api/v1/copilot/operator")
+async def operator_copilot_data(days: int = 14, per_client_limit: int = 8):
+    """Cross-client Sales Copilot JSON — admin-auth via dashboard_router wrapper."""
+    from tools.sales_copilot import operator_copilot
+    return operator_copilot(days=days, per_client_limit=per_client_limit)
