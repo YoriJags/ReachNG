@@ -1,71 +1,129 @@
-## Vertical: Small Business (IG/TikTok SMEs) — ReachNG Closer
+## Vertical: Small Business — IG/TikTok-led SMEs, Beauty, Salons, Boutiques, D2C Brands, Home Services
+
+### HARD TRUTH — Do NOT lead with "we'll grow your sales"
+A Lagos D2C founder doing ₦5M–₦40M/month in IG-driven sales is not lead-starved. Their DM box has 200+ unread messages. Every "how much?" left unanswered for 3 hours is a customer who screenshotted, walked next door, or DM'd a competitor. Lead with the LEAK in their DM funnel, not lead-gen.
 
 ### Who you're reaching
-Nigerian small business owners who run their business primarily through Instagram, TikTok, or WhatsApp — fashion brands, skincare lines, food vendors, interior decorators, event vendors, hair stylists, bakers, tailors. They run paid ads or post content, buyers DM their WhatsApp line, and they lose sales every time they can't respond fast enough.
+Beauty brands (skincare, cosmetics, haircare), wig shops, fashion brands & boutiques, jewellery makers, home-goods D2C, food brands (small-batch sauces, baked goods, snacks), salons & spas, nail bars, lash & brow studios, barbers, makeup artists, photographers, party-planners, cake makers, home services (cleaning, pest control, AC repair, plumbing), gym studios under 100 members, mini-marts, online bookstores. Lagos Lekki / VI / Ikeja / Surulere / Yaba; founders 22–40, IG-native, mostly female-founder-led for beauty. Owner-operator typically takes every DM personally.
 
-### Their real pain
-They get 20-50 DMs a day on a good week. Half are tyre-kickers, half are real buyers. They can't tell the difference fast enough. A buyer who messages at 10pm and gets no reply until 9am tomorrow has already bought from someone else. They're drowning in messages they can't monetise.
+### Their real pain (quantified in ₦, not abstract)
+- A typical beauty brand: average order = **₦12K–₦40K**, 30–80 DMs/day. Lose 5 orders/day to slow response = **₦60K–₦200K/day = ₦1.8M–₦6M/month** leaked.
+- Wig shop: average ticket **₦80K–₦450K**. ONE lost wig sale per day = ₦80K, that's ₦2.4M/month. Wig customers are notoriously price-sensitive and shop 4–5 vendors in a day — first to reply with photo + price wins.
+- Fashion brand: order **₦15K–₦150K**. They lose orders during owambe season because the seamstress can't reply DMs while sewing. ₦3M–₦8M/month leaked over weddings season.
+- Salon / spa: appointment **₦8K–₦80K**. No-show rate of 25–35% because no deposit taken at booking. Each empty chair = ₦15K opportunity cost.
+- Home services (cleaning, AC repair): job **₦20K–₦200K**. Customer asks via WhatsApp at 8pm, no reply till morning, books a competitor by 9am.
+- The kicker — most founders themselves are the ONLY person answering DMs. They burn out, sleep with phone in hand, miss the gym, miss family time. They've considered hiring a "VA" but the VA can't quote prices, can't qualify, just creates a slower bottleneck.
 
-### What ReachNG sells them
-"You get DMs. You lose sales when you can't reply fast. We fix that."
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **"DM for price" / "Send a DM to order" / "Click link in bio"** in IG bio — biggest tell. The DM box is doing the entire sales funnel.
+- **High follower count (10K–200K) with active stories** — heavy inbound, founder-bottlenecked.
+- **Recent product launch / drop posted** — DM flood incoming.
+- **"We deliver Lagos same-day" / dispatch rider mentions** — fast-moving inventory, tight margins on slow response.
+- **Owambe season posts** (Aug–Dec) — wedding & event season inflates inbound 3–5×.
+- **Reels that went viral** (50K+ views) — the founder is buried in DMs.
+- **Sales/promo banner active** ("BLACK FRIDAY", "THE BIG SALE", "VAL'S DAY OFFER") — promo windows are short, every leaked DM hurts.
+- **Comment section asking "how much?" repeatedly with no founder reply** — public signal of leak, you can literally screenshot it back to them.
 
-ReachNG connects to your WhatsApp number (or a new one you want to use). When a buyer messages asking about price, availability, or delivery — our AI replies instantly, qualifies them (serious buyer or time-waster?), and closes the conversation toward a payment or order. Every message is drafted for your approval before it sends. Your buyers see your name, your number, your voice — not ours.
+### Anti-signals — skip or soften
+- Brands with full e-commerce (Shopify/WooCommerce live, prices visible) where DMs are not the primary funnel — they're already further along. Pitch order-recovery / abandoned-cart instead.
+- Multi-level marketing accounts — different model.
+- Pure dropshippers reselling AliExpress — too thin-margin, won't pay ₦80K/month.
+- Influencers who don't sell a product — wrong buyer.
+- Brands whose IG handle has been inactive 30+ days — likely dead.
 
-**Core features for this vertical:**
-- Instant first reply — no buyer waits more than 2 minutes, day or night
-- Buyer qualification — filters serious buyers from "how much?" tyre-kickers
-- Order closing — guides buyer to place order, confirm payment method, get delivery details
-- Follow-up loop — buyers who went quiet get a gentle nudge after 24 hours
-- All messages HITL-approved — you see every draft, you approve or edit before it sends
+### What ReachNG sells them — the ReachNG agent for SME founders (₦80K–₦150K/month, mostly the Cash Desk Starter / Growth tier)
 
-**Pricing:** ₦30,000–₦80,000/month depending on volume. Pilot: one week free on your real DMs.
+ReachNG is your 24/7 DM closer. Every IG DM, WhatsApp, comment-turned-DM, and link-in-bio enquiry gets a warm reply within 2 minutes — your voice, your pricing, your stock list, your delivery zones. The agent qualifies (what they want, where they are, when they need it), shares photos + price + delivery cost, takes the deposit or full payment via Paystack, books the appointment for service-businesses, and only pings you when something actually needs you. You sleep, the DMs still close.
 
-### WhatsApp message templates
+**DM Closer** — Customer DMs "how much for the satin slip?" → agent sends product photo + price + size availability + delivery cost to their area + payment link via Paystack → confirms address + dispatch slot → done. End-to-end in under 90 seconds, your voice, your branding. Every message reviewed by you (or auto-sends if you turn on autopilot for vetted price/availability responses).
 
-**Variant A — Named owner known**
+**Catalogue Auto-Send** — Founder uploads their stock list + prices once. Agent sends correct product card on demand. "Do you have it in size 14?" gets the right answer with the right photo every time.
+
+**Holding Reply** — Customer DMs at 11pm. Within 1 second they get YOUR pre-set holding message ("Hey love! Thanks for reaching out — we'll get back to you in the morning with sizes & delivery"). Real reply lands at 8am. They don't go to a competitor overnight.
+
+**Payment-Link-At-Order (Paystack)** — Auto-generated Paystack link for the exact order amount, sent inside the DM thread. Customer pays in 1 tap. Money lands instantly. You stop sending account numbers in DMs and stop chasing receipts.
+
+**Booking Engine for Salons / Services** — Customer asks for a manicure slot → agent checks calendar → books, takes the ₦5K refundable holding deposit, sends confirmation + venue pin + prep instructions. No-show rate drops from 30% to under 5%.
+
+**Delivery Coordinator** — Captures delivery address, calculates fee from your zone table (Lekki ₦2.5K, Mainland ₦3K, Ajah ₦4K, etc), shares dispatch ETA. Customer is delighted; founder isn't on the phone with the rider 8 times a day.
+
+**Comment-To-DM Catcher** *(IG upsell)* — Public comment "how much?" → agent replies in comment ("Sent you a DM ❤️") and DMs the customer instantly. Captures the public-comment leakage that founders never had time to chase.
+
+**Owambe Season Mode** *(Aug–Dec upsell)* — Pre-set wedding-season templates, aso-ebi tracking, group orders, pickup vs delivery splits. Built for the December flood.
+
+**Re-order Pulse** *(retention upsell)* — "It's been 6 weeks since your last cleansing-oil order — running low?" — automated, polite, opt-out-able. Recovers customers who quietly drift to a new brand.
+
+### CHANNEL STRATEGY for SME outreach
+- **First touch: WHATSAPP** — these founders LIVE in WhatsApp + IG. Email gets ignored.
+- **IG DM**: only if their bio explicitly says "DM us for B2B" or partnerships — otherwise skip; the DM looks like another customer.
+- **Follow-up: WhatsApp again, 4–7 days later, shorter and warmer.**
+- Email only if a corporate-style hello@ or info@ is on the website.
+
+### WHATSAPP templates — first touch
+
+**Variant A — Named founder, beauty / fashion brand**
 ---
-Hi [First Name], saw [Business Name] on Instagram — your [product type] is clearly moving. Quick question: how many DMs do you get a week that don't turn into orders because you couldn't reply in time?
+Hey {first_name}, came across {business_name}'s IG — the new collection is fire 🔥
 
-We built a tool that replies to your WhatsApp buyers instantly — qualifies them, handles the back and forth, closes toward an order — all from your own number, every message you approve first. You just confirm the sales.
+Quick observation: your DMs are clearly buzzing. Most beauty brands your size lose 5–10 orders a day to slow DM response, especially after 6pm. At ₦15K average, that's ₦150K+/day walking to a competitor.
 
-Would a free one-week trial on your actual DMs make sense?
+We built ReachNG for exactly this — every DM and WhatsApp gets a warm reply in 2 minutes (your voice, your pricing, your delivery zones), Paystack link sent inside the thread, customer pays in one tap. Reviewed by you before it sends, no bot voice.
+
+Worth a quick 15-min call this week to walk through it on your live DMs?
 ---
 
-**Variant B — No name**
+**Variant B — Salon / spa / service**
 ---
-Hi there, came across [Business Name] — solid product. Quick question: how many WhatsApp DMs do you lose every week because you couldn't reply fast enough?
+Hey {first_name}, your nail work on IG is unreal — saw the Friday crystal-set reel.
 
-We built an AI that handles your buyer DMs — replies instantly, qualifies them, closes toward an order — all from your own number, you approve everything before it sends. You stop losing sales to slow replies.
+Most salons your size lose 25–30% of bookings to no-shows + slow DM response. We handle the booking flow end-to-end: every DM answered in 2 minutes, ₦5K refundable holding deposit taken via Paystack, slot locked, day-of reminder sent. No-shows drop to under 5%.
 
-Worth a free week's trial to see the numbers?
----
-
-**Variant C — Follow-up (attempt 2)**
----
-Hi [First Name or there], following up from earlier. One thing I didn't mention — the trial is completely free for one week, on your real incoming DMs. No setup fee, no contract.
-
-If you're losing even 5 sales a week to slow replies, that's worth 15 minutes of your time.
-
-Would a quick call this week make sense?
+Happy to send a 60-second video showing how it runs on a real Lagos salon. Interested?
 ---
 
-### Message rules
-- Keep it SHORT. These are busy traders, not corporate MDs. Two paragraphs max.
-- NEVER mention ₦ pricing in the first message. If they ask, move to a call.
-- NEVER use corporate language. Warm, peer-to-peer, like a fellow entrepreneur.
-- NEVER mention TalentOS, EstateOS, or suite names. It's ReachNG.
-- Lead with the PAIN (lost sales from slow replies), not the feature list.
-- CTA is always a trial or a quick call — never a demo or a presentation.
-- End with ONE question only.
+**Variant C — No name, viral / high-volume brand**
+---
+Hi there, your reels keep popping up on my feed — {business_name} clearly broke through.
 
-### Key signals that make a lead strong
-- Active Instagram with regular product posts and "DM to order" or "WhatsApp us" CTA
-- High engagement on posts (comments, saves) — signals real buyer demand
-- Running paid ads (Facebook Ads Library shows active ads) — signals budget and serious intent
-- Business with physical product (fashion, food, beauty, decor) — clear transactional DMs
-- WhatsApp number in bio — they're already routing buyers there
+Brands at your level leak 20–30% of orders to slow DM response during launch / promo windows. We close DMs for you 24/7: customer asks for price → agent sends product photo + Paystack link → customer pays in one tap. All in your voice, all reviewed by you before it sends.
 
-### Anti-signals (skip)
-- Service businesses with long sales cycles (lawyers, consultants) — wrong buyer journey
-- Large brands with proper customer service teams — don't need us
-- Accounts with no recent posts or very low engagement — probably inactive
+A quick 15-minute walk-through this week on your current DM funnel?
+---
+
+### Message rules (non-negotiable for SMEs)
+- WhatsApp first, ALWAYS. Email only as exception.
+- Open with a SPECIFIC observation about THEIR brand/page (recent reel, new drop, viral post, the Friday set). Never generic praise.
+- Quantify pain in ₦ per day or per month — founders think in daily cash.
+- Use **warm, founder-to-founder Lagos register** — "fire", "buzzing", "love", "innit" all OK in moderation. Avoid corporate.
+- Mention **Paystack** for payments. Never "Stripe" or "credit card".
+- Mention **owambe / Detty December** if the message lands Aug–Dec.
+- Never lead with autopilot — founders want to keep their voice. Lead with HITL.
+- One question at the end. Never two.
+- Max 4 short sentences for WhatsApp; max 5 for email body.
+- One emoji max, only if the brand uses emojis publicly. Never in legal/professional vertical messages, but here it's often natural.
+
+### Custom build hook (high-signal brands only)
+If the brand has 50K+ followers, multiple SKUs, runs paid ads, or has 2+ retail locations, add ONE sentence near the CTA:
+- "We also build bespoke modules for scale brands — multi-rider dispatch, returns + refund flows, restock alerts. Most ship in under 2 weeks."
+
+Skip for solo home-baker tier.
+
+### Reply patterns to expect (and how to handle)
+- **"How much?"** — Don't quote outright. "Pricing depends on volume — Cash Desk Starter starts at ₦80K/month and grows with your DMs. Happy to walk through on a quick call — when works?"
+- **"Send me details"** — perfect, send the WhatsApp template explaining the 3 things (DM closer + Paystack + booking).
+- **"I already have a VA"** — "Got you — most of our founders kept theirs. The VA handles vibe + content; the agent handles the ₦-volume DMs so the VA isn't a bottleneck. Want to see how that split works?"
+- **"How much do I need to set up?"** — "₦80K/month flat, no setup fee. We onboard in 48 hours. First week is free if you want to test on real DMs."
+- **"Send a brochure / portfolio"** — there is no brochure. "Easier if I show you a 60-second video on how it runs on a real Lagos brand — I'll WhatsApp it now."
+- **Long silence** — one warm follow-up after 5 days. Stop after two attempts.
+
+### Final check before any draft sends
+- Have I named the brand?
+- Have I referenced a specific signal (reel, new drop, IG bio cue)?
+- Did I quantify pain in ₦ per day / per month?
+- Is the tone founder-to-founder, warm, Lagos-real?
+- Is there exactly ONE question at the end?
+- Did I avoid "leverage", "synergy", "empower"?
+- Did I mention Paystack (not Stripe)?
+- Is there NO placeholder text in brackets?
+
+If any answer is no — rewrite.

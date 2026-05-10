@@ -1,40 +1,111 @@
-## Vertical: Events & Experiences — EventOS
+## Vertical: Events — Event Planners, Wedding Planners, Decorators, Caterers, MCs, Event Venues, Owambe Specialists
+
+### HARD TRUTH — Do NOT lead with "we'll get you more weddings"
+A reputable Lagos events vendor is not booking-starved during owambe season — they are DEPOSIT-CHASING-broken and timeline-coordination-broken. Every "send me your packages" WhatsApp at 10pm that's answered the next day is a wedding date locked at the planner next door. Lead with the QUOTE-TO-DEPOSIT gap and the messy multi-vendor coordination — not lead-gen.
 
 ### Who you're reaching
-Event planners, promoters, venue owners, caterers, and experience companies in Lagos. They coordinate vendors, manage guest lists, track payments, handle aso-ebi orders, and run ticket sales — all over WhatsApp and spreadsheets.
+Wedding planners (the principal coordinator), decorators, MCs, event caterers (often differentiated from restaurant caterers), photo & video houses, makeup artists for events, owambe-specialist DJs, party-rental firms (chairs / canopies / cutlery), event venues (banquet halls, marquees, beachfronts), bridal boutiques, aso-ebi coordinators, private chefs for events, corporate-event-management firms. Lagos VI / Ikoyi / Lekki / Ikeja for premium; Surulere / Yaba / Ajah for mid-tier; Abuja Wuse / Maitama / Asokoro for diplomatic + corporate events. Founder-coordinators who are also the senior planner.
 
-### Their pain
-Events have 15–30 vendors per show. Payments come in late or not at all. Aso-ebi orders get mixed up and cause drama two days before the event. Ticket resellers inflate prices and create fraud. All of it is managed manually, creating chaos at exactly the wrong moment.
+### Their real pain (quantified in ₦, not abstract)
+- Lagos premium wedding planning fee = **₦2M–₦15M+** per wedding. Lose ONE date per year to slow follow-up = a junior planner's annual salary.
+- Decoration & rentals: **₦800K–₦8M per wedding**. Owambe season (Aug–Dec): vendor calendars fill 6 months out. Every leaked enquiry = a Saturday lost.
+- Catering: **₦8K–₦25K per head** × 200–800 guests = **₦1.6M–₦20M per event**. 50% deposit at booking. Slow quote = lost contract.
+- Photo/video premium: **₦600K–₦4M per wedding**. Couples shop 6–8 photographers, pick the one who replied fastest with portfolio + price.
+- Event venues: weekend booking **₦500K–₦5M**. Sunday slots fill 4–6 months ahead. Slow venue inspection scheduling = direct ₦ loss.
+- The kicker — owambe season inbound is 5–10× normal. The principal planner is at a wedding every Saturday. WhatsApp goes unanswered Friday-Sunday because they're literally on the venue floor. Bookings for next year are decided this weekend.
+- Multi-vendor chaos — wedding planners juggle 8–15 vendors per event in 8–15 different WhatsApp threads. Decorator forgot the chairs, caterer needs final headcount Tuesday, MC wants the running order, photographer wants the shot list. The planner's WhatsApp becomes ungovernable.
 
-### What ReachNG sells them — EventOS (₦30K–₦100K/month per planner)
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **"DM for booking" / "WhatsApp the planner" in IG bio** — biggest tell.
+- **Wedding portfolio reels with venue tags + couple tags** — heavy inbound flood.
+- **"Owambe ready" / "December weddings open"** — peak season prep.
+- **Aso-ebi coordination posts** — high-touch coordination job.
+- **Multi-service offering** (planning + decor + catering or planning + MC + photo) — coordination chaos = clear ReachNG fit.
+- **Diaspora wedding mentions** ("we plan weddings for returnee couples", "destination Lagos") — timezone-shifted intake leak.
+- **High-NW venue tags** (Eko Hotel, Civic Centre, Le Meridien Ibom, private estates) — premium tier, big tickets.
+- **Reviews complaining of slow follow-up or "took ages to confirm"** — public proof of leak.
 
-EventOS is an AI-powered event operations system for Lagos planners and promoters. It automates vendor coordination, aso-ebi tracking, budget management, and ticket fraud detection.
+### Anti-signals — skip or soften
+- One-person side-hustle planners doing 3 events/year — too small.
+- Pure venue groups (large hotels with internal events team) — wrong buyer.
+- Religious-only event planners (church-tied, narrow market) — fine but smaller ₦.
+- Big-name celeb planners with 50+ staff — wrong economics, internal IT.
 
-**Event Vendor Coordinator** — Manages vendor confirmations, payment milestones, and delivery timelines via WhatsApp automatically. Sends reminders. Flags late vendors to the organiser. One agent replaces three coordination assistants.
+### What ReachNG sells them — the ReachNG agent for events vendors (₦150K–₦300K/month, mostly Cash Desk Growth tier; spike to Scale during owambe season)
 
-**Aso-ebi Coordinator** — Collects fabric orders via WhatsApp, tracks payments per person, assigns reference numbers, sends collection reminders. Organiser gets a clean order sheet — no missed orders, no confusion.
+ReachNG is your deposit-locking + multi-vendor-coordination assistant. Every WhatsApp enquiry, IG DM, referral lead, and recurring-client check-in gets a warm reply within 2 minutes — your voice, your packages, your venue list, your blackout dates. The agent qualifies (event date, type, headcount, budget tier), sends your portfolio + package PDF, locks the date with a 50% deposit via Paystack, and pings you only when something needs the principal planner. During the event itself: tracks vendor coordination across threads.
 
-**Ticket Resale Fraud Detector** — Monitors resale channels for inflated or counterfeit tickets linked to your events. Flags suspicious listings and generates takedown evidence.
+**Quote-To-Deposit Closer** — Enquiry arrives → agent qualifies (date, event type, headcount, budget tier, venue preference) → sends package PDF + portfolio + venue options → drafts the proposal → sends 50% deposit Paystack link → date locked. End-to-end in under 2 minutes. Every quote reviewed by you before send.
 
-**Event Budget Tracker** — Tracks spend against budget in real time as vendor invoices and payments come in. Sends an alert before you go over budget, not after.
+**Date-Lock Engine** — Calendar check + holding hold for 48 hours when a couple is "deciding" — auto-releases if no deposit. No more accidentally double-booking a Saturday because the planner forgot they offered the date to two couples.
 
-### WhatsApp message template (personalise fully)
+**Vendor Coordination Pulse** *(KILLER feature for principal planners)* — Per-event WhatsApp group with linked vendors → agent surfaces coordination gaps ("Decorator hasn't confirmed chair count for Saturday's wedding", "Caterer needs final headcount by Wednesday"). Cuts planner's coordination time from 12h/event to 2h.
+
+**Holding Reply** — Bride DMs at 11pm. Within 1 second she gets YOUR pre-set holding message ("Hey love! Thanks for reaching out about your big day — we'll send packages + available dates first thing"). Real reply lands at 8am. She doesn't shortlist your competitor overnight.
+
+**Aso-Ebi Order Closer** *(planner / decorator upsell)* — Aso-ebi orders, sizes, deposits, fabric choices, pickup dates — all captured in structured form, not as 200 voice notes. Reduces aso-ebi coordination time by 70%.
+
+**Diaspora Wedding Concierge** *(premium upsell)* — Couples in London/Houston planning Lagos wedding remotely. Agent handles the timezone-shifted exchange, sends video venue tours, takes deposits in NGN/USD via Paystack/Flutterwave.
+
+**December Owambe Mode** *(seasonal upsell)* — Aug–Dec preset templates, weekend block booking, returnee waitlists, December-rate disclosure flows.
+
+**Final-Headcount Reminder Pulse** — Caterers / venues need final numbers 7–10 days out. Agent reminds couples, captures the number, alerts the chef. Stops the "they said 200 but 280 showed up" disaster.
+
+**Day-After Review Capture** *(retention upsell)* — 24h after the event, agent sends a warm "how was the day?" + asks for a Google review or referral. Recovers reviews planners always intend to chase but never do.
+
+### CHANNEL STRATEGY for events outreach
+- **First touch: WHATSAPP** — events vendors live on WhatsApp + IG; email gets ignored.
+- **IG DM: also fine** if business profile, since it's their natural funnel.
+- **Follow-up: WhatsApp again, 5–7 days later, shorter, warmer.**
+- Email only if a corporate booking@ is on website.
+
+### WHATSAPP templates — first touch
+
+**Variant A — Named planner / decorator**
 ---
-Hi [Name], [Business Name] runs serious events — coordinating 20+ vendors per show manually must be intense.
+Hey {first_name}, saw {business_name}'s December wedding reel — proper execution on the Eko Atlantic setup.
 
-EventOS automates vendor confirmations, aso-ebi order tracking, budget management, and ticket fraud monitoring. You get notified when something needs your attention — not buried in WhatsApp threads.
+Quick observation: most planners your tier lose 4–6 dates per owambe season to slow WhatsApp response — couples shortlist 6 vendors, sign with whoever quotes fastest. At ₦3M+ per wedding, that's ₦15M+/season migrating to the planner next door.
 
-Running a pilot this month. Worth a quick call?
+We built ReachNG for exactly this — every enquiry gets a warm reply in 2 minutes (your voice, your packages, your December availability), 50% deposit Paystack link sent, date locked. Plus we coordinate the multi-vendor chaos on event week so you stop running 12 WhatsApp threads in parallel.
+
+Worth a quick 20-min call this week before December rush?
 ---
 
-### Email subject line ideas
-- "Vendor coordination for your next event — automated"
-- "Aso-ebi orders, vendor payments, ticket fraud — all solved"
-- "Replace 3 coordination assistants with one AI agent"
+**Variant B — Catering / decor / rental house**
+---
+Hi {first_name}, your set-up at last weekend's Civic Centre wedding looked clean.
 
-### Key signals that make a lead strong
-- Active events business with upcoming dates on Instagram
-- Venue with corporate event capability (conference rooms, AV)
-- Promoter with existing audience (Instagram 5k+)
-- Located in VI, Lekki, Ikeja — high-activity event zones
-- Google Maps rating ≥ 4.0 (legitimacy signal for venue)
+Most decor / rental houses your size lose 25–30% of bookings between "send me a quote" and "deposit paid" — weekend availability fills 4–6 months out and slow Friday-Sunday response costs the spot. We close that gap: every enquiry quoted in 2 minutes (your voice, your zone-rate matrix), 50% deposit Paystack link inside the thread, calendar locked.
+
+Happy to send a 60-second video on how it runs on a real Lagos vendor. Interested?
+---
+
+### Message rules (non-negotiable for events)
+- WhatsApp ALWAYS first.
+- Open with a SPECIFIC observation about THEIR work (recent reel, venue tag, decor set-up). Never generic.
+- Quantify pain in ₦ per event × dates lost — events vendors think in weekends.
+- Use **owambe / Lagos events register** — "owambe", "aso-ebi", "white wedding", "engagement", "bridal shower", "owambe season". Domain fluency.
+- Mention **Paystack** for deposits, **Flutterwave** for diaspora USD.
+- Mention **December** if message lands Aug–Nov.
+- Never lead with autopilot — planners are voice-protective.
+- One question. Max 4 sentences for WhatsApp.
+
+### Custom build hook (premium / multi-service vendors)
+- "We also build bespoke modules for multi-service vendors — aso-ebi pipelines, venue blackout calendars, shot-list flows for photo houses, coordination dashboards. Most ship in 2 weeks."
+
+### Reply patterns
+- **"What's the price?"** — "Cash Desk Growth is ₦150K/month + 2% on locked deposits."
+- **"I have an assistant already"** — "Most of our planners kept theirs. Assistant handles vendor relationships; agent handles WhatsApp/IG volume + coordination threads."
+- **"Send a portfolio"** — "Easier to show you a 60-second video on how the agent ran a real wedding's enquiry flow — I'll WhatsApp it now."
+
+### Final check
+- Named the vendor?
+- Specific signal (reel, venue tag, decor)?
+- Pain in ₦ per event × dates lost?
+- Owambe / December register?
+- ONE question?
+- Paystack mentioned?
+- No placeholder brackets?
+
+If no — rewrite.

@@ -1,61 +1,120 @@
-## Vertical: HR / Staffing / Recruitment — ReachNG (workload-removal pitch)
+## Vertical: Recruitment & Staffing — Recruitment Agencies, Headhunters, Outsourcing Firms, Staffing Companies
 
 ### HARD TRUTH — Do NOT pitch "we close your inbound leads"
-Recruitment agencies, staffing firms, and in-house HR teams **are themselves in the sales business** (or in deep operational mode). Their "leads" are long-cycle B2B contracts with employers, not WhatsApp DMs to convert. Pitching SDR-as-a-service to them is insulting. They have BD machinery already.
-
-What they DON'T have: time. Their HR director is doing payroll math at midnight, chasing leave forms over WhatsApp, and hand-calculating PENCOM remittances every month. That's the wedge.
+A Lagos recruitment agency does not need more applicants. They are DROWNING in CVs and tired of the "hi sir, please consider me" inbound flood. Their pain is candidate triage + client account management + the back-office grind of pay, contracts, and compliance. Lead with WORKLOAD REMOVAL — running their candidate-pipeline + client-comms + back-office ops, NOT lead-gen.
 
 ### Who you're reaching
-- Staffing / recruitment agencies in Lagos (managing their own internal back-office + sometimes their employer-clients' HR)
-- Executive search firms
-- HR consulting firms
-- In-house HR teams at Lagos employers with 10+ staff (professional services, fintech, oil & gas, real estate, healthcare)
+Mid-size recruitment agencies (5–50 staff), executive search boutiques (C-suite placements), outsourcing firms (managed manpower, security, cleaning, drivers, domestic staff agencies), oil-&-gas manpower contractors, BPO providers, headhunters specialising in tech / banking / FMCG, NYSC programme placement firms, virtual-assistant marketplaces, training-to-placement bootcamps. Founders, principal consultants, ops directors, heads of delivery.
 
-### Their real pain
-Monthly payroll is a 6–10 hour Excel marathon. PAYE / CRA / PENCOM / NHF computed by hand, errors caught only when staff complain. Leave requests buried in WhatsApp threads. Probation end-dates missed. Policy questions ("how many days do I have?") asked 50 times a day. The HR lead becomes a glorified payroll clerk instead of doing strategic work.
+### Their real pain (quantified in ₦, not abstract)
+- A typical placement fee = **15–25% of annual gross**, on a ₦5M–₦50M senior role = ₦750K–₦12.5M per placement.
+- Outsourcing firms charge **15–35% margin** on outsourced staff salaries. A 50-headcount cleaning contract = ₦300K–₦1M/month margin.
+- Each new client onboarding = **2–6 weeks** because contracts, NDAs, candidate shortlists, briefings move slowly across email, WhatsApp, and a partner's inbox.
+- Candidate-side: each role generates **200–2,000 CVs**. The recruiter spends 20–40 hours per role triaging — most of which is "thanks for applying" auto-replies that never actually go out, leaving 1,500 candidates in limbo (and posting bad reviews on Glassdoor / Twitter).
+- Client-side: HR managers ghost agencies because nobody followed up after the shortlist. Each ghosted client = ₦2M–₦15M lost over 12 months.
+- Outsourcing back-office: payroll for outsourced staff, PENCOM, NHF, leave tracking, attendance, replacement requests when a contract worker no-shows. ALL ON THE FOUNDER'S WHATSAPP.
+- The kicker — agency owners are senior recruiters who should be selling to clients, not handling 800 candidate WhatsApps a week.
 
-### What ReachNG sells them — back-office automation (₦50K setup + ₦50K–₦200K/mo, tiered by headcount)
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **"DM us your CV" / "Send your CV to careers@"** in IG / website — biggest tell of CV-volume pain.
+- **Job postings on LinkedIn / IG with "Apply on WhatsApp"** — they're getting drowned right now.
+- **Client testimonial highlights** ("we placed 12 hires for X bank") — high-ticket account base.
+- **Outsourcing brochures / "managed manpower" branding** — back-office grind = candidate for TalentOS-style modules.
+- **Recent agency expansion (new office, new sector vertical)** — scaling pain.
+- **Glassdoor / Twitter reviews** complaining "recruiter never got back to me" — public proof of leak.
+- **Speaking at HR / People conferences** — drives client + candidate flood.
+- **"NYSC corp members welcome" / "fresh grad placement"** — high-volume, low-margin.
 
-**ReachNG runs the operational back-office that HR keeps drowning in — so the team gets back to the work that actually drives revenue (BD, sourcing, talent management).** We never hold payroll funds; you disburse from your own bank — we just kill the math, the chase, and the paperwork around it.
+### Anti-signals — skip or soften
+- HR departments inside corporates — wrong buyer.
+- One-person LinkedIn-only headhunters — too small.
+- Domestic staff agencies running on Telegram with no website — too informal, won't pay ₦80K/month.
+- Job boards (Jobberman / MyJobMag tier) — different model entirely.
 
-**Nigerian-Compliant Payroll** — Monthly run with PAYE bands (7/11/15/19/21/24%), CRA formula, PENCOM 8% employee + 10% employer on basic+housing+transport, NHF 2.5% on basic when enrolled. Outputs printable payslips per staff member and a PENCOM schedule ready for upload. You transfer; we do the math.
+### What ReachNG sells them — the ReachNG agent for recruitment (₦150K–₦300K/month, mostly Cash Desk Growth tier with workload-removal framing)
 
-**Leave & Absence Manager** — Staff request leave on WhatsApp or the dashboard. HR approves or declines with one tap. Balances tracked automatically. Every decision logged.
+ReachNG is your candidate triage + client account assistant. Every CV submission, candidate WhatsApp, client follow-up, and outsourced-staff request gets a warm reply within 2 minutes — your voice, your screening criteria, your client-account playbooks. The agent acknowledges every candidate (kills the Glassdoor ghosting), runs first-pass screening questions, ranks candidates against the JD, and pings the recruiter only when a shortlist is ready. On the client side: every account check-in, contract reminder, replacement request handled.
 
-**Attendance Dashboard** — Daily clock-in / clock-out, late-arrival flags, weekly report.
+**Candidate Triage Engine** *(KILLER feature)* — CV / WhatsApp application arrives → agent acknowledges within 1 minute, runs your 5–8 screening questions (years exp, current salary, location, notice, key skill checks), ranks the candidate, pushes top-tier into your ATS / Google Sheet. Bottom-tier gets a polite "we'll keep your CV on file" response. No more 1,500 candidates in limbo.
 
-**Probation Tracker** — Logs every new hire's probation end-date, sends reminders before expiry, generates confirmation or extension letters.
+**Client Account Comms** — Existing client HR contact messages "any update on the role?". Agent checks the role status from your spreadsheet/ATS, replies with shortlist progress + ETA, books the interview-feedback call. Recruiter only steps in for actual relationship work.
 
-**Policy Oracle** — Upload your handbook. Staff ask "how many leave days do I have?" or "what's the HMO policy?" via WhatsApp; the bot answers from your actual document.
+**Holding Reply** — Candidate or client messages at 11pm. Within 1 second they get YOUR pre-set holding message ("Hi! Thanks for reaching out — we'll come back to you within one business day"). Stops the 1-star review thread.
 
-**Offboarding Checklist Generator** — Per staff exit: asset retrieval, access revocation, final payroll, exit interview — all tracked.
+**Outsourced Staff Replacement Closer** *(outsourcing upsell)* — Client messages "the cleaner didn't show today". Agent confirms the absence, dispatches the replacement, updates the contract roster, alerts ops. End-to-end without the founder.
 
-**Moonlighting & Salary-Erosion Flags** — Weekly retention risk report: who's likely moonlighting based on attendance signals, whose salary has eroded vs inflation since last raise.
+**Payroll & Pay-Day Comms** *(outsourcing upsell)* — On payday, agent confirms pay-out to outsourced staff via WhatsApp ("Your salary of ₦X has been paid"). Handles the 50 follow-up "I haven't received it yet" messages by checking transaction status in real time.
 
-**For staffing agencies specifically:** the same back-office can be offered to your employer-clients as a value-add. "We placed the talent + we run their HR back-office" is a stronger retainer story than placement fees alone.
+**Interview Scheduler** — Recruiter ready to interview shortlisted candidates → agent books across recruiter's calendar + candidate's availability, sends Zoom link + reminder.
 
-### WhatsApp message template (personalise — guide only)
+**Compliance Pulse** *(outsourcing-specific)* — PENCOM, NHF, NSITF deadlines for outsourced workers. Boring stuff that fines an outsourcing firm hard when forgotten.
+
+**Glassdoor / Reviews Saver** *(brand upsell)* — Candidate flagged as "ghosted by us" auto-receives a polite outcome notification. Public reviews mentioning ghosting drop ~70% in first 90 days.
+
+### CHANNEL STRATEGY for recruitment outreach
+- **First touch: EMAIL** — agency principals are corporate-trained, expect formal first contact.
+- **Follow-up: LinkedIn DM (4–7 days), then WhatsApp (10 days).**
+- **Exception: founder-led ≤8-staff outsourcing firms** — open with WhatsApp, peer register.
+
+### EMAIL templates — first touch
+
+**Subject:** Reducing candidate ghosting + back-office load at {business_name}
+
+Dear {first_name or "Sir/Ma"},
+
+I am reaching out from ReachNG, a workload-automation platform built for Lagos recruitment & outsourcing firms managing high-volume candidate inbound and client-account back-office work.
+
+Most active agencies your size process 200–2,000 CVs per role and have neither the time nor the headcount to acknowledge every candidate, run first-pass screening, and still keep client accounts warm. The result: candidate Glassdoor reviews complaining of ghosting, clients quietly migrating to peer firms, and senior recruiters spending 60% of their week on triage instead of placements.
+
+ReachNG handles candidate triage and client-account comms end-to-end. Every CV / WhatsApp application is acknowledged within minutes, runs your 5–8 screening questions, ranks the candidate, and pushes top-tier into your ATS. Every client message gets a status reply within minutes. Every outsourced-staff replacement request is dispatched without the founder needing to be in the WhatsApp loop. Recruiters spend their time on placements and client relationships, not triage.
+
+I would welcome 20 minutes this week to walk through how this performs on a live agency's inbound stream.
+
+Are you available for a brief call?
+
+Best regards,
+{your_name}
+ReachNG
+
+### WHATSAPP templates — follow-up
+
+**Variant A — Named principal**
 ---
-Hi there — saw [Business Name] handles HR / staffing in Lagos. Quick one: how much time does your HR lead burn every month on payroll math, leave forms, PENCOM remittance — the admin work, not the strategic stuff?
+Good day {first_name}, saw your post on the recent senior placements at {business_name} — clean execution.
 
-ReachNG runs that back-office for you. Full Nigerian payroll (PAYE, CRA, PENCOM, NHF) done in minutes, leave on WhatsApp, attendance tracked, probation reminders auto-sent. You disburse from your own bank — we kill the math and the chase.
+Quick observation: most agencies your size lose ~60% of senior-recruiter time to candidate triage that the recruiter should not be doing. At ₦750K+ per placement, every week of senior time burnt on triage is a placement that didn't happen.
 
-Worth a 15-min walkthrough on how it'd fit your flow?
+ReachNG handles candidate triage + client-account comms end-to-end (your voice, your screening, your shortlist criteria). Senior recruiters spend their week on real placements + client relationships, not 800 candidate WhatsApps.
+
+Worth a 20-min walk-through this week?
 ---
 
-### Email subject line ideas
-- "Stop doing payroll math at midnight — [Business Name]"
-- "HR back-office automation for Lagos staffing firms"
-- "Get your HR lead back to strategic work"
-- "Payroll, leave, PENCOM — done in minutes"
+### Message rules (non-negotiable for recruitment)
+- Email first; WhatsApp follow-up.
+- **Pitch as WORKLOAD REMOVAL, not lead-gen.** "We run the triage / back-office work" — never "we'll find you more clients/candidates."
+- Open with a SPECIFIC observation (recent placement post, conference, sector mention). Never generic.
+- Quantify pain in ₦ per placement OR senior-recruiter hours saved.
+- Reference **PENCOM, NHF, NSITF, ITF, NIPC, CIPM, CIPSMN** where relevant. Recruitment regulators matter.
+- Use HR ops register — "shortlist", "JD", "vintage cohort", "headcount", "rolling intake".
+- Never lead with autopilot.
+- One question. Max 6 sentences for email, 4 for WhatsApp.
 
-### Strong signals
-- Staffing or HR firm with 10+ internal staff
-- Lagos head office, multi-state operations
-- LinkedIn presence with recent placements (signals real BD pipeline + needs back-office)
-- In-house HR team at employers with 30+ staff (professional services, fintech, oil & gas)
+### Custom build hook (multi-sector / outsourcing firms)
+- "We also build bespoke modules for outsourcing operators — managed-staff payroll comms, PENCOM/NHF deadline pulses, contract-renewal pipelines, replacement-dispatch flows. Most ship in 2 weeks."
 
-### Anti-signals
-- Pure freelance recruiters (no internal team to support)
-- Agencies with under 5 staff (we're not the right fit yet)
-- Firms already on a full HRIS (BambooHR / Workday) — we lose the price comparison
+### Reply patterns
+- **"What's the price?"** — "Cash Desk Growth starts ₦150K/month, scales with candidate + client volume."
+- **"We use an ATS already"** — "Perfect — ReachNG sits in front of that. ATS manages the candidates you've shortlisted; we handle the messy WhatsApp/email triage funnel before they become ATS records."
+- **"We don't trust AI to talk to candidates"** — "Fair. Every message is reviewed by your recruiter before sending; auto-mode only for the politely-decline acknowledgement template after a month of supervision."
+
+### Final check
+- Named the firm?
+- Specific signal referenced?
+- Pitch is workload-removal, NOT lead-gen?
+- Pain in ₦/placement or senior-hours quantified?
+- ONE question?
+- HR-ops register, not retail?
+- Paystack mentioned where relevant?
+- No placeholder brackets?
+
+If no — rewrite.

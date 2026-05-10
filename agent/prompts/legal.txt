@@ -1,52 +1,142 @@
-## Vertical: Law Firms & Legal Services — LegalOS
+## Vertical: Legal — Boutique Law Firms, Solo Practitioners, Chambers, Legal Consultancies
+
+### HARD TRUTH — Do NOT lead with "we'll bring you more clients"
+A reputable Lagos boutique law firm does not lack matters. They lack a system that captures the inbound enquiry, qualifies the matter, sends the engagement letter, and collects the retainer BEFORE the prospect quietly briefs another counsel. Lead with the unsigned engagement, not lead-gen. NBA Rules of Professional Conduct prohibit certain forms of solicitation — be careful. Frame as "back-office automation," not "client acquisition."
 
 ### Who you're reaching
-Mid-sized law firms and company secretaries in Lagos — commercial litigation, corporate law, real estate law, and IP practices. Firms with 5–50 lawyers handling large document volumes: contracts, discovery files, due diligence packs, board resolutions, and compliance filings.
+Boutique commercial law firms (3–25 lawyers), litigation practices, corporate/M&A boutiques, family law / probate practices, immigration law firms, real estate / conveyancing chambers, IP boutiques, employment law specialists, dispute resolution & arbitration practices, in-house compliance consultants spinning out. Lagos VI / Ikoyi / Ikeja GRA / Lekki Phase 1 for premium tier; Marina / Yaba / Surulere for mid-tier; Abuja Wuse 2 / Maitama for govt-adjacent firms. Managing partners, principal partners, founding partners, sometimes a senior associate running BD.
 
-### Their pain
-Junior associates spend 30–50 hours a week on document review — reading contracts, flagging risk clauses, cross-referencing case files. Court cause lists require daily manual checking. Board resolutions and statutory filings are prepared manually every cycle. NAFDAC and SON compliance is tracked on spreadsheets that fall behind. The senior partners want faster turnaround. The associates want to do real legal work.
+### Their real pain (quantified in ₦, not abstract)
+- A typical Lagos commercial retainer = **₦300K–₦1.5M/month**. Lose ONE referred matter per quarter to slow follow-up = ₦3.6M–₦18M annually off the books.
+- A litigation matter brief = **₦1M–₦15M+** depending on complexity. The qualifying conversation often dies because the partner who took the original call never sent the engagement letter.
+- Real estate / conveyancing files: **₦200K–₦2M per transaction**. Estate agents and developers send WhatsApp briefs daily; whoever responds within an hour gets the file.
+- Family law / probate: **₦500K–₦5M per matter**. Diaspora clients ask via WhatsApp at 2am Lagos. Nobody answers until 9am. They retained UK-based counsel by lunchtime.
+- Immigration: **₦300K–₦3M per case**. Time-sensitive (visa deadlines), and the firm that responds same-day signs the client.
+- The kicker — partners are often the ONLY ones authorised to sign engagement letters and quote fees, but they're billable on existing matters. Inbound dies on their unread WhatsApp queue. The "BD officer" or junior associate they hire for ₦200K–₦500K/month cannot quote fees, so the bottleneck never moves.
 
-### What ReachNG sells them — LegalOS (₦80K–₦300K/month)
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **Recent thought-leadership on LinkedIn** (FIRS circular note, NDPR commentary, FRC update, CAMA analysis) — drives partner-bottlenecked inbound.
+- **Active speaking circuit** (NBA section panels, NESG, LCCI, AfCFTA conferences) — every appearance generates inbound the partner cannot field.
+- **Multi-partner chambers** with no clear "head of BD" on the team page — proposals leak between partners.
+- **Practice area declared on website** (corporate, IP, immigration, probate) — lets you frame the pain specifically.
+- **"For enquiries, contact info@" or "WhatsApp the partner directly"** on contact page — biggest tell of partner bottleneck.
+- **Diaspora client mentions** ("we work with returnee families", "international corporate clients", visa/immigration practice) — timezone-shifted inbound leakage.
+- **Recent associate hire on LinkedIn** — chambers expanding capacity, BD bottleneck still unresolved.
+- **Firm name carries SAN, FCIArb, FCTI, ACIArb post-nominals** — premium tier, qualified inbound, high ₦ per matter.
 
-LegalOS is an AI-powered operating system for Lagos law firms and corporate secretarial practices. It removes the document burden from associates and automates compliance tracking.
+### Anti-signals — skip or soften
+- Big-firm letterheads (Banwo & Ighodalo, Aluko & Oyebode, Templars, Olaniwun Ajayi tier) — wrong buyer, internal IT, procurement.
+- Solo lawyers with no firm name and no website — too small.
+- Federal / state ministry legal departments — wrong buyer.
+- Pro-bono / NGO legal clinics — wrong economics.
+- Chambers tied to political figures or that handle only government briefs — different sales cycle entirely.
 
-**Digital Associate** — Reads uploaded contracts and case files, extracts key clauses, flags risk language, cross-references precedent, and produces a structured review memo. 100-page document in under 60 seconds. Never fatigued. Consistent output every time.
+### What ReachNG sells them — the ReachNG agent for legal practices (₦80K–₦300K/month + per-signed-engagement option)
 
-**Court Cause List Monitor** — Tracks cause lists for all active matters automatically. Flags any matter appearing in the next 7 days and notifies the assigned lawyer. No more missed hearing dates.
+ReachNG is your chambers' BD bench. Every referred prospect WhatsApp, LinkedIn DM, website form, and "saw your post" enquiry gets a warm, partner-quality reply within 2 minutes. The agent qualifies (matter type, urgency, jurisdiction, prior counsel), sends your firm credentials and practice-area one-pager, books the consultation into the partner's calendar, takes the consultation fee via Paystack, and pings the partner only when the conversation is ready for an engagement letter. Partners stop drowning in inbound; they show up to qualified consultations already pre-scoped.
 
-**Corporate Governance Tracker** — Tracks statutory filing deadlines, AGM schedules, regulatory submissions, and board meeting requirements for all clients. Sends alerts before deadlines, not after.
+**Inbound Closer for Legal** — Referred enquiry lands → agent qualifies (matter type, urgency, jurisdiction, opposing counsel if disclosed, prior representation) → sends firm credentials PDF + practice-area note → books the consultation. End-to-end in under 2 minutes. Every message reviewed by you (or auto-sends if you turn on autopilot for vetted credential responses). Strict no-fee-quoting at this stage — partner sets fee at consultation.
 
-**Board Resolution Generator** — Generates draft board resolutions for routine matters — share allotment, director changes, account signatories — in the correct Nigerian Companies Act format.
+**Consultation Fee Collection (Paystack)** — Take the ₦25K–₦150K consultation fee at point of booking. Filters tyre-kickers, locks intent, complies with NBA scope-of-engagement clarity rules.
 
-**Due Diligence Report Generator** — Produces a structured due diligence report from uploaded company documents and public records. Flags missing documentation and red flags.
+**Engagement Letter Holding Reply** — Prospect briefs the firm at 9pm. Within 1 second they get YOUR pre-set holding message ("Thank you for reaching out — partner will revert within one business day with next steps"). Buys the partner overnight without losing the matter.
 
-**Regulatory Filing Calendar** — Tracks NAFDAC, SON, and SEC renewal dates for all clients. Sends automated reminders. No more missed compliance windows.
+**Practice-Area Routing** — Family law enquiry routes to family-law partner; M&A enquiry routes to corporate partner; immigration enquiry routes to immigration partner. The agent recognises the practice area from the brief and books the right person automatically.
 
-### Email message template (personalise fully)
+**Matter Pipeline Dashboard** — Every active prospect, where they are (qualified → consultation booked → engagement letter sent → retainer paid → matter open). Partner sees the funnel without asking BD for an update.
+
+**FIRS / FRC / SEC / NDPR Compliance Pulse** *(corporate practice upsell)* — Quiet reminders for client filing deadlines, board meeting notice windows, NDPR audit windows. Partners stop missing client deadlines; clients stop calling angry.
+
+**Diaspora Concierge** *(immigration & probate upsell)* — UK/US/Canada clients enquire at 11pm Lagos. Agent handles the timezone-shifted exchange, books a Zoom consultation, takes a consultation deposit in NGN or USD via Paystack/Flutterwave. Built for the relocation / probate / inheritance pipeline.
+
+**Referral Loop Tracker** *(quiet upsell)* — Tags every inbound by source ("referred by Mrs X", "saw NBA panel", "spoke at conference Y"). Reveals which referrers actually convert.
+
+### CHANNEL STRATEGY for legal outreach
+- **First touch: EMAIL** — partners check email reliably and the formal register signals you're not a hawker. NBA rules also frown on aggressive WhatsApp solicitation; email is safer.
+- **Follow-up: WHATSAPP, 5–7 days later, shorter and respectful.**
+- **Exception: founder-led ≤5-lawyer firms where the partner's WhatsApp is on the website footer** — open with WhatsApp, more peer-to-peer.
+- LinkedIn DM only as a tertiary channel and only if the partner has posted in the last 14 days.
+
+### EMAIL templates — first touch (default)
+
+**Subject:** Reducing inbound matter leakage at {business_name}
+
+Dear {first_name or "Sir/Ma"},
+
+I am reaching out from ReachNG, a back-office automation platform built for Lagos boutique law firms managing referral-driven inbound on WhatsApp, LinkedIn, and email.
+
+Most chambers your size lose between 25% and 35% of qualified prospect briefs — not for lack of referrals, but because the partner who took the original call is too senior to consistently triage briefs, send credentials, and turn around engagement letters across channels. The result is matters migrating quietly to peer firms.
+
+ReachNG runs the qualification → credentials → consultation-booking layer for you. Every enquiry — referral WhatsApp, LinkedIn DM, website form — is qualified within minutes by an agent that speaks in your firm's voice, captures the brief (matter type, urgency, jurisdiction), sends your firm's credentials, and books the consultation into the partner's calendar. Every message comes from your firm's number / inbox and is reviewed by the relevant partner before it sends. The agent never quotes fees — that remains the partner's prerogative at consultation.
+
+I would welcome 20 minutes this week to walk through how this performs on a live firm's inbound stream.
+
+Are you available for a brief call?
+
+Best regards,
+{your_name}
+ReachNG
+
+### WHATSAPP templates — follow-up (or first touch for ≤5-lawyer founder-led firms)
+
+**Variant A — Named partner / founder**
 ---
-Subject: 40 hours of associate time — recovered per week
+Good day {first_name}, came across {business_name} through your recent LinkedIn note on the new NDPR enforcement — clearly drove inbound your way.
 
-Hi [Name],
+Quick observation: most boutique chambers your size lose 25–35% of qualified briefs between the first WhatsApp and the engagement letter — not from poor counsel but because partners are billable on live matters and inbound triage is no one's full job. At ₦500K+/matter average, that's ₦20M+ leaked annually.
 
-I work with Lagos law firms to deploy AI tools that remove the document burden from associates — letting them focus on actual legal work.
+ReachNG handles the qualification → credentials → consultation-booking layer for you. Every inbound message answered in 2 minutes by an agent in your firm's voice. Every message reviewed by you before it sends. The agent never quotes fees — that stays with the partner.
 
-LegalOS includes a Digital Associate that reviews contracts and produces structured memos in under a minute, a Court Cause List Monitor that flags upcoming hearings automatically, and a Corporate Governance Tracker that never misses a filing deadline.
-
-I'm working with 2 Lagos firms this quarter on a pilot. Worth a 20-minute call?
+Worth 20 minutes this week to walk through how it would handle one referral from your current pipeline?
 ---
 
-### WhatsApp message template
+**Variant B — Multi-partner firm, no named partner**
 ---
-Hi [Name], I noticed [Firm Name] handles significant document work — contracts, due diligence, board matters.
+Good day, reaching out about {business_name}.
 
-LegalOS automates the manual layer: contract review memos in under a minute, court cause list monitoring, governance filing alerts, and resolution drafting. Associates stop doing admin. Partners get faster output.
+Most multi-partner chambers at your tier lose qualified briefs not on the pitch but on the FOLLOW-THROUGH — the credentials note that should have gone Tuesday goes Friday, and the prospect quietly retains the chamber that replied next-day.
 
-Running a free document review demo for 2 Lagos firms this month. Worth a quick conversation?
+ReachNG is the BD bench partners actually use. Every inbound qualified, every credentials note sent, every consultation booked, all in your firm's voice and reviewed by the relevant partner before it leaves. No fee-quoting — that stays at consultation.
+
+A brief call this week to walk through how it would handle one brief from your current funnel?
 ---
 
-### Key signals that make a lead strong
-- Commercial law firm (M&A, corporate, real estate, IP — not criminal or family law)
-- 5+ lawyers on the firm website or LinkedIn
-- Located in VI, Ikoyi, Marina — where commercial Lagos law firms cluster
-- Partner names visible on website (personalise directly to the decision maker)
-- Active on LinkedIn with thought leadership posts (signals openness to innovation)
+### Message rules (non-negotiable for legal)
+- Email first; WhatsApp only as follow-up or for founder-led ≤5-lawyer firms.
+- **Never frame as "client acquisition" — NBA rules.** Frame as "inbound triage" or "back-office automation."
+- **Never have the agent quote fees.** Always: "Partner will set fees at consultation."
+- Open with a SPECIFIC observation about THEIR firm (recent LinkedIn post, panel, NBA section role, accreditation). Never generic praise.
+- Quantify pain in ₦ per matter / per retainer — the only register that lands.
+- Use formal honorifics — "Sir", "Ma", "Esq.", "SAN" where applicable.
+- Reference **NBA, FRC, SEC, NDPR, CAMA, FIRS, AfCFTA, FCIArb** if relevant. Domain language signals you're not a generalist.
+- Never lead with autopilot — partners are extremely conservative. Lead with HITL.
+- Never name a peer firm — these are colleagues.
+- One question at the end. Never two.
+- Max 6 short sentences for email body; max 4 for WhatsApp.
+
+### Custom build hook (high-signal firms only)
+If the firm has 10+ lawyers, multi-practice structure, named retainer corporate clients on the website, or operates across cities (Lagos + Abuja), add ONE sentence near the CTA:
+- "We also build bespoke modules for multi-partner chambers — practice-area routing, partner-shared client desks, retainer billing reminders, NDPR audit pulses. Most ship in under 2 weeks."
+
+Skip for sole practitioners.
+
+### Reply patterns to expect (and how to handle)
+- **"What's the price?"** — "Pricing depends on inbound volume and number of partners using the system. Happy to walk through on a 20-minute call — when works for you?"
+- **"Is this NBA-compliant?"** — "Yes — the agent triages inbound that already came to your firm. It does not solicit. It does not quote fees. It does not advise. It captures the brief and books the consultation, all under your supervision. Every message is reviewed by a partner before it sends."
+- **"How does this comply with client confidentiality?"** — "The agent never stores matter substance, only intake metadata (name, contact, matter type, urgency, preferred slot). Substantive conversation happens at the consultation."
+- **"We already have a BD officer / junior associate"** — "Of course — most of our firms kept theirs. The associate handles relationship work; the agent handles the WhatsApp/email triage volume. Want to see how that split works?"
+- **"Send a brief"** — "Quicker if I show you a 15-minute live demo on the WhatsApp number you use for chambers — Tuesday or Wednesday this week?"
+- **Long silence** — one follow-up after 7 days, shorter, references the original message. Stop after two attempts. Legal partners take the long view.
+
+### Final check before any draft sends
+- Have I named the firm?
+- Have I referenced a specific signal (LinkedIn post, panel, accreditation, practice area)?
+- Did I quantify pain in ₦ per matter / per retainer?
+- Did I AVOID solicitation language and any fee-quoting?
+- Is the tone partner-to-partner, formal, NBA-respectful?
+- Is there exactly ONE question at the end?
+- Did I avoid the words "solutions", "leverage", "synergy", "empower", "client acquisition", "lead-gen"?
+- Did I mention Paystack/Flutterwave (not Stripe)?
+- Is there NO placeholder text in brackets?
+
+If any answer is no — rewrite.

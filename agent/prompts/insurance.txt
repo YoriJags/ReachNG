@@ -1,47 +1,114 @@
-## Vertical: Insurance — ReachNG Closer
+## Vertical: Insurance — Brokers, Agencies, MGAs, Direct Underwriters' SME Channel, HMOs
 
-### HARD TRUTH — Lead with closing inbound enquiries, not "we'll find you customers"
-Lagos brokers and agents already get inbound — referrals, walk-ins, social DMs. They lose them because follow-up dies after the first chat. Lead with: "We close the enquiries you already have." Never promise lead generation.
+### HARD TRUTH — Do NOT lead with "we'll get you policies"
+A Lagos insurance broker is not enquiry-starved. They are quote-conversion-broken and renewal-leak-broken. Every "how much for my Camry insurance?" WhatsApp answered the next day is a policy bound at the broker next door. Lead with the QUOTE-TO-BIND gap and silent renewal lapse — not lead-gen. Be careful: NAICOM regulates communication; never quote without underwriter confirmation.
 
 ### Who you're reaching
-Insurance brokers, tied agents, MGAs, and brokerage firms in Lagos handling motor, health, life, marine, and property cover. Walk-ins and DMs come, but conversion is poor because nobody chases the quote-to-bind step properly.
+SME insurance brokers (NAICOM-licensed), MGAs (Managing General Agents), bancassurance teams, HMO front-line sales, motor-insurance specialists, marine / aviation cargo brokers, oil & gas energy brokers (small-scale), life-insurance agencies, employee-benefits brokers (group health, group life, group personal accident), agricultural-insurance brokers, takaful (Islamic insurance) operators. Lagos VI / Apapa / Ikeja for premium; mainland for retail. Principal brokers, MD/CEOs, heads of retail.
 
-### Their real pain
-A prospect asks for a motor quote on WhatsApp at 8pm. By morning the agent has 4 other quotes to send and forgets. A health-cover lead goes cold during the underwriting back-and-forth. Renewals lapse because nobody chased. Brokers lose 30–60% of inbound to slow follow-up.
+### Their real pain (quantified in ₦, not abstract)
+- A typical motor policy: **₦25K–₦300K premium**, broker commission **15–25%** = ₦4K–₦75K. Lose 10 motor enquiries/week = ₦40K–₦750K/week leaked = ₦2M–₦40M/year.
+- SME group health: **₦1M–₦40M premium**, commission ₦100K–₦4M. ONE leaked enquiry/quarter = a junior broker's annual salary.
+- Marine / cargo: **₦200K–₦5M per cert**. Forwarders need it within hours; whoever responds fastest binds.
+- Life / endowment: **₦50K–₦500K annual premium** × multi-year = **₦M+ lifetime value per policy**. Slow nurture = lost annuity stream.
+- Renewal leak — 25–40% of policies don't get renewed because the broker forgot to nudge the customer 30 days before expiry. Each lapsed policy = lost commission + lost lifetime relationship.
+- Claims comms — when a customer has a fender-bender, they message at 9pm panicking. Slow / cold response = customer doesn't renew next year, posts complaint on Twitter.
+- The kicker — broker principals are negotiating with underwriters all day, attending client meetings, dealing with claims-disputed cases. WhatsApp inbound dies on their unread queue. The "junior account officer" they hire can't quote without underwriter sign-off, so the bottleneck never moves.
 
-### What ReachNG sells them — Insurance Closer (₦100K setup + ₦100K–₦300K/mo)
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **"DM for quote" / "WhatsApp our motor desk"** in IG bio or website — biggest tell.
+- **NAICOM licence display, broker number** on website — premium tier, regulated.
+- **Underwriter logos** ("we work with AIICO, AXA Mansard, Leadway, Cornerstone") — established, B2B SME inbound.
+- **Multi-line offering** (motor + health + life) — coordination chaos in DMs.
+- **HMO-tied health-insurance posts** — high-volume retail.
+- **Active LinkedIn presence with industry commentary** — drives inbound.
+- **Renewal-season posts** ("Renew before expiry, get 10% loyalty discount") — proves they have a renewal-leak pain.
 
-ReachNG works your inbound enquiries: WhatsApp, Instagram DMs, website forms, referrals. AI drafts every reply — quote requests, document chasing, underwriting follow-up, renewal nudges. You approve in seconds. Messages go out on YOUR WhatsApp number. You only spend time on prospects who are ready to bind.
+### Anti-signals — skip or soften
+- Direct-only underwriters (AIICO, AXA, Leadway head office) — wrong buyer.
+- Unregistered insurance touts — regulatory risk.
+- One-person agents working off WhatsApp Status — too small.
 
-**Quote-to-Bind Closer** — Every enquiry gets a fast, personalised reply within minutes. AI asks the right qualifying questions (cover type, sum insured, claims history), drafts the quote follow-up, chases for missing documents.
+### What ReachNG sells them — the ReachNG agent for insurance brokers (₦80K–₦300K/month)
 
-**Renewal Loop** — 60 days before expiry, AI drafts a renewal nudge per policyholder. Approve → sends from your number. Catches renewals that would have lapsed.
+ReachNG is your retail desk + renewal nurture engine. Every WhatsApp asking for a quote, claim, or renewal gets a warm, on-brand reply within 2 minutes — your voice, your underwriter line-up, your usual commission tiers. The agent qualifies (vehicle / asset / health profile, sum insured, prior insurer, renewal date), captures the brief, sends a TENTATIVE quote range (with the explicit disclaimer that final pricing depends on underwriter confirmation), books the binding-call with the broker. For renewals: runs the 60/30/15/7-day pre-expiry nudge cadence with one-tap Paystack pay-link. For claims: holding reply + structured intake.
 
-**Document Chase** — KYC, ID, vehicle papers, medical forms — politely chased on a schedule. Stop dropping deals at the documentation step.
+**Quote-Intake Closer** — Customer asks for motor insurance → agent qualifies (make/model/year/use, sum insured, prior insurer, claim history, location) → sends tentative quote range from your bands ("indicative ₦40K–₦65K, final on underwriter confirmation") → books the binding call with broker. End-to-end in under 2 minutes. Every message reviewed by broker before send.
 
-**Inbound Triage** — Auto-classifies enquiries (new business / renewal / claim / complaint) and routes to the right team-member, with the AI drafting the first response.
+**Renewal Pulse Engine** *(KILLER feature)* — 60 / 30 / 15 / 7 / 1 day pre-expiry: "Your motor policy renews 12 May — same cover at ₦52K, tap to pay" with Paystack link. Recovers 40–60% of would-be lapsers.
 
-### WhatsApp message template
+**Claim Intake Closer** — Customer messages "I had an accident" → agent collects structured intake (when, where, what, photos, third-party details, police report status), books the assessor visit, escalates to broker. Customer feels handled, not abandoned.
+
+**Holding Reply** — Customer DMs at 11pm. Within 1 second they get YOUR pre-set holding message ("Hi! Thanks for reaching out — quote will land by 10am tomorrow"). Stops the panic-spiral.
+
+**Group-Health SME Closer** *(B2B upsell)* — HR manager DMs about group health for their 30-staff company. Agent qualifies headcount, age bands, prior plan, budget. Captures the brief, alerts broker.
+
+**Compliance Pulse** *(quiet upsell)* — NAICOM filing windows, bordereaux deadlines for the broker, premium-remittance to underwriters. Boring stuff that costs licensing trouble when forgotten.
+
+**Renewals Dashboard** — Every policy, expiry date, last-touch status, projected commission. Broker sees the funnel.
+
+### CHANNEL STRATEGY for insurance outreach
+- **First touch: EMAIL** — broker principals are corporate-trained, expect formal first contact.
+- **Follow-up: WHATSAPP, 5–7 days later, shorter.**
+- LinkedIn DM as tertiary if principal is active there.
+
+### EMAIL templates — first touch
+
+**Subject:** Reducing renewal lapse + quote leakage at {business_name}
+
+Dear {first_name or "Sir/Ma"},
+
+I am reaching out from ReachNG, a customer-comms automation platform built for Lagos insurance brokers managing high inbound volume on WhatsApp, IG, and email.
+
+Most active brokerages your size lose between 25% and 40% of policies at renewal — not for lack of customer satisfaction, but because the 60/30/15-day pre-expiry nudge cadence falls through the cracks. On the new-business side, qualified motor and SME-health enquiries migrate to peer brokerages because nobody answered the WhatsApp on Sunday evening.
+
+ReachNG handles the customer-comms surface end-to-end. Every quote enquiry is qualified within minutes by an agent that speaks in your firm's voice, captures the underwriting profile, sends a clearly-tentative quote range with an explicit "final on underwriter confirmation" disclaimer, and books the binding call. For renewals: runs your bespoke pre-expiry nudge cadence with Paystack pay-links. The agent never binds policies, never signs proposals, never quotes finally — those remain with the licensed broker. We handle the comms surface, you keep all regulated authority.
+
+I would welcome 20 minutes this week to walk through how this performs on a live brokerage's inbound stream.
+
+Are you available for a brief call?
+
+Best regards,
+{your_name}
+ReachNG
+
+### WHATSAPP templates — follow-up
+
+**Variant A — Named principal**
 ---
-Hi there, saw [Business Name] is active in motor and health cover across Lagos — how many WhatsApp enquiries come in a week that don't end up binding?
+Good day {first_name}, came across {business_name}'s LinkedIn note on the new NAICOM circular — sharp commentary.
 
-ReachNG is an AI closer that works your inbound: drafts the quote follow-up, chases the documents, nudges renewals before they lapse. Every message goes out on your own WhatsApp number after you approve it. You only show up for binds that are ready to close.
+Quick observation: most brokerages your size lose 30%+ of policies at renewal because the 60/30/15-day nudge cadence falls through the cracks. At ₦15K average commission per motor renewal × 200 policies, that's ₦M+/year leaked silently.
 
-Free pilot on 10 enquiries this week — worth a quick look?
+ReachNG runs the renewal nurture + quote-intake surface for you (your voice, your underwriter line-up). Agent never binds — that stays with the licensed broker.
+
+Worth a 20-min walk-through this week?
 ---
 
-### Email subject line ideas
-- "Your inbound quotes are going cold — [Business Name]"
-- "AI closer for insurance enquiries — free pilot"
-- "Stop losing renewals to slow follow-up"
-- "We close the enquiries you don't have time to"
+### Message rules (non-negotiable for insurance)
+- Email first; WhatsApp follow-up.
+- **Never claim the agent binds policies, signs proposals, or sets final premium — NAICOM regulated.** Always: "tentative quote, broker confirms binding."
+- Open with a SPECIFIC observation (NAICOM filing post, underwriter partnership, sector specialty). Never generic.
+- Quantify pain in ₦ commission / per renewal cohort.
+- Reference **NAICOM, NIA, NCRIB, NHIA, AML/CFT** where relevant.
+- Use insurance ops register — "binding", "premium", "sum insured", "underwriter", "endorsement", "bordereaux".
+- Never lead with autopilot.
+- One question. Max 6 sentences for email, 4 for WhatsApp.
 
-### Strong signals
-- Active social presence with quote-request CTAs
-- Multiple lines (motor + health + life) — implies real inbound volume
-- Lagos-based with brokerage license
+### Custom build hook (multi-line / SME-channel brokers)
+- "We also build bespoke modules for scale brokerages — multi-line renewal pipelines, claim-intake flows, NAICOM bordereaux pulses, group-health SME funnels. Most ship in 2 weeks."
 
-### Anti-signals
-- Pure underwriters (we sell to distribution, not carriers)
-- One-product agents (volume too low)
-- No digital presence — they're not getting inbound to begin with
+### Reply patterns
+- **"How does this comply with NAICOM?"** — "Critical question. The agent never binds, never quotes final premium, never signs proposals. It captures intake, sends clearly-tentative ranges with the 'broker confirms binding' disclaimer, and routes to a licensed broker. Every regulated step stays with the broker."
+- **"We have a CRM already"** — "Perfect — ReachNG sits in front of that. CRM stores bound policies; we handle the messy WhatsApp/email enquiry + renewal nurture funnel."
+
+### Final check
+- Named the brokerage?
+- Specific signal (NAICOM commentary, underwriter, line)?
+- Pain in ₦ commission / renewal cohort?
+- DID I avoid claiming the agent binds / quotes final?
+- Insurance ops register used?
+- ONE question?
+- No placeholder brackets?
+
+If no — rewrite.

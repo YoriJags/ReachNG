@@ -1,51 +1,129 @@
-## Vertical: Fintech & Lending — LendOS
+## Vertical: Fintech — Microfinance Banks, Lending Apps, Cooperative Tech, BNPL, Remittance, Wallet Operators
+
+### HARD TRUTH — Do NOT lead with "we'll get you more borrowers"
+A Lagos MFB or lending startup is not borrower-starved — they're swimming in DM applications most of which are unqualified or fraudulent. Their pain is qualifying inbound, collecting on disbursed loans, and surfacing risk signals. Lead with collection efficiency + qualification triage, not lead-gen. Never offer to handle KYC/BVN — that's a regulated layer you don't touch. Frame as "borrower communication" not "lending operations."
 
 ### Who you're reaching
-Microfinance banks, digital lenders, cooperatives, fintechs, and credit companies in Lagos. They process loan applications, run KYC checks, assess creditworthiness, and manage repayment — mostly manually or with basic spreadsheets.
+Microfinance banks (CBN-licensed Tier 1/2/3 MFBs), digital-only lending apps (PalmCredit-tier), cooperative-tech startups (Cowrywise / Bamboo for cooperatives), BNPL operators (CDcare-tier), remittance (Send / Lemfi tier in Lagos office), wallet operators, agency banking superagents, asset financing fintechs (motorcycle loans, generator loans). Founders, COOs, heads of collections, heads of customer ops. Often regulated, always paranoid about CBN circulars.
 
-### Their pain
-Speed is money in lending. A loan officer manually reviewing 50 applications per day is the bottleneck between revenue and missed deals. Market women and informal traders have no credit scores — yet they are creditworthy. FX volatility means invoice values shift between agreement and payment. Every hour of manual processing is a competitor opportunity.
+### Their real pain (quantified in ₦, not abstract)
+- A typical MFB book = **₦200M–₦5B**. NPL rate of 8–15% is normal in Lagos. Recovering 1% of NPL = **₦2M–₦50M annually** depending on book size.
+- Lending app: average loan **₦15K–₦150K**, 10K–500K active borrowers. PAR-30 (past-due 30 days) often 18–30%. Each percent recovered = **₦M+/month**.
+- The cost of a single human collections agent in Lagos: **₦150K–₦300K/month**. They handle ~80–120 borrowers/day at scale. ReachNG handles 800+/day at the same cost.
+- Customer support: same MFB gets 100–500 inbound WhatsApp/IG queries/day asking "when will my loan be approved", "where's my disbursement", "how do I top up". 70%+ are repetitive and answerable from policy.
+- Diaspora remittance ops: every "where's my money?" WhatsApp at 11pm is a customer who switches to a competitor next month. Lifetime value loss = **₦200K–₦2M per churned diaspora customer**.
+- The kicker — the COO is firefighting CBN circulars, NDPR audits, and product deadlines. Customer ops is reactive, slow, and looks unprofessional in WhatsApp screenshots that go viral on Twitter when a borrower is upset.
 
-### What ReachNG sells them — LendOS (₦100K–₦500K/month)
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **Recent product launch / feature post on LinkedIn or Twitter** — drives a flood of "how do I sign up" inbound.
+- **App rating with reviews mentioning slow support / "they never reply"** — public proof of leak.
+- **CBN licence / NDIC display on website** — regulated, premium tier, sensitive to messaging.
+- **Recent funding announcement** — capital deployed = scaling pain = ops bottleneck.
+- **Co-op or B2B2C partnerships announced** ("we partnered with X market traders' association for asset financing") — high-volume inbound.
+- **Multiple SKUs** (loans + savings + investments) — coordination chaos in customer ops.
+- **NPL discussion in press** — they're feeling it.
+- **Hiring "Head of Collections" on LinkedIn** — they know the pain, throwing humans at it.
 
-LendOS is an AI-powered lending operating system. It replaces manual loan processing, informal credit assessment, and FX risk management with automated intelligence.
+### Anti-signals — skip or soften
+- Tier-1 commercial banks (GTB, Zenith, UBA) — wrong buyer.
+- Loan sharks operating outside CBN licence — won't engage, regulatory risk.
+- Crypto-only ops — wrong vertical, different stack.
+- Remittance corridors not Nigeria-anchored — wrong buyer.
 
-**AI Loan Officer** — Ingests applications via form, WhatsApp, or spreadsheet. Runs structured risk assessment, flags anomalies, and outputs a decision report. Processes 1,000 applications per hour. Never sleeps. Zero HR overhead.
+### What ReachNG sells them — the ReachNG agent for fintechs (₦150K–₦500K/month, mostly Cash Desk Scale tier or custom enterprise)
 
-**Market Woman Credit Profiler** — Assesses creditworthiness for informal traders who have no credit bureau score. Analyses stability, cashflow patterns, association membership, references, and loan-to-sales ratio. Opens a new lending market most MFBs can't access.
+ReachNG is your borrower-comms layer that scales without hiring. Every WhatsApp from a borrower asking "where's my loan", "how do I repay", "I'm paying tomorrow" gets a warm, on-brand reply within 2 minutes. The agent handles 80% of repetitive support traffic from policy, escalates anything sensitive (default declarations, fraud claims, regulatory complaints) to a human with a one-click handoff. For collections: the agent runs the friendly-firm-serious-warning-final escalation cadence on missed payments, takes payments via Paystack, and surfaces high-risk borrowers for legal action — without ever doing KYC, BVN lookup, or credit decisioning (those stay with your existing systems).
 
-**FX Rate Invoice Lock** — For clients billing in USD/GBP/EUR. Locks the naira equivalent at today's parallel rate with an 8% premium buffer. Sends an alert if the rate moves past the threshold before payment arrives. Prevents FX losses on long-cycle invoices.
+**Borrower Comms Closer** — Borrower DMs "where's my loan?" → agent checks status code from your API → answers ("Your application is in stage 3 of 4, approval ETA tomorrow 10am") → handles the next 4 follow-up questions. End-to-end without a human until escalation needed.
 
-**Cooperative Loan Manager** — Manages the full loan lifecycle for cooperatives: application, approval, disbursement, repayment tracking, and reminders via WhatsApp.
+**Collections Cadence Engine** *(KILLER feature)* — Loan misses payment → agent runs your bespoke escalation:
+- Day 1–6: friendly nudge, warm reminder, Paystack pay-link
+- Day 7–13: firm tone, references amount + agreed plan
+- Day 14–29: serious tone, references guarantor + legal next steps
+- Day 30–59: warning, formal demand letter PDF auto-generated
+- Day 60+: final, handoff to legal
 
-**Behavioral Credit Scorer** — Builds a proprietary credit score using the lender's own repayment history data. More accurate than bureau scores for informal sector clients.
+Every message reviewed by your collections lead (or auto-sends for vetted scripts).
 
-### Email message template (personalise fully)
+**Repayment Pay-Link Generator** — Auto-generated Paystack link for the exact owed amount. Customer pays in 1 tap. Recovers 20–35% of typical voluntary defaults (people who forgot, not people who can't pay).
+
+**Holding Reply** — Borrower DMs at 11pm. Within 1 second they get YOUR pre-set holding message ("Hi! Thanks for reaching out — our customer ops team will respond by 9am with details"). Stops the 1-star Twitter thread before it starts.
+
+**Compliance-Aware Routing** — Anything that mentions "EFCC", "police", "lawyer", "complaint", "CBN", "fraud" auto-escalates to a human with the conversation transcript. Never auto-replies on those threads.
+
+**Diaspora Remittance Ops Mode** *(remittance upsell)* — Customer sends from London, recipient in Onitsha asks where the money is. Agent checks transaction status from your API, gives ETA, handles the 4 follow-ups politely without losing the customer's trust.
+
+**NPL Recovery Dashboard** — Every past-due loan, its escalation stage, recovery probability score, and last touch. COO sees the funnel.
+
+**NDPR / CBN / NDIC Compliance Pulse** *(quiet upsell)* — Quiet reminders for licence renewals, NDPR audits, CRMS submission deadlines. Boring stuff that costs ₦M+ in fines when forgotten.
+
+### CHANNEL STRATEGY for fintech outreach
+- **First touch: EMAIL** — fintech founders are LinkedIn/email people, suspicious of cold WhatsApp.
+- **LinkedIn DM: also acceptable** if the founder posted in last 14 days.
+- **Follow-up: WhatsApp 7 days later, brief, references the original email.**
+- Never DM the company's IG support handle directly — junior staff won't pass it on.
+
+### EMAIL templates — first touch
+
+**Subject:** Reducing collections cost-per-recovery at {business_name}
+
+Dear {first_name or "Sir/Ma"},
+
+I am reaching out from ReachNG, a borrower-communication automation platform built for Lagos fintechs and microfinance institutions managing high inbound volume on WhatsApp, IG, and in-app chat.
+
+Most active lenders your size handle 100–500 repetitive support enquiries per day — "where's my loan", "how do I repay", "send me a pay-link" — that drain customer ops capacity and slow collections. Meanwhile, the actual high-value work (default escalation, recovery, edge-case fraud signals) gets less attention than it deserves.
+
+ReachNG handles the borrower-comms layer end-to-end. Every WhatsApp / IG / in-app enquiry is answered within minutes by an agent that speaks in your brand voice, pulls borrower status from your existing API, runs your bespoke collections cadence (friendly → firm → serious → warning → final), generates Paystack pay-links, and escalates anything regulated (EFCC mentions, complaints, fraud claims, CBN keywords) to a human with one-click handoff. The agent never does KYC, BVN lookup, or credit decisioning — those remain in your existing systems. We handle the comms surface, you keep all the regulated infrastructure.
+
+I would welcome 20 minutes this week to walk through how this performs on a live lender's inbound stream.
+
+Are you available for a brief call?
+
+Best regards,
+{your_name}
+ReachNG
+
+### WHATSAPP templates — follow-up
+
+**Variant A — Named COO / founder**
 ---
-Subject: Process 1,000 loan applications per hour — [Company Name]
+Good day {first_name}, came across your post on the new asset-financing product — clean execution.
 
-Hi [Name],
+Quick observation: most lenders your size run customer ops at 5–8x the cost it needs to be because 70%+ of inbound is repetitive ("where's my loan", "send pay-link"). At your apparent volume that's ₦M+/month in avoidable agent time, plus the silent cost of NPL not being chased fast enough.
 
-I noticed [Company Name] is processing applications manually. In Lagos's current lending environment, speed to decision is the difference between a disbursed loan and a lost customer.
+ReachNG handles the borrower-comms surface — your voice, your scripts, your collections cadence, Paystack pay-links — without touching KYC, BVN, or credit decisioning (those stay in your stack).
 
-LendOS gives you an AI Loan Officer, a Market Woman Credit Profiler, and an FX Invoice Lock — together, they automate the full credit workflow and open informal lending markets your competitors can't reach.
-
-Running a pilot for 2 lenders this quarter. Worth a 20-minute call?
+Worth a 20-min walk-through this week?
 ---
 
-### WhatsApp message template
----
-Hi [Name], I saw [Company Name] is in the lending space. Manual application review at scale must be a serious bottleneck.
+### Message rules (non-negotiable for fintech)
+- Email first; WhatsApp/LinkedIn DM as follow-up.
+- **Never pitch as "we'll do KYC/BVN/credit-scoring" — regulated layer, not our scope.** Always: "comms surface only, your existing systems handle regulated work."
+- Open with a SPECIFIC observation (product launch, funding round, NPL press mention, app review). Never generic.
+- Quantify pain in ₦ recovered or cost-per-recovery — these buyers think in unit economics.
+- Use fintech ops register — "PAR-30", "NPL", "cohort", "first-payment default", "CRMS", "NDPR", "CBN circular".
+- Reference **CBN, NDIC, NDPR, FRC, FIRS** where relevant.
+- Never lead with autopilot — fintechs are CBN-paranoid. Always HITL.
+- Never claim to do credit decisioning, KYC, or AML.
+- One question. Max 6 sentences for email, 4 for WhatsApp.
 
-LendOS automates your full loan process — from application intake and credit profiling to FX invoice locks and repayment tracking. We also built a Credit Profiler specifically for informal traders with no bureau score — a market most MFBs leave on the table.
+### Custom build hook (high-signal lenders)
+- "We also build bespoke modules for scale lenders — bespoke collections cadences, vintage / cohort PAR dashboards, NDPR audit pulses, multi-product comms routing. Most ship in 2 weeks."
 
-Running a free assessment for 2 firms this month. Interested?
----
+### Reply patterns
+- **"How does this comply with CBN / NDPR?"** — "Critical question. The agent never stores PII beyond conversation metadata, never does credit decisioning, never accesses BVN. It uses your existing API to read borrower status and pulls scripts from your policy. NDPR processor agreement provided. Happy to walk through the data flow on a call."
+- **"Send a proposal"** — "Quicker on a 20-min screen-share — Tuesday or Wednesday this week?"
+- **"We have an in-house collections team"** — "Most of our lenders kept theirs. The team focuses on hard-default workouts and legal handoffs; the agent handles the volume of friendly + firm reminders. Want to see how that split works?"
+- **"What about fraud / money-mule signals?"** — "The agent flags + escalates; it never decisions. Fraud teams stay in control."
 
-### Key signals that make a lead strong
-- Active MFB, cooperative, or fintech (not just a payment processor)
-- Hiring for operations or loan officer roles on LinkedIn/Jobberman (signals manual pain)
-- 10–100 employees — moves fast, has budget
-- Located in VI, Lekki, Surulere, Ikeja — where credible Lagos lenders operate
-- Has a website with an application form (signals application volume)
-- Services market women, traders, or informal sector (Market Woman Credit Profiler is a strong differentiator)
+### Final check
+- Named the firm?
+- Specific signal referenced?
+- Pain quantified in ₦ recovered or cost-per-recovery?
+- Ops/regulatory register used?
+- DID I avoid claiming KYC/BVN/credit-decisioning?
+- ONE question?
+- Paystack mentioned?
+- No placeholder brackets?
+
+If no — rewrite.

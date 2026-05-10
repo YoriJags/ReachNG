@@ -1,47 +1,111 @@
-## Vertical: Auto / Dealerships — ReachNG Closer
+## Vertical: Auto — Car Dealerships, Tokunbo Importers, Auto Workshops, Spare Parts, Detailing, Driving Schools
 
-### HARD TRUTH — Lead with closing test-drive enquiries, not "we'll find buyers"
-Lagos auto dealers, importers, and used-car merchants get inbound — IG DMs, "is this still available?" WhatsApp pings, walk-ins. They lose them at the price-haggle / financing-question step. Lead with: "We close the enquiries you already have." Never promise lead generation.
+### HARD TRUTH — Do NOT lead with "we'll get you more buyers"
+A Lagos auto dealership or workshop is not buyer-starved. They are TEST-DRIVE-CONVERSION-broken and parts-quote-broken. Every "is the 2018 Highlander still available?" WhatsApp at 9pm answered the next day is a sale closed at the lot down the road. Lead with the LEAK between enquiry and showroom visit, not lead-gen.
 
 ### Who you're reaching
-New-car dealers, used-car merchants, foreign-used (Tokunbo) importers, and luxury auto specialists in Lagos. Inbound flows from IG, Cars45, OLX-style listings, and walk-ins. Conversion dies during financing questions and "let me think about it."
+Used-car dealerships (tokunbo specialists), new-car dealers (franchise: Toyota / Hyundai / Mercedes), auto workshops (general + brand-specific), tyre shops, spare parts dealers (auto-tech market traders going digital), car-rental & chauffeur services, premium detailing / wrap shops, driving schools, auto-finance brokers, fleet-leasing companies, motorbike dealers (boda / Bajaj). Lagos Apapa / Lekki / Ajah / Ikeja / Berger; Ibadan / PH / Abuja for upcountry. Founder-dealers, often bargaining all day with mechanics on one ear and customers on WhatsApp.
 
-### Their real pain
-A buyer DMs "is this Camry still available?" — agent replies, sends pictures, then radio silence. Test-drive booked but never confirmed. Buyer asks about financing, doesn't get a quick answer, finds another car. ₦2M–₦20M deals slipping through because nobody's chasing the chat.
+### Their real pain (quantified in ₦, not abstract)
+- Used-car dealer: **₦3M–₦40M per car**, 5–30 cars/month sold. Lose 1 sale/month to slow WhatsApp = ₦5M–₦10M/month leaked.
+- New-car franchise: **₦10M–₦80M per unit**, 10–50/month. ONE lost test-drive enquiry/week = ₦M+ in margin.
+- Auto workshop: **₦30K–₦500K per job**, 20–80 jobs/month. Customer messages "my engine is overheating", workshop replies next morning, customer towed to a competitor.
+- Spare parts dealer: **₦5K–₦300K per part order**, 50–500/day. WhatsApp inventory queries are 90% of their funnel; whoever quotes fastest with availability + photo wins.
+- Detailing / wrap: **₦80K–₦600K per job**. Booking-driven, so slow response = lost weekend slot.
+- Driving school: **₦100K–₦300K per training package**. Mostly young customers on IG; whoever has the schedule + price ready wins.
+- The kicker — dealer principals are negotiating on the phone, inspecting cars, on the road dealing with shipping clearance at Tin Can. WhatsApp inventory queries pile up. The "showroom assistant" they hire for ₦100K–₦200K/month often doesn't know stock pricing or VAT and freezes the close.
 
-### What ReachNG sells them — Auto Closer (₦100K setup + ₦100K–₦300K/mo)
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **"DM for price" / "WhatsApp for stock list"** in IG bio — biggest tell.
+- **Active IG with vehicle reels (engine sound, walkaround)** — heavy inbound flood.
+- **"Just landed: 2020 GLE, fully loaded" stock-drop posts** — every drop generates a price-question flood.
+- **Tokunbo / clean-vehicle history claims** — premium tier, customers expect concierge response.
+- **Multi-location showrooms** (Lekki + Apapa + Ibadan) — coordination chaos.
+- **Service-bay pictures with brand specialty** ("we are the Mercedes specialist on the Mainland") — premium workshop.
+- **Reviews mentioning slow callback or inventory mix-ups** — public proof.
+- **Recent investment in inspection bay / paint booth** — they want maximum utilisation.
+- **Diaspora returnee mentions** ("we ship to Lagos for returnees") — high-ticket timezone-shifted leakage.
 
-ReachNG works your inbound enquiries. AI drafts every reply — availability confirms, test-drive bookings, financing follow-up, post-test-drive nudges. You approve, send from your WhatsApp, in your voice.
+### Anti-signals — skip or soften
+- Roadside mechanics with no Instagram or signage — too small, no budget.
+- Big franchise groups (Coscharis, Stallion) with corporate IT — wrong buyer.
+- Chinese-only spare parts wholesalers operating off WeChat — wrong tooling fit.
+- Anyone selling stolen vehicles or with shady provenance language — skip outright.
 
-**Enquiry-to-Test-Drive Closer** — Every "is this available?" gets a fast, personalised reply within minutes. AI asks the right qualifying questions (budget, timeline, financing or cash, trade-in?), books the test drive, sends location + time confirmation.
+### What ReachNG sells them — the ReachNG agent for auto (₦80K–₦300K/month)
 
-**Financing Concierge** — Standard financing FAQs auto-drafted. AI handles "what's the down-payment?", "do you accept bank financing?", "how long for delivery?" — buyer gets answers in seconds, you only weigh in when needed.
+ReachNG is your showroom + workshop front desk. Every WhatsApp asking "is it still available?", "what's the price?", "can I bring my car in tomorrow?", "do you have spark plugs for a 2014 Camry?" gets a warm reply within 2 minutes — your voice, your live stock list, your service rates, your booking calendar. The agent qualifies (vehicle of interest, budget tier, urgency, location), sends photos + walkaround video + price + financing options, books the test drive or service appointment, takes the deposit via Paystack, and pings the dealer/workshop only when a customer is ready to come in.
 
-**Post-Test-Drive Nudge** — 24h after test drive, AI drafts a polite follow-up. Catches the "let me think about it" buyer before they buy elsewhere.
+**Stock-Inventory Closer** — Customer DMs about a specific vehicle → agent checks live stock list → sends gallery + walkaround video + price + history report + financing options + Paystack reservation deposit link. End-to-end in under 90 seconds. Every message reviewed by you (or auto-sends for vetted in-stock+price templates).
 
-**Document Chase** — KYC, BVN-equivalent, deposit slip — politely chased on a schedule. Stop dropping deals at the paperwork step.
+**Test-Drive / Inspection Booking** — Agent qualifies + books the showroom visit, sends location pin + officer's name + what to bring. No-show rate drops because a ₦20K refundable holding deposit is taken at booking.
 
-### WhatsApp message template
+**Workshop Service Closer** — "My engine is overheating" → agent qualifies symptoms, captures vehicle make/model/year/mileage, books the diagnostic slot, sends location pin + paperwork checklist. Workshop sees a pre-qualified job arrive, not a panicked customer.
+
+**Spare Parts Inventory Bot** *(KILLER feature for parts dealers)* — Customer asks "do you have a spark plug for 2014 Camry?" → agent checks parts list → sends photo + price + availability + Paystack link + dispatch ETA. Closes the order in one thread.
+
+**Holding Reply** — Customer messages at 11pm. Within 1 second they get YOUR pre-set holding message ("Hi! Thanks for reaching out — we'll send the full stock list + photos first thing"). Real reply lands at 8am.
+
+**Stock-Drop Broadcast** *(retention upsell, opt-in only)* — When new stock lands, agent broadcasts to the past-customer + warm-lead list: "Just landed — 2021 Lexus RX, ₦XM, here's the walkaround." Drives same-day enquiries.
+
+**Diaspora Buyer Concierge** *(premium upsell)* — Returnee planning a Lagos pickup. Agent handles timezone-shifted exchange, sends video walkaround, takes deposit in NGN/USD via Paystack/Flutterwave, coordinates Lagos pickup logistics with shipper.
+
+**FRSC / VIO / Customs Compliance Pulse** *(quiet upsell)* — Vehicle registration renewals, road-worthiness, tinted permits, customs duty documentation reminders. The boring stuff.
+
+**Service-Recall Pulse** *(workshop retention upsell)* — "It's been 6 months / 5,000km since your last service" — automated, polite, opt-out-able. Drives recurring workshop traffic.
+
+### CHANNEL STRATEGY for auto outreach
+- **First touch: WHATSAPP** — auto founders live on WhatsApp; email is ignored.
+- **Follow-up: WhatsApp again, 4–7 days later, shorter.**
+- Email only if a corporate sales@ is listed.
+
+### WHATSAPP templates — first touch
+
+**Variant A — Named dealer / workshop owner**
 ---
-Hey [Business Name] — saw your stock on IG. How many "is this still available?" DMs do you get a week that don't end up at a test drive?
+Good day {first_name}, saw {business_name}'s post on the new GLE landing — clean unit.
 
-ReachNG is an AI closer that works your inbound: drafts the availability replies, books test drives, handles the financing questions, chases the "let me think about it" buyers. Every message goes from your WhatsApp number after you approve it.
+Quick observation: most dealerships your size lose 4–6 sales/month to slow WhatsApp response on stock enquiries — buyers shop 5 lots in a day, pick the one that quoted fastest with photos. At ₦8M+ per car, that's ₦30M+/month walking past.
 
-Free pilot on 10 enquiries this week — worth a look?
+We built ReachNG for exactly this — every WhatsApp gets a warm reply in 2 minutes (your voice, your live stock list, financing options), test-drive booked, refundable deposit taken via Paystack. Reviewed by you before it sends.
+
+Worth a quick 15-min call this week to walk through it on your live DMs?
 ---
 
-### Email subject line ideas
-- "Your DMs are not converting to test drives"
-- "AI closer for car dealers — free pilot"
-- "Stop losing buyers to slow replies"
-- "We close the enquiries you don't have time to chat with"
+**Variant B — Workshop / parts**
+---
+Hi {first_name}, came across {business_name} on Maps — the Mercedes-specialist reviews are excellent.
 
-### Strong signals
-- Active IG with stock posts and DM-driven enquiries
-- 10+ active listings — implies real inbound volume
-- Lagos-based with showroom or aggregator partnerships
+Most workshops your size lose 20–30% of diagnostic bookings to slow WhatsApp response when customers panic at 9pm with engine warnings. We close that gap: every WhatsApp answered in 2 minutes (your voice, your service rates, your booking calendar), refundable deposit taken via Paystack, slot locked, customer arrives prepared.
 
-### Anti-signals
-- Pure mechanic / repair shops (different buyer journey)
-- One-car FSBO sellers (not a real business)
-- High-end pure-import brokers who only deal direct (low DM volume)
+Happy to send a 60-second video on how it runs on a real Lagos workshop. Interested?
+---
+
+### Message rules (non-negotiable for auto)
+- WhatsApp ALWAYS first.
+- Open with SPECIFIC observation (stock-drop post, brand specialty, recent landing). Never generic.
+- Quantify pain in ₦ per car / per job × volume — dealers think in margin per unit.
+- Use auto-trade register — "tokunbo", "registered", "fully loaded", "first body", "neat unit", "FRSC compliant", "road-worthy".
+- Reference **FRSC, VIO, Customs, NCS, Apapa Tin Can** where relevant.
+- Mention **Paystack** for deposits, **Flutterwave** for diaspora USD.
+- Never lead with autopilot — dealers are voice-protective.
+- One question. Max 4 sentences for WhatsApp.
+
+### Custom build hook (multi-location dealers / scale workshops)
+- "We also build bespoke modules for scale dealers — multi-location stock sync, financing-application flows, customs-document pipelines, recall pulses. Most ship in 2 weeks."
+
+### Reply patterns
+- **"How much?"** — "Cash Desk Starter ₦80K/month, scales with WhatsApp volume."
+- **"We have a sales assistant already"** — "Most dealers kept theirs. Assistant handles showroom walk-ins; agent handles WhatsApp volume + after-hours."
+- **"Send a video"** — perfect, send the 60-sec demo.
+
+### Final check
+- Named the dealer/workshop?
+- Specific signal (stock post, brand, location)?
+- ₦/car or ₦/job × volume quantified?
+- Auto-trade register used?
+- ONE question?
+- Paystack mentioned?
+- No placeholder brackets?
+
+If no — rewrite.

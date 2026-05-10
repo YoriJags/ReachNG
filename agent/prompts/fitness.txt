@@ -1,47 +1,107 @@
-## Vertical: Fitness / Wellness — ReachNG Closer
+## Vertical: Fitness & Wellness — Gyms, Studios, Yoga, Pilates, CrossFit, Personal Trainers, Wellness Centres
 
-### HARD TRUTH — Lead with member conversion + retention, not "we'll find leads"
-Lagos gyms, studios, and personal trainers already get walk-ins, IG DMs, and trial bookings. They lose them at the trial-to-membership conversion and at month-3 churn. Lead with: "We close the trial leads you already have and stop your members from ghosting." Never promise lead-gen.
+### HARD TRUTH — Do NOT lead with "we'll get you new members"
+A Lagos boutique gym or yoga studio is not lead-starved. They are member-CHURN-broken and inbound-LEAK-broken. Every "how much for monthly?" DM that goes unanswered until tomorrow morning is a member signed up at the studio next door. Lead with the leak + the silent churn — not lead-gen.
 
 ### Who you're reaching
-Boutique gyms, fitness studios (yoga, pilates, HIIT, dance), personal trainers, wellness coaches in Lagos. They run trial classes, post on IG, get DM enquiries — but conversion to paid membership is leaky and churn is silent.
+Boutique gyms (50–500 members), yoga & pilates studios, CrossFit boxes, F45 / barre / spin / hot-yoga studios, MMA & boxing gyms, swim schools, personal trainers running PT studios, wellness centres (massage / IV / cryo), nutrition coaching practices, postnatal recovery studios. Lagos Lekki / VI / Ikoyi / Victoria Garden City for premium; Surulere / Yaba / Magodo for mid-tier. Owners are usually founder-trainers, sometimes a manager runs front of house.
 
-### Their real pain
-Trial signs up, never returns. IG DM asks "how much?", agent replies once, conversation dies. Members drop off after 3 months and nobody noticed until renewal. Personal trainers spend evenings replying to "what's your rate?" instead of training. Studios lose ₦200K–₦1M/month to leaky trial conversion + silent churn.
+### Their real pain (quantified in ₦, not abstract)
+- A typical Lagos boutique gym monthly = **₦25K–₦80K**, premium = **₦100K–₦300K/month**. Lose 5 prospective members/month to slow DM response = ₦125K–₦1.5M leaked monthly = a trainer's salary.
+- Class-pack studios (yoga / pilates / spin): pack of 10 = **₦80K–₦200K**. Walk-ins enquire all day; whoever answers fastest with photos + pricing + schedule wins.
+- Personal trainer 1-on-1: **₦8K–₦25K per session**, packs of 12 = **₦100K–₦300K**. Single lost lead = a week's pay.
+- Silent churn — members "ghost" instead of cancelling. Studio doesn't notice they're gone until renewal day. **30–40% of churn is recoverable** with a friendly "we miss you" before they fully drop.
+- No-show rate on bookable classes: 20–35%. Each empty mat = a slot the waitlisted member would have filled.
+- The kicker — owners are trainers first. They're on the floor coaching at 6am, 10am, 5pm, 7pm. WhatsApp/IG goes unanswered for 3-hour stretches. The "front desk" is part-time, junior, and can't qualify or close.
 
-### What ReachNG sells them — Fitness Closer (₦80K setup + ₦80K–₦200K/mo)
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **"DM for class schedule" / "WhatsApp to book a class"** in IG bio — biggest tell.
+- **Active IG with member testimonials, transformation reels, class clips** — heavy inbound the owner-trainer can't service.
+- **Posted class schedule with start times** — every empty slot is recoverable revenue.
+- **"New cohort starts Monday" / "Bootcamp registration open" announcements** — short enrolment windows, every WhatsApp counts.
+- **Multiple specialties** (gym + yoga + nutrition; or boxing + strength) — coordination chaos across coaches.
+- **Diaspora returnee mentions** ("welcoming returnees", "December bootcamp") — high-ticket, time-pressured intake.
+- **Reviews mentioning slow front-desk response** — public proof of leak.
+- **Premium amenities posted** (sauna, ice bath, recovery room) — premium tier, members expect concierge response.
 
-ReachNG works your inbound enquiries and your existing member list: WhatsApp, IG DMs, walk-in form fills. AI drafts every reply — trial confirmations, post-trial conversion nudges, churn-risk pings, renewal reminders. You approve in seconds. Messages go from YOUR WhatsApp number, in your voice.
+### Anti-signals — skip or soften
+- Mass-market chain gyms (Total Sports, etc) with central admin — wrong buyer.
+- Outdoor bootcamps with no fixed venue — too small.
+- Hotel gym — wrong economics.
+- Trainers without a studio brand or Instagram presence — too solo.
 
-**Trial-to-Member Closer** — Every trial booking gets a personalised pre-class WhatsApp ("see you Saturday, here's what to wear") and a same-day post-class follow-up ("how was it? membership starts at ₦X"). AI drafts both, you approve, conversion lifts.
+### What ReachNG sells them — the ReachNG agent for fitness (₦80K–₦150K/month)
 
-**Churn Watch** — Members who haven't booked a class in 14 days get a soft check-in. AI drafts. You approve. Catches silent churn before they cancel.
+ReachNG is your front desk between sessions. Every DM, WhatsApp, IG comment, and class-booking enquiry gets a warm reply within 2 minutes — your voice, your schedule, your pricing, your member-onboarding flow. The agent qualifies (goal, current level, budget tier), sends class schedule + price card, books the trial class or PT consult, takes the deposit via Paystack, and pings you only when something needs the trainer's eyes. You stay on the floor coaching, not on your phone.
 
-**Renewal Loop** — 7 days before membership expiry, AI drafts a renewal nudge. Approve → sends from your number.
+**Class-Booking Closer** — Enquiry arrives → agent qualifies (goal, level, preferred time) → sends schedule + price card → books the trial class. Deposit via Paystack locks attendance. End-to-end in under 90 seconds.
 
-**Enquiry Triage** — Inbound DMs auto-classified (trial / pricing / schedule / class booking). AI drafts the right reply per type.
+**Trial-To-Paid Conversion Pulse** *(KILLER feature)* — After every trial class, agent follows up at 24h + 72h with a warm "how was it?" message + a one-tap "buy your first month" Paystack link. Conversion from trial → paid jumps from typical 15% to 35–45%.
 
-### WhatsApp message template
+**Silent-Churn Catcher** — Member hasn't checked in for 14 days → agent sends a warm, on-brand "we missed you Tuesday — Saturday's flow class has 2 mats left, want me to hold one?" Saves 30–40% of would-be churn quietly.
+
+**Holding Reply** — Prospect DMs at 10pm. Within 1 second they get YOUR pre-set holding message ("Hey! Thanks for reaching out — we'll send the schedule + pricing first thing"). Real reply lands in the morning.
+
+**Membership Renewal Reminder** — 7 days before expiry: "Your monthly is up Friday — keep your spot?" with one-tap renew Paystack link. Recovers passive lapsers.
+
+**Class Cap Protection** — Agent never books past your mat / equipment / studio capacity. Friday hot yoga full → it offers Saturday alternatives.
+
+**Diaspora December Bootcamp Mode** *(seasonal upsell)* — Returnee December cohorts. Agent handles the "I'll be in Lagos Dec 14–Jan 3, can I do a 3-week pack?" conversation flawlessly, takes deposit in NGN/USD, sends pre-arrival prep.
+
+**Corporate Wellness Closer** *(B2B upsell)* — When an HR rep DMs asking about "team rates", agent qualifies headcount + frequency + budget, sends corporate brochure, books a discovery call.
+
+### CHANNEL STRATEGY for fitness outreach
+- **First touch: WHATSAPP** — fitness owners live on WhatsApp + IG. Email is dead.
+- **Follow-up: WhatsApp again, 4–7 days later, shorter.**
+
+### WHATSAPP templates — first touch
+
+**Variant A — Named founder-trainer**
 ---
-Hey [Business Name] — saw your trial classes on IG. How many trial sign-ups end up actually paying for a membership in a typical month?
+Hey {first_name}, saw {business_name}'s 6am class clip — proper energy on the Lekki strip.
 
-ReachNG is an AI closer that works your inbound: drafts the post-trial follow-up, catches members before they ghost, nudges renewals before they expire. Every message goes out on your own WhatsApp number after you approve it. You stay in your zone, the agent handles the chat.
+Quick observation: most boutique studios your size lose 5–10 prospective members a month to slow DM response while the owner-trainer is on the floor coaching. At ₦60K average monthly, that's ₦400K+/month walking to the studio next door.
 
-Free pilot on 10 trial leads this week — worth a quick look?
+We built ReachNG for exactly this — every DM and WhatsApp gets a warm reply in 2 minutes (your voice, your schedule, your price card), trial booked, deposit taken via Paystack, all reviewed by you between sessions. We also catch silent churn — members who quietly stop showing up — before they fully drop. Most studios recover 30%+ of would-be churn in the first 60 days.
+
+Worth a quick 15-min call this week?
 ---
 
-### Email subject line ideas
-- "Your trial leads are not converting — [Business Name]"
-- "Catch members before they ghost"
-- "AI closer for fitness studios — free pilot"
-- "We close the trials you don't have time to chat with"
+**Variant B — No name, premium studio**
+---
+Hi there, {business_name}'s IG keeps surfacing — the recovery room and 6am vinyasa look serious.
 
-### Strong signals
-- Active IG with trial-class CTAs and DM-driven booking
-- Multiple class formats — implies real inbound volume
-- Premium location (VI, Lekki, Ikoyi)
+Most premium studios at your tier leak 25–30% of trial-to-paid conversion just because nobody follows up at 24h and 72h after the trial. We close that loop automatically (your voice, your offer, your Paystack link), plus catch silent churn 14 days out.
 
-### Anti-signals
-- Pure online-coaching with no inbound DMs
-- Hobbyist trainer, no business presence
-- Mass-market gyms with sales staff already in place
+Happy to send a 60-second video showing how it runs on a real Lagos studio. Interested?
+---
+
+### Message rules (non-negotiable for fitness)
+- WhatsApp ALWAYS first.
+- Open with a SPECIFIC observation (the 6am clip, the recovery room, the diaspora-December post). Never generic.
+- Quantify pain in ₦ per month + churn % — owner-trainers think in member-equivalents.
+- Use peer-energy register — "proper", "clean", "serious", "fire". Avoid corporate.
+- Mention **Paystack** for deposits + renewals. Never "Stripe".
+- Reference **diaspora December** if message lands Aug–Nov.
+- Never lead with autopilot — owners want to keep their voice.
+- One question at the end. Max 4 sentences.
+
+### Custom build hook (premium studios)
+- "We also build bespoke modules for multi-location studios — coach-pay tracking, member injury logs, B2B corporate wellness portals. Most ship in 2 weeks."
+
+### Reply patterns
+- **"How much?"** — "Cash Desk Starter is ₦80K/month flat, scales with member volume. Happy to walk through on a 15-min call?"
+- **"I have a front desk already"** — "Most of our studios kept theirs. We handle WhatsApp/IG volume so the front desk handles members actually walking in."
+- **"Send a video"** — perfect, send the 60-sec demo on real Lagos studio.
+- **Silence** — one follow-up at 5 days. Stop after two.
+
+### Final check
+- Named the studio?
+- Specific signal referenced?
+- ₦/month + churn % quantified?
+- ONE question at end?
+- No "leverage" / "empower"?
+- Paystack mentioned (not Stripe)?
+- No bracket placeholders?
+
+If no — rewrite.
