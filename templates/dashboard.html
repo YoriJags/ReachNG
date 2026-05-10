@@ -638,47 +638,111 @@
   .wizard-check-status.fail { color: #ff4444; }
   .wizard-check-status.checking { color: #f5c842; }
 
-  /* ── Sidebar Layout ── */
+  /* ── Sidebar Layout (Phase D) ── */
   .layout { display: flex; height: calc(100vh - 57px); overflow: hidden; }
 
   .sidebar {
-    width: 190px; min-width: 190px;
-    background: #05080c;
-    border-right: 1px solid #0d1520;
+    width: 232px; min-width: 232px;
+    background: var(--bg-deep);
+    border-right: 1px solid var(--border);
     overflow-y: auto; overflow-x: hidden;
-    padding: 8px 0 32px;
-    scrollbar-width: thin; scrollbar-color: #1a2530 transparent;
+    padding: 12px 0 24px;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
     flex-shrink: 0;
+    display: flex; flex-direction: column;
   }
-  .sidebar::-webkit-scrollbar { width: 3px; }
-  .sidebar::-webkit-scrollbar-thumb { background: #1a2530; border-radius: 2px; }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
   .sidebar-label {
-    font-size: 9px; color: #1a2a38; text-transform: uppercase;
-    letter-spacing: 1.5px; padding: 16px 16px 4px; display: block; user-select: none;
+    font-size: 10px; color: var(--text-lo); text-transform: uppercase;
+    letter-spacing: 0.14em; font-weight: 700;
+    padding: 18px 18px 6px; display: block; user-select: none;
   }
+
+  /* Suite-level item (top group) */
   .sidebar-item {
     display: flex; align-items: center; gap: 10px;
     padding: 9px 14px 9px 13px;
-    font-size: 12.5px; font-weight: 600; letter-spacing: 0.1px;
-    color: #2e4458; cursor: pointer;
+    font-size: 13px; font-weight: 600; letter-spacing: 0.01em;
+    color: var(--text-mid); cursor: pointer;
     border-left: 3px solid transparent;
-    transition: color 0.1s, background 0.1s;
+    transition: color 0.12s, background 0.12s, border-color 0.12s;
     user-select: none;
   }
-  .sidebar-item:hover { color: #7090a8; background: #080e16; }
-  .sidebar-item.active { color: #d8eaf8; background: #0a1520; }
+  .sidebar-item:hover { color: var(--text-hi); background: rgba(255,255,255,0.02); }
+  .sidebar-item.active {
+    color: var(--text-hi);
+    background: rgba(255,255,255,0.03);
+    border-left-color: var(--suite-accent, var(--accent));
+  }
   .sidebar-dot {
     width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-    opacity: 0.4; transition: opacity 0.1s;
+    opacity: 0.4; transition: opacity 0.12s;
   }
-  .sidebar-item.active .sidebar-dot { opacity: 1; }
-  .sidebar-item.active { border-left-color: var(--suite-accent, #ff5c00); }
+  .sidebar-item.active .sidebar-dot { opacity: 1; box-shadow: 0 0 8px currentColor; }
+
+  /* Section sub-items (Phase D — replaces top tab nav) */
+  .sidebar-section {
+    display: flex; flex-direction: column;
+    padding: 4px 8px 0;
+  }
+  .sidebar-section-item {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 12.5px; font-weight: 600;
+    color: var(--text-lo);
+    cursor: pointer;
+    transition: color 0.12s, background 0.12s;
+    user-select: none;
+    margin-bottom: 1px;
+  }
+  .sidebar-section-item:hover {
+    color: var(--text-hi);
+    background: rgba(255,255,255,0.025);
+  }
+  .sidebar-section-item.active {
+    color: var(--text-hi);
+    background: rgba(255,92,0,0.08);
+    box-shadow: inset 2px 0 0 var(--accent);
+  }
+  .sidebar-section-item .ssi-left {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sidebar-section-item .material-symbols-outlined {
+    font-size: 18px; opacity: 0.85;
+  }
+  .sidebar-section-item.active .material-symbols-outlined { color: var(--accent); opacity: 1; }
+  .sidebar-section-item .tab-badge { position: relative; top: 0; }
+
+  /* Sidebar utility footer */
+  .sidebar-foot {
+    margin-top: auto;
+    padding: 16px 14px;
+    border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .sidebar-util {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 11.5px; font-weight: 600; letter-spacing: 0.02em;
+    color: var(--text-lo);
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer; text-decoration: none;
+    transition: color 0.12s, background 0.12s;
+  }
+  .sidebar-util:hover { color: var(--text-hi); background: rgba(255,255,255,0.025); }
+  .sidebar-util .material-symbols-outlined { font-size: 16px; }
 
   .main-content {
     flex: 1; overflow-y: auto; overflow-x: hidden;
     display: flex; flex-direction: column; min-width: 0;
   }
+
+  /* Phase D — hide the legacy outreach top tab strip (sidebar replaces it) */
+  nav.tab-nav.product-tabs[data-product="outreach"] { display: none; }
 
   /* ── Tab nav (inside main-content) ── */
   .tab-section-label {
@@ -943,9 +1007,7 @@
       <div class="health-pill"><span class="health-dot" id="dot-apollo"></span> Apollo</div>
       <div class="health-pill"><span class="health-dot" id="dot-unipile"></span> Unipile</div>
     </div>
-    <a href="/dashboard/copilot" target="_blank" title="Cross-client Sales Copilot — every inbound thread that needs a next move" style="background:#ff5500;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.3px;text-decoration:none;display:inline-block;">Copilot</a>
-    <a href="/dashboard/flow" target="_blank" title="Visual operations flow — diagrams of how everything connects" style="background:#111;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.3px;text-decoration:none;display:inline-block;">Flow</a>
-    <button onclick="copyDemoPortalLink(this)" title="Copy public demo portal link to clipboard (for prospects)" style="background:#111;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.3px;">Demo Portal</button>
+    <button onclick="copyDemoPortalLink(this)" title="Copy public demo portal link to clipboard" style="background:var(--bg-card);color:var(--text-mid);border:1px solid var(--border);padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;letter-spacing:0.04em;text-transform:uppercase;">Copy Demo Link</button>
     <div class="live-badge"><span class="live-dot"></span> Live</div>
   </div>
 </header>
@@ -968,6 +1030,27 @@ function copyDemoPortalLink(btn){
   <span class="sidebar-label">Outreach</span>
   <div class="sidebar-item active" data-product="outreach" style="--suite-accent:#ff5c00" onclick="switchProduct('outreach', this)">
     <span class="sidebar-dot" style="background:#ff5c00;"></span> Outreach
+  </div>
+
+  <!-- Phase D: section sub-nav under active suite — replaces top tab strip -->
+  <div class="sidebar-section" id="sidebar-outreach-sections">
+    <div class="sidebar-section-item active" id="ssn-overview"  onclick="sidebarNav('overview', this)">
+      <span class="ssi-left"><span class="material-symbols-outlined">today</span> Today</span>
+    </div>
+    <div class="sidebar-section-item" id="ssn-activate"  onclick="sidebarNav('activate', this); loadActivateTab();">
+      <span class="ssi-left"><span class="material-symbols-outlined">bolt</span> Activate</span>
+      <span class="tab-badge" id="tab-badge-activate-side"></span>
+    </div>
+    <div class="sidebar-section-item" id="ssn-approvals" onclick="sidebarNav('approvals', this)">
+      <span class="ssi-left"><span class="material-symbols-outlined">forum</span> Recover</span>
+      <span class="tab-badge" id="tab-badge-approvals-side"></span>
+    </div>
+    <div class="sidebar-section-item" id="ssn-clients"   onclick="sidebarNav('clients', this)">
+      <span class="ssi-left"><span class="material-symbols-outlined">groups</span> Clients</span>
+    </div>
+    <div class="sidebar-section-item" id="ssn-tools"     onclick="sidebarNav('tools', this)">
+      <span class="ssi-left"><span class="material-symbols-outlined">terminal</span> System</span>
+    </div>
   </div>
 
   <span class="sidebar-label">Real Estate</span>
@@ -1011,6 +1094,17 @@ function copyDemoPortalLink(btn){
   </div>
   -->
 
+  <div class="sidebar-foot">
+    <a href="/dashboard/copilot" target="_blank" class="sidebar-util" title="Cross-client Sales Copilot">
+      <span class="material-symbols-outlined">auto_awesome</span> Copilot
+    </a>
+    <a href="/dashboard/flow" target="_blank" class="sidebar-util" title="Operations flow viewer">
+      <span class="material-symbols-outlined">account_tree</span> Flow Viewer
+    </a>
+    <a href="/portal/demo" target="_blank" class="sidebar-util" title="Public demo portal">
+      <span class="material-symbols-outlined">visibility</span> Demo Portal
+    </a>
+  </div>
 
 </aside>
 <div class="main-content" id="main-content">
@@ -8756,6 +8850,37 @@ function _actRelTime(iso) {
 }
 
 let _activateLoaded = false;
+
+// Phase D — sidebar section nav. Calls switchTab(), then highlights the
+// matching sidebar item and mirrors badges from the legacy top tabs.
+function sidebarNav(tabName, btn) {
+  // Trigger the existing switchTab logic via a synthetic click target so
+  // the loaders that depend on the active button (e.g. event.target reads)
+  // still receive a usable element.
+  const fakeBtn = document.createElement("button");
+  fakeBtn.classList.add("tab-btn");
+  switchTab(tabName, fakeBtn);
+  // Highlight active sidebar section item
+  document.querySelectorAll(".sidebar-section-item").forEach(el => el.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+}
+
+// Keep sidebar section badges in sync with the (hidden) top-tab badges.
+function syncSidebarBadges() {
+  const pairs = [
+    ["tab-badge-activate",   "tab-badge-activate-side"],
+    ["tab-badge-approvals",  "tab-badge-approvals-side"],
+  ];
+  pairs.forEach(([src, dst]) => {
+    const a = document.getElementById(src);
+    const b = document.getElementById(dst);
+    if (!a || !b) return;
+    b.textContent = a.textContent;
+    b.classList.toggle("show", a.classList.contains("show"));
+  });
+}
+// Poll lightly — badge updates fire from various loaders
+setInterval(syncSidebarBadges, 1500);
 
 // KPI hero on Today — operator-roll-up cash signals (hot / drafts / threads)
 async function loadKpiHeroOperator() {
