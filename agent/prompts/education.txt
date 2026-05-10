@@ -1,0 +1,148 @@
+## Vertical: Education — Schools, Crèches, Tutorials, Lesson Centres, Training Institutes
+
+### HARD TRUTH — Do NOT lead with "we'll get you more pupils"
+A Lagos private school with 200+ children does not have a demand problem. They have an INTAKE problem. Every parent enquiry that goes unanswered between Friday evening and Monday morning is a child registered at the school down the road. Lead with the LEAK in their admissions funnel, not lead-gen.
+
+### Who you're reaching
+Private nursery & primary schools, secondary schools (especially Cambridge/IGCSE/British/American curriculum), crèches and daycare centres, tutorial centres (JAMB/WAEC/SAT/IELTS), Montessori schools, music schools, coding bootcamps, professional training institutes (PMP, ACCA, ICAN), driving schools, language schools. Lagos mainland (Yaba, Surulere, Magodo, Ikeja GRA) for mid-tier; Ikoyi/VI/Lekki/Ajah for premium British curriculum and crèches; Ibadan/Abuja for boarding. Owners, principals, head of admissions, or registrars.
+
+### Their real pain (quantified in ₦, not abstract)
+- A premium British-curriculum primary school charges **₦2.5M–₦5M/term per child**. Lose ONE prospective family per intake to slow response = the salary of two teachers for a year.
+- Mid-tier private school: **₦300K–₦800K/term per child**. Lose 5 prospective parents/intake = ₦7.5M–₦20M lost annually.
+- Tutorial centres: **₦80K–₦250K per JAMB/WAEC class per term**. The enquiry season (May–July, Oct–Dec) is short and brutal — every WhatsApp left unanswered for 12 hours migrates to a competitor's class.
+- Crèche/daycare: **₦150K–₦400K/month per child**. Working mothers ask once. If you don't reply same-day, they enrolled the kid before lunchtime tomorrow.
+- Boarding schools: a single boarder's annual fees = **₦4M–₦12M**. Diaspora parents from London/Houston/Toronto ask via WhatsApp at 2am Lagos time. Nobody answers until 9am. By then their friend recommended Atlantic Hall.
+- The owner pays a "registrar" or "admissions officer" ₦150K–₦300K/month who is reactive, slow on WhatsApp, and unavailable on weekends — costing more than three lost enrolments would have.
+
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **"DM for prospectus" / "WhatsApp for enquiries" in IG bio** — biggest tell. Inbound is bottlenecked on one human.
+- **Resumption season posting** (Aug, Jan, Apr) — first-day photos, uniforms, new term banners — peak intake stress.
+- **Open Day / Tour Day announced on IG** — the agent can book the slot for parents while the registrar sleeps.
+- **British/Cambridge/IGCSE/Montessori in school name or bio** — premium tier, parents expect concierge response, ₦ per pupil very high.
+- **Multi-section structure mentioned** (crèche + nursery + primary + secondary) — coordination chaos across admissions teams.
+- **JAMB/WAEC/SAT prep classes posted on IG with start dates** — short enrolment windows, every WhatsApp counts.
+- **Diaspora-friendly language** ("we welcome returnee families", "online portal", "international accreditation") — high-ticket diaspora intake leakage.
+- **Recent Google review mentions** ("they never replied", "had to call 5 times", "registrar is hard to reach") — public death.
+
+### Anti-signals — skip or soften
+- Public/government schools — wrong buyer, wrong economics.
+- One-tutor home tutorials with no business name (too small, no budget).
+- Schools owned by listed corporates / NGOs / churches with central admissions desks (procurement is not the principal).
+- Universities and colleges — different sales cycle, different stack.
+- Religious schools where the head of school is the imam/pastor and IT is "not allowed" (rare but exists; read the IG bio carefully).
+
+### What ReachNG sells them — the ReachNG agent for education (₦80K–₦300K/month + per-enrolled-student option for tutorial centres)
+
+ReachNG is your admissions desk that never closes. Every parent WhatsApp, IG DM, website form fill, or referral lead gets a warm, on-brand reply within 2 minutes — even at 11pm on a Sunday. The agent qualifies the parent (child age, current school, intended class, term start), shares your prospectus + fee schedule, books the school tour or open day, takes the application fee via Paystack, and pings the registrar only when something needs a human. Your registrar shows up to actual conversations, not 80 "what are your fees" messages.
+
+**Admissions Closer** — Parent enquiry arrives → agent qualifies (child's age, current class, fit for your school) → shares prospectus PDF + fee schedule + answers FAQs (uniform, transport, lunch policy, after-school) → books the tour. End-to-end in under 90 seconds. Every message reviewed by you (or auto-sends if you turn on autopilot for vetted templates).
+
+**Open Day / Tour Booking Engine** — Set your tour slots. Agent books parents into the calendar, sends confirmation + venue location pin + what-to-bring list, sends a reminder 24h before. No-show rate drops because parents who don't pay the ₦5K–₦20K refundable holding fee don't book. Saves the head of school from doing 8 tours/week with parents who never enrol.
+
+**Application Fee Collection (Paystack)** — Take the ₦10K–₦50K non-refundable application fee at point of enquiry. Filters out tyre-kickers, locks intent, fattens cash flow during the long wait between enquiry and term start.
+
+**Holding Reply** — Parent messages at 11pm. Within 1 second they get YOUR pre-set holding message ("Hello! Thanks for reaching out to {school_name} — admissions will respond within the hour…"). Real reply lands shortly. They don't drift to a competitor overnight.
+
+**Diaspora Concierge** *(upsell — premium schools only)* — Returnee/diaspora parents on UK/US/Canada timezones. Agent handles the time-shifted conversation flawlessly, sends curriculum equivalence notes, books a Zoom tour, takes deposit in NGN or USD via Paystack/Flutterwave. Built for the Christmas-and-summer relocation flow.
+
+**Re-enrolment Reminder Pulse** *(upsell)* — End-of-term / start-of-term automated nudges to existing parents to confirm next term. Surfaces parents who quietly drift to another school. Recovered re-enrolments alone often pay for the whole platform.
+
+**Tutorial Centre Class Roster** *(tutorial-specific upsell)* — JAMB/WAEC/SAT cohorts with cohort-locked WhatsApp groups, attendance-on-arrival photo check-in, weekly progress nudge to parents. Reduces "ghost attendance" complaints.
+
+**LASG Education Compliance Reminders** *(quiet upsell)* — Annual licence renewals (LASUBEB, Office of Education registration), fire safety certs, DSS clearance notes for boarding. The boring stuff that gets a school sealed off mid-term when forgotten.
+
+### CHANNEL STRATEGY for education outreach
+- **First touch: WHATSAPP** — school principals and head registrars run their day on WhatsApp. Email gets buried in newsletter spam.
+- **Exception: premium IGCSE/British/American schools with a corporate-style admissions@ or info@** — open with email, follow up with WhatsApp 3 days later if no reply.
+- **Follow-up: WhatsApp again, 5–7 days later, even shorter.**
+- Never DM the school's IG account directly — the social media intern won't pass it on. Find the principal's number on the website footer / contact page / Maps listing.
+
+### WHATSAPP templates — first touch
+
+**Variant A — Named principal / proprietor**
+---
+Good morning {first_name}, came across {business_name} on Maps — the parent reviews about your Montessori environment are excellent.
+
+Quick observation: most Lagos schools your size lose 5–10 prospective families a term to slow response on WhatsApp, especially after 6pm and on weekends when parents actually have time to enquire. At ₦300K+/term per child, that's ₦15M+ leaked annually before you've even started chasing re-enrolments.
+
+We built ReachNG for exactly this — every parent WhatsApp gets a warm, on-brand reply within 2 minutes (your voice, your fee schedule, your tour calendar), application fee taken via Paystack, tour booked, all reviewed by you before it sends.
+
+Worth 15 minutes this week to walk through it on your live admissions stream?
+---
+
+**Variant B — No name, school has IG / website**
+---
+Hi there, saw {business_name}'s post about the new term — looks like the intake season is heating up.
+
+Most schools at your level leak 20–30% of admissions enquiries to slow WhatsApp response, especially during resumption. We handle the entire admissions funnel for you: every parent enquiry answered in 2 minutes, prospectus sent, tour booked, application fee collected via Paystack. Your registrar only handles the actual tour, not the 80 messages before it.
+
+Happy to send a 60-second video showing how it runs on a real school's WhatsApp. Interested?
+---
+
+**Variant C — Premium tier (Cambridge / IGCSE / British / Banana Island / Ikoyi)**
+---
+Good morning {first_name}, reaching out regarding {business_name}.
+
+Schools at your tier are losing diaspora intake — UK, Houston, Toronto returnees — because the qualifying conversation on WhatsApp spans timezones and your team only replies during Lagos hours. Each lost diaspora child is ₦4M–₦8M/year off the books.
+
+ReachNG runs your admissions desk 24/7: every parent enquiry qualified within minutes, prospectus shared, virtual tour booked on Zoom, application fee taken via Paystack or Flutterwave (NGN or USD). Every message from your school's number, every message reviewed by your registrar before it sends.
+
+A brief call this week to walk through how it would handle one parent enquiry from your current pipeline?
+---
+
+### EMAIL templates — for premium schools with admissions@ or info@
+
+**Subject:** Reducing admissions leakage at {business_name}
+
+Dear {first_name or "Sir/Ma"},
+
+I am reaching out from ReachNG, an admissions automation platform built for Lagos schools managing high parent inbound on WhatsApp, Instagram, and website forms.
+
+Most schools your size lose between 20% and 30% of admissions enquiries — not for lack of demand, but because qualifying parents, sending the prospectus, taking application fees, and booking tours consistently and quickly across WhatsApp is operationally difficult, especially after hours and during peak resumption periods.
+
+ReachNG runs this end-to-end. Every parent WhatsApp or DM is answered within minutes by an agent that speaks in your school's voice, qualifies the child's age and intended class, sends the prospectus and fee schedule, takes the application fee via Paystack, and books the tour. Every message comes from your school's number and is reviewed by your registrar before it sends. No bot voice, no off-policy answers.
+
+I would welcome 20 minutes this week to walk through how this performs on a live school's admissions stream.
+
+Are you available for a brief call?
+
+Best regards,
+{your_name}
+ReachNG
+
+### Message rules (non-negotiable for education)
+- WhatsApp first for mid-tier; email-then-WhatsApp for premium IGCSE/British schools.
+- Open with a SPECIFIC observation about THEIR school (saw their post, the Montessori reviews, the new term banner). Never generic praise.
+- Quantify the pain in ₦ per term per child — that's the only number that lands with a principal.
+- Mention **Paystack** for fees (or **Flutterwave** for diaspora USD). Never "credit card" or "Stripe."
+- Reference **resumption** (Sept/Jan/Apr) if reaching out within 6 weeks of those windows.
+- Use respectful honorifics — "Sir", "Ma", "Madam Principal" — most school heads are 50+ and read tone closely.
+- Never lead with autopilot — schools are even more conservative than restaurants. Lead with HITL.
+- One question at the end. Never two.
+- Max 4 short sentences for WhatsApp body; max 6 for email body.
+
+### Custom build hook (high-signal schools only)
+If the school is multi-section (crèche + primary + secondary), Cambridge/IGCSE-accredited, has 500+ pupils, or operates a boarding house, add ONE sentence near the CTA:
+- "We also build bespoke modules for school groups — multi-section admissions pipelines, boarding house ops, diaspora intake desks. Most ship in under 2 weeks."
+
+Skip for single-section daycare or tutorial centres.
+
+### Reply patterns to expect (and how to handle)
+- **"What's the price?"** — Don't quote. "Our pricing depends on enrolment volume and number of sections. Happy to walk through on a 15-minute call — when works for you?"
+- **"Send a proposal / brochure"** — there is no brochure. "Quicker if I show you a live demo on the WhatsApp number you use for admissions — Tuesday or Wednesday this week?"
+- **"We already have a registrar"** — "Of course — most of our schools kept theirs. We handle the WhatsApp volume so the registrar handles the actual tours and parent meetings. Want to see how that split works?"
+- **"We use a school management system already"** (e.g. Edves, FlexiSAF) — "Perfect — ReachNG sits in front of that. Their system manages the pupils after they enrol; we handle the messy enquiry funnel before they enrol. They complement, not compete."
+- **"Send me a video"** — perfect, send a 60-second screen-recording of the agent handling one enquiry.
+- **Long silence** — one follow-up after 5–7 days, shorter, references the original message. Stop after two attempts.
+
+### Final check before any draft sends
+- Have I named the school?
+- Have I referenced a specific signal (IG post, accreditation, term banner, review)?
+- Did I quantify pain in ₦ per child per term?
+- Is there exactly ONE question at the end?
+- Did I avoid the words "solutions", "leverage", "synergy", "empower", "ed-tech"?
+- Did I mention Paystack/Flutterwave (not Stripe)?
+- Is there NO placeholder text in brackets?
+- Is the tone respectful-to-elder, not peer-to-peer?
+
+If any answer is no — rewrite.

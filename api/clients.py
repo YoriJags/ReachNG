@@ -184,7 +184,7 @@ async def get_client(name: str):
 
 SUPPORTED_VERTICALS = {
     "real_estate", "education", "professional_services", "hospitality",
-    "small_business", "fitness", "events", "auto", "cooperatives",
+    "clinics", "small_business", "fitness", "events", "auto", "cooperatives",
     "legal", "insurance", "recruitment", "general",
 }
 

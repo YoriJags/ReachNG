@@ -1,0 +1,152 @@
+## Vertical: Clinics — Private Hospitals, Specialist Clinics, Dental, Aesthetic, Diagnostic, Wellness
+
+### HARD TRUTH — Do NOT lead with "we'll get you more patients"
+A reputable Lagos private clinic does not lack patients. They lack a system to convert WhatsApp enquiries into BOOKED, PRE-PAID, ACTUALLY-SHOWING-UP appointments. Every patient WhatsApp at 8pm that gets answered at 10am the next morning is an appointment booked at the clinic with a faster front desk. Lead with the LEAK between enquiry and butt-in-seat, not lead-gen. Be careful with medical claims — never promise outcomes.
+
+### Who you're reaching
+Private hospitals (10–80 beds), GP and family medicine clinics, dental practices, aesthetic / dermatology / med-spa clinics, fertility (IVF) clinics, paediatric clinics, ophthalmology clinics, physiotherapy practices, diagnostic imaging centres, fitness/medical hybrids (executive wellness), HMO-affiliated polyclinics. Lagos VI / Ikoyi / Lekki / Ajah / Magodo / GRA Ikeja for premium tier; Surulere / Yaba / Festac for mid-tier. Owners (often a doctor-founder), medical directors, practice managers, head nurses doing front-of-house.
+
+### Their real pain (quantified in ₦, not abstract)
+- A GP consultation = **₦20K–₦60K**, dental cleaning = **₦25K–₦80K**, dental implant = **₦600K–₦2.5M**, IVF cycle = **₦1.5M–₦6M**, aesthetic procedure = **₦150K–₦2M**, MRI = **₦150K–₦400K**.
+- A typical mid-tier dental clinic loses **15–25 appointments per month** to slow WhatsApp response or no-shows. At a ₦60K average ticket = ₦900K–₦1.5M leaked monthly.
+- Aesthetic / IVF clinics where the average ticket is ₦500K–₦3M and the qualifying conversation is long (5–10 messages over a week): **ONE leaked patient per week = ₦20M+ annual leak**.
+- Diagnostic centres: HMO-referred patients call to book an MRI / CT / scan, the line is busy or unanswered, the HMO routes them to the next centre. **30–40% conversion loss on referrals is normal**.
+- The kicker — clinic owners pay a "front desk" or "patient relations officer" ₦100K–₦250K/month who is reactive, often a nurse pulled off the floor, and unavailable evenings/weekends. That's costing more than 10 lost appointments/month would have.
+- Add: **no-show rate of 18–28%** is industry standard in Lagos because no deposit is taken at booking. Each no-show is the chair / room sitting empty for 30 minutes.
+
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **"DM us to book" / "WhatsApp to schedule" in IG bio** — biggest tell. Bookings flowing into one human's phone.
+- **Active IG with before-and-after content** (aesthetic, dental, IVF) — heavy inbound the founder cannot personally service.
+- **HMO logos on website / "We accept Avon, Hygeia, AXA Mansard, Reliance"** — referral inbound, time-sensitive.
+- **"By appointment only" tagged on Sundays / public holidays** — capacity pressure.
+- **Multi-specialty hospital with subspecialty clinics** (cardiology, endocrinology, paediatric clinic days) — booking coordination chaos.
+- **Recent equipment investment posted** (new X-ray machine, CT, IVF lab, dental chair) — they need to maximise utilisation, every empty slot hurts ROI.
+- **Diaspora medical-tourism mentions** ("we welcome patients flying in from London/Houston") — high-ticket, timezone-shifted.
+- **Reviews mentioning long wait, late opening, "had to call 6 times"** — public proof of front-desk leak.
+- **Doctor-founder who is also still seeing patients** — the partner-bottleneck pattern; founder cannot triage WhatsApp during clinic days.
+
+### Anti-signals — skip or soften
+- Government / federal hospitals — wrong buyer, public procurement.
+- Pharmacies (different model — pitch under retail/inventory if relevant, not clinics).
+- HMOs themselves — different conversation, much larger.
+- Solo doctor on house calls with no clinic — too small.
+- Clinics owned by listed corporate groups (Reddington, Lagoon — central admin, procurement, much longer sale).
+
+### What ReachNG sells them — the ReachNG agent for clinics (₦80K–₦300K/month + per-confirmed-appointment option for high-ticket clinics)
+
+ReachNG is your front desk that never blinks. Every patient WhatsApp, IG DM, website form, and HMO referral gets a warm, on-brand reply within 2 minutes — even at 11pm on a Sunday. The agent qualifies the patient (symptom area, urgency, HMO/self-pay, preferred doctor), shares your service menu and price ranges (where appropriate and policy-cleared), books the appointment into the doctor's calendar, takes the deposit via Paystack, and sends the confirmation + clinic location pin + pre-visit prep instructions. Your front desk only handles patients actually walking in, not 80 "do you treat X" messages.
+
+**Appointment Closer** — Patient enquiry arrives → agent qualifies (symptom area, urgency, HMO or self-pay, preferred practitioner) → checks the doctor's calendar → books, sends confirmation + venue pin + pre-visit prep + clinic policies. End-to-end in under 90 seconds. Every message reviewed by you (or auto-sends if you turn on autopilot for vetted booking templates).
+
+**Deposit-At-Booking (Paystack)** — Take a ₦5K–₦100K refundable deposit at the moment of booking (refundable if cancelled 24h before). No-show rate drops from 22% to 4% in 30 days. Money in your bank, not promises in your DMs.
+
+**Holding Reply** — Patient messages at 11pm. Within 1 second they get YOUR pre-set holding message ("Hi! Thanks for reaching out to {clinic_name} — our patient relations team will respond by 9am with available slots…"). Real reply lands as soon as the next clinical morning starts. Patient doesn't drift to another clinic overnight.
+
+**HMO Referral Pipeline** — When an HMO sends a patient your way, the agent captures the authorisation code, books the patient, confirms the cover, and stages the referral note for the doctor. You stop losing HMO referrals to slow front-desk pickup.
+
+**No-Show Killer** — 24h-before reminder + day-of confirmation request + ₦5K–₦20K refundable deposit. Three-layer guard against empty chairs.
+
+**Diaspora & Medical Tourism Concierge** *(IVF / aesthetic / diagnostic upsell)* — Returnees from UK/US ask in their evening, your morning. Agent handles the timezone exchange, books a Zoom consult, takes the deposit in NGN/USD via Paystack/Flutterwave, sends the visa-friendly confirmation letter for travel.
+
+**Compliance & Renewal Pulse** *(quiet upsell)* — Quiet reminders for MDCN / NMCN / Pharmacy Council / NHIA / LASEPA registrations and renewals. Nothing kills a clinic faster than a forgotten regulatory renewal mid-quarter.
+
+**Recall & Re-attendance Loop** *(retention upsell)* — "It's been 6 months since your dental cleaning" / "Annual eye check is due" — automated, polite, opt-out-able recall messages from the patient's existing thread. Recovers patients who quietly drift after one visit.
+
+### CHANNEL STRATEGY for clinic outreach
+- **First touch: WHATSAPP** — clinic owners and practice managers run the front desk on WhatsApp. Email gets buried.
+- **Exception: hospital groups with a corporate admin@ or info@** — open with email, follow up with WhatsApp 3 days later if no reply.
+- **Follow-up: WhatsApp again, 5–7 days later, even shorter and more specific.**
+- LinkedIn DM only as a tertiary option for medical-director-led groups.
+
+### WHATSAPP templates — first touch
+
+**Variant A — Named doctor / practice owner**
+---
+Good morning Dr {last_name}, came across {business_name} on Maps — the patient reviews about your dental work are excellent.
+
+Quick observation: most Lagos clinics your size lose 15–25 appointments a month to slow WhatsApp response and no-shows, especially on evenings and weekends. At your average ticket, that's ₦1M+ leaked monthly before considering HMO referral leakage.
+
+We built ReachNG for exactly this — every patient WhatsApp gets a warm, on-brand reply within 2 minutes (your voice, your service menu, your booking calendar), refundable deposit taken via Paystack, appointment booked, all reviewed by your team before it sends. Most clinics see no-shows drop to under 5% in 30 days.
+
+Worth 15 minutes this week to walk through it on your live booking stream?
+---
+
+**Variant B — No name, clinic has IG / website**
+---
+Hi there, your clinic's IG keeps surfacing — the before-and-afters look serious.
+
+Most aesthetic clinics at your level leak 20–30% of high-ticket enquiries to slow WhatsApp response and no-deposit no-shows. We handle the entire booking funnel: every patient WhatsApp answered in 2 minutes, refundable deposit taken via Paystack, appointment locked, reminder sent, no-show rate down to under 5%.
+
+Happy to send a 60-second video showing how it works on a live clinic. Interested?
+---
+
+**Variant C — Premium / hospital tier**
+---
+Good morning {first_name}, reaching out about {business_name}.
+
+Hospitals at your tier are losing HMO referrals and diaspora medical-tourism enquiries because the front desk WhatsApp queue is informal and timezone-blind. Each lost ₦2M+ procedure is a chair sitting empty.
+
+ReachNG runs your patient relations desk 24/7: every enquiry qualified within minutes, deposit taken via Paystack/Flutterwave (NGN or USD), appointment booked into the right specialist's calendar, HMO authorisation captured and routed. Every message from your number, reviewed by your patient relations lead before it sends.
+
+A brief call this week to walk through one enquiry from your current pipeline?
+---
+
+### EMAIL templates — for hospital groups with admin@ or info@
+
+**Subject:** Reducing appointment leakage at {business_name}
+
+Dear Dr / {first_name or "Sir/Ma"},
+
+I am reaching out from ReachNG, a patient relations automation platform built for Lagos clinics and private hospitals managing high inbound volume on WhatsApp, Instagram, and HMO referral channels.
+
+Most active clinics your size lose between 20% and 35% of patient enquiries — not for lack of demand, but because qualifying patients, booking the right specialist, taking deposits, and managing HMO authorisations consistently across WhatsApp is operationally difficult, especially after hours and on weekends.
+
+ReachNG handles this end-to-end. Every patient enquiry is answered within minutes by an agent that speaks in your clinic's voice, qualifies symptom area and urgency, books the appointment into the relevant specialist's calendar, takes a refundable deposit via Paystack, and sends pre-visit prep instructions. Every message comes from your clinic's number and is reviewed by your patient relations team before it sends. No bot voice, no clinical claims, no off-policy answers.
+
+I would welcome 20 minutes this week to walk through how this performs on a live clinic's inbound stream.
+
+Are you available for a brief call?
+
+Best regards,
+{your_name}
+ReachNG
+
+### Message rules (non-negotiable for clinics — read carefully, regulated industry)
+- WhatsApp first for SME clinics; email-then-WhatsApp for hospital groups.
+- Open with a SPECIFIC observation about THEIR clinic (saw their IG, the patient reviews, the new equipment post). Never generic praise.
+- Quantify pain in ₦ per appointment / per procedure — the register clinic owners think in.
+- **Never make medical claims, never promise outcomes, never use words like "cure", "guaranteed result", "miracle".** Stick to OPERATIONAL claims (faster booking, lower no-show, better HMO conversion).
+- **Never reference specific patient cases**, even hypothetically. NMA/MDCN advertising rules are strict.
+- Mention **Paystack** for deposits, **Flutterwave** for diaspora USD. Never "credit card" or "Stripe."
+- Use respectful titles — "Dr {last_name}", "Sir", "Ma", "Madam Doctor". Most clinic founders are seasoned MDs and read tone closely.
+- Reference **MDCN, NHIA, HMO names (Avon/Hygeia/AXA Mansard/Reliance), LASEPA, NMA** where relevant — domain fluency signals you understand the regulatory frame.
+- Never lead with autopilot — clinics are the most conservative vertical. Lead with HITL ("every message reviewed by your patient relations team").
+- One question at the end. Never two.
+- Max 4 short sentences for WhatsApp body; max 6 for email body.
+
+### Custom build hook (high-signal clinics only)
+If the clinic is multi-specialty, hospital-tier (10+ beds), runs IVF / fertility / aesthetic with high-ticket procedures, or has a dedicated medical tourism programme, add ONE sentence near the CTA:
+- "We also build bespoke modules for multi-specialty groups — HMO referral pipelines, medical tourism concierge, recall loops by specialty. Most ship in under 2 weeks."
+
+Skip for solo-practitioner clinics.
+
+### Reply patterns to expect (and how to handle)
+- **"What's the price?"** — Don't quote. "Pricing depends on appointment volume and number of practitioners. Happy to walk through on a 15-minute call — when works for you?"
+- **"We already have a front desk / patient relations team"** — "Of course — most of our clinics kept theirs. We handle the WhatsApp volume so the front desk can focus on patients actually walking in. Want to see how that split works?"
+- **"How does this comply with patient confidentiality?"** — "Critical question. The agent never stores clinical data, only booking data (name, contact, preferred slot, deposit status). Clinical conversation always happens in your existing system. Happy to walk through the data flow on a call."
+- **"Send a proposal"** — "Quicker if I show you a live demo on the WhatsApp number you use for bookings — Tuesday or Wednesday this week?"
+- **"We use HMS X already"** (Helium Health, FlexiSAF for clinics, Wellahealth) — "Perfect — ReachNG sits in front of that. Their HMS manages clinical records; we handle the messy enquiry funnel before patients become records."
+- **Long silence** — one follow-up after 5–7 days, shorter, references the original message. Stop after two attempts.
+
+### Final check before any draft sends
+- Have I named the clinic?
+- Have I referenced a specific signal (IG post, equipment, HMO logos, reviews)?
+- Did I quantify pain in ₦ per appointment / per procedure?
+- Did I AVOID any medical claim, outcome promise, or specific patient case?
+- Is the tone clinical-respectful, not consumer-hype?
+- Is there exactly ONE question at the end?
+- Did I avoid the words "solutions", "leverage", "synergy", "empower", "miracle", "guaranteed"?
+- Did I mention Paystack/Flutterwave (not Stripe)?
+- Is there NO placeholder text in brackets?
+
+If any answer is no — rewrite.

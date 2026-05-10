@@ -1,0 +1,149 @@
+## Vertical: Professional Services — Accountants, Consultants, Architects, Marketing Agencies, IT Firms
+
+### HARD TRUTH — Do NOT lead with "we'll grow your client base"
+A Lagos boutique accounting firm or marketing agency is not starved of leads. They are starved of the FOLLOW-THROUGH between a referral, a prospect call, and a signed engagement letter. Every WhatsApp from a referred prospect that lingers in a partner's inbox for 4 days is a retainer signed at the firm next door. Lead with the LOST DEAL, not lead-gen.
+
+### Who you're reaching
+Boutique accounting firms (4–25 staff, ICAN/ACCA partners), management & strategy consultants, HR consultancies, brand and creative agencies, digital marketing agencies, architecture practices, interior design studios, IT consultancies and managed service providers, training firms, ESG/sustainability consultants, family office advisors. Lagos VI/Ikoyi/Lekki/GRA Ikeja/Yaba Tech corridor; Abuja Wuse/Maitama for govt-adjacent firms. Managing partners, principal consultants, founders, business development heads.
+
+### Their real pain (quantified in ₦, not abstract)
+- A typical SME accounting retainer = **₦150K–₦500K/month**. Lose ONE referred prospect per quarter to slow follow-up = ₦1.8M–₦6M annually off the books.
+- A management consulting engagement = **₦2M–₦15M per project**. The qualifying conversation often dies because the partner who took the original call never sent the follow-up scoping note. One lost engagement per year = a junior consultant's salary.
+- Architecture/interior design fees on a Lagos residential project: **₦3M–₦25M**. Wealthy clients message on WhatsApp, expect concierge response, and ghost when the studio takes 3 days to send a portfolio.
+- Marketing/creative agencies: **₦300K–₦2M/month retainer**. Founders shop on referral, qualify in 5 conversations, and pick the firm that responded fastest with a credible deck.
+- IT consultancy / MSP: **₦400K–₦3M/month managed service**. Procurement asks for a proposal, gets it 2 weeks late, awards to the firm that responded next-day.
+- The kicker — the partners are often the only people authorised to write proposals, but they're billing 50+ hours a week on existing clients. Inbound dies on their unread WhatsApp queue. The "BD person" they hire for ₦300K–₦700K/month does not have authority to send proposals, so the bottleneck never moves.
+
+### Specific signals to lead with (reference one in the opening line — never generic praise)
+- **"DM us your scope" / "WhatsApp the partner directly" on website contact page** — biggest tell. Inbound is partner-bottlenecked.
+- **Recent thought-leadership post on LinkedIn** (FIRS tax circular breakdown, FRC update, Naira policy commentary, brand strategy hot-take) — the post draws inbound the firm cannot service.
+- **Multi-partner firm with no clear "head of BD"** in the team page — proposals leak between partners.
+- **ICAN/ACCA/ARCON/CITN/NIM letters in the firm name or bio** — credentialed = premium tier, qualified inbound = high ₦.
+- **"Building Lagos's most ambitious projects" / portfolio of commercial buildings** (architecture) — long sales cycles where pre-engagement follow-up matters.
+- **Active speaking circuit / podcast appearances** (founder publishing, NESG/LCCI panel speakers) — every appearance = a flood of inbound the partner cannot field.
+- **Diaspora client mentions** ("we work with returnee founders", "international family offices") — timezone-shifted enquiries leaking overnight.
+- **Recent hire of a "Business Development Officer" on LinkedIn** — they know they have the leak and threw a junior at it. Pitch ReachNG as the actual fix.
+
+### Anti-signals — skip or soften
+- Big-4 accounting firms (KPMG/PwC/EY/Deloitte) and global consultancies — wrong buyer, wrong economics, wrong sales cycle.
+- One-person freelance consultants with no firm name — too small, no budget for ₦80K/month.
+- Law firms (treat under `legal.txt` — different ethics rules and channel preferences).
+- Religious / pro-bono advisory groups — wrong economics.
+
+### What ReachNG sells them — the ReachNG agent for professional services (₦80K–₦300K/month + per-signed-engagement option)
+
+ReachNG is your business-development bench. Every referred prospect WhatsApp, LinkedIn DM, website form, and "saw your post" enquiry gets a warm, partner-quality reply within 2 minutes. The agent qualifies (industry, scope, timeline, budget range), sends your firm credentials deck, books the discovery call into the partner's calendar, and pings the partner only when the conversation is ready for a proposal. Partners stop drowning in inbound; they show up to qualified discovery calls already pre-scoped.
+
+**Inbound Closer for Pro Services** — Referral lands → agent qualifies (industry, headcount or revenue, what they're trying to solve, timeline, prior providers) → sends firm credentials PDF → books the discovery call. Partner walks into the meeting with the qualifier brief in their phone. End-to-end in under 2 minutes from enquiry. Every message reviewed by you (or auto-sends if you turn on autopilot for vetted credential responses).
+
+**Discovery Call Scheduler** — Set partner availability windows. Agent books prospects directly, sends Google Meet/Zoom link + agenda + 24h reminder. No more "what time works?" volleys. No more partner double-bookings.
+
+**Proposal Holding Reply** — Prospect asks for a proposal at 9pm. Within 1 second they get YOUR pre-set holding message ("Thanks for the brief — our scoping team will reply by 10am Lagos time tomorrow with next steps"). Buys the partner overnight without losing the lead.
+
+**Credential Pack Auto-Send** — When a prospect qualifies, the agent automatically sends the firm's credentials deck, case study one-pagers, and team bios — branded, watermarked, tracked. Read receipts surface in the dashboard so the partner knows which prospects actually opened the pitch.
+
+**Engagement Letter Pipeline Dashboard** — Every active prospect, where they are in the cycle (qualified → discovery booked → proposal sent → engagement letter out → signed). Partner sees the funnel without asking BD for a status update.
+
+**FIRS / FRC / NESG Compliance Pulse** *(accountants & consultants upsell)* — Quiet reminders for client filing deadlines, CIT, VAT, transfer pricing, FRC AGM notice windows. Partners stop missing deadlines for retainer clients; clients stop calling angry.
+
+**Diaspora & Returnee Concierge** *(premium upsell)* — UK/US/Canada-based founders enquire at 11pm Lagos. Agent handles the timezone-shifted exchange, books a Zoom call in their working window, takes a refundable scoping deposit via Paystack/Flutterwave (NGN or USD).
+
+**Referral Loop Tracker** *(quiet upsell)* — Tags every inbound by source ("referred by X", "saw LinkedIn post Y", "spoke to partner Z at event"). Reveals which referrers actually convert — partner stops wasting hospitality on referrers who never close.
+
+### CHANNEL STRATEGY for professional services outreach
+- **First touch: EMAIL** — partners check email more reliably than WhatsApp during work hours; corporate signal matters at this tier.
+- **Follow-up: WHATSAPP, 4–7 days later, shorter and more personal.**
+- **Exception: founder-led boutique firms (creative agencies, design studios, ≤8 staff) where the partner's WhatsApp is on the website footer — open with WhatsApp, more peer-to-peer.**
+- LinkedIn DM only as a tertiary channel and only if the partner has posted in the last 14 days.
+
+### EMAIL templates — first touch (default for professional services)
+
+**Subject:** Reducing inbound proposal leakage at {business_name}
+
+Dear {first_name or "Sir/Ma"},
+
+I am reaching out from ReachNG, an inbound automation platform built for Lagos professional services firms managing referral-driven business development on WhatsApp, LinkedIn, and email.
+
+Most boutique firms your size lose between 25% and 35% of qualified inbound — not for lack of referrals, but because the partner who took the original call is too senior to consistently triage proposals, scoping notes, and discovery-call follow-ups across channels. The result is signed engagements migrating quietly to peer firms.
+
+ReachNG runs this end-to-end. Every prospect message — whether it comes through your website form, a referral WhatsApp, or a "saw your LinkedIn post" enquiry — is qualified within minutes by an agent that speaks in your firm's voice, captures the brief (industry, scope, timeline, budget range), sends your credentials pack, and books the discovery call into the partner's calendar. Every message comes from your firm's number / inbox and is reviewed by the relevant partner before it sends.
+
+I would welcome 20 minutes this week to walk through how this performs on a live firm's inbound stream.
+
+Are you available for a brief call?
+
+Best regards,
+{your_name}
+ReachNG
+
+### WHATSAPP templates — first touch (only for founder-led boutique firms) or follow-up (for everyone else)
+
+**Variant A — Named partner / founder**
+---
+Hi {first_name}, came across {business_name} through your recent LinkedIn piece on the FRC update — sharp commentary, clearly drove inbound.
+
+Quick observation: most boutique firms your size lose 25–35% of qualified prospects between the first WhatsApp and the engagement letter — not from poor pitching but because partners are too senior to triage 40 inbound enquiries a week. At ₦300K+/month average retainer, that's ₦15M+ leaked annually.
+
+ReachNG handles the qualification → credentials → discovery-call booking layer for you. Every inbound message answered in 2 minutes by an agent in your firm's voice. Every message reviewed by you before it sends.
+
+Worth 20 minutes this week to walk through how it would handle one prospect from your current funnel?
+---
+
+**Variant B — No name, multi-partner firm**
+---
+Hi there, looked at {business_name}'s portfolio page — the Ikoyi residential work is excellent.
+
+Most architecture practices at your tier lose 20–30% of high-net-worth enquiries between the first WhatsApp and the signed letter, simply because the partners are billable on existing builds and inbound triage is no one's full job. Each lost ₦15M residential project is a junior architect's annual salary.
+
+We run that triage layer for you — every prospect WhatsApp answered in minutes (your voice), portfolio sent, scoping call booked, partner only steps in when it's ready for a proposal. Happy to send a 60-second video on how it works on a live firm.
+
+Interested?
+---
+
+**Variant C — Premium / multi-partner consultancy**
+---
+Hi {first_name}, reaching out about {business_name}.
+
+Boutique firms at your tier lose engagement letters not on the pitch but on the FOLLOW-THROUGH — the credentials pack that should have gone Tuesday goes Friday, the proposal due Monday goes Thursday, and the prospect quietly signs the firm that replied next-day.
+
+ReachNG is the BD bench partners actually need. Every inbound qualified, every credentials pack sent, every discovery call booked, all in your firm's voice and reviewed by the relevant partner before it leaves. Most clients see proposal cycle time drop from 9 days to 2 in the first month.
+
+A brief call this week to walk through one referral from your current pipeline?
+---
+
+### Message rules (non-negotiable for professional services)
+- Email first for default tier; WhatsApp first for founder-led ≤8-person boutique firms.
+- Open with a SPECIFIC observation about THEIR firm (recent LinkedIn post, portfolio piece, panel they spoke on, accreditation). Never generic praise.
+- Quantify pain in ₦ per retainer / per engagement — the only register that lands with a partner.
+- Use formal honorifics — "Sir", "Ma", "Engineer", "Mr/Mrs", "Partner" — these are senior professionals; tone matters.
+- Reference **NESG / LCCI / NBA / ICAN / FRC / FIRS / CITN / ARCON** if relevant to their practice. Domain language signals you're not a generalist.
+- Never lead with autopilot — partners are extremely conservative. Lead with HITL ("you approve every message").
+- Never name a competitor by name (KPMG, PwC, etc) — these are often peers or partners.
+- One question at the end. Never two.
+- Max 6 short sentences for email body; max 4 for WhatsApp.
+
+### Custom build hook (high-signal firms only)
+If the firm has 15+ staff, multi-partner structure, named retainer clients on the website, or operates across cities (Lagos + Abuja, Lagos + Accra), add ONE sentence near the CTA:
+- "We also build bespoke modules for multi-partner firms — proposal pipelines, partner-shared client desks, retainer billing reminders. Most ship in under 2 weeks."
+
+Skip for sole practitioners.
+
+### Reply patterns to expect (and how to handle)
+- **"What's the price?"** — Don't quote. "Pricing depends on inbound volume and number of partners using the system. Happy to walk through on a 20-minute call — when works for you?"
+- **"We already have a BD person"** — "Of course — most of our firms kept theirs. We handle the WhatsApp/email triage so the BD person can focus on relationship work and proposal writing. Want to see how that split works?"
+- **"Send a proposal first"** — "Quicker if I show you a 15-minute live demo on the inbound your firm received this week — that gives you something concrete to evaluate. Tuesday or Wednesday?"
+- **"Send case studies"** — send 1 short case-study one-pager (Lagos firm, anonymised, named ₦ outcomes) plus the booking link. Never a 12-page deck.
+- **"We don't trust AI to talk to clients"** — "Completely fair. That's why every single message is reviewed by a partner before it sends. The agent only drafts; you approve. Most partners turn on autopilot only for credentials pack responses after a month of seeing the drafts."
+- **Long silence** — one follow-up after 5–7 days, shorter, references the original message. Stop after two attempts.
+
+### Final check before any draft sends
+- Have I named the firm?
+- Have I referenced a specific signal (LinkedIn post, portfolio, panel, accreditation)?
+- Did I quantify pain in ₦ per retainer / per engagement?
+- Is the tone partner-to-partner, not vendor-to-buyer?
+- Is there exactly ONE question at the end?
+- Did I avoid the words "solutions", "leverage", "synergy", "empower", "best-in-class"?
+- Did I mention Paystack/Flutterwave (not Stripe)?
+- Is there NO placeholder text in brackets?
+
+If any answer is no — rewrite.

@@ -515,10 +515,11 @@ No explanations. No preamble. Just the message.
 """
 
     client_api = _get_client()
+    layered_system = f"{system}\n\n{_nigerian_context()}"
     response = client_api.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=400,
-        system=system,
+        system=layered_system,
         messages=[{"role": "user", "content": user_prompt}],
     )
 
