@@ -144,6 +144,20 @@ async def get_owner_brief(token: str):
     }
 
 
+@router.get("/sales-copilot/{token}")
+async def get_sales_copilot(token: str, days: int = 14):
+    """Pipeline-card view of inbound threads that need a next move."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from tools.sales_copilot import sales_copilot_for
+    return {
+        "client": client["name"],
+        "days": days,
+        **sales_copilot_for(client["name"], days=days),
+    }
+
+
 # ─── Lead Resurrection (token-auth wrapper around /b2c upload + run) ─────────
 
 @router.get("/upload-leads/{token}", response_class=HTMLResponse)

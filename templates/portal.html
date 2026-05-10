@@ -580,6 +580,23 @@
       <div id="radar-empty" style="display:none;font-size:13px;color:#5dd28a;padding:8px 0;">✅ No missed opportunities — every price-asker has been followed up.</div>
     </div>
 
+    <!-- WhatsApp Sales Copilot -->
+    <div class="section-label">WhatsApp Sales Copilot</div>
+    <div id="copilot-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#e8e8e8;">Inbound threads that need a next move</div>
+          <div style="font-size:12px;color:#555;margin-top:2px;">Hot replies, pending AI drafts, and warm questions from the last 14 days.</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span id="copilot-hot" style="font-size:11px;color:#ffb84d;background:#1a1204;border:1px solid #3a2608;border-radius:999px;padding:5px 9px;">— hot</span>
+          <span id="copilot-drafts" style="font-size:11px;color:#5dd28a;background:#07160f;border:1px solid #123522;border-radius:999px;padding:5px 9px;">— drafts</span>
+        </div>
+      </div>
+      <div id="copilot-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;"></div>
+      <div id="copilot-empty" style="display:none;font-size:13px;color:#5dd28a;padding:8px 0;">✅ No inbound threads need action right now.</div>
+    </div>
+
     <!-- Stats -->
     <div class="stats-grid" id="stats-grid">
       <div class="stat-card orange">
@@ -945,6 +962,107 @@ async function loadRadar() {
   }
 }
 
+function esc(s) {
+  return String(s || "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[ch]));
+}
+
+function copilotBadge(priority, intent) {
+  const color = priority === "hot" ? "#ffb84d"
+    : priority === "warm" ? "#5dd28a"
+    : priority === "closed" ? "#ff7a7a"
+    : "#777";
+  const bg = priority === "hot" ? "#1a1204"
+    : priority === "warm" ? "#07160f"
+    : priority === "closed" ? "#1c0909"
+    : "#151515";
+  return `<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:${color};background:${bg};border:1px solid ${color}33;border-radius:999px;padding:4px 8px;">${esc(intent || priority)}</span>`;
+}
+
+async function loadCopilot() {
+  const list = document.getElementById("copilot-list");
+  const empty = document.getElementById("copilot-empty");
+  const hot = document.getElementById("copilot-hot");
+  const drafts = document.getElementById("copilot-drafts");
+  if (!list) return;
+
+  try {
+    const r = await fetch(`/portal/sales-copilot/{{ token }}`).then(x => x.json());
+    const items = r.threads || [];
+    const summary = r.summary || {};
+    hot.textContent = `${summary.hot || 0} hot`;
+    drafts.textContent = `${summary.drafts || 0} drafts`;
+
+    if (!items.length) {
+      list.innerHTML = "";
+      empty.style.display = "";
+      return;
+    }
+    empty.style.display = "none";
+
+    list.innerHTML = items.map(t => {
+      const phone = t.phone || "";
+      const waLink = phone ? `https://wa.me/${phone.replace(/[^0-9]/g, "")}` : "";
+      const ago = t.received_at ? relTime(t.received_at) : "";
+      const draft = t.draft_preview
+        ? `<div style="margin-top:10px;background:#07120d;border:1px solid #123522;border-radius:8px;padding:10px;font-size:12px;color:#a9e9c4;line-height:1.45;">${esc(t.draft_preview)}</div>`
+        : "";
+      const approve = t.approval_id
+        ? `<button onclick="copilotApprove('${t.approval_id}', this)" style="background:#00a86b;color:#03140d;border:none;border-radius:6px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer;">Approve draft</button>
+           <button onclick="copilotSkip('${t.approval_id}', this)" style="background:#1e2530;color:#999;border:1px solid #2a3340;border-radius:6px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer;">Skip</button>`
+        : "";
+      return `
+        <div style="background:#0a0a0a;border:1px solid #1e2530;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+            <div style="min-width:0;">
+              <div style="font-size:13px;font-weight:700;color:#e8e8e8;">${esc(t.contact_name)}</div>
+              <div style="font-size:11px;color:#555;margin-top:3px;">${esc(t.channel || "whatsapp")}${ago ? " · " + esc(ago) : ""}</div>
+            </div>
+            ${copilotBadge(t.priority, t.intent)}
+          </div>
+          <div style="font-size:12px;color:#999;line-height:1.45;font-style:italic;">"${esc(t.reply_text || t.summary || "No message text captured.").slice(0, 220)}"</div>
+          <div style="font-size:12px;color:#fff;line-height:1.45;"><span style="color:#ff5500;font-weight:700;">Next:</span> ${esc(t.suggested_action)}</div>
+          ${draft}
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;">
+            ${approve}
+            ${waLink ? `<a href="${waLink}" target="_blank" style="background:#1e2530;color:#5dd28a;text-decoration:none;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:700;">Open WhatsApp →</a>` : ""}
+          </div>
+        </div>`;
+    }).join("");
+  } catch (e) {
+    list.innerHTML = `<div style="font-size:12px;color:#777;">Could not load Sales Copilot.</div>`;
+  }
+}
+
+async function copilotApprove(id, btn) {
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+  try {
+    const r = await fetch(`/api/v1/portal-approvals/{{ token }}/${id}/approve`, { method: "POST" });
+    if (!r.ok) throw new Error("approve failed");
+    btn.textContent = "Sent";
+    setTimeout(loadCopilot, 700);
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = "Try again";
+  }
+}
+
+async function copilotSkip(id, btn) {
+  btn.disabled = true;
+  btn.textContent = "Skipping…";
+  try {
+    const r = await fetch(`/api/v1/portal-approvals/{{ token }}/${id}/skip`, { method: "POST" });
+    if (!r.ok) throw new Error("skip failed");
+    btn.textContent = "Skipped";
+    setTimeout(loadCopilot, 700);
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = "Try again";
+  }
+}
+
 // ── Load ──────────────────────────────────────────────────────────────────────
 
 async function load() {
@@ -956,6 +1074,7 @@ async function load() {
 
     renderOwnerBrief(data.cash);
     loadRadar();
+    loadCopilot();
 
     const s = data.stats || {};
     const contacted = s.contacted || 0;

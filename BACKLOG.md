@@ -83,10 +83,10 @@ Internal research that enriches and activates leads the client ALREADY HAS. Does
 
 The killer features per `project_reachng_lead_activation_pivot.md`:
 
-- [ ] **Lead Resurrection flow** (~1.5 days) — `/portal/upload-leads` page, CSV upload UI, segments uploaded list (active/dormant/cold), generates reactivation campaigns, each lead gets a tailored re-engagement message in HITL queue. Repositions existing BYO Leads infra.
-- [ ] **Missed Opportunity Radar** (~1 day) — new dashboard widget. Queries: "asked price + no follow-up", "hot lead untouched > 3 days", "said 'send details' + nothing sent". Each row = one-tap action.
-- [ ] **WhatsApp Sales Copilot view** (~1 day) — pipeline-card view of every inbound thread, with AI suggested next reply, hot/cold marker, and qualifying-question prompts. Lives at `/dashboard/copilot`.
-- [ ] **Owner Brief upgrade** (~1 day, also in genius_repositioning memo) — rebuild `scheduler.py::morning_brief` as cash-focused: collectible amount this week + hot replies overnight + actions today. Each item one-tap.
+- [x] ~~**Lead Resurrection flow**~~ — shipped 2026-05-09. `/portal/upload-leads/{token}` CSV upload + NDPR attestation + `/portal/run-resurrection/{token}` HITL-forced campaign run. Entry button lives on the Owner Brief card.
+- [x] ~~**Missed Opportunity Radar**~~ — shipped 2026-05-09. Detects price-asking replies with no follow-up via reply → contact → outreach_log join. Portal endpoint: `/portal/missed-opportunities/{token}`. Portal widget has one-tap WhatsApp deeplink.
+- [ ] **WhatsApp Sales Copilot view** (~1 day) — portal v0 shipped 2026-05-09: `/portal/sales-copilot/{token}` + client portal cards for hot/warm inbound threads, suggested next action, draft approve/skip, WhatsApp deeplink. Remaining: admin/operator `/dashboard/copilot` view with full pipeline-card layout, qualifying prompts, and Control Tower navigation.
+- [x] ~~**Owner Brief upgrade**~~ — shipped 2026-05-09. `tools/morning_brief_client.py` is cash-focused: collectible amount, hot replies, actions today, cash landed overnight. Portal card renders same signal pack.
 
 ## P0 — ReachNG Prospect OS (internal SDR engine, ~3 days MVP)
 
