@@ -79,7 +79,12 @@ async def research_trending_hooks(vertical: str, max_posts: int = 30) -> list[st
     """
     Scrape top Instagram posts in the vertical, extract first sentences as hook examples.
     These are real hooks that have already earned engagement — not guesses.
+
+    Apify-spend is gated to IG-native verticals only (see tools.apify_gate).
     """
+    from tools.apify_gate import should_use_apify_for
+    if not should_use_apify_for(vertical):
+        return []
     hashtags = VERTICAL_HASHTAGS.get(vertical, [])
     if not hashtags:
         return []

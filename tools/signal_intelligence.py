@@ -264,7 +264,12 @@ async def discover_ig_signals(vertical: str, max_results: int = 20) -> list[dict
     """
     Scrape Instagram business profiles with hot signal keywords via Apify.
     Requires APIFY_API_TOKEN — skipped if missing.
+
+    Apify-spend gated to IG-native verticals only (see tools.apify_gate).
     """
+    from tools.apify_gate import should_use_apify_for
+    if not should_use_apify_for(vertical):
+        return []
     settings = get_settings()
     token = settings.apify_api_token
     if not token:
@@ -336,7 +341,12 @@ async def discover_tiktok_signals(vertical: str, max_results: int = 15) -> list[
     """
     Scrape TikTok business posts with hot signal keywords via Apify.
     Requires APIFY_API_TOKEN — skipped if missing.
+
+    Apify-spend gated to IG-native verticals only (see tools.apify_gate).
     """
+    from tools.apify_gate import should_use_apify_for
+    if not should_use_apify_for(vertical):
+        return []
     settings = get_settings()
     token = settings.apify_api_token
     if not token:

@@ -826,6 +826,111 @@
 
   /* Selection */
   ::selection { background: var(--accent-soft); color: var(--text-hi); }
+
+  /* ════════════════════════════════════════════════════════════════════════
+     PHASE C — KPI hero ribbon. Bloomberg-tier headline cards on Today.
+     ════════════════════════════════════════════════════════════════════════ */
+  .kpi-hero {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: linear-gradient(160deg, var(--bg-card) 0%, var(--bg-deep) 100%);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s, transform 0.25s;
+  }
+  .kpi-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-bright), transparent);
+  }
+  .kpi-card::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.18;
+    transform: translate(40%, -40%);
+    pointer-events: none;
+    transition: transform 0.6s, opacity 0.6s;
+  }
+  .kpi-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+  .kpi-card:hover::after { transform: translate(35%, -45%) scale(1.1); opacity: 0.28; }
+
+  .kpi-card.fire::after  { background: var(--accent); }
+  .kpi-card.green::after { background: var(--green); }
+  .kpi-card.amber::after { background: var(--amber); }
+  .kpi-card.blue::after  { background: var(--blue); }
+  .kpi-card.red::after   { background: var(--red); }
+  .kpi-card.purple::after { background: #a855f7; }
+
+  .kpi-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 16px; position: relative; z-index: 1;
+  }
+  .kpi-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-deep); border: 1px solid var(--border);
+  }
+  .kpi-card.fire  .kpi-icon { color: var(--accent); border-color: rgba(255,92,0,0.3); }
+  .kpi-card.green .kpi-icon { color: var(--green);  border-color: rgba(0,229,160,0.3); }
+  .kpi-card.amber .kpi-icon { color: var(--amber);  border-color: rgba(245,200,66,0.3); }
+  .kpi-card.blue  .kpi-icon { color: var(--blue);   border-color: rgba(85,153,255,0.3); }
+  .kpi-card.red   .kpi-icon { color: var(--red);    border-color: rgba(255,92,92,0.3); }
+  .kpi-card.purple .kpi-icon { color: #a855f7;      border-color: rgba(168,85,247,0.3); }
+
+  .kpi-delta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+    padding: 3px 8px; border-radius: 6px;
+    display: inline-flex; align-items: center; gap: 3px;
+  }
+  .kpi-delta.up   { background: rgba(0,229,160,0.1);  color: var(--green); }
+  .kpi-delta.down { background: rgba(255,92,92,0.1);  color: var(--red); }
+  .kpi-delta.flat { background: var(--bg-deep);       color: var(--text-lo); }
+
+  .kpi-label {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em;
+    color: var(--text-lo); text-transform: uppercase;
+    margin-bottom: 6px; position: relative; z-index: 1;
+  }
+  .kpi-value {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 44px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em; line-height: 1.05;
+    color: var(--text-hi);
+    position: relative; z-index: 1;
+  }
+  .kpi-card.fire  .kpi-value { color: #ff8240; }
+  .kpi-card.green .kpi-value { color: var(--green); }
+  .kpi-card.amber .kpi-value { color: var(--amber); }
+  .kpi-card.blue  .kpi-value { color: var(--blue); }
+  .kpi-card.red   .kpi-value { color: var(--red); }
+  .kpi-card.purple .kpi-value { color: #c084fc; }
+
+  .kpi-foot {
+    margin-top: 10px;
+    font-size: 11px; color: var(--text-lo);
+    display: flex; align-items: center; gap: 6px;
+    position: relative; z-index: 1;
+  }
+  .kpi-foot .material-symbols-outlined { font-size: 14px; }
+
+  @media (max-width: 768px) {
+    .kpi-value { font-size: 34px; }
+  }
 </style>
 </head>
 <body>
@@ -1032,6 +1137,69 @@ function copyDemoPortalLink(btn){
 
 <!-- ── Overview ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel active" id="tab-overview">
+
+  <!-- KPI Hero Ribbon — Bloomberg-tier headline cards (Phase C) -->
+  <section class="kpi-hero" id="kpi-hero">
+    <div class="kpi-card fire" onclick="switchTabByName('approvals')" style="cursor:pointer;" title="Open Message Queue">
+      <div class="kpi-head">
+        <div class="kpi-icon"><span class="material-symbols-outlined icon-md">inbox</span></div>
+        <span class="kpi-delta flat" id="kpi-drafts-delta">—</span>
+      </div>
+      <div class="kpi-label">Drafts Pending</div>
+      <div class="kpi-value" id="kpi-drafts">—</div>
+      <div class="kpi-foot"><span class="material-symbols-outlined icon-sm">schedule</span> awaiting human approval</div>
+    </div>
+
+    <div class="kpi-card amber" onclick="switchTabByName('replies')" style="cursor:pointer;" title="Open Replies">
+      <div class="kpi-head">
+        <div class="kpi-icon"><span class="material-symbols-outlined icon-md">local_fire_department</span></div>
+        <span class="kpi-delta flat" id="kpi-hot-delta">—</span>
+      </div>
+      <div class="kpi-label">Hot Replies</div>
+      <div class="kpi-value" id="kpi-hot">—</div>
+      <div class="kpi-foot"><span class="material-symbols-outlined icon-sm">priority_high</span> price-asking · interested</div>
+    </div>
+
+    <div class="kpi-card green" onclick="switchTabByName('clients')" style="cursor:pointer;" title="Open Clients">
+      <div class="kpi-head">
+        <div class="kpi-icon"><span class="material-symbols-outlined icon-md">groups</span></div>
+        <span class="kpi-delta flat" id="kpi-clients-delta">—</span>
+      </div>
+      <div class="kpi-label">Active Clients</div>
+      <div class="kpi-value" id="kpi-clients-hero">—</div>
+      <div class="kpi-foot"><span class="material-symbols-outlined icon-sm">verified</span> running campaigns</div>
+    </div>
+
+    <div class="kpi-card blue" onclick="switchTabByName('pipeline')" style="cursor:pointer;" title="Open Pipeline">
+      <div class="kpi-head">
+        <div class="kpi-icon"><span class="material-symbols-outlined icon-md">send</span></div>
+        <span class="kpi-delta flat" id="kpi-contacted-delta">—</span>
+      </div>
+      <div class="kpi-label">Total Contacted</div>
+      <div class="kpi-value" id="kpi-contacted">—</div>
+      <div class="kpi-foot"><span class="material-symbols-outlined icon-sm">trending_up</span> all-time outreach</div>
+    </div>
+
+    <div class="kpi-card purple" onclick="switchTabByName('approvals')" style="cursor:pointer;" title="Open Message Queue">
+      <div class="kpi-head">
+        <div class="kpi-icon"><span class="material-symbols-outlined icon-md">forum</span></div>
+        <span class="kpi-delta flat" id="kpi-threads-delta">—</span>
+      </div>
+      <div class="kpi-label">Threads Tracked</div>
+      <div class="kpi-value" id="kpi-threads">—</div>
+      <div class="kpi-foot"><span class="material-symbols-outlined icon-sm">timeline</span> last 14 days</div>
+    </div>
+
+    <div class="kpi-card red" onclick="switchTabByName('replies')" style="cursor:pointer;" title="Open Replies">
+      <div class="kpi-head">
+        <div class="kpi-icon"><span class="material-symbols-outlined icon-md">notifications_active</span></div>
+        <span class="kpi-delta flat" id="kpi-replied-delta">—</span>
+      </div>
+      <div class="kpi-label">Replies Received</div>
+      <div class="kpi-value" id="kpi-replied">—</div>
+      <div class="kpi-foot"><span class="material-symbols-outlined icon-sm">mark_chat_read</span> all-time inbound</div>
+    </div>
+  </section>
 
   <!-- Onboarding Checklist — hidden once all steps complete -->
   <div class="onboarding-banner" id="onboarding-banner" style="display:none;">
@@ -4139,9 +4307,14 @@ async function refreshRoster() {
     if (!clients || !clients.length) {
       tbody.innerHTML = '<tr><td colspan="9" class="empty">No clients yet. Add one in Client Onboarding below.</td></tr>';
       document.getElementById("s-clients").textContent = "0";
+      const heroClients = document.getElementById("kpi-clients-hero");
+      if (heroClients) heroClients.textContent = "0";
       return;
     }
-    document.getElementById("s-clients").textContent = clients.filter(c => c.active).length;
+    const activeClients = clients.filter(c => c.active).length;
+    document.getElementById("s-clients").textContent = activeClients;
+    const heroClients = document.getElementById("kpi-clients-hero");
+    if (heroClients) heroClients.textContent = activeClients;
     tbody.innerHTML = clients.map(c => {
       const plan = c.plan || "";
       const planClass = plan ? `plan-${plan}` : "plan-starter";
@@ -5183,6 +5356,13 @@ async function refresh() {
     document.getElementById("s-contacted").textContent = fmt(all.contacted);
     document.getElementById("s-replied").textContent   = fmt(all.replied);
     document.getElementById("s-converted").textContent = fmt(all.converted);
+
+    // KPI hero — mirror the same admin-stats numbers at the top of Today
+    const setHero = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setHero("kpi-contacted", fmt(all.contacted));
+    setHero("kpi-replied",   fmt(all.replied));
+    // hot/drafts/threads are populated by loadKpiHeroOperator() below — async copilot fetch
+    if (typeof loadKpiHeroOperator === "function") loadKpiHeroOperator();
 
     // Source attribution pills
     const bySource   = all.by_source   || {};
@@ -8576,6 +8756,20 @@ function _actRelTime(iso) {
 }
 
 let _activateLoaded = false;
+
+// KPI hero on Today — operator-roll-up cash signals (hot / drafts / threads)
+async function loadKpiHeroOperator() {
+  const setHero = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  try {
+    const r = await fetch("/api/v1/copilot/operator?days=14&per_client_limit=4");
+    if (!r.ok) return;
+    const data = await r.json();
+    const s = data.summary || {};
+    setHero("kpi-hot",     s.hot     != null ? s.hot     : "0");
+    setHero("kpi-drafts",  s.drafts  != null ? s.drafts  : "0");
+    setHero("kpi-threads", s.total   != null ? s.total   : "0");
+  } catch (_) { /* silent */ }
+}
 
 async function loadActivateTab() {
   _activateLoaded = true;

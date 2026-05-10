@@ -414,6 +414,9 @@ async def scrape_wa_directories(vertical: str, max_results: int = 20) -> list[di
 
 async def scrape_instagram_hashtags(vertical: str, max_results: int = 20) -> list[dict]:
     """Find business accounts posting under vertical-relevant hashtags."""
+    from tools.apify_gate import should_use_apify_for
+    if not should_use_apify_for(vertical):
+        return []
     config   = VERTICAL_SOCIAL.get(vertical, {})
     hashtags = config.get("ig_hashtags", [])
     if not hashtags:
@@ -457,6 +460,9 @@ async def scrape_instagram_hashtags(vertical: str, max_results: int = 20) -> lis
 
 async def scrape_twitter_leads(vertical: str, max_results: int = 20) -> list[dict]:
     """Search Twitter/X for intent-signalling tweets in a vertical."""
+    from tools.apify_gate import should_use_apify_for
+    if not should_use_apify_for(vertical):
+        return []
     config  = VERTICAL_SOCIAL.get(vertical, {})
     queries = config.get("twitter_queries", [])
     if not queries:
@@ -583,6 +589,9 @@ async def scrape_twitter_api(vertical: str, max_results: int = 20) -> list[dict]
 
 async def scrape_facebook_mentions(vertical: str, max_results: int = 20) -> list[dict]:
     """Scrape Facebook pages and groups for vertical-relevant businesses."""
+    from tools.apify_gate import should_use_apify_for
+    if not should_use_apify_for(vertical):
+        return []
     config   = VERTICAL_SOCIAL.get(vertical, {})
     keywords = config.get("fb_keywords", [])
     if not keywords:
@@ -634,6 +643,9 @@ async def scrape_tiktok_leads(vertical: str, max_results: int = 20) -> list[dict
     TikTok is massive for Nigerian SMEs — product demos, service showcases,
     business pitches all happen there. High intent signal.
     """
+    from tools.apify_gate import should_use_apify_for
+    if not should_use_apify_for(vertical):
+        return []
     config   = VERTICAL_SOCIAL.get(vertical, {})
     hashtags = config.get("tt_hashtags", [])
     if not hashtags:

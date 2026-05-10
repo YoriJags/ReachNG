@@ -33,7 +33,7 @@ These are next up after current Phase 1.5 (Business Brief + BYO Leads) finishes.
 - [x] ~~**Vertical tag enforcement on client upsert**~~ — shipped 2026-05-09. `vertical` required + validated against `SUPPORTED_VERTICALS` whitelist. Lowercased and normalised on save.
 - [x] ~~**HITL drafter reads `enrichment.decision_maker`**~~ — shipped 2026-05-10. `tools/apify_discovery.py` now also propagates `enrichment.title` → `contact_title`. `campaigns/base.py` backfills `biz["contact_name"]` from `enrich_business().team_names[0]` when missing, persists `contact_name`/`contact_title` via `upsert_contact`, passes them into both drafter branches plus follow-ups. `generate_outreach_message_for_client` now accepts + injects `contact_name`/`contact_title`/`enrichment_context` (same `[Partner Name]` placeholder guardrail as the generic drafter).
 - [ ] **Control Tower shows `enrichment.decision_maker` + `title`** on lead detail + "Re-enrich" button. (Phase 1.4 close-out)
-- [ ] ~~**APIFY_API_TOKEN to Railway env**~~ — DEFERRED until 3 paying clients land. Lean Discovery Stack replaces Apify until then. Re-enable via `USE_APIFY=true` flag once revenue covers it.
+- [x] ~~**APIFY_API_TOKEN to Railway env**~~ — **REACTIVATED 2026-05-10**. User has credits, Lean Discovery Stack not yet built. Code already gates on `settings.apify_api_token` per call site (hooks.py, social.py, signal_intelligence.py, main.py TikTok actor, api/contacts.py). Setting the env var makes all 5 paths go live with no code change.
 
 ## P0 — Nigerian Market Fluency Layer (1 day, ship before/with Business Brief)
 
