@@ -692,6 +692,140 @@
   }
   .tab-section-clickable:hover { background: #1a2530; border-color: #ff5c00; color: #ff7a30; }
   .tab-divider { width: 1px; height: 18px; background: #1a2530; margin: 0 4px; align-self: center; flex-shrink: 0; }
+
+  /* ════════════════════════════════════════════════════════════════════════
+     PHASE B — Fintech / Wall Street polish across every panel.
+     Overrides hardcoded legacy colours with design tokens.
+     ════════════════════════════════════════════════════════════════════════ */
+
+  /* Glass panels — universal card surface */
+  .glass-panel {
+    background: linear-gradient(180deg, var(--bg-card) 0%, rgba(14,18,24,0.4) 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .glass-panel:hover { border-color: var(--border-bright); }
+
+  /* Cards — make every legacy card feel fintech */
+  .vertical-card,
+  .disc-source-card,
+  .signal-stat,
+  .approval-card,
+  .stat-card {
+    background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-deep) 100%);
+    border-color: var(--border);
+  }
+  .vertical-card:hover,
+  .disc-source-card:hover,
+  .signal-stat:hover,
+  .approval-card:hover { border-color: var(--border-bright); }
+
+  .vertical-card h3 { color: var(--text-mid); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .v-row { border-bottom-color: var(--border); font-size: 12px; padding: 7px 0; }
+  .v-row .lbl { color: var(--text-lo); }
+  .v-row .val { font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace; color: var(--text-hi); font-weight: 500; }
+
+  .dh-name { color: var(--text-mid); font-weight: 600; letter-spacing: 0.02em; }
+  .dh-count { font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace; color: var(--text-hi); letter-spacing: -0.02em; }
+  .dh-label { color: var(--text-lo); letter-spacing: 0.1em; font-weight: 600; }
+
+  .signal-stat .s-val { font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace; letter-spacing: -0.02em; font-weight: 600; }
+  .signal-stat .s-lbl { color: var(--text-lo); letter-spacing: 0.1em; font-weight: 600; }
+
+  /* Approvals — Wall Street compact ticker feel */
+  .approval-card { padding: 14px 16px; border-left-width: 3px; }
+  .approval-name { color: var(--text-hi); font-weight: 700; }
+  .approval-meta { color: var(--text-lo); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.04em; }
+  .approval-message { background: var(--bg-deep); border-color: var(--border); color: var(--text-hi); font-size: 13px; line-height: 1.55; }
+
+  /* Buttons — denser, monospaced labels */
+  .action-btn { font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; font-size: 11px; padding: 7px 14px; }
+  .action-btn.approve { background: var(--green); color: #002113; }
+  .action-btn.edit    { background: rgba(85,153,255,0.1); color: var(--blue); border: 1px solid rgba(85,153,255,0.25); }
+  .action-btn.skip    { background: var(--bg-card); color: var(--text-lo); border: 1px solid var(--border); }
+
+  /* Tables — fintech grid */
+  .roster-table { font-size: 12.5px; }
+  .roster-table th {
+    color: var(--text-lo); border-bottom-color: var(--border);
+    font-size: 10px; letter-spacing: 0.12em; font-weight: 700; padding: 10px 10px;
+  }
+  .roster-table td { border-bottom-color: var(--border); padding: 12px 10px; }
+  .roster-table tr:hover td { background: var(--bg-card-hover); }
+  .roster-table .num,
+  .roster-table td:has(.num) { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+
+  /* Plan badges — sharper */
+  .plan-badge { letter-spacing: 0.08em; font-size: 9.5px; padding: 3px 8px; border-radius: 4px; }
+  .plan-starter { background: var(--bg-card); color: var(--text-mid); border: 1px solid var(--border); }
+  .plan-growth  { background: rgba(245,200,66,0.08); color: var(--amber); border: 1px solid rgba(245,200,66,0.2); }
+  .plan-agency  { background: rgba(255,92,0,0.1); color: var(--accent); border: 1px solid rgba(255,92,0,0.25); }
+
+  /* ROI banner — refined */
+  .roi-banner {
+    background: linear-gradient(135deg, rgba(255,92,0,0.04), var(--bg-card));
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+  }
+  .roi-label-text { color: var(--accent); font-weight: 700; letter-spacing: -0.01em; }
+  .roi-sub { color: var(--text-lo); }
+  .roi-stat .r-val { font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em; }
+  .roi-stat .r-lbl { color: var(--text-lo); letter-spacing: 0.1em; font-weight: 600; }
+
+  /* Source pills — uniformised */
+  .source-pill {
+    background: var(--bg-card); border-color: var(--border); color: var(--text-mid);
+    font-size: 10.5px; letter-spacing: 0.04em;
+  }
+  .source-pill span { color: var(--text-hi); }
+  .source-pill.social { border-color: rgba(168,168,255,0.25); color: #6666aa; }
+  .source-pill.social span { color: #b0b0ff; }
+
+  /* Sort buttons */
+  .sort-btn { background: var(--bg-card); border-color: var(--border); color: var(--text-lo); font-size: 10.5px; letter-spacing: 0.04em; }
+  .sort-btn:hover { color: var(--text-mid); border-color: var(--border-bright); }
+  .sort-btn.sort-active { background: rgba(255,92,0,0.08); color: var(--accent); border-color: rgba(255,92,0,0.4); }
+
+  /* Limit bar */
+  .limit-label { color: var(--text-lo); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; }
+  .limit-bar-track { background: var(--bg-card); border: 1px solid var(--border); }
+  .limit-bar-fill { background: linear-gradient(90deg, var(--accent), #ff8a40); }
+
+  /* Copy-link, secondary buttons */
+  .copy-link-btn {
+    background: var(--bg-card); border: 1px solid var(--border); color: var(--text-lo);
+    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600;
+  }
+  .copy-link-btn:hover { background: var(--bg-card-hover); color: var(--text-hi); border-color: var(--border-bright); }
+
+  /* Tab section dividers in nav */
+  .tab-section-label { color: var(--text-lo); font-weight: 700; }
+  .tab-section-clickable { color: var(--accent); font-weight: 700; }
+  .tab-section-clickable:hover { background: rgba(255,92,0,0.08); border-color: var(--accent); color: #ff8240; }
+  .tab-divider { background: var(--border); }
+
+  /* Section dividers everywhere */
+  .post-context { background: var(--bg-deep); border-left-color: var(--accent); color: var(--text-mid); }
+
+  /* Empty + error states */
+  .approvals-empty { color: var(--text-lo); font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  /* Activate tab — KPI strip & Missed-Opp Radar polish */
+  #tab-activate .stat-card .value,
+  .activate-kpi .value { font-family: 'JetBrains Mono', monospace; }
+
+  /* Scrollbars (webkit) — refined */
+  *::-webkit-scrollbar { width: 8px; height: 8px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  *::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
+
+  /* Selection */
+  ::selection { background: var(--accent-soft); color: var(--text-hi); }
 </style>
 </head>
 <body>
