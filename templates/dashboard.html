@@ -698,31 +698,13 @@ function copyDemoPortalLink(btn){
 </aside>
 <div class="main-content" id="main-content">
 
-<!-- ── Outreach Tab Nav (grouped by launch flow — section labels are clickable) ── -->
+<!-- ── Outreach Tab Nav — 5 focused tabs ── -->
 <nav class="tab-nav product-tabs" data-product="outreach">
-  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('overview')" title="Jump to Overview">Start</button>
-  <button class="tab-btn active" onclick="switchTab('overview', this)" title="Today's work, ROI, system health">Overview</button>
-  <div class="tab-divider"></div>
-  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('clients')" title="Jump to Setup — Clients">1. Setup</button>
-  <button class="tab-btn" onclick="switchTab('clients', this)" title="Add a client and pair their WhatsApp">Clients</button>
-  <button class="tab-btn" onclick="switchTab('briefs', this); briefAdminLoadClients();" title="Legal pack + Business Brief — required before outreach">Briefs &amp; Legal</button>
-  <div class="tab-divider"></div>
-  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('campaigns')" title="Jump to Run — Campaigns">2. Run</button>
-  <button class="tab-btn" onclick="switchTab('campaigns', this)" title="Upload lead list (BYO) or run discovery">Campaigns</button>
-  <button class="tab-btn" onclick="switchTab('approvals', this)" title="Approve drafted messages before they send">Message Queue <span class="tab-badge" id="tab-badge-approvals"></span></button>
-  <button class="tab-btn" onclick="switchTab('signal_leads', this); loadSignalLeads();" title="Buyer intent signals found on social — people looking for what your clients sell">Signal Leads <span class="tab-badge" id="tab-badge-signals"></span></button>
-  <div class="tab-divider"></div>
-  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('replies')" title="Jump to Engage — Replies">3. Engage</button>
-  <button class="tab-btn" onclick="switchTab('replies', this)" title="Inbound replies needing attention">Replies</button>
-  <button class="tab-btn" onclick="switchTab('closer', this); closerAdminLoadClients();" title="Live conversations the AI Closer is running">Closer</button>
-  <div class="tab-divider"></div>
-  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('pipeline')" title="Jump to Money — Pipeline">4. Money</button>
-  <button class="tab-btn" onclick="switchTab('pipeline', this)" title="Funnel: contacted → replied → converted">Pipeline</button>
-  <button class="tab-btn" onclick="switchTab('invoices', this)" title="Send and chase invoices">Invoices</button>
-  <div class="tab-divider"></div>
-  <button class="tab-section-label tab-section-clickable" onclick="switchTabByName('tower')" title="Jump to System — Control Tower">System</button>
-  <button class="tab-btn" onclick="switchTab('tower', this)" title="Live ops feed — what every job is doing right now">Control Tower</button>
-  <button class="tab-btn" onclick="switchTab('tools', this)" title="System checks, demo seed, utilities">Tools</button>
+  <button class="tab-btn active" onclick="switchTab('overview', this)" title="Today's cash signals, ROI, onboarding">Today</button>
+  <button class="tab-btn" onclick="switchTab('activate', this); loadActivateTab();" title="Lead Resurrection · Missed Opp Radar · Sales Copilot">Activate <span class="tab-badge" id="tab-badge-activate"></span></button>
+  <button class="tab-btn" onclick="switchTab('approvals', this)" title="HITL message queue · Replies · Closer · Invoices">Recover <span class="tab-badge" id="tab-badge-approvals"></span></button>
+  <button class="tab-btn" onclick="switchTab('clients', this)" title="Client setup · Briefs · Campaigns · Control Tower">Clients</button>
+  <button class="tab-btn" onclick="switchTab('tools', this)" title="Discovery health · Signal leads · Tools · Flow">System</button>
 </nav>
 
 <!-- ── LegalOS Tab Nav ── -->
@@ -1001,8 +983,42 @@ function copyDemoPortalLink(btn){
   <div id="last-updated"></div>
 </div>
 
+<!-- ── Activate Tab ───────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-activate">
+
+  <!-- Cash KPI strip -->
+  <div class="summary-bar" id="act-kpi-strip" style="margin-bottom:20px;">
+    <div class="stat-card fire"><div class="label">Hot threads</div><div class="value" id="act-hot">—</div></div>
+    <div class="stat-card amber"><div class="label">Warm threads</div><div class="value" id="act-warm">—</div></div>
+    <div class="stat-card green"><div class="label">Drafts pending</div><div class="value" id="act-drafts">—</div></div>
+    <div class="stat-card blue"><div class="label">Total threads</div><div class="value" id="act-total">—</div></div>
+  </div>
+
+  <!-- Missed Opp Radar -->
+  <p class="section-title" style="margin-top:0;">Missed Opp Radar <span style="color:#ff4444;font-size:10px;margin-left:6px;">Price asked · no quote sent · across all clients</span></p>
+  <div id="act-radar-body"><div style="color:#555;font-size:13px;padding:14px 0;">Loading radar…</div></div>
+
+  <!-- Operator Sales Copilot inline -->
+  <p class="section-title" style="margin-top:28px;">Sales Copilot — All Clients <span style="color:#555;font-size:10px;margin-left:6px;">Hot replies · drafts ready to approve · next action per thread</span></p>
+  <div class="controls" style="margin-bottom:16px;">
+    <label for="act-days" style="font-size:11px;color:var(--muted,#777);text-transform:uppercase;letter-spacing:.1em;">Window (days)</label>
+    <input type="number" id="act-days" min="1" max="60" value="14" style="background:#0a0a0a;border:1px solid #1e2530;border-radius:6px;color:#e8e8e8;padding:6px 10px;font-size:13px;width:70px;">
+    <label for="act-limit" style="font-size:11px;color:var(--muted,#777);text-transform:uppercase;letter-spacing:.1em;margin-left:8px;">Per client</label>
+    <input type="number" id="act-limit" min="1" max="20" value="8" style="background:#0a0a0a;border:1px solid #1e2530;border-radius:6px;color:#e8e8e8;padding:6px 10px;font-size:13px;width:60px;">
+    <button onclick="loadActivateTab()" style="background:#ff5c00;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;margin-left:4px;">Refresh</button>
+  </div>
+  <div id="act-copilot-body"><div style="color:#555;font-size:13px;padding:14px 0;">Loading copilot…</div></div>
+
+</div>
+
 <!-- ── Control Tower ──────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-tower">
+  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
+    <button class="tab-btn" id="csubnav-clients-t"   onclick="clientsNav('clients',this)"                              style="font-size:11px;padding:8px 14px;">Clients</button>
+    <button class="tab-btn" id="csubnav-briefs-t"    onclick="clientsNav('briefs',this);briefAdminLoadClients();"      style="font-size:11px;padding:8px 14px;">Briefs &amp; Legal</button>
+    <button class="tab-btn" id="csubnav-campaigns-t" onclick="clientsNav('campaigns',this)"                            style="font-size:11px;padding:8px 14px;">Campaigns</button>
+    <button class="tab-btn active" id="csubnav-tower-t" onclick="clientsNav('tower',this)"                             style="font-size:11px;padding:8px 14px;">Control Tower</button>
+  </div>
 
   <div class="ct-header">
     <div>
@@ -1170,6 +1186,12 @@ function copyDemoPortalLink(btn){
 
 <!-- ── Campaigns ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-campaigns">
+  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
+    <button class="tab-btn" id="csubnav-clients-ca"   onclick="clientsNav('clients',this)"                              style="font-size:11px;padding:8px 14px;">Clients</button>
+    <button class="tab-btn" id="csubnav-briefs-ca"    onclick="clientsNav('briefs',this);briefAdminLoadClients();"      style="font-size:11px;padding:8px 14px;">Briefs &amp; Legal</button>
+    <button class="tab-btn active" id="csubnav-campaigns-ca" onclick="clientsNav('campaigns',this)"                     style="font-size:11px;padding:8px 14px;">Campaigns</button>
+    <button class="tab-btn" id="csubnav-tower-ca"     onclick="clientsNav('tower',this);loadControlTower();"            style="font-size:11px;padding:8px 14px;">Control Tower</button>
+  </div>
 
   <!-- Quick Launch — May 5 outreach start -->
   <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #ff5c00;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
@@ -1305,6 +1327,12 @@ function copyDemoPortalLink(btn){
 
 <!-- ── Briefs (admin) ────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-briefs">
+  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
+    <button class="tab-btn" id="csubnav-clients-b"   onclick="clientsNav('clients',this)"                              style="font-size:11px;padding:8px 14px;">Clients</button>
+    <button class="tab-btn active" id="csubnav-briefs-b" onclick="clientsNav('briefs',this)"                           style="font-size:11px;padding:8px 14px;">Briefs &amp; Legal</button>
+    <button class="tab-btn" id="csubnav-campaigns-b" onclick="clientsNav('campaigns',this)"                            style="font-size:11px;padding:8px 14px;">Campaigns</button>
+    <button class="tab-btn" id="csubnav-tower-b"     onclick="clientsNav('tower',this);loadControlTower();"            style="font-size:11px;padding:8px 14px;">Control Tower</button>
+  </div>
   <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #ff5c00;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
     <div style="font-size:13px;font-weight:700;color:#ff5c00;margin-bottom:4px;">Business Briefs</div>
     <div style="font-size:11px;color:#556;line-height:1.8;">
@@ -1354,6 +1382,12 @@ function copyDemoPortalLink(btn){
 
 <!-- ── Closer (admin) ────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-closer">
+  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
+    <button class="tab-btn" id="rsubnav-approvals-c" onclick="recoverNav('approvals',this)" style="font-size:11px;padding:8px 14px;">Message Queue</button>
+    <button class="tab-btn" id="rsubnav-replies-c"   onclick="recoverNav('replies',this)"   style="font-size:11px;padding:8px 14px;">Replies</button>
+    <button class="tab-btn active" id="rsubnav-closer-c" onclick="recoverNav('closer',this)" style="font-size:11px;padding:8px 14px;">Closer</button>
+    <button class="tab-btn" id="rsubnav-invoices-c"  onclick="recoverNav('invoices',this)"  style="font-size:11px;padding:8px 14px;">Invoices</button>
+  </div>
   <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #ff5c00;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
     <div style="font-size:13px;font-weight:700;color:#ff5c00;margin-bottom:4px;">ReachNG Closer (real estate only)</div>
     <div style="font-size:11px;color:#556;line-height:1.8;">
@@ -1384,6 +1418,14 @@ function copyDemoPortalLink(btn){
 
 <!-- ── Clients ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-clients">
+
+  <!-- Clients sub-nav -->
+  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
+    <button class="tab-btn active" id="csubnav-clients"  onclick="clientsNav('clients',this)"                             style="font-size:11px;padding:8px 14px;">Clients</button>
+    <button class="tab-btn" id="csubnav-briefs"    onclick="clientsNav('briefs',this);briefAdminLoadClients();"           style="font-size:11px;padding:8px 14px;">Briefs &amp; Legal</button>
+    <button class="tab-btn" id="csubnav-campaigns" onclick="clientsNav('campaigns',this)"                                style="font-size:11px;padding:8px 14px;">Campaigns</button>
+    <button class="tab-btn" id="csubnav-tower"     onclick="clientsNav('tower',this);loadControlTower();"                style="font-size:11px;padding:8px 14px;">Control Tower</button>
+  </div>
 
   <!-- Demo Sandbox -->
   <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #ff5c00;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
@@ -1579,8 +1621,16 @@ function copyDemoPortalLink(btn){
   </div>
 </div>
 
-<!-- ── Approvals ───────────────────────────────────────────────────────────────── -->
+<!-- ── Approvals (Recover sub-tab: default) ──────────────────────────────────── -->
 <div class="tab-panel" id="tab-approvals">
+
+  <!-- Recover sub-nav: jump between the Recover-group panels -->
+  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
+    <button class="tab-btn active" id="rsubnav-approvals" onclick="recoverNav('approvals',this)" style="font-size:11px;padding:8px 14px;">Message Queue <span class="tab-badge show" id="rsub-badge-approvals"></span></button>
+    <button class="tab-btn" id="rsubnav-replies"  onclick="recoverNav('replies',this)"                              style="font-size:11px;padding:8px 14px;">Replies</button>
+    <button class="tab-btn" id="rsubnav-closer"   onclick="recoverNav('closer',this);closerAdminLoadClients();"    style="font-size:11px;padding:8px 14px;">Closer</button>
+    <button class="tab-btn" id="rsubnav-invoices" onclick="recoverNav('invoices',this)"                            style="font-size:11px;padding:8px 14px;">Invoices</button>
+  </div>
 
   <div class="sop-box">
     <div class="sop-title">Message Queue SOP — Money-in-motion. Review twice daily (9:30am and 3pm)</div>
@@ -1613,6 +1663,11 @@ function copyDemoPortalLink(btn){
 
 <!-- ── Signal Leads ─────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-signal_leads">
+  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
+    <button class="tab-btn" id="ssubnav-tools-sl"    onclick="systemNav('tools',this)"                                  style="font-size:11px;padding:8px 14px;">Tools &amp; Health</button>
+    <button class="tab-btn active" id="ssubnav-signals-sl" onclick="systemNav('signal_leads',this)"                     style="font-size:11px;padding:8px 14px;">Signal Leads</button>
+    <button class="tab-btn" id="ssubnav-pipeline-sl" onclick="systemNav('pipeline',this);loadPipeline();"               style="font-size:11px;padding:8px 14px;">Pipeline</button>
+  </div>
   <div class="sop-box">
     <div class="sop-title">Signal Leads — People ALREADY looking for what your client sells</div>
     <div class="sop-step"><span class="sop-num">1</span><span>ReachNG found these on Twitter/X and the web. <b>They have NOT been contacted.</b> Each card shows what they posted.</span></div>
@@ -1638,6 +1693,12 @@ function copyDemoPortalLink(btn){
 
 <!-- ── Replies ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-replies">
+  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
+    <button class="tab-btn" id="rsubnav-approvals-r" onclick="recoverNav('approvals',this)" style="font-size:11px;padding:8px 14px;">Message Queue</button>
+    <button class="tab-btn active" id="rsubnav-replies-r" onclick="recoverNav('replies',this)" style="font-size:11px;padding:8px 14px;">Replies</button>
+    <button class="tab-btn" id="rsubnav-closer-r"    onclick="recoverNav('closer',this);closerAdminLoadClients();" style="font-size:11px;padding:8px 14px;">Closer</button>
+    <button class="tab-btn" id="rsubnav-invoices-r"  onclick="recoverNav('invoices',this)"  style="font-size:11px;padding:8px 14px;">Invoices</button>
+  </div>
 
   <div class="sop-box">
     <div class="sop-title">Replies SOP — Check every 2–3 hours</div>
@@ -1674,6 +1735,11 @@ function copyDemoPortalLink(btn){
 
 <!-- ── Pipeline ──────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-pipeline">
+  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
+    <button class="tab-btn" id="ssubnav-tools-pl"    onclick="systemNav('tools',this)"                                  style="font-size:11px;padding:8px 14px;">Tools &amp; Health</button>
+    <button class="tab-btn" id="ssubnav-signals-pl"  onclick="systemNav('signal_leads',this);loadSignalLeads();"        style="font-size:11px;padding:8px 14px;">Signal Leads</button>
+    <button class="tab-btn active" id="ssubnav-pipeline-pl" onclick="systemNav('pipeline',this)"                        style="font-size:11px;padding:8px 14px;">Pipeline</button>
+  </div>
 
   <div class="sop-box">
     <div class="sop-title">Sales Pipeline — Full Prospect View</div>
@@ -1688,6 +1754,12 @@ function copyDemoPortalLink(btn){
 
 <!-- ── Invoices ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-invoices">
+  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
+    <button class="tab-btn" id="rsubnav-approvals-i" onclick="recoverNav('approvals',this)" style="font-size:11px;padding:8px 14px;">Message Queue</button>
+    <button class="tab-btn" id="rsubnav-replies-i"   onclick="recoverNav('replies',this)"   style="font-size:11px;padding:8px 14px;">Replies</button>
+    <button class="tab-btn" id="rsubnav-closer-i"    onclick="recoverNav('closer',this);closerAdminLoadClients();" style="font-size:11px;padding:8px 14px;">Closer</button>
+    <button class="tab-btn active" id="rsubnav-invoices-i" onclick="recoverNav('invoices',this)" style="font-size:11px;padding:8px 14px;">Invoices</button>
+  </div>
 
   <div class="sop-box">
     <div class="sop-title">Invoice SOP</div>
@@ -1737,8 +1809,15 @@ function copyDemoPortalLink(btn){
   </div>
 </div>
 
-<!-- ── Tools ───────────────────────────────────────────────────────────────── -->
+<!-- ── Tools / System ───────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-tools">
+  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
+    <button class="tab-btn active" id="ssubnav-tools"   onclick="systemNav('tools',this)"                                style="font-size:11px;padding:8px 14px;">Tools &amp; Health</button>
+    <button class="tab-btn" id="ssubnav-signals" onclick="systemNav('signal_leads',this);loadSignalLeads();"             style="font-size:11px;padding:8px 14px;">Signal Leads <span class="tab-badge" id="tab-badge-signals"></span></button>
+    <button class="tab-btn" id="ssubnav-pipeline" onclick="systemNav('pipeline',this);loadPipeline();"                  style="font-size:11px;padding:8px 14px;">Pipeline</button>
+    <a href="/dashboard/flow" target="_blank" style="background:#111;color:#aaa;border:1px solid #2a3340;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;margin-left:4px;">Flow ↗</a>
+    <a href="/dashboard/copilot" target="_blank" style="background:#ff5500;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;margin-left:4px;">Copilot ↗</a>
+  </div>
 
   <div class="sop-box">
     <div class="sop-title">Tools SOP</div>
@@ -3762,6 +3841,7 @@ function switchTab(name, btn) {
   if (btn) btn.classList.add("active");
 
   // Auto-load data for tabs that need it
+  if (name === "activate")    loadActivateTab();
   if (name === "tower")       loadControlTower();
   if (name === "sf_students") sfLoadStudentsTable();
   if (name === "sf_claims")   sfLoadClaims();
@@ -5305,12 +5385,72 @@ function toggleQuickMenu() {
   fab.textContent = menu.classList.contains("open") ? "✕" : "⚡";
 }
 
+// Map old sub-tab names to the new 5-tab + sub-nav routing
+const _TAB_REMAP = {
+  campaigns:    () => clientsNav("campaigns", null),
+  briefs:       () => { clientsNav("briefs", null); briefAdminLoadClients(); },
+  tower:        () => { clientsNav("tower", null);  loadControlTower(); },
+  replies:      () => recoverNav("replies", null),
+  closer:       () => { recoverNav("closer", null); closerAdminLoadClients(); },
+  invoices:     () => recoverNav("invoices", null),
+  pipeline:     () => { systemNav("pipeline", null); loadPipeline(); },
+  signal_leads: () => { systemNav("signal_leads", null); loadSignalLeads(); },
+  activate:     () => { const b = document.querySelector('.product-tabs[data-product="outreach"] .tab-btn:nth-child(2)'); switchTab("activate", b); },
+};
+
 function switchTabByName(name) {
+  if (_TAB_REMAP[name]) { _TAB_REMAP[name](); window.scrollTo({ top:0, behavior:"smooth" }); return; }
   const btn = document.querySelector(`.tab-btn[onclick="switchTab('${name}', this)"]`);
   if (btn) { switchTab(name, btn); window.scrollTo({ top: 0, behavior: "smooth" }); }
   const menu = document.getElementById("quick-menu");
   menu.classList.remove("open");
   document.getElementById("quick-fab").textContent = "⚡";
+}
+
+// ── Group sub-navs (Recover · Clients · System) ──────────────────────────────
+function _subNavSwitch(panelName) {
+  // Show the target panel without changing the outer 5-tab active state
+  document.querySelectorAll(".tab-panel").forEach(p => { p.classList.remove("active"); p.style.display = "none"; });
+  const panel = document.getElementById("tab-" + panelName);
+  if (panel) { panel.style.display = "block"; panel.classList.add("active"); }
+  // Auto-load
+  if (panelName === "tower")       loadControlTower();
+  if (panelName === "pipeline")    loadPipeline();
+  if (panelName === "activate")    loadActivateTab();
+}
+
+function recoverNav(name, btn) {
+  _subNavSwitch(name);
+  // Highlight the outer "Recover" tab (approvals maps to it)
+  const nav = document.querySelector('.product-tabs[data-product="outreach"]');
+  if (nav) {
+    nav.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    const recoverBtn = nav.querySelector(`button[onclick*="approvals"]`);
+    if (recoverBtn) recoverBtn.classList.add("active");
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function clientsNav(name, btn) {
+  _subNavSwitch(name);
+  const nav = document.querySelector('.product-tabs[data-product="outreach"]');
+  if (nav) {
+    nav.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    const clientsBtn = nav.querySelector(`button[onclick*="'clients'"]`);
+    if (clientsBtn) clientsBtn.classList.add("active");
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function systemNav(name, btn) {
+  _subNavSwitch(name);
+  const nav = document.querySelector('.product-tabs[data-product="outreach"]');
+  if (nav) {
+    nav.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    const sysBtn = nav.querySelector(`button[onclick*="'tools'"]`);
+    if (sysBtn) sysBtn.classList.add("active");
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 async function quickApproveAll() {
@@ -8208,6 +8348,154 @@ async function closerAdminSaveBrief() {
   } catch (e) {
     alert('Error: ' + e.message);
   }
+}
+
+// ── Activate Tab ──────────────────────────────────────────────────────────────
+function _actEsc(s) {
+  return String(s || "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+function _actRelTime(iso) {
+  if (!iso) return "";
+  const s = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (s < 60) return s + "s ago";
+  if (s < 3600) return Math.floor(s/60) + "m ago";
+  if (s < 86400) return Math.floor(s/3600) + "h ago";
+  return Math.floor(s/86400) + "d ago";
+}
+
+let _activateLoaded = false;
+
+async function loadActivateTab() {
+  _activateLoaded = true;
+  const days  = document.getElementById("act-days").value  || 14;
+  const limit = document.getElementById("act-limit").value || 8;
+
+  document.getElementById("act-copilot-body").innerHTML = '<div style="color:#555;font-size:13px;padding:14px 0;">Loading copilot…</div>';
+  document.getElementById("act-radar-body").innerHTML   = '<div style="color:#555;font-size:13px;padding:14px 0;">Loading radar…</div>';
+
+  try {
+    const r    = await fetch(`/api/v1/copilot/operator?days=${days}&per_client_limit=${limit}`);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json();
+    const s    = data.summary || {};
+
+    // KPI strip
+    document.getElementById("act-hot").textContent    = s.hot    || 0;
+    document.getElementById("act-warm").textContent   = s.warm   || 0;
+    document.getElementById("act-drafts").textContent = s.drafts || 0;
+    document.getElementById("act-total").textContent  = s.total  || 0;
+
+    // Activate badge on tab
+    const badge = document.getElementById("tab-badge-activate");
+    if (badge) { badge.textContent = s.hot || 0; badge.classList.toggle("show", (s.hot || 0) > 0); }
+
+    // Radar: gather threads where price was asked but no draft (approximation)
+    const radarItems = [];
+    for (const b of (data.clients || [])) {
+      for (const t of (b.threads || [])) {
+        const txt = (t.reply_text || t.summary || "").toLowerCase();
+        if (/how much|price|pricing|rate|cost|fee|quote/.test(txt) && !t.approval_id) {
+          radarItems.push({ client: b.client, ...t });
+        }
+      }
+    }
+    if (!radarItems.length) {
+      document.getElementById("act-radar-body").innerHTML = '<div style="color:#00e5a0;font-size:13px;padding:10px 0;">No missed price enquiries across your clients right now.</div>';
+    } else {
+      document.getElementById("act-radar-body").innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${radarItems.slice(0,20).map(t => {
+            const phone = (t.phone||"").replace(/[^0-9]/g,"");
+            const wa    = phone ? `https://wa.me/${phone}` : "";
+            const ago   = _actRelTime(t.received_at);
+            return `
+              <div style="background:#0e1218;border:1px solid #2a1a00;border-left:3px solid #f5c842;border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+                <div style="min-width:0;flex:1;">
+                  <div style="font-size:13px;font-weight:700;color:#e8e8e8;">${_actEsc(t.contact_name)} <span style="font-size:10px;font-weight:400;color:#555;margin-left:6px;">${_actEsc(t.client)}</span></div>
+                  <div style="font-size:11px;color:#555;margin:3px 0 6px;">${_actEsc(t.channel||"whatsapp")}${ago ? " · "+_actEsc(ago) : ""}</div>
+                  <div style="font-size:12px;color:#a0b8c8;font-style:italic;">"${_actEsc((t.reply_text||t.summary||"").slice(0,200))}"</div>
+                </div>
+                ${wa ? `<a href="${wa}" target="_blank" style="background:#1e2530;color:#00e5a0;border:1px solid #2a3a4a;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;">Send quote →</a>` : ""}
+              </div>`;
+          }).join("")}
+        </div>`;
+    }
+
+    // Copilot buckets
+    const buckets = data.clients || [];
+    if (!buckets.length) {
+      document.getElementById("act-copilot-body").innerHTML = '<div style="color:#00e5a0;font-size:13px;padding:14px 0;">No inbound threads need action across your clients right now.</div>';
+      return;
+    }
+    document.getElementById("act-copilot-body").innerHTML = buckets.map(b => `
+      <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;padding:20px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #111;flex-wrap:wrap;gap:10px;">
+          <div>
+            <span style="font-size:16px;font-weight:700;color:#e8e8e8;">${_actEsc(b.client)}</span>
+            <span style="font-size:10px;font-weight:500;color:#555;text-transform:uppercase;letter-spacing:.1em;margin-left:10px;">${_actEsc(b.vertical)}</span>
+          </div>
+          <div>
+            <span style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:20px;color:#f5c842;background:#1a1204;border:1px solid #3a2608;">${b.summary.hot} hot</span>
+            <span style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:20px;color:#00e5a0;background:#07160f;border:1px solid #123522;margin-left:4px;">${b.summary.warm} warm</span>
+            <span style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:20px;color:#ff5c00;background:#1c0d04;border:1px solid #3a1d08;margin-left:4px;">${b.summary.drafts} drafts</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
+          ${(b.threads||[]).map(t => _actThreadCard(t)).join("")}
+        </div>
+      </div>`).join("");
+
+  } catch (e) {
+    const msg = '<div style="color:#ff6666;font-size:13px;padding:14px 0;">Could not load activate tab: ' + _actEsc(e.message||String(e)) + '</div>';
+    document.getElementById("act-copilot-body").innerHTML = msg;
+    document.getElementById("act-radar-body").innerHTML   = msg;
+  }
+}
+
+function _actThreadCard(t) {
+  const phone = (t.phone||"").replace(/[^0-9]/g,"");
+  const wa    = phone ? `https://wa.me/${phone}` : "";
+  const ago   = _actRelTime(t.received_at);
+  const priColor = { hot:"#f5c842", warm:"#00e5a0", watch:"#555", closed:"#ff4444" }[t.priority] || "#555";
+  const draft = t.draft_preview
+    ? `<div style="background:#07120d;border:1px solid #123522;border-radius:8px;padding:10px;font-size:12px;color:#a9e9c4;line-height:1.45;margin:4px 0;">${_actEsc(t.draft_preview)}</div>` : "";
+  const appBtns = t.approval_id ? `
+    <button style="background:#00a86b;color:#03140d;border:none;border-radius:6px;padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;" onclick="actApprove('${_actEsc(t.approval_id)}',this)">Approve draft</button>
+    <button style="background:#1e2530;color:#999;border:1px solid #2a3340;border-radius:6px;padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;" onclick="actSkip('${_actEsc(t.approval_id)}',this)">Skip</button>` : "";
+  return `
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+        <div style="min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:#e8e8e8;">${_actEsc(t.contact_name)}</div>
+          <div style="font-size:11px;color:#555;margin-top:2px;">${_actEsc(t.channel||"whatsapp")}${ago?" · "+_actEsc(ago):""}</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;color:${priColor};background:#111;border:1px solid #1a1a1a;white-space:nowrap;">${_actEsc(t.intent||t.priority)}</span>
+      </div>
+      <div style="font-size:12px;color:#888;font-style:italic;line-height:1.45;">"${_actEsc((t.reply_text||t.summary||"").slice(0,200))}"</div>
+      <div style="font-size:12px;color:#e8e8e8;"><span style="color:#ff5c00;font-weight:700;">Next:</span> ${_actEsc(t.suggested_action)}</div>
+      ${draft}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+        ${appBtns}
+        ${wa ? `<a href="${wa}" target="_blank" style="background:#1e2530;color:#00e5a0;border:1px solid #2a3340;border-radius:6px;padding:6px 11px;font-size:11px;font-weight:700;text-decoration:none;">Open WhatsApp →</a>` : ""}
+      </div>
+    </div>`;
+}
+
+async function actApprove(id, btn) {
+  btn.disabled = true; btn.textContent = "Sending…";
+  try {
+    const r = await fetch(`/api/v1/approvals/${id}/approve`, { method:"POST" });
+    if (!r.ok) throw new Error();
+    btn.textContent = "Sent"; setTimeout(loadActivateTab, 700);
+  } catch { btn.disabled = false; btn.textContent = "Try again"; }
+}
+async function actSkip(id, btn) {
+  btn.disabled = true; btn.textContent = "Skipping…";
+  try {
+    const r = await fetch(`/api/v1/approvals/${id}/skip`, { method:"POST" });
+    if (!r.ok) throw new Error();
+    btn.textContent = "Skipped"; setTimeout(loadActivateTab, 700);
+  } catch { btn.disabled = false; btn.textContent = "Try again"; }
 }
 </script>
 
