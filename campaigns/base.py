@@ -285,6 +285,9 @@ class BaseCampaign:
                     biz["email"] = enrichment["email"]
                     # Re-evaluate channel now that email is available
                     channel = self._pick_channel(biz) or channel
+                # Backfill decision-maker from website team page if discovery didn't catch one
+                if not biz.get("contact_name") and enrichment.get("team_names"):
+                    biz["contact_name"] = enrichment["team_names"][0]
 
             # Step 6: Generate message — social leads get post-aware opener
             try:
@@ -309,6 +312,9 @@ class BaseCampaign:
                         rating=biz.get("rating"),
                         website=biz.get("website"),
                         is_followup=False,
+                        enrichment_context=enrichment_ctx,
+                        contact_name=biz.get("contact_name"),
+                        contact_title=biz.get("contact_title"),
                     )
                 else:
                     generated = generate_outreach_message(
@@ -360,6 +366,8 @@ class BaseCampaign:
                 platform=biz.get("platform"),
                 lead_temperature=biz.get("lead_temperature", 0),
                 temperature_reason=biz.get("temperature_reason"),
+                contact_name=biz.get("contact_name"),
+                contact_title=biz.get("contact_title"),
             )
 
             # Step 7a: HITL mode — queue for human approval instead of sending
@@ -509,6 +517,8 @@ class BaseCampaign:
                     website=contact.get("website"),
                     is_followup=True,
                     attempt_number=attempt,
+                    contact_name=contact.get("contact_name"),
+                    contact_title=contact.get("contact_title"),
                 )
             except Exception as e:
                 log.error("followup_generation_failed", contact=contact["name"], error=str(e))

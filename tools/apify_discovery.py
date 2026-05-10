@@ -179,6 +179,8 @@ async def discover_apify_leads(
                 stub["phone"] = enrichment["phone"]
             if enrichment.get("decision_maker"):
                 stub["contact_name"] = enrichment["decision_maker"]
+            if enrichment.get("title"):
+                stub["contact_title"] = enrichment["title"]
             stub["enrichment"] = enrichment
         return stub
 

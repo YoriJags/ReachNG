@@ -458,6 +458,9 @@ def generate_outreach_message_for_client(
     website: Optional[str] = None,
     is_followup: bool = False,
     attempt_number: int = 1,
+    enrichment_context: Optional[str] = None,
+    contact_name: Optional[str] = None,
+    contact_title: Optional[str] = None,
 ) -> dict:
     """
     Generate a message using a client-specific context prompt instead of the
@@ -477,6 +480,15 @@ def generate_outreach_message_for_client(
     if is_followup:
         followup_note = f"\n\nIMPORTANT: This is follow-up attempt {attempt_number}. Acknowledge you reached out before. Keep it very brief and low pressure."
 
+    contact_block = ""
+    if contact_name:
+        contact_block = f"\nDecision-maker: {contact_name}"
+        if contact_title:
+            contact_block += f" ({contact_title})"
+        contact_block += "\nAddress them by first name in the opener. Keep it personal, not corporate."
+
+    enrichment_block = f"\n{enrichment_context}" if enrichment_context else ""
+
     user_prompt = f"""
 Write a {channel} outreach message for the following business on behalf of our client.
 
@@ -488,9 +500,12 @@ Name: {business_name}
 Location: {location_hint or address or "Lagos"}
 Category: {category or "Not specified"}
 Google rating: {rating or "Unknown"}
-Website: {website or "None found"}
+Website: {website or "None found"}{contact_block}
 Channel: {channel}
+{enrichment_block}
 {followup_note}
+
+CRITICAL: Never use placeholder text like [Partner Name], [Name], [Contact], [First Name], or any bracket-enclosed variable. If you do not know the contact's name, address them as "there" or use the business name directly. Never leave any placeholder unresolved.
 
 Return ONLY:
 - For WhatsApp: the message text (max 4 sentences, no subject line)

@@ -65,6 +65,8 @@ def upsert_contact(
     platform: Optional[str] = None,
     lead_temperature: int = 0,   # 0=cold · 1=warm · 2=hot
     temperature_reason: Optional[str] = None,
+    contact_name: Optional[str] = None,
+    contact_title: Optional[str] = None,
 ) -> str:
     """Insert or update a contact. Returns the contact _id as string."""
     contacts = get_contacts()
@@ -113,6 +115,10 @@ def upsert_contact(
         doc["lead_temperature"] = lead_temperature
     if temperature_reason:
         doc["temperature_reason"] = temperature_reason
+    if contact_name:
+        doc["contact_name"] = contact_name
+    if contact_title:
+        doc["contact_title"] = contact_title
 
     # Compound filter: scoped to client in agency mode, global otherwise.
     # This allows multiple clients to independently contact the same business
