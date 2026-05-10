@@ -995,6 +995,185 @@
   @media (max-width: 768px) {
     .kpi-value { font-size: 34px; }
   }
+
+  /* ════════════════════════════════════════════════════════════════════════
+     PHASE E — universal data-table + status-pill treatment.
+     Hits .data-table, .contact-table, .table, .roster-table — every list.
+     ════════════════════════════════════════════════════════════════════════ */
+  .data-table, .contact-table, .table, .roster-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    background: transparent;
+  }
+  .data-table thead th,
+  .contact-table thead th,
+  .table thead th,
+  .roster-table thead th {
+    text-align: left;
+    color: var(--text-lo);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 11px 12px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.015);
+    position: sticky; top: 0;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 1;
+  }
+  .data-table tbody td,
+  .contact-table tbody td,
+  .table tbody td,
+  .roster-table tbody td {
+    padding: 12px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-hi);
+    vertical-align: middle;
+  }
+  .data-table tbody tr:hover td,
+  .contact-table tbody tr:hover td,
+  .table tbody tr:hover td,
+  .roster-table tbody tr:hover td {
+    background: var(--bg-card-hover);
+  }
+  .data-table tbody tr:last-child td,
+  .contact-table tbody tr:last-child td,
+  .table tbody tr:last-child td,
+  .roster-table tbody tr:last-child td { border-bottom: none; }
+
+  /* Auto-mono on numeric columns — apply .num to <td> for tabular alignment */
+  .data-table td.num, .contact-table td.num, .table td.num, .roster-table td.num,
+  .data-table td.amt, .contact-table td.amt, .table td.amt, .roster-table td.amt {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    letter-spacing: -0.01em;
+  }
+
+  /* Wrap any <table> in this for horizontal scroll + compact card-frame */
+  .table-wrap {
+    background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-deep) 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .table-wrap .data-table thead th,
+  .table-wrap .contact-table thead th,
+  .table-wrap .table thead th,
+  .table-wrap .roster-table thead th { background: var(--bg-card); }
+
+  /* Status pills — Wall Street ticker indicators */
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 999px;
+    border: 1px solid;
+    font-variant-numeric: tabular-nums;
+  }
+  .status-pill::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor; flex-shrink: 0;
+  }
+  .status-pill.live::before,
+  .status-pill.transit::before,
+  .status-pill.pulse::before { animation: pulse 2s infinite; }
+
+  .status-pill.ok,
+  .status-pill.success,
+  .status-pill.settled,
+  .status-pill.paid     { color: var(--green); background: rgba(0,229,160,0.08);  border-color: rgba(0,229,160,0.25); }
+  .status-pill.warn,
+  .status-pill.pending,
+  .status-pill.queued   { color: var(--amber); background: rgba(245,200,66,0.08); border-color: rgba(245,200,66,0.25); }
+  .status-pill.error,
+  .status-pill.fail,
+  .status-pill.overdue,
+  .status-pill.transit  { color: var(--red); background: rgba(255,92,92,0.08);   border-color: rgba(255,92,92,0.25); }
+  .status-pill.idle,
+  .status-pill.draft    { color: var(--text-lo); background: var(--bg-deep);     border-color: var(--border); }
+  .status-pill.live,
+  .status-pill.active,
+  .status-pill.fire     { color: var(--accent); background: rgba(255,92,0,0.08); border-color: rgba(255,92,0,0.25); }
+  .status-pill.info,
+  .status-pill.review   { color: var(--blue); background: rgba(85,153,255,0.08); border-color: rgba(85,153,255,0.25); }
+
+  /* Avatar chip used in roster/clients tables */
+  .avatar-chip {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em;
+    background: linear-gradient(135deg, rgba(255,92,0,0.15), rgba(85,153,255,0.15));
+    border: 1px solid var(--border);
+    color: var(--text-hi);
+  }
+
+  /* Empty state — calmer + on-brand */
+  .empty, .empty-state {
+    color: var(--text-lo);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-align: center;
+    padding: 36px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+  }
+
+  /* Loading skeleton — subtle pulse for any "Loading..." text */
+  .loading-skel {
+    color: var(--text-lo);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    padding: 18px 12px;
+    text-align: center;
+    text-transform: uppercase;
+    animation: pulse 1.6s infinite;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Compact button family — for table-row inline actions */
+  .btn-mini {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: inherit;
+    font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-mini:hover { color: var(--text-hi); border-color: var(--border-bright); background: var(--bg-card-hover); }
+  .btn-mini.primary  { background: rgba(255,92,0,0.12); color: var(--accent); border-color: rgba(255,92,0,0.3); }
+  .btn-mini.success  { background: rgba(0,229,160,0.1); color: var(--green); border-color: rgba(0,229,160,0.3); }
+  .btn-mini.danger   { background: rgba(255,92,92,0.08); color: var(--red); border-color: rgba(255,92,92,0.25); }
+  .btn-mini .material-symbols-outlined { font-size: 14px; }
+
+  /* Section header pattern — title + right-aligned tools */
+  .section-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 12px; flex-wrap: wrap;
+  }
+  .section-row .section-title { margin: 0; flex: 0 0 auto; }
+  .section-row .section-title::after { display: none; }
+  .section-row .section-tools {
+    display: flex; align-items: center; gap: 6px;
+    margin-left: auto;
+  }
+
+  /* Make any Approve/Skip buttons inside cards align with the new btn-mini */
+  .approval-actions .action-btn {
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-size: 10.5px; padding: 6px 12px;
+  }
 </style>
 </head>
 <body>
