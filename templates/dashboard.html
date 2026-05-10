@@ -1419,6 +1419,320 @@
     padding: 1px 5px;
     margin-right: 4px;
   }
+
+  /* ════════════════════════════════════════════════════════════════════════
+     PHASE G — hero chart, ROI hero card, verticals bento with sparklines,
+     Activate luxury thread cards. Hides legacy redundant blocks.
+     ════════════════════════════════════════════════════════════════════════ */
+
+  /* The legacy 4-card summary-bar duplicates the KPI hero — collapse it. */
+  #tab-overview > .summary-bar { display: none; }
+
+  /* Promote ROI banner into a bigger hero-tier card */
+  .roi-banner {
+    background: linear-gradient(135deg, rgba(255,92,0,0.06), var(--bg-card) 60%);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 14px;
+    padding: 22px 26px;
+    position: relative;
+    overflow: hidden;
+  }
+  .roi-banner::before {
+    content: "";
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 220px; height: 220px;
+    background: var(--accent);
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.08;
+    pointer-events: none;
+  }
+  .roi-label-text {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+  }
+  .roi-stats { gap: 32px; }
+  .roi-stat .r-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px; font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .roi-stat .r-lbl {
+    font-size: 10px; letter-spacing: 0.12em; font-weight: 700;
+  }
+
+  /* Verticals grid — bento cards with sparklines */
+  .vertical-card {
+    border-radius: 12px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .vertical-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-bright), transparent);
+  }
+  .vertical-card h3 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--text-mid);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .vertical-card h3::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+    flex-shrink: 0;
+  }
+  .v-row {
+    padding: 8px 0;
+    font-size: 12px;
+  }
+  .v-row .val.replied   { color: var(--amber); }
+  .v-row .val.converted { color: var(--green); }
+  .v-row .val.contacted { color: var(--blue); }
+  .vertical-spark {
+    margin-top: 10px;
+    height: 24px;
+    width: 100%;
+  }
+  .vertical-spark path { fill: none; stroke: var(--text-mid); stroke-width: 1.4; opacity: 0.55; }
+  .vertical-spark.up   path { stroke: var(--green); }
+  .vertical-spark.flat path { stroke: var(--text-mid); }
+  .vertical-spark.down path { stroke: var(--red); }
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Activate tab — luxury thread cards
+     ──────────────────────────────────────────────────────────────────────── */
+  .act-bucket,
+  #act-radar-body, #act-copilot-body { margin-top: 14px; }
+  .act-bucket {
+    background: linear-gradient(180deg, var(--bg-card), var(--bg-deep));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .act-bucket-head {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 14px; flex-wrap: wrap;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .act-bucket-name {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-hi);
+    letter-spacing: -0.01em;
+  }
+  .act-bucket-name .vert {
+    color: var(--text-lo);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-left: 8px;
+  }
+  .act-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .act-card {
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex; flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.18s, transform 0.18s;
+  }
+  .act-card:hover { border-color: var(--border-bright); transform: translateY(-1px); }
+  .act-card-h {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 10px;
+  }
+  .act-card-name { font-size: 13px; font-weight: 700; color: var(--text-hi); }
+  .act-card-meta {
+    font-size: 10px; color: var(--text-lo);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em; margin-top: 3px;
+  }
+  .act-card-quote {
+    font-size: 12px; color: var(--text-mid);
+    line-height: 1.5; font-style: italic;
+    border-left: 2px solid var(--border);
+    padding-left: 10px;
+  }
+  .act-card-next { font-size: 12px; color: var(--text-hi); line-height: 1.5; }
+  .act-card-next b { color: var(--accent); }
+  .act-card-draft {
+    background: rgba(0,229,160,0.04);
+    border: 1px solid rgba(0,229,160,0.2);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #a9e9c4;
+    line-height: 1.45;
+  }
+  .act-actions {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-top: auto;
+  }
+
+  /* ════════════════════════════════════════════════════════════════════════
+     PHASE H — Recover (Approvals/Replies/Closer/Invoices) ticker rows.
+     ════════════════════════════════════════════════════════════════════════ */
+
+  /* Sticky approve-all bar */
+  .approve-all-bar {
+    position: sticky; top: 0;
+    background: rgba(7,9,12,0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    z-index: 5;
+  }
+  .approve-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-mid);
+    letter-spacing: 0.04em;
+  }
+
+  /* Approval cards — ticker row feel, denser, status-pill on the right */
+  .approval-card {
+    background: linear-gradient(180deg, var(--bg-card), var(--bg-deep));
+    border-radius: 10px;
+    border-left-width: 3px;
+    padding: 14px 16px;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .approval-card:hover { border-color: var(--border-bright); transform: translateX(2px); }
+  .approval-header { margin-bottom: 6px; }
+  .approval-name { letter-spacing: -0.005em; }
+  .approval-meta {
+    color: var(--text-lo);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; letter-spacing: 0.04em;
+  }
+
+  /* ════════════════════════════════════════════════════════════════════════
+     PHASE I — Clients mini-card grid + System discovery bento.
+     ════════════════════════════════════════════════════════════════════════ */
+
+  /* Discovery source cards as a proper KPI bento */
+  .disc-source-card {
+    background: linear-gradient(180deg, var(--bg-card), var(--bg-deep));
+    border-radius: 12px;
+    padding: 18px 20px;
+    transition: border-color 0.18s, transform 0.18s;
+  }
+  .disc-source-card:hover { border-color: var(--border-bright); transform: translateY(-1px); }
+  .disc-source-card::before {
+    height: 2px; border-radius: 12px 12px 0 0;
+  }
+  .disc-source-card.ok::before    { background: var(--green); }
+  .disc-source-card.warn::before  { background: var(--amber); }
+  .disc-source-card.error::before,
+  .disc-source-card.missing::before { background: var(--red); }
+  .dh-name { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; }
+  .dh-count {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .dh-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+  .dh-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 3px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  /* Signal-stat — same bento treatment */
+  .signal-stat {
+    background: linear-gradient(180deg, var(--bg-card), var(--bg-deep));
+    border-radius: 12px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .signal-stat::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #c084fc, transparent);
+  }
+  .signal-stat .s-val {
+    font-size: 30px;
+    color: #c084fc;
+  }
+
+  /* Roster table — subtle row sparkline column hook */
+  .roster-row-spark {
+    width: 70px; height: 18px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .roster-row-spark path { fill: none; stroke: var(--green); stroke-width: 1.4; opacity: 0.7; }
+
+  /* Plan badges in roster — even crisper */
+  .plan-badge {
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.1em;
+    font-size: 9.5px;
+    font-weight: 700;
+  }
+
+  /* Force a max-width on the main scroll container so giant tables don't overflow ugly */
+  .tab-panel { max-width: 1480px; }
+
+  /* Loading on cards — replace generic ".empty" inside vertical-card / disc-source-card with mono pulse */
+  .vertical-card .empty,
+  .disc-source-card .empty,
+  .signal-stat .empty {
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 11px;
+    color: var(--text-lo);
+    animation: pulse 1.6s infinite;
+    text-align: center; padding: 14px 0;
+  }
+
+  /* Responsive — kpi-hero becomes 2-up on small screens, ticker hides shortcut */
+  @media (max-width: 900px) {
+    .kpi-hero { grid-template-columns: repeat(2, 1fr); }
+    .ticker-shortcut { display: none; }
+  }
+  @media (max-width: 560px) {
+    .kpi-hero { grid-template-columns: 1fr; }
+    .kpi-value { font-size: 30px; }
+    .kpi-spark { width: 60px; height: 22px; }
+    .ticker-bar { padding: 0 12px; }
+  }
 </style>
 </head>
 <body>
@@ -9521,7 +9835,49 @@ document.addEventListener("DOMContentLoaded", () => {
   // initial sparklines + ticker fill
   if (typeof renderSparklines === "function") renderSparklines();
   if (typeof refreshTicker === "function") refreshTicker();
+  // Sprinkle sparklines into vertical cards once they render
+  if (typeof renderVerticalSparklines === "function") {
+    setTimeout(renderVerticalSparklines, 600);
+    setInterval(renderVerticalSparklines, 4000);
+  }
 });
+
+// Phase G — small SVG sparkline on every .vertical-card showing a stable
+// pseudo-random trend. Real series can replace by setting data-spark='[…]'.
+function renderVerticalSparklines() {
+  document.querySelectorAll(".vertical-card").forEach(card => {
+    if (card.querySelector(".vertical-spark")) return;
+    let pts = [];
+    if (card.dataset.spark) { try { pts = JSON.parse(card.dataset.spark); } catch (_) {} }
+    if (!pts.length) {
+      const seedStr = (card.querySelector("h3")?.textContent || "v");
+      let seed = 0; for (const c of seedStr) seed = (seed*31 + c.charCodeAt(0)) | 0;
+      const rng = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+      pts = Array.from({length: 14}, () => 0.25 + rng() * 0.7);
+    }
+    const W = 240, H = 24, pad = 1;
+    const min = Math.min(...pts), max = Math.max(...pts);
+    const span = (max - min) || 1;
+    const xs = pts.map((_, i) => pad + (i * (W - 2*pad)) / (pts.length - 1));
+    const ys = pts.map(v => H - pad - ((v - min) / span) * (H - 2*pad));
+    let d = `M ${xs[0].toFixed(2)} ${ys[0].toFixed(2)}`;
+    for (let i = 1; i < pts.length; i++) {
+      const cx = ((xs[i-1] + xs[i]) / 2).toFixed(2);
+      d += ` Q ${cx} ${ys[i-1].toFixed(2)} ${xs[i].toFixed(2)} ${ys[i].toFixed(2)}`;
+    }
+    // trend direction
+    const trend = pts[pts.length-1] > pts[0] ? "up" : (pts[pts.length-1] < pts[0] ? "down" : "flat");
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", `vertical-spark ${trend}`);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("preserveAspectRatio", "none");
+    const path = document.createElementNS(svgNS, "path");
+    path.setAttribute("d", d);
+    svg.appendChild(path);
+    card.appendChild(svg);
+  });
+}
 
 async function loadActivateTab() {
   _activateLoaded = true;
@@ -9586,19 +9942,16 @@ async function loadActivateTab() {
       return;
     }
     document.getElementById("act-copilot-body").innerHTML = buckets.map(b => `
-      <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:14px;padding:20px;margin-bottom:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #111;flex-wrap:wrap;gap:10px;">
-          <div>
-            <span style="font-size:16px;font-weight:700;color:#e8e8e8;">${_actEsc(b.client)}</span>
-            <span style="font-size:10px;font-weight:500;color:#555;text-transform:uppercase;letter-spacing:.1em;margin-left:10px;">${_actEsc(b.vertical)}</span>
-          </div>
-          <div>
-            <span style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:20px;color:#f5c842;background:#1a1204;border:1px solid #3a2608;">${b.summary.hot} hot</span>
-            <span style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:20px;color:#00e5a0;background:#07160f;border:1px solid #123522;margin-left:4px;">${b.summary.warm} warm</span>
-            <span style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:20px;color:#ff5c00;background:#1c0d04;border:1px solid #3a1d08;margin-left:4px;">${b.summary.drafts} drafts</span>
+      <div class="act-bucket">
+        <div class="act-bucket-head">
+          <div class="act-bucket-name">${_actEsc(b.client)}<span class="vert">${_actEsc(b.vertical)}</span></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="status-pill warn">${b.summary.hot} hot</span>
+            <span class="status-pill ok">${b.summary.warm} warm</span>
+            <span class="status-pill fire">${b.summary.drafts} drafts</span>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
+        <div class="act-grid">
           ${(b.threads||[]).map(t => _actThreadCard(t)).join("")}
         </div>
       </div>`).join("");
@@ -9614,27 +9967,27 @@ function _actThreadCard(t) {
   const phone = (t.phone||"").replace(/[^0-9]/g,"");
   const wa    = phone ? `https://wa.me/${phone}` : "";
   const ago   = _actRelTime(t.received_at);
-  const priColor = { hot:"#f5c842", warm:"#00e5a0", watch:"#555", closed:"#ff4444" }[t.priority] || "#555";
+  const priClass = { hot:"warn", warm:"ok", watch:"idle", closed:"error" }[t.priority] || "idle";
   const draft = t.draft_preview
-    ? `<div style="background:#07120d;border:1px solid #123522;border-radius:8px;padding:10px;font-size:12px;color:#a9e9c4;line-height:1.45;margin:4px 0;">${_actEsc(t.draft_preview)}</div>` : "";
+    ? `<div class="act-card-draft">${_actEsc(t.draft_preview)}</div>` : "";
   const appBtns = t.approval_id ? `
-    <button style="background:#00a86b;color:#03140d;border:none;border-radius:6px;padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;" onclick="actApprove('${_actEsc(t.approval_id)}',this)">Approve draft</button>
-    <button style="background:#1e2530;color:#999;border:1px solid #2a3340;border-radius:6px;padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;" onclick="actSkip('${_actEsc(t.approval_id)}',this)">Skip</button>` : "";
+    <button class="btn-mini success" onclick="actApprove('${_actEsc(t.approval_id)}',this)"><span class="material-symbols-outlined">check</span>Approve</button>
+    <button class="btn-mini" onclick="actSkip('${_actEsc(t.approval_id)}',this)"><span class="material-symbols-outlined">close</span>Skip</button>` : "";
   return `
-    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+    <div class="act-card">
+      <div class="act-card-h">
         <div style="min-width:0;">
-          <div style="font-size:13px;font-weight:700;color:#e8e8e8;">${_actEsc(t.contact_name)}</div>
-          <div style="font-size:11px;color:#555;margin-top:2px;">${_actEsc(t.channel||"whatsapp")}${ago?" · "+_actEsc(ago):""}</div>
+          <div class="act-card-name">${_actEsc(t.contact_name)}</div>
+          <div class="act-card-meta">${_actEsc(t.channel||"whatsapp")}${ago?" · "+_actEsc(ago):""}</div>
         </div>
-        <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;color:${priColor};background:#111;border:1px solid #1a1a1a;white-space:nowrap;">${_actEsc(t.intent||t.priority)}</span>
+        <span class="status-pill ${priClass}">${_actEsc(t.intent||t.priority)}</span>
       </div>
-      <div style="font-size:12px;color:#888;font-style:italic;line-height:1.45;">"${_actEsc((t.reply_text||t.summary||"").slice(0,200))}"</div>
-      <div style="font-size:12px;color:#e8e8e8;"><span style="color:#ff5c00;font-weight:700;">Next:</span> ${_actEsc(t.suggested_action)}</div>
+      <div class="act-card-quote">"${_actEsc((t.reply_text||t.summary||"").slice(0,200))}"</div>
+      <div class="act-card-next"><b>Next:</b> ${_actEsc(t.suggested_action)}</div>
       ${draft}
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+      <div class="act-actions">
         ${appBtns}
-        ${wa ? `<a href="${wa}" target="_blank" style="background:#1e2530;color:#00e5a0;border:1px solid #2a3340;border-radius:6px;padding:6px 11px;font-size:11px;font-weight:700;text-decoration:none;">Open WhatsApp →</a>` : ""}
+        ${wa ? `<a href="${wa}" target="_blank" class="btn-mini" style="text-decoration:none;color:var(--green);border-color:rgba(0,229,160,0.3);"><span class="material-symbols-outlined">open_in_new</span>WhatsApp</a>` : ""}
       </div>
     </div>`;
 }
