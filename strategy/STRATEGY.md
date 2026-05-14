@@ -1,9 +1,9 @@
-# ReachNG — Strategy, Pivot Memo & Current-Build Audit
+﻿# ReachNG — Strategy, Pivot Memo & Current-Build Audit
 
 > **Audience:** You (founder), blunt teardown mode
 > **Current date:** April 2026
 > **Stack you're actually on:** Python 3.12 / FastAPI / MongoDB Atlas / Claude Haiku 4.5 / Unipile (WhatsApp + Email) / Apollo.io / Google Maps Places API / Railway
-> **Live URL:** `https://reachng-production.up.railway.app`
+> **Live URL:** `https://www.reachng.ng`
 > **Revised thesis:** Stop pretending ReachNG is *one* product. It's **three layers**: a Discovery Engine (internal), a Closer (client-facing, real estate), and a Back-Office (client-facing, HR). The whole game is selling **Closer to luxury + regular real estate + agencies** on recurring rails, with the SDR as the acquisition loop underneath.
 
 ---

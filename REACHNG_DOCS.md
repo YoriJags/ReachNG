@@ -1,4 +1,4 @@
-# ReachNG — Full System Documentation
+﻿# ReachNG — Full System Documentation
 
 > AI-powered outreach machine for Lagos businesses.
 > Last updated: April 2026
@@ -112,7 +112,7 @@ Send via WhatsApp → Track replies → Classify intent → Follow up
 ### Railway
 - **What it does:** Hosts the FastAPI server. Auto-deploys from GitHub main branch
 - **Cost:** ~$5–20/month depending on usage
-- **URL:** `https://reachng-production.up.railway.app`
+- **URL:** `https://www.reachng.ng`
 
 ---
 
@@ -462,7 +462,7 @@ Set all of these in Railway → Service → Variables.
 - Build: Nixpacks (detects Python automatically)
 - Start command: `python main.py`
 - Health check: `GET /health` → returns `{"status": "ok", "db": true}`
-- URL: `https://reachng-production.up.railway.app`
+- URL: `https://www.reachng.ng`
 
 ### Debug endpoints (Basic Auth required)
 | Endpoint | Purpose |

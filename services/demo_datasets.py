@@ -37,7 +37,7 @@ from typing import Optional
 
 
 HOSPITALITY = {
-    "brand": "Mercury Lagos",
+    "brand": "Altitude Lagos",
     "tagline": "Rooftop Bar & Lounge · Victoria Island",
     "category": "Hospitality",
     "intro_label": "Reservation & Events Inbox",
@@ -54,10 +54,10 @@ HOSPITALITY = {
          "draft": "Hi Tunde! Yes, we have availability for 4 on Saturday from 8pm onwards. Our rooftop is lively with a DJ set from 10pm — great energy. Minimum spend is ₦50,000 per table, which covers drinks and small plates. Shall I hold a table for you? I'll just need a name and a quick confirmation."},
         {"name": "Chisom Okafor", "initials": "CO", "time": "23 minutes ago", "tag": "event", "tag_label": "Birthday Event",
          "inbound": "Good evening. I want to plan a birthday dinner for about 25 people next month. Do you do private sections? What's the process?",
-         "draft": "Good evening Chisom! We'd love to host your birthday celebration at Mercury. We have a private section on the rooftop that accommodates up to 35 guests with a dedicated bar area and stunning Lagos skyline views.\n\nFor private bookings of 25 guests, our minimum spend is ₦500,000 which includes a welcome drinks round, table service, and your own playlist slot with the DJ.\n\nTo secure the date, we'd need a 50% deposit. What date were you considering? I can check availability and send you a full proposal."},
+         "draft": "Good evening Chisom! We'd love to host your birthday celebration at Altitude. We have a private section on the rooftop that accommodates up to 35 guests with a dedicated bar area and stunning Lagos skyline views.\n\nFor private bookings of 25 guests, our minimum spend is ₦500,000 which includes a welcome drinks round, table service, and your own playlist slot with the DJ.\n\nTo secure the date, we'd need a 50% deposit. What date were you considering? I can check availability and send you a full proposal."},
         {"name": "Emeka Nwosu", "initials": "EN", "time": "41 minutes ago", "tag": "enquiry", "tag_label": "Corporate Event",
          "inbound": "We're looking for a venue for a corporate team outing, around 40 people, cocktails and dinner. Do you cater for that sort of thing?",
-         "draft": "Hi Emeka, Mercury is a great fit for corporate events — we've hosted several team outings and client dinners on the rooftop. For 40 guests we'd recommend a full private hire or a semi-private section depending on the evening.\n\nFull hire is available on weeknights and includes: full bar, canapés and sharing platters, dedicated host, and PA system if needed. Pricing starts from ₦1.2M for the space.\n\nWould a weeknight work for your team? I can walk you through the options and send a formal proposal."},
+         "draft": "Hi Emeka, Altitude is a great fit for corporate events — we've hosted several team outings and client dinners on the rooftop. For 40 guests we'd recommend a full private hire or a semi-private section depending on the evening.\n\nFull hire is available on weeknights and includes: full bar, canapés and sharing platters, dedicated host, and PA system if needed. Pricing starts from ₦1.2M for the space.\n\nWould a weeknight work for your team? I can walk you through the options and send a formal proposal."},
     ],
     "secondary_section": {
         "title": "Venue Capacity — This Week",
@@ -93,7 +93,7 @@ HOSPITALITY = {
         {"col1": "Amaka Igwe",       "col2": "Label Night Enquiry","col3": "50+ guests · TBC",                 "status": "replied",   "col5": "6 hours ago"},
         {"col1": "Seun Oladipo",     "col2": "Table Booking",      "col3": "3 guests · Sun 11 May",            "status": "new",       "col5": "4 hours ago"},
     ],
-    "holding_message": "Hi! Thanks for reaching out to Mercury — give us a few minutes and we'll be back with availability, pricing and the vibe for the night. 🥂",
+    "holding_message": "Hi! Thanks for reaching out to Altitude — give us a few minutes and we'll be back with availability, pricing and the vibe for the night. 🥂",
 }
 
 
@@ -352,7 +352,7 @@ DATASETS: dict[str, dict] = {
 
 
 def get_dataset(vertical: Optional[str] = None) -> dict:
-    """Return demo dataset for a vertical, defaulting to hospitality (Mercury)."""
+    """Return demo dataset for a vertical, defaulting to hospitality (Altitude)."""
     if not vertical:
         return HOSPITALITY
     return DATASETS.get(vertical.lower(), HOSPITALITY)

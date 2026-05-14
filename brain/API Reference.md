@@ -6,7 +6,7 @@ tags: [reachng]
 [[Home]] | [[Architecture]] | [[Ops]]
 
 > All routes require HTTP Basic Auth unless noted.
-> Base URL: `https://reachng-production.up.railway.app`
+> Base URL: `https://www.reachng.ng`
 
 ---
 

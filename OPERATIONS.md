@@ -1,4 +1,4 @@
-# ReachNG — Operations Guide (A–Z)
+﻿# ReachNG — Operations Guide (A–Z)
 
 Complete reference for running ReachNG as a managed outreach service.
 
@@ -41,11 +41,11 @@ ReachNG is an AI-powered outreach machine. It:
 
 **Stack:** FastAPI · MongoDB · Claude (Anthropic) · Unipile (WhatsApp + Email) · Railway
 
-**Live URL:** `https://reachng-production.up.railway.app`
+**Live URL:** `https://www.reachng.ng`
 
-**Dashboard:** `https://reachng-production.up.railway.app/dashboard`
+**Dashboard:** `https://www.reachng.ng/dashboard`
 
-**API Docs:** `https://reachng-production.up.railway.app/docs`
+**API Docs:** `https://www.reachng.ng/docs`
 
 ---
 
@@ -129,7 +129,7 @@ Click **Save Client**. The brief is saved and Steps 2 & 3 are auto-filled.
 ### Step 2 — Generate Portal Link
 Click **Generate Portal**. A unique URL is generated for this client — e.g.:
 ```
-https://reachng-production.up.railway.app/portal/abc123xyz
+https://www.reachng.ng/portal/abc123xyz
 ```
 Copy and send this link to the client. No login needed — the token in the URL is the auth.
 
@@ -288,7 +288,7 @@ Or use Step 2 of the Client Onboarding panel on the dashboard.
 - Lead scores and contact details
 
 ### Sharing
-Send the full URL: `https://reachng-production.up.railway.app/portal/abc123xyz`
+Send the full URL: `https://www.reachng.ng/portal/abc123xyz`
 The token in the URL is the only authentication needed.
 
 ---
@@ -464,7 +464,7 @@ Any client who refers a paying client gets **1 month free** on their next billin
 
 ## 20. API Reference
 
-Base URL: `https://reachng-production.up.railway.app/api/v1`
+Base URL: `https://www.reachng.ng/api/v1`
 
 Full interactive docs: `/docs` (Swagger UI)
 

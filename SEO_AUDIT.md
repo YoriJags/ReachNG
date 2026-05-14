@@ -1,4 +1,4 @@
-# ReachNG — SEO Audit
+﻿# ReachNG — SEO Audit
 
 Date: 2026-05-09
 Auditor: code review of live site + repo
@@ -26,7 +26,7 @@ Auditor: code review of live site + repo
 | OpenGraph (`og:`) tags on portal_demo.html | ❌ Missing — sharing the demo URL gives no rich preview |
 | Twitter Card tags | ❌ Missing |
 | Schema.org JSON-LD (Organization, SoftwareApplication, FAQPage) | ❌ Missing |
-| Canonical domain | ⚠️ Only `reachng-production.up.railway.app` — not `reachng.ng` or similar branded domain |
+| Canonical domain | ⚠️ Only `www.reachng.ng` — not `reachng.ng` or similar branded domain |
 | HTTPS | ✅ Provided by Railway |
 | Mobile responsive | ✅ Demo portal templates are responsive |
 | Page speed | ✅ Demo portal is light (no framework, vanilla JS) |
@@ -109,7 +109,7 @@ Right now if you paste your demo URL into WhatsApp, IG DM, or Twitter, you get a
 <meta property="og:title" content="ReachNG — Mercury Lagos Demo">
 <meta property="og:description" content="See how a Lagos rooftop venue handles 47 enquiries / week with zero leakage.">
 <meta property="og:image" content="https://reachng.ng/static/og-mercury.png">
-<meta property="og:url" content="https://reachng-production.up.railway.app/portal/demo">
+<meta property="og:url" content="https://www.reachng.ng/portal/demo">
 <meta name="twitter:card" content="summary_large_image">
 ```
 
@@ -119,7 +119,7 @@ Generate one OG card image per vertical demo (₦1500 in Canva or 30 mins in Fig
 
 ### 5. Buy and route a real domain (BEFORE publishing)
 
-`reachng-production.up.railway.app` doesn't sound like a real product. Options:
+`www.reachng.ng` doesn't sound like a real product. Options:
 - `reachng.ng` — preferred, ₦15K/year on Whogohost
 - `reachng.co` — good fallback if `.ng` taken
 - `reach.ng` — short, premium

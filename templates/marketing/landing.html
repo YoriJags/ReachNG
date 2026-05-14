@@ -1,6 +1,7 @@
 {% extends "marketing/_base.html" %}
 
-{% block title %}ReachNG — The AI sales engine for WhatsApp-first businesses{% endblock %}
+{% block title %}ReachNG — Your future customer is typing a WhatsApp right now. Here's what happens next.{% endblock %}
+{% block description %}A customer messages your business at 11:47pm. With ReachNG they get a reply in under a second, a personal draft in minutes — written in your voice, with their name, your pricing, a Paystack link. You tap approve from bed. Deposit hits before sunrise. Built in Lagos for Nigerian SMEs who are tired of being glorified WhatsApp typists.{% endblock %}
 
 {% block schema %}
 <script type="application/ld+json">
@@ -8,16 +9,10 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "ReachNG",
-  "operatingSystem": "Web · WhatsApp · iOS · Android",
+  "operatingSystem": "Web · WhatsApp",
   "applicationCategory": "BusinessApplication",
-  "description": "The AI sales engine for WhatsApp-first businesses. Activates leads Lagos SMEs already have, follows up until they book or buy, and recovers unpaid invoices, rent and school fees.",
-  "offers": {
-    "@type": "AggregateOffer",
-    "priceCurrency": "NGN",
-    "lowPrice": "80000",
-    "highPrice": "300000",
-    "offerCount": "3"
-  },
+  "description": "An agentic employee for Nigerian SMEs. Drafts WhatsApp replies in your voice, on your number, with your approval before send. Threads every conversation into a lead pipeline. Nurtures the quiet ones back. Briefs you every morning.",
+  "offers": {"@type": "AggregateOffer", "priceCurrency": "NGN", "lowPrice": "80000", "highPrice": "300000", "offerCount": "3"},
   "areaServed": "Nigeria"
 }
 </script>
@@ -27,171 +22,329 @@
 
 <!-- ── Hero ─────────────────────────────────────────────── -->
 <section class="hero">
-  <div class="eyebrow">Built in Lagos · for WhatsApp-first SMEs</div>
-  <h1>You already have leads. <em>ReachNG makes sure none of them die quietly.</em></h1>
-  <p class="sub">Old WhatsApp chats. Dead spreadsheets. Ignored IG DMs. Forgotten form submissions. <strong style="color:var(--text-strong);">ReachNG activates them all</strong> — qualifies, follows up, books the call, takes the deposit. The same agent recovers your unpaid invoices, rent and school fees. One Owner Brief every morning shows the cash about to land and who needs a call.</p>
+  <div class="eyebrow">Built in Lagos · No templates · Your number, your voice, your approval</div>
+  <h1>It's 11:47pm. A customer is typing a WhatsApp to your business. <em>Here's what happens in the next 60 seconds.</em></h1>
+  <p class="sub">Without ReachNG: nothing. They wait. They get bored. They DM your competitor. You wake up to a "never mind." <strong style="color:var(--text-strong)">With ReachNG:</strong> they see a warm reply from your number in under one second. A personal draft hits your phone minutes later — their name, your tone, your pricing, a Paystack link if it fits. You tap approve from bed. Deposit lands before sunrise. You did nothing. They became a customer.</p>
   <div class="hero-ctas">
-    <a href="/portal/demo" class="btn btn-primary" target="_blank">See a live demo →</a>
-    <a href="/how-it-works" class="btn btn-ghost">How it works</a>
+    <a href="/portal/demo" class="btn btn-primary" target="_blank">Watch it run — 90 seconds →</a>
+    <a href="https://wa.me/2348164583657?text=Hi%20ReachNG%2C%20I%27d%20like%20to%20see%20a%20demo" class="btn btn-ghost" target="_blank" rel="noopener">WhatsApp us now</a>
   </div>
-  <p style="margin-top: 28px; font-size: 12px; color: var(--muted); letter-spacing: 0.04em;">No credit card · Real Lagos sample data · 90 seconds to feel it</p>
+  <p style="margin-top: 28px; font-size: 12px; color: var(--muted); letter-spacing: 0.04em;">No signup · Real Lagos sample data · You'll feel it in the first 15 seconds</p>
 </section>
 
-<!-- ── Pain ─────────────────────────────────────────────── -->
+<!-- ── The line in the sand ─────────────────────────────────────────────── -->
 <section style="background: var(--bg-2); border-bottom: 1px solid var(--border);">
-  <div class="inner">
-    <div class="section-label">The Lagos SME pain</div>
-    <h2 class="section-h2">Every WhatsApp at 11pm that goes unanswered until morning is a customer walked across to the next venue.</h2>
-    <p class="section-sub">It's not a lead-generation problem. It's a <strong style="color:var(--text-strong)">response-speed</strong> problem. And it's costing you ₦1M+ a month in walked-past business.</p>
+  <div class="inner" style="max-width: 920px;">
+    <div class="section-label">Let me save you six months of pain</div>
+    <h2 class="section-h2">You don't need another chatbot. You need an employee.</h2>
+    <p class="section-sub">An employee who never sleeps. Writes exactly like you. And won't send a single message without your tap. That's it. That's the whole thing. Read that twice.</p>
 
-    <div class="grid-3">
-      <div class="card">
-        <div class="tag">Restaurants &amp; venues</div>
-        <h3>5–8 bookings leak per week</h3>
-        <p>Average ticket ₦40K–₦80K. Detty December multiplies inbound by 4–5×. Your "social media manager" answers in hours, not minutes. Tables walk.</p>
+    <div class="grid-2" style="margin-top: 40px; gap: 20px;">
+      <div class="card" style="border-color: var(--border-strong); opacity: 0.55;">
+        <div class="tag" style="color: var(--muted);">Every other "AI WhatsApp tool"</div>
+        <h3 style="color: var(--muted-strong);">Bulk blasts. Bot answers. Lost customers.</h3>
+        <p style="line-height: 1.7;">Same template to a thousand contacts. Generic "How can I help you today?" energy. Your customer sniffs the bot in two seconds and stops replying. You pay ₦20K a month to embarrass yourself faster.</p>
       </div>
-      <div class="card">
-        <div class="tag">Real estate</div>
-        <h3>Saturdays burned on unqualified viewings</h3>
-        <p>You drive to Ajah for a buyer who never had the budget. Meanwhile the buyer who DID DM at 9pm Friday booked elsewhere by Saturday morning.</p>
+      <div class="card" style="border-color: var(--orange);">
+        <div class="tag">ReachNG</div>
+        <h3>One personal reply to one specific message. Every time.</h3>
+        <p style="line-height: 1.7;">The agent reads what they actually said. Writes a draft using <em>your</em> tone, <em>their</em> name, <em>your</em> pricing, <em>their</em> context. You tap approve. It sends from your number. Customer assumes you typed it. Because as far as anyone can tell — you did.</p>
       </div>
-      <div class="card">
-        <div class="tag">Schools</div>
-        <h3>Admissions enquiries die in WhatsApp</h3>
-        <p>Diaspora parents asking for the prospectus get nothing for 24 hours. By Monday they've contacted three other schools.</p>
-      </div>
-      <div class="card">
-        <div class="tag">Beauty &amp; wellness</div>
-        <h3>18% no-show rate. Wasted slots.</h3>
-        <p>"I'll book tomorrow" never gets followed up. The chair sits empty Saturday afternoon. The deposit conversation never happens.</p>
-      </div>
-      <div class="card">
-        <div class="tag">Legal &amp; professional</div>
-        <h3>Cold enquiries get no response till Monday</h3>
-        <p>The retainer-sized client emails Friday evening, hears nothing till the office opens — and has hired your competitor by Tuesday.</p>
-      </div>
-      <div class="card">
-        <div class="tag">Every Lagos SME</div>
-        <h3>Founder is the bottleneck</h3>
-        <p>You answer DMs. You draft invoices. You chase rent. You should be growing the business — instead you're a glorified WhatsApp typist.</p>
-      </div>
+    </div>
+
+    <div style="margin-top: 32px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px 28px;">
+      <p style="margin: 0; font-size: 15px; color: var(--muted-strong); line-height: 1.8;">
+        <strong style="color: var(--text-strong);">Here's the line we will not cross:</strong> nothing leaves your number without your tap. Not "by default." Not "until you turn it off." The architecture <em>literally has no path</em> to send a message without you. The customer is yours. The voice is yours. The reputation is yours. We just save you the typing.
+      </p>
     </div>
   </div>
 </section>
 
-<!-- ── Solution ─────────────────────────────────────────────── -->
+<!-- ── Three pillars ─────────────────────────────────────────────── -->
 <section>
   <div class="inner">
-    <div class="section-label">What ReachNG does</div>
-    <h2 class="section-h2">An agent that closes, then operates.</h2>
-    <p class="section-sub">Not another chatbot. Not another CRM. A single AI hire that takes inbound work off your plate end-to-end — and then runs the back-office once a deal closes.</p>
+    <div class="section-label">If you only remember three things</div>
+    <h2 class="section-h2">Make them these.</h2>
 
-    <div class="grid-2">
-      <div class="card">
-        <div class="tag">Phase 1 · Closes &amp; nurtures</div>
-        <h3>Every inbound message handled in under 2 minutes</h3>
-        <p>WhatsApp, IG DM, web form, referral — every enquiry gets a warm, personalised, vertical-aware reply. The agent qualifies, sends pricing/menus/event packs, takes the deposit via Paystack, books the call/viewing/table. <strong style="color:var(--text-strong)">You approve every message before it sends</strong> — your number, your voice, zero AI surprises.</p>
+    <div class="grid-3" style="margin-top: 48px;">
+
+      <div class="card" style="border-color: var(--border-strong);">
+        <div class="tag">⚡ Under one second</div>
+        <h3>Nobody waits. Not at midnight. Not on a Sunday.</h3>
+        <p style="line-height: 1.75;">The second a WhatsApp lands on your line, the customer sees a warm reply in your voice — measured: <strong style="color:var(--text-strong)">under 1,000 milliseconds</strong>. No "we'll get back to you." No silence. The real personal answer follows minutes later. Conversion math: a customer who feels heard in 1 second doesn't DM your competitor.</p>
       </div>
-      <div class="card">
-        <div class="tag">Phase 2 · Operates the back-office</div>
-        <h3>Once they're a customer, the agent keeps working</h3>
-        <p>Same agent runs rent chase (real estate), payroll PAYE/PENCOM/NHF (HR clients), invoice follow-up (every business), KYC vault (premium leads), lawyer handover bundle (closing deals), capacity protection (hospitality). The work that used to eat your evenings just... happens.</p>
+
+      <div class="card" style="border-color: var(--border-strong);">
+        <div class="tag">🇳🇬 19 Lagos-deep playbooks</div>
+        <h3>The agent grew up here.</h3>
+        <p style="line-height: 1.75;">Hospitality knows Detty December and owambe deposits. Real estate knows Proof of Funds for Banana Island vs Phase 1. Schools know diaspora parents emailing from Atlanta at 3am. Legal knows conflict checks. <strong style="color:var(--text-strong)">Each vertical is 100+ lines of Lagos-specific instruction</strong> — not a "you are a helpful assistant" stub.</p>
       </div>
+
+      <div class="card" style="border-color: var(--border-strong);">
+        <div class="tag">🧠 Forgets nothing</div>
+        <h3>"Maybe next month" never dies.</h3>
+        <p style="line-height: 1.75;">Every conversation gets threaded into a lead pipeline. If they go quiet, the agent brings them back at the right moment with a friendly, contextual follow-up — referencing the specific thing you discussed. The lead that DM'd you in February doesn't disappear because you forgot. <strong style="color:var(--text-strong)">Nurture sequences run themselves</strong>, in your voice, with your approval.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── The math nobody wants to do ─────────────────────────────────────────────── -->
+<section style="background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="inner" style="max-width: 880px;">
+    <div class="section-label">The math you've been avoiding</div>
+    <h2 class="section-h2">Slow WhatsApp replies aren't an inconvenience. They're a tax on your business.</h2>
+    <p class="section-sub">Let's count what you're already losing. Numbers are conservative — your real bleed is probably worse.</p>
+
+    <table style="width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 40px;">
+      <thead>
+        <tr style="background: var(--surface-2);">
+          <th style="text-align: left; padding: 16px 20px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;">If you're losing…</th>
+          <th style="text-align: right; padding: 16px 20px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;">That's per year</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 15px;">
+        <tr style="border-top: 1px solid var(--border);"><td style="padding: 14px 20px;">5 weekend bookings/month to slow replies (avg ₦60K)</td><td style="text-align:right; padding: 14px 20px; color: var(--text-strong); font-weight: 700;">₦3,600,000</td></tr>
+        <tr style="border-top: 1px solid var(--border);"><td style="padding: 14px 20px;">2 Saturdays/month wasted on unqualified viewings</td><td style="text-align:right; padding: 14px 20px; color: var(--text-strong); font-weight: 700;">₦1,440,000+</td></tr>
+        <tr style="border-top: 1px solid var(--border);"><td style="padding: 14px 20px;">1 retainer-sized legal enquiry/quarter dying over the weekend</td><td style="text-align:right; padding: 14px 20px; color: var(--text-strong); font-weight: 700;">₦24,000,000+</td></tr>
+        <tr style="border-top: 1px solid var(--border);"><td style="padding: 14px 20px;">10 invoices/month getting paid 30 days late</td><td style="text-align:right; padding: 14px 20px; color: var(--text-strong); font-weight: 700;">~₦2,000,000 in trapped cash</td></tr>
+        <tr style="border-top: 1px solid var(--border);"><td style="padding: 14px 20px;">1 admission enquiry/term lost to a slow reply</td><td style="text-align:right; padding: 14px 20px; color: var(--text-strong); font-weight: 700;">₦24,000,000+ (over school career)</td></tr>
+        <tr style="border-top: 1px solid var(--border); background: rgba(255,85,0,0.06);"><td style="padding: 18px 20px; font-weight: 700; color: var(--text-strong);">Conservative annual leakage</td><td style="text-align:right; padding: 18px 20px; color: var(--orange); font-weight: 800; font-size: 18px;">₦20M+</td></tr>
+      </tbody>
+    </table>
+
+    <p style="text-align: center; margin-top: 32px; font-size: 15px; color: var(--muted-strong); line-height: 1.7;">
+      ReachNG Growth is <strong style="color: var(--text-strong);">₦1.8M a year</strong>. If we save you one Saturday booking a month it pays for itself twice over.
+      The question isn't "can I afford it." The question is "why am I still typing replies at midnight."
+    </p>
+  </div>
+</section>
+
+<!-- ── How it works ─────────────────────────────────────────────── -->
+<section>
+  <div class="inner" style="max-width: 920px;">
+    <div class="section-label">How it actually runs</div>
+    <h2 class="section-h2">Four moves. No magic. No "transformation journey."</h2>
+
+    <div style="margin-top: 56px; display: grid; gap: 40px;">
+
+      <div style="display: grid; grid-template-columns: 56px 1fr; gap: 28px; align-items: start;">
+        <div style="font-size: 48px; font-weight: 800; color: var(--orange); line-height: 1; letter-spacing: -2px;">01</div>
+        <div>
+          <h3 style="margin: 0 0 10px; font-size: 22px; font-weight: 700; color: var(--text-strong); letter-spacing: -0.3px;">A customer messages your business WhatsApp</h3>
+          <p style="margin: 0; color: var(--muted-strong); font-size: 15px; line-height: 1.75;">Doesn't matter what time. Doesn't matter if you're driving, sleeping, in a meeting, or on a beach. The message lands. The agent sees it instantly.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 56px 1fr; gap: 28px; align-items: start;">
+        <div style="font-size: 48px; font-weight: 800; color: var(--orange); line-height: 1; letter-spacing: -2px;">02</div>
+        <div>
+          <h3 style="margin: 0 0 10px; font-size: 22px; font-weight: 700; color: var(--text-strong); letter-spacing: -0.3px;">They get a warm reply in under one second</h3>
+          <p style="margin: 0; color: var(--muted-strong); font-size: 15px; line-height: 1.75;">In your voice. Not a robot. Not "thanks for reaching out, we'll be in touch." A real human-sounding holding message that buys you minutes without burning trust. They feel heard. They don't go anywhere.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 56px 1fr; gap: 28px; align-items: start;">
+        <div style="font-size: 48px; font-weight: 800; color: var(--orange); line-height: 1; letter-spacing: -2px;">03</div>
+        <div>
+          <h3 style="margin: 0 0 10px; font-size: 22px; font-weight: 700; color: var(--text-strong); letter-spacing: -0.3px;">Your phone buzzes — a full draft is waiting for you</h3>
+          <p style="margin: 0; color: var(--muted-strong); font-size: 15px; line-height: 1.75;">Reads exactly like you'd write it. Their name. Your pricing. The specific thing they asked about. A Paystack link if a deposit makes sense. A viewing slot if a viewing makes sense. Drafted by Claude Haiku 4.5 with your business brief and your industry's 100+ line playbook layered into the prompt. Takes about 8 seconds.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 56px 1fr; gap: 28px; align-items: start;">
+        <div style="font-size: 48px; font-weight: 800; color: var(--orange); line-height: 1; letter-spacing: -2px;">04</div>
+        <div>
+          <h3 style="margin: 0 0 10px; font-size: 22px; font-weight: 700; color: var(--text-strong); letter-spacing: -0.3px;">You tap approve. It sends from <em>your</em> number.</h3>
+          <p style="margin: 0; color: var(--muted-strong); font-size: 15px; line-height: 1.75;">One thumb. One second. The customer sees your name, your DP, your tone. They never know you didn't type it. Edit it first if you want — your call. After a few weeks, you'll flip Autopilot on for the easy ones. Anything risky still routes back to you. Forever.</p>
+        </div>
+      </div>
+
     </div>
 
     <div style="text-align: center; margin-top: 56px;">
-      <a href="/portal/demo" class="btn btn-primary" target="_blank">See it on a live Lagos demo →</a>
+      <a href="/portal/demo" class="btn btn-primary" target="_blank">See it run on real Lagos data →</a>
     </div>
   </div>
 </section>
 
-<!-- ── Trust / Differentiators ─────────────────────────────────────────────── -->
+<!-- ── Pain ─────────────────────────────────────────────── -->
 <section style="background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
   <div class="inner">
-    <div class="section-label">Why it works in Nigeria</div>
-    <h2 class="section-h2">Built for how Lagos actually does business.</h2>
-    <p class="section-sub">Most "AI" tools are built for San Francisco SaaS. ReachNG is built for the WhatsApp-first, Paystack-paid, Detty-December reality you actually run a business in.</p>
+    <div class="section-label">Sound familiar?</div>
+    <h2 class="section-h2">Pick the one that's costing you right now.</h2>
 
-    <div class="grid-3">
+    <div class="grid-3" style="margin-top: 40px;">
       <div class="card">
-        <h3>🇳🇬 WhatsApp-native</h3>
-        <p>Every message goes from your own WhatsApp number — not ours. Customers see your brand, your name, your tone. No "this message was sent by an AI" footer.</p>
+        <div class="tag">Restaurants &amp; venues</div>
+        <h3>The Saturday table that booked across the road</h3>
+        <p>Group of six DMs at 9pm. Your social media manager sees it at 11am Saturday. They've already paid a deposit at the venue across the road. ₦60K table. Times four every weekend.</p>
       </div>
       <div class="card">
-        <h3>👤 Human-in-the-loop, always</h3>
-        <p>The agent drafts. You approve, edit or skip. Nothing leaves your number without your green light. <strong style="color:var(--text-strong)">Trust built in.</strong></p>
+        <div class="tag">Real estate</div>
+        <h3>The Saturday you wasted on a buyer with no PoF</h3>
+        <p>Drove to Ajah for a "serious buyer" who turned out to have no Proof of Funds. Meanwhile the buyer who DM'd Friday at 9pm — the one with ₦650M — was viewing with your competitor by Saturday lunchtime.</p>
       </div>
       <div class="card">
-        <h3>₦ Naira pricing &amp; Paystack</h3>
-        <p>Deposits go through Paystack to your account. We never hold client funds. Every pricing conversation is in naira, not dollars.</p>
+        <div class="tag">Schools</div>
+        <h3>The diaspora parent who applied somewhere else</h3>
+        <p>London parent asking about Year 7. Messages Wednesday 4pm UK time. Your admissions team replies Friday afternoon. They've already toured two schools online by then. Term fee gone.</p>
       </div>
       <div class="card">
-        <h3>📍 Lagos-aware drafting</h3>
-        <p>The agent knows about Detty December surge, owambe season, school resumption, the difference between a Banana Island buyer and a Mushin one. It writes like someone who lives here.</p>
+        <div class="tag">Beauty &amp; wellness</div>
+        <h3>"Let me check with my husband." Disappears.</h3>
+        <p>The follow-up never happens. The slot stays empty. Saturday afternoon, ₦35K in bookings missing because nobody had time to send a friendly nudge.</p>
       </div>
       <div class="card">
-        <h3>🔒 Your data stays yours</h3>
-        <p>Every client gets isolated data. No "shared model." Bank-grade encryption on portal tokens, audit log on every change.</p>
+        <div class="tag">Legal &amp; professional</div>
+        <h3>The Friday-evening retainer that vanished</h3>
+        <p>A potential client with a fintech CBN question messages your firm at 6pm Friday. Your office opens 9am Monday. By Tuesday they've engaged another firm. ₦8M retainer you'll never know you lost.</p>
       </div>
       <div class="card">
-        <h3>🛡️ NDPR compliant</h3>
-        <p>Consent attestation on every campaign. Audit trail. Opt-out automatic. We won't get you sued.</p>
+        <div class="tag">Every Lagos founder</div>
+        <h3>You answer DMs at midnight and you hate it</h3>
+        <p>You wanted to build a business. You became a glorified WhatsApp typist. You're chasing rent on Sundays. You're drafting the same five sentences for the tenth time this week. There's a better version of this — and it doesn't involve hiring three more people.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── Verticals ─────────────────────────────────────────────── -->
-<section>
+<!-- ── The appetizer — back-office workflows ─────────────────────────────────────────────── -->
+<section style="background: linear-gradient(180deg, var(--bg) 0%, rgba(255,85,0,0.04) 100%); border-top: 1px solid var(--border);">
   <div class="inner">
-    <div class="section-label">Pick the demo for your business</div>
-    <h2 class="section-h2">See yourself in the product in 90 seconds.</h2>
-    <p class="section-sub">Same engine, vertical-tailored sample data. Click any demo to see exactly how the agent would run your inbound.</p>
+    <div class="section-label">And then the part nobody else does</div>
+    <h2 class="section-h2">Most "AI sales" tools quit the second the deal closes.</h2>
+    <p class="section-sub">Mine doesn't. The same agent that booked the table also reminds them Saturday morning, chases the deposit if it bounces, and — once they're a customer — runs the workflows you've been doing by hand for years. <strong style="color:var(--text-strong)">All optional. All included. Think of it as the side dish.</strong></p>
+
+    <div class="grid-3" style="margin-top: 48px;">
+      <div class="card" style="border-color: var(--orange);">
+        <div class="tag">📸 Receipt Catcher</div>
+        <h3>Reads bank screenshots like a human.</h3>
+        <p style="line-height: 1.7;">Customer sends a transfer screenshot — GTBank, OPay, Kuda, Access mobile, POS slip, Moniepoint, anything. The agent reads it: bank, amount, sender, reference, time. Matches it against the open invoice or booking. Drafts <em>"Thank you Mr Bola, your ₦450K transfer is confirmed — receipt coming."</em> Catches the wrong-amount ones too: <em>"You sent ₦40K, balance was ₦400K. Did you mean the full amount?"</em> <strong style="color:var(--text-strong)">Nobody else does this — because nobody else built it for Lagos.</strong></p>
+      </div>
+      <div class="card">
+        <div class="tag">Closer pipeline</div>
+        <h3>Every conversation, threaded.</h3>
+        <p style="line-height: 1.7;">Every inbound message becomes a lead. Threaded conversations, status (new / replied / qualifying / hot / closed), the full back-and-forth in one view. You always know who's hot, who's stalling, what the agent said last, what's the next move. No spreadsheets. No "remind me what we discussed."</p>
+      </div>
+      <div class="card">
+        <div class="tag">Nurture sequences</div>
+        <h3>The "maybe next month" lead comes back.</h3>
+        <p style="line-height: 1.7;">If they went quiet two weeks ago, the agent brings them back with a contextual follow-up — referencing your actual previous conversation, not a generic blast. Drafts queue for your tap. You stop forgetting people. You start re-closing leads you'd given up on.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Lead Quality Scorer</div>
+        <h3>Knows which lead is worth your time.</h3>
+        <p style="line-height: 1.7;">Pulls signals from across enrichment — business size, recent activity, decision-maker presence, pain signals on socials, vertical fit — and sorts your outreach queue Hot → Warm → Cold with a reason on each one. You stop wasting Apify spend on dead leads. The agent works the hot ones first.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Daily Owner Brief — 8am</div>
+        <h3>One WhatsApp. Everything you need.</h3>
+        <p style="line-height: 1.7;">Every morning at 8am Lagos time, a WhatsApp from your agent: overnight enquiries by intent, who's pending your approval, your pipeline value, this-month ROI, and <strong style="color:var(--text-strong)">three AI-generated action items</strong> for the day. Read it over coffee. You know exactly where the day's revenue is coming from before you leave the house.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Human-in-the-loop</div>
+        <h3>Your tap is the only path.</h3>
+        <p style="line-height: 1.7;">Architecturally enforced — not a setting you have to remember to keep on. There is literally no code path that sends a message without your approval. Even with Autopilot on for the easy ones, anything risky (complaints, disputes, high-value) still routes back to your queue. The voice is yours. The reputation is yours.</p>
+      </div>
+    </div>
+
+    <p style="text-align: center; margin-top: 40px; font-size: 13px; color: var(--muted); max-width: 720px; margin-left: auto; margin-right: auto; line-height: 1.7;">
+      And depending on your vertical, the agent quietly handles the back-office work that fits — the kind of operational stuff that's specific to your industry. We show you what applies to <em>your</em> business on the demo. No generic feature list here.
+    </p>
+  </div>
+</section>
+
+<!-- ── Vertical demos ─────────────────────────────────────────────── -->
+<section style="background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="inner">
+    <div class="section-label">See yourself in it</div>
+    <h2 class="section-h2">90 seconds. Real Lagos data. Pick the one closest to you.</h2>
+    <p class="section-sub">Every demo is a real working portal with realistic conversations, real naira amounts, real escalation. Not slides. Not a video. The actual product.</p>
 
     <div class="grid-3">
       <a href="/portal/demo/hospitality" class="card" style="display:block; text-decoration:none; color:inherit;">
         <div class="tag">Hospitality</div>
-        <h3>Mercury Lagos →</h3>
-        <p>Rooftop bar in VI. 34 enquiries/week, 18 bookings confirmed, ₦2.4M tracked.</p>
+        <h3>Altitude Lagos →</h3>
+        <p>Rooftop bar, Victoria Island. Saturday filling up at 11pm Tuesday. Reservation inbox, deposit collection, capacity wall.</p>
       </a>
-      <a href="/portal/demo/real-estate" class="card" style="display:block; text-decoration:none; color:inherit;">
+      <a href="/portal/demo/real_estate" class="card" style="display:block; text-decoration:none; color:inherit;">
         <div class="tag">Real estate</div>
         <h3>Sapphire Estates →</h3>
-        <p>Luxury agency in Banana Island. 47 buyer enquiries, 12 viewings booked, ₦4.8B pipeline.</p>
+        <p>Luxury agency, Banana Island &amp; Ikoyi. A ₦650M buyer enquiry handled at 10pm Friday. PoF, viewings, pipeline.</p>
       </a>
-      <a href="/portal/demo/school" class="card" style="display:block; text-decoration:none; color:inherit;">
-        <div class="tag">Education</div>
+      <a href="/portal/demo/education" class="card" style="display:block; text-decoration:none; color:inherit;">
+        <div class="tag">Schools</div>
         <h3>Lagoon British International →</h3>
-        <p>International school in Lekki. 89 admissions enquiries this term, 31 tours booked.</p>
+        <p>International school, Lekki. A diaspora family in London gets a full prospectus response at midnight Lagos time.</p>
       </a>
-      <a href="/portal/demo/legal" class="card" style="display:block; text-decoration:none; color:inherit;">
+      <a href="/portal/demo/professional_services" class="card" style="display:block; text-decoration:none; color:inherit;">
         <div class="tag">Legal &amp; professional</div>
         <h3>Adesina &amp; Co. Solicitors →</h3>
-        <p>Lagos commercial firm. 22 new client enquiries, 9 paid consultations booked.</p>
+        <p>Commercial firm, Lagos. Friday 6pm enquiry gets a qualified, specific response in minutes — not Monday morning.</p>
       </a>
-      <a href="/portal/demo/smb" class="card" style="display:block; text-decoration:none; color:inherit;">
-        <div class="tag">Small business</div>
+      <a href="/portal/demo/small_business" class="card" style="display:block; text-decoration:none; color:inherit;">
+        <div class="tag">Beauty &amp; wellness</div>
         <h3>Glow Studio Lagos →</h3>
-        <p>Beauty &amp; wellness in Lekki. 142 DMs/week, 58 bookings, no-show rate down to 4%.</p>
+        <p>Studio, Lekki &amp; VI. Every DM gets a personal reply with a Paystack deposit link. No bookings die quietly.</p>
       </a>
-      <a href="/contact" class="card" style="display:block; text-decoration:none; color:inherit;">
-        <div class="tag">Don't see your vertical?</div>
-        <h3>We probably handle it →</h3>
-        <p>The engine is vertical-agnostic. Tell us your business and we'll show you the closest fit, or build the demo for you.</p>
+      <a href="https://wa.me/2348164583657?text=Hi%20ReachNG%2C%20can%20you%20build%20a%20demo%20for%20my%20vertical%3F" target="_blank" rel="noopener" class="card" style="display:block; text-decoration:none; color:inherit;">
+        <div class="tag">Don't see your industry?</div>
+        <h3>WhatsApp us — we'll build it →</h3>
+        <p>The engine has 19 vertical playbooks. Tell us what you do. We'll either point at the closest fit or build the demo on your data in a day.</p>
       </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Trust ─────────────────────────────────────────────── -->
+<section>
+  <div class="inner">
+    <div class="section-label">Why we're different from imported SaaS</div>
+    <h2 class="section-h2">Built for Naira, Paystack, Detty December.</h2>
+    <p class="section-sub">Most "AI for business" tools are San Francisco products with a Nigerian flag taped on. ReachNG was built from line one for the way you actually do business here.</p>
+
+    <div class="grid-3" style="margin-top: 40px;">
+      <div class="card">
+        <h3>Your WhatsApp number. Not ours.</h3>
+        <p>Messages go from your own number, paired via Unipile in 30 minutes. Customer sees you. ReachNG is invisible to them — and to your competitors.</p>
+      </div>
+      <div class="card">
+        <h3>You approve every single send. Forever.</h3>
+        <p>Architecturally enforced — not a toggle. The only path to a sent message is your tap. You can edit, skip, rewrite. No surprises. No "AI sent something weird to a customer" stories.</p>
+      </div>
+      <div class="card">
+        <h3>Deposits go to your Paystack. Not ours.</h3>
+        <p>When the agent closes a booking and a deposit is paid, the money lands in your Paystack account, then your bank. ReachNG never holds client funds. Not now, not ever.</p>
+      </div>
+      <div class="card">
+        <h3>One client, one isolated workspace.</h3>
+        <p>Your contacts, your drafts, your pipeline — completely separate from every other client. No shared model trained on your conversations. Bank-grade encryption on every portal token.</p>
+      </div>
+      <div class="card">
+        <h3>Naira pricing. Monthly. Cancel anytime.</h3>
+        <p>₦80K–₦300K per month, paid via Paystack. No annual lock-in. No "speak to sales for pricing." If we don't earn the renewal, you don't pay it.</p>
+      </div>
+      <div class="card">
+        <h3>Lagos team. Lagos hours. Lagos timezone.</h3>
+        <p>The team building this lives in Lagos, takes WhatsApp messages in WAT, and answers them the same way the product does — fast and like a human.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ── Final CTA ─────────────────────────────────────────────── -->
-<section style="background: linear-gradient(180deg, transparent 0%, rgba(255,85,0,0.06) 100%); text-align: center;">
-  <div class="inner">
-    <h2 class="section-h2" style="margin-bottom: 28px;">Stop being a glorified WhatsApp typist.</h2>
-    <p class="section-sub" style="margin-bottom: 36px;">Every day you don't have ReachNG is another ₦40K–₦80K booking that walked. Get on a 15-minute call and we'll show you the agent running on a venue exactly like yours.</p>
+<section style="background: linear-gradient(180deg, transparent 0%, rgba(255,85,0,0.08) 100%); text-align: center;">
+  <div class="inner" style="max-width: 760px;">
+    <h2 class="section-h2" style="margin-bottom: 20px;">Look. The next 11pm WhatsApp is coming.</h2>
+    <p class="section-sub" style="margin-bottom: 28px;">Either it sits unread until morning and the customer moves on. Or it gets answered in your voice, in their language, within minutes — and they book before sunrise.</p>
+    <p class="section-sub" style="margin-bottom: 36px; font-style: italic;">Pick one. Then book the demo.</p>
     <div class="hero-ctas">
-      <a href="/contact" class="btn btn-primary">Book a 15-min call</a>
-      <a href="/pricing" class="btn btn-ghost">See pricing</a>
+      <a href="https://wa.me/2348164583657?text=Hi%20ReachNG%2C%20I%27d%20like%20to%20book%20a%20demo" class="btn btn-primary" target="_blank" rel="noopener">WhatsApp us — book a demo</a>
+      <a href="/pricing" class="btn btn-ghost">See pricing first</a>
     </div>
+    <p style="margin-top: 24px; font-size: 12px; color: var(--muted); letter-spacing: 0.04em;">+234 816 458 3657 · hello@reachng.ng · Lagos · Reply within 30 minutes during business hours</p>
   </div>
 </section>
 

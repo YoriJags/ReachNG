@@ -1,4 +1,4 @@
-# ReachNG
+﻿# ReachNG
 
 **The AI sales engine for WhatsApp-first businesses.**
 
@@ -141,7 +141,7 @@ All outbound drafts route through `tools/hitl.py::queue_draft()`. The owner appr
 
 ## Deployment
 
-Railway auto-deploys from `main`. Production URL: `https://reachng-production.up.railway.app`.
+Railway auto-deploys from `main`. Production URL: `https://www.reachng.ng`.
 
 Set all env vars under Variables. Webhook signatures are enforced when `APP_ENV=production`.
 

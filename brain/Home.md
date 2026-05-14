@@ -45,4 +45,4 @@ tags: [reachng]
 
 ## Live URL
 
-`https://reachng-production.up.railway.app`
+`https://www.reachng.ng`

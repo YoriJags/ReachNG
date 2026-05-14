@@ -11,7 +11,7 @@ tags: [reachng]
 
 - **Platform:** Railway
 - **Repo:** GitHub `main` branch → auto-deploy on push
-- **Live URL:** `https://reachng-production.up.railway.app`
+- **Live URL:** `https://www.reachng.ng`
 - **GCP Project:** `reachng-492121` (Google Maps billing)
 
 ---
@@ -84,5 +84,5 @@ python main.py
 1. Dashboard → Clients tab → Add Client
 2. Fill: name, vertical, city, Unipile account ID
 3. System generates portal token automatically
-4. Share portal link: `https://reachng-production.up.railway.app/portal/{token}`
+4. Share portal link: `https://www.reachng.ng/portal/{token}`
 5. Client can view their campaign stats, contacts, replies at that link
