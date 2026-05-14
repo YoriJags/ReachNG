@@ -76,7 +76,11 @@ def _parse_unipile(payload: dict) -> tuple[str | None, str, str | None]:
     return sender, body, account_id
 
 
-def _parse_meta(payload: dict) -> list[tuple[str, str]]:
+def _parse_meta(payload: dict) -> list[tuple[str, str, dict]]:
+    """
+    Returns (sender, body, raw_msg) per message. raw_msg lets the image branch
+    look up `msg.type == "image"` and `msg.image.id` for media download.
+    """
     results = []
     try:
         for entry in payload.get("entry", []):
@@ -86,10 +90,51 @@ def _parse_meta(payload: dict) -> list[tuple[str, str]]:
                     sender = msg.get("from")
                     body = (msg.get("text") or {}).get("body", "")
                     if sender:
-                        results.append((sender, body))
+                        results.append((sender, body, msg))
     except Exception as e:
         log.warning("meta_payload_parse_error", error=str(e))
     return results
+
+
+# ─── Receipt Catcher pipeline (images on inbound) ─────────────────────────────
+
+async def _handle_image_attachment(
+    sender_phone: str,
+    image_bytes: bytes,
+    mime_type: str,
+    source: str | None,
+) -> bool:
+    """
+    Try the Receipt Catcher pipeline on an inbound image.
+
+    Returns True if we processed the image (matched + queued), False if we should
+    fall through to text-only handling (e.g. vision call failed and there's a caption).
+    """
+    try:
+        from tools.receipt_vision import extract_receipt
+        from services.receipt_match import match_receipt, queue_receipt_ack
+    except Exception as e:
+        log.error("receipt_module_import_failed", error=str(e))
+        return False
+
+    try:
+        receipt = await extract_receipt(image_bytes, mime_type)
+    except Exception as e:
+        log.error("receipt_vision_crashed", error=str(e), phone=sender_phone)
+        return False
+
+    if not receipt.is_receipt and receipt.confidence < 0.3:
+        log.info("inbound_image_not_a_receipt", phone=sender_phone,
+                 conf=receipt.confidence)
+        return False  # let text branch handle the caption if any
+
+    try:
+        match = match_receipt(receipt, sender_phone)
+        queue_receipt_ack(receipt, match, sender_phone)
+        return True
+    except Exception as e:
+        log.error("receipt_match_or_queue_failed", error=str(e), phone=sender_phone)
+        return False
 
 
 # ─── Meta verification handshake ──────────────────────────────────────────────
@@ -121,27 +166,94 @@ async def whatsapp_inbound(request: Request):
     except Exception:
         return {"ok": True}
 
-    messages_to_process: list[tuple[str | None, str, str | None]] = []
+    is_meta = payload.get("object") == "whatsapp_business_account"
 
-    if payload.get("object") == "whatsapp_business_account":
-        for sender, body in _parse_meta(payload):
-            messages_to_process.append((sender, body, "meta"))
+    # ── Receipt Catcher: images get processed FIRST, separately from text ────
+    # If the inbound message is an image (or has an image attachment), run the
+    # Receipt Catcher pipeline. If it's a pure image (no caption), we short-circuit.
+    # If it has a caption, we ALSO run the text handler so we don't drop context.
+    image_handled_for: set[str] = set()
+    try:
+        if is_meta:
+            from tools.inbound_media import extract_meta_image, download_meta_media
+            for sender, _body, raw_msg in _parse_meta(payload):
+                img = extract_meta_image(raw_msg)
+                if not img:
+                    continue
+                media_id, mime = img
+                try:
+                    image_bytes, fetched_mime = await download_meta_media(media_id)
+                    if await _handle_image_attachment(sender, image_bytes,
+                                                      fetched_mime or mime, "meta"):
+                        image_handled_for.add(sender)
+                except Exception as e:
+                    log.error("meta_image_pipeline_failed", error=str(e), sender=sender)
+        else:
+            from tools.inbound_media import extract_unipile_image, download_unipile_attachment
+            data = payload.get("data", {})
+            sender_p = data.get("from") or payload.get("from")
+            img = extract_unipile_image(data)
+            if sender_p and img:
+                msg_id, att_id, mime = img
+                try:
+                    image_bytes, fetched_mime = await download_unipile_attachment(msg_id, att_id)
+                    if await _handle_image_attachment(sender_p, image_bytes,
+                                                      fetched_mime or mime, "unipile"):
+                        image_handled_for.add(sender_p)
+                except Exception as e:
+                    log.error("unipile_image_pipeline_failed", error=str(e), sender=sender_p)
+    except Exception as e:
+        log.error("inbound_image_dispatch_crashed", error=str(e))
+
+    # ── Text handler — also runs for pure images, with a synthetic body ─────
+    # We never short-circuit the text handler. If the inbound was a pure image
+    # (no caption), we substitute a synthetic body so the Closer thread / rent /
+    # invoice intakes still capture the moment. Receipt acknowledgement is queued
+    # in parallel by the image pipeline above — the customer feels one cohesive chat.
+    # `skip_autodraft` suppresses the Closer auto-draft for pure-image inbounds so
+    # we don't queue two competing drafts (receipt ack already covers it).
+    messages_to_process: list[tuple[str | None, str, str | None, bool]] = []
+    synthetic_body = "[Image received — receipt extraction in progress]"
+
+    if is_meta:
+        for sender, body, _raw in _parse_meta(payload):
+            effective_body = body
+            skip_ad = False
+            if sender in image_handled_for and not (body or "").strip():
+                effective_body = synthetic_body
+                skip_ad = True
+            messages_to_process.append((sender, effective_body, "meta", skip_ad))
     else:
         sender, body, account_id = _parse_unipile(payload)
-        messages_to_process.append((sender, body, account_id))
+        effective_body = body
+        skip_ad = False
+        if sender in image_handled_for and not (body or "").strip():
+            effective_body = synthetic_body
+            skip_ad = True
+        messages_to_process.append((sender, effective_body, account_id, skip_ad))
 
-    for sender_phone, message_body, source in messages_to_process:
+    for sender_phone, message_body, source, skip_ad in messages_to_process:
         if not sender_phone:
             continue
         try:
-            await _handle_message(sender_phone, message_body, source, payload.get("event", "message.received"))
+            await _handle_message(
+                sender_phone, message_body, source,
+                payload.get("event", "message.received"),
+                skip_autodraft=skip_ad,
+            )
         except Exception as e:
             log.error("inbound_handler_crashed", error=str(e), phone=sender_phone)
 
     return {"ok": True}
 
 
-async def _handle_message(sender_phone: str, message_body: str, source: str | None, event: str):
+async def _handle_message(
+    sender_phone: str,
+    message_body: str,
+    source: str | None,
+    event: str,
+    skip_autodraft: bool = False,
+):
     """
     Full pipeline for one inbound message:
     link → classify via Claude → auto-reply to debtor → notify bursar → log
@@ -204,11 +316,13 @@ async def _handle_message(sender_phone: str, message_body: str, source: str | No
                     log_doc["linked_product"] = "closer"
                     log_doc["linked_lead_id"] = lead_id
                     # Auto-draft the next move — queues to HITL, never auto-sends.
-                    try:
-                        from services.closer.brain import draft_next_move
-                        draft_next_move(lead_id)
-                    except Exception as _e:
-                        log.warning("closer_autodraft_failed", lead=lead_id, error=str(_e))
+                    # Skipped when Receipt Catcher already queued an acknowledgement.
+                    if not skip_autodraft:
+                        try:
+                            from services.closer.brain import draft_next_move
+                            draft_next_move(lead_id)
+                        except Exception as _e:
+                            log.warning("closer_autodraft_failed", lead=lead_id, error=str(_e))
                 else:
                     lead = create_lead(
                         client_id=client_id,
@@ -222,11 +336,13 @@ async def _handle_message(sender_phone: str, message_body: str, source: str | No
                     log_doc["linked_product"] = "closer"
                     log_doc["linked_lead_id"] = lead["id"]
                     # First-touch auto-draft on the new lead — owner approves to send.
-                    try:
-                        from services.closer.brain import draft_next_move
-                        draft_next_move(lead["id"])
-                    except Exception as _e:
-                        log.warning("closer_autodraft_first_failed", lead=lead["id"], error=str(_e))
+                    # Skipped when Receipt Catcher already queued an acknowledgement.
+                    if not skip_autodraft:
+                        try:
+                            from services.closer.brain import draft_next_move
+                            draft_next_move(lead["id"])
+                        except Exception as _e:
+                            log.warning("closer_autodraft_first_failed", lead=lead["id"], error=str(_e))
                 try:
                     _db()["inbound_messages"].insert_one(log_doc)
                 except Exception:
