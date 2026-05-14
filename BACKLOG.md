@@ -22,6 +22,33 @@ The five things that turn ReachNG from "this works" into "bro, you have to see t
 
 ---
 
+## P0 — Next sprint (queued 2026-05-14, after landing rewrite ship)
+
+Locked sequence — build in this order. Total ~10 days.
+
+> **Priority call to revisit on resume**: Outcomes Engine (#1) is the long-term reputation flywheel — every existing client becomes a walking case study automatically. Receipt Catcher (#2) is the higher "wow" demo moment in the short term. Default order below puts Outcomes Engine first per the strategic logic; reorder if first-paid-client demo needs Receipt Catcher faster.
+
+- [ ] **1. Outcomes Engine** (~4 days) — The 4-layer measurement system that makes reputation speak for itself.
+  - **Layer A: Per-client Scorecard widget** (~1.5 days) — Live, real-time numbers in client portal + Control Tower: ₦ closed via ReachNG-handled conversations (Paystack-confirmed only, not just touched), ₦ recovered from chase ladders, bookings confirmed, **median response time before vs after** (the killer chart — usually hours → seconds), reply rate before vs after, hours saved (drafts × avg manual-typing time), cost per booking, cost per ₦ recovered. One-tap branded PDF export. Files: new `services/scorecard.py`, new `api/scorecard.py` (`GET /api/v1/scorecard/{client_id}` + `GET /api/v1/scorecard/{client_id}/pdf`), widget on `templates/portal.html` and `templates/dashboard.html`. Materialised nightly via scheduler from raw events (drafts, approvals, paystack_events, chased_invoices, estate_rent_ledger, sf_students, contacts).
+  - **Layer B: Quality Metrics dashboard** (~0.5 day) — Approval rate (% drafts approved unedited — measures voice match), edit distance (avg chars changed before send — draft fidelity), skip rate (relevance), time-to-approve (owner trust), customer reply rate to drafts (conversion power). Per-client + per-vertical breakdown. **Drift alarm**: approval rate dropping >15% triggers operator alert. Surfaces on Control Tower.
+  - **Layer C: Cohort Rollups + landing-page social proof** (~0.5 day) — Anonymised platform-wide aggregates refreshed nightly. New `/api/v1/cohort-stats` endpoint. Render live tiles on landing page (replaces static "Why it works" copy with rolling numbers): *"₦XM closed via ReachNG this week / N businesses on the platform / X seconds median response / N hours of typing saved this month"*. Becomes auto-updating social proof and investor-deck content.
+  - **Layer D: Weekly Owner digest** (~1 day) — Every Monday 7am Lagos time, WhatsApp + email digest to each client owner: last-7-days numbers, top wins, slowest chase, "your agent saved you N hours this week." Auto-drafted, hits HITL when content needs tuning. Builds the share-worthy moment.
+  - **Layer E: Milestone Engine + auto-tweet drafter** (~0.5 day) — Scheduler watches per-client KPIs for milestones (first ₦1M closed, 100th booking, 30-day anniversary, first 1000 drafts approved, etc.). On hit: generate a milestone card (screenshot-ready) + draft a celebratory tweet/LinkedIn post the owner can one-tap share, tagging @reachng. Most clients won't post. The 20% who do compound your reputation faster than any paid acquisition.
+
+- [ ] **2. Receipt Catcher** (~2 days) — Customer sends bank-transfer screenshot (GTB, OPay, Kuda, Access, Moniepoint, PalmPay, POS slip) on WhatsApp. Agent reads image via Claude Haiku 4.5 vision: bank, amount, sender, reference, time, recipient. Match against `chased_invoices` / `estate_rent_ledger` / `sf_students` / Closer leads. Draft ack: *"Thank you Mr Bola — your ₦450K transfer (GTB ref 0234XXX) is confirmed."* Catch mismatches: *"You sent ₦40K, balance was ₦400K — did you mean the full amount?"* Suspicious receipts → escalate. Surface in HITL queue. Files: `tools/messaging.py` (add media download), `api/webhooks.py` (image branch), new `tools/receipt_vision.py`, new `services/receipt_match.py`. Already shown on landing page (universal capability card #1) — must ship before any prospect tries it.
+
+- [ ] **3. Lead Quality Scorer** (~1 day) — Combine enrichment signals (business size, Maps rating + review count, decision_maker presence, vertical fit, recent IG/Twitter pain signals, website freshness) into Hot/Warm/Cold verdict with reason. Reorder outreach queue. Saves Apify/Apollo spend on cold leads. Already shown on landing page. Files: new `tools/lead_scorer.py`, hook into `campaigns/base.py` queue sort, surface in dashboard contacts table.
+
+- [ ] **4. Closer UI** (~1-2 days) — Backend + API exist (`services/closer/`); no operator dashboard. Add Closer tab to `templates/dashboard.html`: lead list w/ status (new/replied/qualifying/hot/closed), thread view, draft preview, approve/edit/skip, manual move-to-stage. Already implied on landing page.
+
+- [ ] **5. Nurture Sequences trigger** (~1 day) — Code exists but never triggers. Add scheduler job to detect leads quiet for N days (configurable per stage), draft contextual revival message referencing last conversation, queue to HITL. Per-vertical timing. Already shown on landing page.
+
+- [ ] **6. Pricing Settings panel** (~1.5 hours) — Mongo `platform_settings.pricing` doc with three plan amounts. Read from doc in `api/marketing.py::PLAN_PRICING` (fallback to defaults). Edit inline from dashboard Control Tower → Settings tab. Audit log on each change. Killer for testing price points without a deploy.
+
+- [ ] **7. Marketing site visual overhaul** (~half day, ~4-5 hrs) — Current orange/black palette is wrong for the audience. Re-skin all marketing pages (`templates/marketing/*`). **References**: 11x.ai (dark glass + glow + premium AI energy), Artisan.co (warm editorial cream + serif headlines + sophistication), Landbase.com (clean grid + Linear-esque minimal). **Direction to synthesise**: premium AI-era feel — likely a hybrid of Artisan's editorial typography (large serif headline + clean sans body) with 11x's depth and glow accents in section breaks. Apply across landing, pricing, about, contact, vertical landers, signup, signup_success. Token-driven CSS so dashboard + portal can adopt incrementally.
+
+---
+
 ## P0 — Pull these into PLAN.md when quota resets
 
 These are next up after current Phase 1.5 (Business Brief + BYO Leads) finishes.
