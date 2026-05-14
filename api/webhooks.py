@@ -279,6 +279,23 @@ async def _handle_message(
         "bursar_notified": False,
     }
 
+    # ── Memory learning — fire-and-forget after matched_client resolves ─────
+    # We extract durable facts from the inbound and store them scoped to
+    # (client_id, sender_phone). Pure-image inbounds (synthetic body) are skipped.
+    def _maybe_learn_memory(client_doc: dict | None, body_text: str) -> None:
+        if not client_doc or not body_text or body_text.startswith("[Image received"):
+            return
+        try:
+            from services.client_memory import learn_from_inbound
+            learn_from_inbound(
+                client_id=str(client_doc["_id"]),
+                contact_phone=sender_phone,
+                inbound_text=body_text,
+                vertical=client_doc.get("vertical"),
+            )
+        except Exception as _e:
+            log.warning("memory_learn_failed", error=str(_e))
+
     # ── Holding Reply — universal across all verticals ────────────────────────
     # Fire instantly for any active client whose WhatsApp line received this
     # inbound, regardless of vertical or product wired underneath. Gated by
@@ -292,6 +309,8 @@ async def _handle_message(
             })
             if matched_client:
                 await _maybe_send_holding_reply(matched_client, sender_phone)
+                # Learn durable facts from this inbound (scoped to client + contact)
+                _maybe_learn_memory(matched_client, message_body)
     except Exception as e:
         log.warning("holding_reply_lookup_failed", error=str(e))
 

@@ -212,6 +212,7 @@ def generate_b2c_message(
     client_name: Optional[str] = None,     # PREFERRED — looks up structured BusinessBrief
     notes: Optional[str] = None,
     tags: Optional[list] = None,
+    phone: Optional[str] = None,           # for client_memory retrieval (scope-locked)
 ) -> dict:
     """
     Generate a personalized B2C outreach message for a customer.
@@ -235,6 +236,26 @@ def generate_b2c_message(
             log.warning("brief_context_fetch_failed", client=client_name, error=str(exc))
 
     system = (brief_system + "\n\n" + ng_context + "\n\n" + base_system) if brief_system else (ng_context + "\n\n" + base_system)
+
+    # ── Inject scoped client memory if we have both client + phone ───────────
+    memory_block_text = ""
+    if client_name and phone:
+        try:
+            import re as _re
+            from database import get_db as _get_db
+            from services.client_memory import fetch_memory_block
+            client_doc = _get_db()["clients"].find_one(
+                {"name": {"$regex": f"^{_re.escape(client_name)}$", "$options": "i"}}
+            )
+            cid = str(client_doc["_id"]) if client_doc else None
+            if cid:
+                memory_block_text = fetch_memory_block(
+                    client_id=cid, contact_phone=phone, requested_by="generate_b2c_message"
+                )
+                if memory_block_text:
+                    system = system + "\n\n" + memory_block_text
+        except Exception as exc:
+            log.warning("memory_inject_b2c_failed", error=str(exc))
 
     notes_block = f"\nCustomer notes: {notes}" if notes else ""
     tags_block  = f"\nCustomer tags/segments: {', '.join(tags)}" if tags else ""

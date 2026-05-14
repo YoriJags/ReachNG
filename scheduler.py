@@ -321,8 +321,35 @@ async def _client_morning_briefs():
         log.error("client_briefs_failed", error=str(e))
 
 
+async def _isolation_audit():
+    """Nightly: run the multi-tenant isolation suite over client_memory.
+
+    Surfaces any leak risk to the operator immediately. Persists last result
+    so the dashboard can show pass/fail status.
+    """
+    try:
+        from tests.test_isolation import run_isolation_suite
+        from database import get_db
+        from datetime import datetime, timezone
+        report = run_isolation_suite()
+        get_db()["isolation_audits"].insert_one({
+            **report,
+            "logged_at": datetime.now(timezone.utc),
+        })
+        if not report.get("pass"):
+            log.error("ISOLATION_AUDIT_FAILED_persisted")
+    except Exception as e:
+        log.error("isolation_audit_crashed", error=str(e))
+
+
 def setup_scheduler():
     """Register all jobs and return configured scheduler."""
+
+    scheduler.add_job(
+        _isolation_audit,
+        CronTrigger(hour=3, minute=0, timezone="Africa/Lagos"),
+        id="isolation_audit", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=600,
+    )
 
     scheduler.add_job(
         _system_sweep,

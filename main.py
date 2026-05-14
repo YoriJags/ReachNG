@@ -126,6 +126,8 @@ async def lifespan(app: FastAPI):
     from services.estate.rent_roll import ensure_rent_indexes
     from services.closer import ensure_closer_indexes
     from services.brief import ensure_brief_indexes, seed_default_primers
+    from services.client_memory import ensure_memory_indexes
+    ensure_memory_indexes()
     from api.legal import ensure_legal_indexes
     ensure_payroll_indexes()
     ensure_rent_indexes()

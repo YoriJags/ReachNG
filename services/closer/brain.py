@@ -103,6 +103,23 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
         extra_context={"objection": objection} if objection else None,
     )
 
+    # ── Inject scoped client memory ──────────────────────────────────────────
+    system_prompt = ctx["system_prompt"]
+    contact_phone = lead.get("contact_phone")
+    lead_client_id = lead.get("client_id")
+    if lead_client_id and contact_phone:
+        try:
+            from services.client_memory import fetch_memory_block
+            mem = fetch_memory_block(
+                client_id=str(lead_client_id),
+                contact_phone=contact_phone,
+                requested_by="closer.draft_next_move",
+            )
+            if mem:
+                system_prompt = system_prompt + "\n\n" + mem
+        except Exception as _e:
+            log.warning("memory_inject_closer_failed", lead=lead_id, error=str(_e))
+
     # Render the actual draft using the assembled system prompt + lead thread.
     user_prompt = _render_user_prompt(lead, intent)
     settings = get_settings()
@@ -111,7 +128,7 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
         msg = client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=350,
-            system=ctx["system_prompt"],
+            system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}],
         )
     except Exception as e:
