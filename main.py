@@ -132,6 +132,10 @@ async def lifespan(app: FastAPI):
     ensure_kb_indexes()
     from services.client_rules import ensure_rules_indexes
     ensure_rules_indexes()
+    from services.scorecard import ensure_scorecard_indexes
+    ensure_scorecard_indexes()
+    from services.quality_metrics import ensure_quality_indexes
+    ensure_quality_indexes()
     from api.legal import ensure_legal_indexes
     ensure_payroll_indexes()
     ensure_rent_indexes()
@@ -251,8 +255,10 @@ app.include_router(client_signals_router,     prefix="/api/v1", **_auth)
 # work without router-level auth.
 from api.knowledge_base import router as kb_router
 from api.client_rules import router as client_rules_router
+from api.scorecard import router as scorecard_router
 app.include_router(kb_router)
 app.include_router(client_rules_router)
+app.include_router(scorecard_router)
 
 app.include_router(dashboard_router, **_auth)
 

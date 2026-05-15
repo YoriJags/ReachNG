@@ -321,6 +321,31 @@ async def _client_morning_briefs():
         log.error("client_briefs_failed", error=str(e))
 
 
+async def _scorecard_snapshot_all():
+    """Nightly: materialise the per-client scorecard for every active client.
+
+    Stored in `scorecard_snapshots` for trend charts. Lightweight — each compute
+    runs ~50 indexed Mongo queries, completes in <1s per client.
+    """
+    try:
+        from services.scorecard import snapshot_all_clients
+        n = snapshot_all_clients(period_days=30)
+        log.info("scorecard_nightly_done", count=n)
+    except Exception as e:
+        log.error("scorecard_nightly_crashed", error=str(e))
+
+
+async def _quality_audit_all():
+    """Daily: recompute quality metrics across all clients — drift alarms persist."""
+    try:
+        from services.quality_metrics import compute_quality_all_clients
+        reports = compute_quality_all_clients(window_days=14)
+        drifters = sum(1 for r in reports if r.drift_detected)
+        log.info("quality_audit_done", clients=len(reports), drifters=drifters)
+    except Exception as e:
+        log.error("quality_audit_crashed", error=str(e))
+
+
 async def _isolation_audit():
     """Nightly: run the multi-tenant isolation suite over client_memory.
 
@@ -349,6 +374,18 @@ def setup_scheduler():
         _isolation_audit,
         CronTrigger(hour=3, minute=0, timezone="Africa/Lagos"),
         id="isolation_audit", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=600,
+    )
+
+    scheduler.add_job(
+        _scorecard_snapshot_all,
+        CronTrigger(hour=3, minute=30, timezone="Africa/Lagos"),
+        id="scorecard_snapshot", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=900,
+    )
+
+    scheduler.add_job(
+        _quality_audit_all,
+        CronTrigger(hour=4, minute=0, timezone="Africa/Lagos"),
+        id="quality_audit", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=900,
     )
 
     scheduler.add_job(

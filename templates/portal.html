@@ -543,6 +543,83 @@
 <div id="content">
   <div class="content">
 
+    <!-- ── Outcomes Scorecard — last 30 days ─────────────────────────────── -->
+    <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <span>Outcomes — last 30 days</span>
+      <a id="sc-export" href="#" target="_blank" style="font-size:11px;color:#999;text-decoration:none;border:1px solid #2a3340;padding:4px 10px;border-radius:5px;">↗ Export PDF</a>
+    </div>
+    <div id="scorecard-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px;">
+      <div class="sc-kpi" data-key="ngn_closed">
+        <div class="sc-label">₦ Closed</div>
+        <div class="sc-value" id="sc-ngn-closed" style="color:#ff5500;">—</div>
+        <div class="sc-sub" id="sc-bookings">— bookings</div>
+      </div>
+      <div class="sc-kpi" data-key="hours_saved">
+        <div class="sc-label">Hours Saved</div>
+        <div class="sc-value" id="sc-hours" style="color:#5dd28a;">—</div>
+        <div class="sc-sub" id="sc-drafts">— drafts approved</div>
+      </div>
+      <div class="sc-kpi" data-key="response">
+        <div class="sc-label">Median Response</div>
+        <div class="sc-value" id="sc-response">—</div>
+        <div class="sc-sub">inbound → reply</div>
+      </div>
+      <div class="sc-kpi" data-key="approval">
+        <div class="sc-label">Approval Rate</div>
+        <div class="sc-value" id="sc-approval">—</div>
+        <div class="sc-sub" id="sc-approval-sub">— actioned</div>
+      </div>
+      <div class="sc-kpi" data-key="pending">
+        <div class="sc-label">Pending (claimed)</div>
+        <div class="sc-value" id="sc-pending" style="color:#ffb84d;">—</div>
+        <div class="sc-sub">awaiting verification</div>
+      </div>
+      <div class="sc-kpi" data-key="cost">
+        <div class="sc-label">Cost / Booking</div>
+        <div class="sc-value" id="sc-cost">—</div>
+        <div class="sc-sub">avg ₦ per closed deal</div>
+      </div>
+    </div>
+    <style>
+      .sc-kpi { background:#141414;border:1px solid #1f2530;border-radius:10px;padding:14px 16px; }
+      .sc-label { font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#6a7280;font-weight:700;margin-bottom:6px; }
+      .sc-value { font-size:22px;color:#fff;font-weight:700;letter-spacing:-0.5px;font-variant-numeric:tabular-nums; }
+      .sc-sub   { font-size:11px;color:#6a7280;margin-top:4px; }
+    </style>
+    <script>
+      (async function loadScorecard() {
+        try {
+          const res = await fetch(`/portal/{{ token }}/scorecard`);
+          const sc = await res.json();
+          const fmtNgn = (n) => {
+            if (n == null || isNaN(n)) return '—';
+            if (n >= 1_000_000) return '₦' + (n/1_000_000).toFixed(1) + 'M';
+            if (n >= 1_000) return '₦' + (n/1_000).toFixed(0) + 'K';
+            return '₦' + Number(n).toLocaleString();
+          };
+          const fmtTime = (s) => {
+            if (s == null) return '—';
+            if (s < 60) return Math.round(s) + 's';
+            if (s < 3600) return (s/60).toFixed(1) + 'm';
+            return (s/3600).toFixed(1) + 'h';
+          };
+          document.getElementById('sc-ngn-closed').textContent = fmtNgn(sc.ngn_closed);
+          document.getElementById('sc-bookings').textContent   = (sc.bookings_closed || 0) + ' booking' + (sc.bookings_closed === 1 ? '' : 's');
+          document.getElementById('sc-hours').textContent      = (sc.hours_saved || 0).toFixed(1) + 'h';
+          document.getElementById('sc-drafts').textContent     = (sc.drafts_approved || 0) + ' drafts approved';
+          document.getElementById('sc-response').textContent   = fmtTime(sc.median_response_seconds);
+          document.getElementById('sc-approval').textContent   = sc.approval_rate ? Math.round(sc.approval_rate * 100) + '%' : '—';
+          const actioned = (sc.drafts_approved || 0) + (sc.drafts_edited || 0) + (sc.drafts_skipped || 0);
+          document.getElementById('sc-approval-sub').textContent = actioned + ' actioned';
+          document.getElementById('sc-pending').textContent    = fmtNgn(sc.ngn_pending);
+          document.getElementById('sc-cost').textContent       = fmtNgn(sc.cost_per_booking_ngn);
+          document.getElementById('sc-export').href = `/portal/{{ token }}/scorecard.html`;
+        } catch (e) {
+          console.error('scorecard load failed', e);
+        }
+      })();
+    </script>
+
     <!-- Owner Brief — cash headline -->
     <div class="section-label">Owner Brief — today</div>
     <div id="owner-brief-card" style="background:linear-gradient(135deg,#181818 0%,#111 100%);border:1px solid #2a3340;border-radius:12px;padding:24px;margin-bottom:24px;">
