@@ -168,6 +168,50 @@ async def whatsapp_inbound(request: Request):
 
     is_meta = payload.get("object") == "whatsapp_business_account"
 
+    # ── Voice-note transcription (T0.1) — runs FIRST so transcript becomes text ──
+    # If the inbound carries a voice note / audio attachment, transcribe it via
+    # Whisper and substitute the transcript as the message body so every
+    # downstream handler (Closer intake, rent matcher, invoice matcher, drafter)
+    # treats it identically to a typed message. Keyed by sender_phone.
+    voice_transcripts: dict[str, str] = {}  # sender_phone → transcript text
+    try:
+        if is_meta:
+            from tools.inbound_media import extract_meta_audio, download_meta_media
+            from tools.voice_whisper import transcribe_voice_note, format_for_draft
+            for sender, _body, raw_msg in _parse_meta(payload):
+                aud = extract_meta_audio(raw_msg)
+                if not aud:
+                    continue
+                media_id, mime = aud
+                try:
+                    audio_bytes, fetched_mime = await download_meta_media(media_id)
+                    tr = await transcribe_voice_note(audio_bytes, fetched_mime or mime)
+                    if tr and tr.text:
+                        voice_transcripts[sender] = format_for_draft(tr)
+                        log.info("voice_note_transcribed", sender=sender,
+                                 dur=tr.duration_seconds, chars=len(tr.text))
+                except Exception as e:
+                    log.error("meta_audio_pipeline_failed", error=str(e), sender=sender)
+        else:
+            from tools.inbound_media import extract_unipile_audio, download_unipile_attachment
+            from tools.voice_whisper import transcribe_voice_note, format_for_draft
+            data = payload.get("data", {})
+            sender_p = data.get("from") or payload.get("from")
+            aud = extract_unipile_audio(data)
+            if sender_p and aud:
+                msg_id, att_id, mime = aud
+                try:
+                    audio_bytes, fetched_mime = await download_unipile_attachment(msg_id, att_id)
+                    tr = await transcribe_voice_note(audio_bytes, fetched_mime or mime)
+                    if tr and tr.text:
+                        voice_transcripts[sender_p] = format_for_draft(tr)
+                        log.info("voice_note_transcribed", sender=sender_p,
+                                 dur=tr.duration_seconds, chars=len(tr.text))
+                except Exception as e:
+                    log.error("unipile_audio_pipeline_failed", error=str(e), sender=sender_p)
+    except Exception as e:
+        log.error("inbound_audio_dispatch_crashed", error=str(e))
+
     # ── Receipt Catcher: images get processed FIRST, separately from text ────
     # If the inbound message is an image (or has an image attachment), run the
     # Receipt Catcher pipeline. If it's a pure image (no caption), we short-circuit.
@@ -219,7 +263,12 @@ async def whatsapp_inbound(request: Request):
         for sender, body, _raw in _parse_meta(payload):
             effective_body = body
             skip_ad = False
-            if sender in image_handled_for and not (body or "").strip():
+            # Voice transcript takes precedence over empty/null body. If the
+            # customer included a caption AND a voice note, concatenate.
+            if sender in voice_transcripts:
+                v_text = voice_transcripts[sender]
+                effective_body = f"{v_text}\n\n{body}".strip() if (body or "").strip() else v_text
+            elif sender in image_handled_for and not (body or "").strip():
                 effective_body = synthetic_body
                 skip_ad = True
             messages_to_process.append((sender, effective_body, "meta", skip_ad))
@@ -227,7 +276,10 @@ async def whatsapp_inbound(request: Request):
         sender, body, account_id = _parse_unipile(payload)
         effective_body = body
         skip_ad = False
-        if sender in image_handled_for and not (body or "").strip():
+        if sender in voice_transcripts:
+            v_text = voice_transcripts[sender]
+            effective_body = f"{v_text}\n\n{body}".strip() if (body or "").strip() else v_text
+        elif sender in image_handled_for and not (body or "").strip():
             effective_body = synthetic_body
             skip_ad = True
         messages_to_process.append((sender, effective_body, account_id, skip_ad))

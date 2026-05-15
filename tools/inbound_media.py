@@ -89,6 +89,22 @@ def extract_meta_image(msg: dict) -> tuple[str, str] | None:
     return media_id, mime
 
 
+def extract_meta_audio(msg: dict) -> tuple[str, str] | None:
+    """Pull (media_id, mime_type) from a Meta inbound message, if it's audio/voice.
+
+    Meta delivers WhatsApp voice notes as type=='audio' with `audio` payload.
+    Some carriers also send normal audio recordings under the same type.
+    """
+    if msg.get("type") not in {"audio", "voice"}:
+        return None
+    audio = msg.get("audio") or msg.get("voice") or {}
+    media_id = audio.get("id")
+    mime = audio.get("mime_type") or "audio/ogg"
+    if not media_id:
+        return None
+    return media_id, mime
+
+
 def extract_unipile_image(data: dict) -> tuple[str, str, str] | None:
     """
     Pull (message_id, attachment_id, mime_type) from a Unipile inbound payload,
@@ -110,3 +126,24 @@ def extract_unipile_image(data: dict) -> tuple[str, str, str] | None:
     if not (msg_id and att_id):
         return None
     return msg_id, att_id, mime or "image/jpeg"
+
+
+def extract_unipile_audio(data: dict) -> tuple[str, str, str] | None:
+    """Pull (message_id, attachment_id, mime_type) from a Unipile inbound payload,
+    if the first attachment is an audio file (voice note / recording).
+
+    Voice notes from WhatsApp via Unipile typically carry mimetype starting with
+    'audio/' — common values: 'audio/ogg', 'audio/mpeg', 'audio/mp4', 'audio/m4a'.
+    """
+    attachments = data.get("attachments") or []
+    if not attachments:
+        return None
+    first = attachments[0]
+    mime = (first.get("mimetype") or first.get("mime_type") or "").lower()
+    if not mime.startswith("audio/"):
+        return None
+    msg_id = data.get("id") or data.get("message_id")
+    att_id = first.get("id")
+    if not (msg_id and att_id):
+        return None
+    return msg_id, att_id, mime or "audio/ogg"

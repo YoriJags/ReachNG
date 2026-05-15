@@ -71,6 +71,9 @@ class Settings(BaseSettings):
     # Gemini Flash (cheap extraction — PDF parsing, data scraping)
     gemini_api_key: str | None = Field(default=None, env="GEMINI_API_KEY")
 
+    # OpenAI — Whisper transcription for inbound voice notes (T0.1)
+    openai_api_key: str | None = Field(default=None, env="OPENAI_API_KEY")
+
     # WhatsApp inbound webhook verify token (Meta handshake) — set WEBHOOK_VERIFY_TOKEN in env
     webhook_verify_token: str | None = Field(default=None, env="WEBHOOK_VERIFY_TOKEN")
 
