@@ -337,6 +337,27 @@ async def client_portal(token: str, request: Request):
     return templates.TemplateResponse(request, "portal.html", {"token": token, "client_name": client_name, "vertical": vertical})
 
 
+@router.get("/{token}/configure", response_class=HTMLResponse)
+async def configure_page(token: str, request: Request):
+    """Client-facing AI Configuration page — KB upload, Rules, Scenarios, Sandbox.
+
+    Single dedicated page (not embedded in portal.html) so the config UX has room
+    to breathe and so existing portal layouts don't risk breakage.
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found")
+    templates = request.app.state.templates
+    return templates.TemplateResponse(
+        request, "portal_configure.html",
+        {
+            "token":       token,
+            "client_name": client["name"],
+            "vertical":    client.get("vertical") or "general",
+        },
+    )
+
+
 # ─── Portal HTML ──────────────────────────────────────────────────────────────
 
 def _portal_html(token: str, client_name: str, vertical: str, demo: bool = False) -> str:

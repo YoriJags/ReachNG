@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configure your ReachNG agent — {{ client_name }}</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-2: #111;
+    --surface: #141414;
+    --surface-2: #181818;
+    --border: #1f2530;
+    --border-strong: #2a3340;
+    --text: #e8e8e8;
+    --text-strong: #fff;
+    --muted: #6a7280;
+    --muted-strong: #9aa0a8;
+    --accent: #ff5500;
+    --accent-soft: #ff8c42;
+    --green: #5dd28a;
+    --amber: #ffb84d;
+    --red:   #ff7a7a;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-soft); }
+
+  /* ── Topbar ─────────────────────────────────── */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,10,10,0.94); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .topbar .brand { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: var(--text-strong); }
+  .topbar .brand span { color: var(--accent); }
+  .topbar .meta {
+    font-size: 11px; color: var(--muted-strong); text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .topbar .back {
+    font-size: 12px; color: var(--muted-strong);
+  }
+
+  /* ── Hero ───────────────────────────────────── */
+  .hero { padding: 48px 24px 24px; max-width: 1100px; margin: 0 auto; }
+  .hero .eyebrow {
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-size: 38px; line-height: 1.1; margin: 0 0 12px;
+    color: var(--text-strong); letter-spacing: -0.8px; font-weight: 700;
+  }
+  .hero p { color: var(--muted-strong); font-size: 16px; max-width: 720px; margin: 0; }
+
+  /* ── Tabs ───────────────────────────────────── */
+  .tabs-wrap {
+    border-bottom: 1px solid var(--border);
+    margin: 0 auto; max-width: 1100px; padding: 0 24px;
+    display: flex; gap: 2px;
+    overflow-x: auto;
+  }
+  .tab {
+    background: transparent; border: none; color: var(--muted-strong);
+    padding: 14px 18px; font-size: 14px; font-weight: 600;
+    cursor: pointer; border-bottom: 2px solid transparent;
+    white-space: nowrap; transition: 0.15s;
+  }
+  .tab:hover { color: var(--text-strong); }
+  .tab.active { color: var(--text-strong); border-bottom-color: var(--accent); }
+
+  /* ── Sections ──────────────────────────────── */
+  .panel { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+  .panel-pane { display: none; }
+  .panel-pane.active { display: block; }
+  .panel-h2 {
+    font-size: 22px; margin: 0 0 6px; color: var(--text-strong);
+    font-weight: 700; letter-spacing: -0.3px;
+  }
+  .panel-sub { color: var(--muted-strong); font-size: 14px; margin: 0 0 24px; max-width: 720px; line-height: 1.65; }
+
+  /* ── Card / form ───────────────────────────── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 20px; margin-bottom: 16px;
+  }
+  .card h3 { margin: 0 0 6px; font-size: 15px; color: var(--text-strong); font-weight: 700; }
+  .card-meta { font-size: 12px; color: var(--muted); }
+  .row { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 12px; }
+  @media (min-width: 720px) { .row.two { grid-template-columns: 1fr 1fr; } }
+  label {
+    display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin-bottom: 6px; font-weight: 600;
+  }
+  input[type=text], input[type=file], textarea, select {
+    width: 100%; background: var(--bg-2); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 12px; border-radius: 6px;
+    font-size: 14px; font-family: inherit;
+  }
+  textarea { min-height: 92px; resize: vertical; }
+  input:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--accent); background: #161616;
+  }
+  .btn {
+    display: inline-block; background: var(--accent); color: #fff;
+    border: none; padding: 10px 16px; border-radius: 6px;
+    font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: 0.02em;
+    transition: 0.15s;
+  }
+  .btn:hover { background: var(--accent-soft); }
+  .btn.ghost { background: transparent; color: var(--text-strong); border: 1px solid var(--border-strong); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.danger { background: transparent; color: var(--red); border: 1px solid #4a2020; padding: 6px 10px; font-size: 12px; }
+  .btn.danger:hover { background: rgba(255,122,122,0.08); }
+  .pill {
+    display: inline-block; background: #1d2330; color: var(--muted-strong);
+    font-size: 10px; padding: 3px 8px; border-radius: 999px;
+    text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+  }
+  .pill.live { background: rgba(93,210,138,0.14); color: var(--green); }
+  .pill.warn { background: rgba(255,184,77,0.14); color: var(--amber); }
+
+  /* ── List rows ─────────────────────────────── */
+  .list-row {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 16px; padding: 14px 0; border-top: 1px solid var(--border);
+  }
+  .list-row:first-child { border-top: none; }
+  .list-row .body { flex: 1; min-width: 0; }
+  .list-row .body strong { color: var(--text-strong); }
+  .list-row .body small { color: var(--muted); font-size: 12px; }
+  .list-row .actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  /* ── Sandbox ───────────────────────────────── */
+  .sandbox-out {
+    background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; margin-top: 12px;
+    white-space: pre-wrap; font-size: 14px; color: var(--text-strong);
+    min-height: 80px;
+  }
+  .sandbox-meta { font-size: 12px; color: var(--muted); margin-top: 8px; display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .empty {
+    padding: 28px; text-align: center; color: var(--muted);
+    border: 1px dashed var(--border); border-radius: 10px; font-size: 13px;
+  }
+
+  .scenario {
+    border: 1px solid var(--border); border-radius: 10px; padding: 16px;
+    margin-bottom: 12px; background: var(--surface);
+  }
+  .scenario h4 { margin: 0 0 6px; color: var(--text-strong); font-size: 15px; font-weight: 700; }
+  .scenario p  { color: var(--muted-strong); font-size: 13px; margin: 0 0 12px; line-height: 1.6; }
+  .scenario .activated { font-size: 12px; color: var(--green); }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="brand">Reach<span>NG</span></div>
+  <div class="meta">Configure · {{ vertical|replace('_',' ')|title }}</div>
+  <a class="back" href="/portal/{{ token }}">← Dashboard</a>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">Tell the agent how to think</div>
+  <h1>Configure your AI for {{ client_name }}.</h1>
+  <p>Upload the documents your agent should know about, write rules that shape every reply, switch on prebuilt scenarios for your industry, and test the agent live in the sandbox — all without redeploying anything.</p>
+</div>
+
+<div class="tabs-wrap">
+  <button class="tab active" data-pane="kb">Knowledge Base</button>
+  <button class="tab" data-pane="rules">Rules</button>
+  <button class="tab" data-pane="scenarios">Scenarios</button>
+  <button class="tab" data-pane="sandbox">Sandbox</button>
+</div>
+
+<div class="panel">
+
+  <!-- ── KB ─────────────────────────────────── -->
+  <div class="panel-pane active" data-pane="kb">
+    <h2 class="panel-h2">Knowledge Base</h2>
+    <p class="panel-sub">Upload menus, FAQs, pricing sheets, refund policies, anything the agent should know verbatim. We chunk and index automatically. At reply time, the agent fetches the most relevant chunk and quotes from it.</p>
+
+    <div class="card">
+      <h3>Add a document</h3>
+      <div class="row two">
+        <div>
+          <label>Title</label>
+          <input id="kb-title" type="text" placeholder="e.g. Refund Policy 2026">
+        </div>
+        <div>
+          <label>Tags (comma-separated, optional)</label>
+          <input id="kb-tags" type="text" placeholder="refund, policy, customer">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Paste content</label>
+          <textarea id="kb-paste" placeholder="Paste menu items, policy text, FAQ entries, pricing rules… Anything the agent should know."></textarea>
+        </div>
+      </div>
+      <div class="row two">
+        <div>
+          <label>Or upload PDF / .txt / .md</label>
+          <input id="kb-file" type="file" accept=".pdf,.txt,.md,.csv,.html">
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px;">
+          <button class="btn" onclick="kbSubmit()">Add to KB</button>
+        </div>
+      </div>
+      <div id="kb-msg" style="margin-top:8px;font-size:12px;color:var(--muted);"></div>
+    </div>
+
+    <h3 style="font-size:14px;color:var(--muted-strong);margin:24px 0 8px;text-transform:uppercase;letter-spacing:0.08em;">Documents in your KB</h3>
+    <div id="kb-list"></div>
+  </div>
+
+  <!-- ── Rules ─────────────────────────────────── -->
+  <div class="panel-pane" data-pane="rules">
+    <h2 class="panel-h2">Rules</h2>
+    <p class="panel-sub">Write IF-THEN rules in plain English. The agent treats them as instructions that override the default playbook. Examples: <em>"If someone asks about refunds, offer 50% within 7 days, 25% within 14, none after."</em> · <em>"Never quote prices on weekends — always escalate."</em></p>
+
+    <div class="card">
+      <h3>Add a rule</h3>
+      <div class="row two">
+        <div>
+          <label>Name</label>
+          <input id="rule-name" type="text" placeholder="Weekend pricing escalation">
+        </div>
+        <div>
+          <label>Trigger keywords (comma-separated, optional)</label>
+          <input id="rule-kws" type="text" placeholder="price, quote, cost">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Behavior — what should the agent do?</label>
+          <textarea id="rule-behavior" placeholder="When someone asks for pricing on a weekend, do NOT quote — tell them the team will respond with pricing on Monday morning and escalate to me."></textarea>
+        </div>
+      </div>
+      <div class="row two">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input id="rule-escalate" type="checkbox" style="width:auto;">
+          <label style="margin:0;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text);">Also flag for owner escalation</label>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px;">
+          <button class="btn" onclick="ruleSubmit()">Add Rule</button>
+        </div>
+      </div>
+      <div id="rule-msg" style="margin-top:8px;font-size:12px;color:var(--muted);"></div>
+    </div>
+
+    <h3 style="font-size:14px;color:var(--muted-strong);margin:24px 0 8px;text-transform:uppercase;letter-spacing:0.08em;">Active rules</h3>
+    <div id="rule-list"></div>
+  </div>
+
+  <!-- ── Scenarios ─────────────────────────────────── -->
+  <div class="panel-pane" data-pane="scenarios">
+    <h2 class="panel-h2">Scenario library</h2>
+    <p class="panel-sub">Prebuilt rule bundles for your industry. One click adds 2-4 rules tailored for common situations. You can tweak or delete any rule afterwards from the Rules tab.</p>
+    <div id="scn-list"></div>
+  </div>
+
+  <!-- ── Sandbox ─────────────────────────────────── -->
+  <div class="panel-pane" data-pane="sandbox">
+    <h2 class="panel-h2">Sandbox preview</h2>
+    <p class="panel-sub">Type a fake inbound message and see exactly what the agent would draft — using your KB, your rules, your client memory. Nothing is sent and no draft is queued.</p>
+
+    <div class="card">
+      <div class="row two">
+        <div>
+          <label>Customer name (optional)</label>
+          <input id="sbx-name" type="text" placeholder="Tunde">
+        </div>
+        <div>
+          <label>Phone (optional — pulls memory)</label>
+          <input id="sbx-phone" type="text" placeholder="+2348012345678">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Inbound message</label>
+          <textarea id="sbx-inbound" placeholder="Hi! Do you have a table for 4 this Saturday? What's the minimum spend?"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn" onclick="sbxRun()">Run sandbox</button>
+        <span id="sbx-status" style="font-size:12px;color:var(--muted);"></span>
+      </div>
+
+      <div id="sbx-out" style="display:none;">
+        <div class="sandbox-out" id="sbx-draft"></div>
+        <div class="sandbox-meta" id="sbx-meta"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TOKEN = {{ token | tojson }};
+const VERTICAL = {{ vertical | tojson }};
+
+// ── Tab switching ───────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const pane = btn.dataset.pane;
+    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.panel-pane').forEach(p => p.classList.toggle('active', p.dataset.pane === pane));
+    if (pane === 'kb') loadKB();
+    if (pane === 'rules') loadRules();
+    if (pane === 'scenarios') loadScenarios();
+  });
+});
+
+function setMsg(id, text, isError) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = isError ? 'var(--red)' : 'var(--green)';
+  setTimeout(() => { if (el.textContent === text) el.textContent = ''; }, 4500);
+}
+
+// ── KB ─────────────────────────────────────────────────────────────────────
+async function loadKB() {
+  const list = document.getElementById('kb-list');
+  list.innerHTML = '<div class="empty">Loading…</div>';
+  try {
+    const res = await fetch(`/portal/${TOKEN}/kb`);
+    const data = await res.json();
+    if (!data.documents || !data.documents.length) {
+      list.innerHTML = '<div class="empty">No documents yet. Paste content or upload your first file above.</div>';
+      return;
+    }
+    list.innerHTML = data.documents.map(d => `
+      <div class="list-row">
+        <div class="body">
+          <strong>${escapeHtml(d.title)}</strong>
+          <div><small>${d.source} · ${d.text_length || 0} chars · ${new Date(d.uploaded_at).toLocaleString()}</small></div>
+        </div>
+        <div class="actions">
+          <button class="btn danger" onclick="kbDelete('${d._id}')">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    list.innerHTML = '<div class="empty">Failed to load KB.</div>';
+  }
+}
+
+async function kbSubmit() {
+  const title = document.getElementById('kb-title').value.trim();
+  const text  = document.getElementById('kb-paste').value.trim();
+  const tags  = document.getElementById('kb-tags').value.split(',').map(s => s.trim()).filter(Boolean);
+  const file  = document.getElementById('kb-file').files[0];
+
+  if (!title) return setMsg('kb-msg', 'Title is required.', true);
+
+  try {
+    let resp;
+    if (file) {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('title', title);
+      if (tags.length) fd.append('tags', tags.join(','));
+      resp = await fetch(`/portal/${TOKEN}/kb/upload`, { method: 'POST', body: fd });
+    } else if (text) {
+      resp = await fetch(`/portal/${TOKEN}/kb/paste`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ title, text, tags }),
+      });
+    } else {
+      return setMsg('kb-msg', 'Paste content or pick a file.', true);
+    }
+    const out = await resp.json();
+    if (!resp.ok) throw new Error(out.detail || 'Upload failed');
+    setMsg('kb-msg', `Added "${out.title}" — ${out.chunks} chunks indexed.`);
+    document.getElementById('kb-title').value = '';
+    document.getElementById('kb-paste').value = '';
+    document.getElementById('kb-tags').value = '';
+    document.getElementById('kb-file').value = '';
+    loadKB();
+  } catch (e) {
+    setMsg('kb-msg', e.message || 'Failed', true);
+  }
+}
+
+async function kbDelete(id) {
+  if (!confirm('Delete this document and all its chunks?')) return;
+  await fetch(`/portal/${TOKEN}/kb/${id}`, { method: 'DELETE' });
+  loadKB();
+}
+
+// ── Rules ─────────────────────────────────────────────────────────────────
+async function loadRules() {
+  const list = document.getElementById('rule-list');
+  list.innerHTML = '<div class="empty">Loading…</div>';
+  try {
+    const res = await fetch(`/portal/${TOKEN}/rules`);
+    const data = await res.json();
+    if (!data.rules || !data.rules.length) {
+      list.innerHTML = '<div class="empty">No rules yet. Add your first rule above or activate a scenario.</div>';
+      return;
+    }
+    list.innerHTML = data.rules.map(r => `
+      <div class="card" style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+          <div style="flex:1;">
+            <strong style="color:var(--text-strong);">${escapeHtml(r.name)}</strong>
+            ${r.active ? '<span class="pill live" style="margin-left:8px;">Active</span>' : '<span class="pill" style="margin-left:8px;">Paused</span>'}
+            ${r.escalate_to_owner ? '<span class="pill warn" style="margin-left:8px;">Escalates</span>' : ''}
+            ${r.source_scenario ? `<span class="pill" style="margin-left:8px;">scenario: ${escapeHtml(r.source_scenario)}</span>` : ''}
+            <div style="margin-top:8px;font-size:13px;color:var(--muted-strong);line-height:1.65;">${escapeHtml(r.behavior_text)}</div>
+            ${r.trigger_keywords && r.trigger_keywords.length ? `<div style="margin-top:6px;font-size:11px;color:var(--muted);">Triggers: ${r.trigger_keywords.map(escapeHtml).join(', ')}</div>` : ''}
+          </div>
+          <div class="actions">
+            <button class="btn ghost" style="padding:6px 10px;font-size:12px;" onclick="ruleToggle('${r._id}', ${!r.active})">${r.active ? 'Pause' : 'Resume'}</button>
+            <button class="btn danger" onclick="ruleDelete('${r._id}')">Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    list.innerHTML = '<div class="empty">Failed to load rules.</div>';
+  }
+}
+
+async function ruleSubmit() {
+  const name = document.getElementById('rule-name').value.trim();
+  const behavior = document.getElementById('rule-behavior').value.trim();
+  const kws = document.getElementById('rule-kws').value.split(',').map(s => s.trim()).filter(Boolean);
+  const escalate = document.getElementById('rule-escalate').checked;
+  if (!name || !behavior) return setMsg('rule-msg', 'Name and behavior required.', true);
+  try {
+    const resp = await fetch(`/portal/${TOKEN}/rules`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name, behavior_text: behavior, trigger_keywords: kws, escalate_to_owner: escalate }),
+    });
+    if (!resp.ok) throw new Error('Save failed');
+    setMsg('rule-msg', 'Rule added.');
+    document.getElementById('rule-name').value = '';
+    document.getElementById('rule-behavior').value = '';
+    document.getElementById('rule-kws').value = '';
+    document.getElementById('rule-escalate').checked = false;
+    loadRules();
+  } catch (e) {
+    setMsg('rule-msg', e.message || 'Failed', true);
+  }
+}
+
+async function ruleToggle(id, active) {
+  await fetch(`/portal/${TOKEN}/rules/${id}`, {
+    method: 'PATCH', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ active }),
+  });
+  loadRules();
+}
+
+async function ruleDelete(id) {
+  if (!confirm('Delete this rule?')) return;
+  await fetch(`/portal/${TOKEN}/rules/${id}`, { method: 'DELETE' });
+  loadRules();
+}
+
+// ── Scenarios ─────────────────────────────────────────────────────────────
+async function loadScenarios() {
+  const list = document.getElementById('scn-list');
+  list.innerHTML = '<div class="empty">Loading…</div>';
+  try {
+    const res = await fetch(`/portal/${TOKEN}/scenarios`);
+    const data = await res.json();
+    if (!data.scenarios || !data.scenarios.length) {
+      list.innerHTML = `<div class="empty">No prebuilt scenarios for your vertical yet (${escapeHtml(data.vertical || 'unknown')}). Use the Rules tab to add custom ones.</div>`;
+      return;
+    }
+    list.innerHTML = data.scenarios.map(s => `
+      <div class="scenario">
+        <h4>${escapeHtml(s.label)}</h4>
+        <p>${escapeHtml(s.summary)}</p>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="btn" onclick="scnActivate('${s.key}', this)">Activate</button>
+          <small style="color:var(--muted);">${s.rules.length} rule${s.rules.length === 1 ? '' : 's'}</small>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    list.innerHTML = '<div class="empty">Failed to load scenarios.</div>';
+  }
+}
+
+async function scnActivate(key, btn) {
+  btn.disabled = true; btn.textContent = 'Activating…';
+  try {
+    const resp = await fetch(`/portal/${TOKEN}/scenarios/${key}/activate`, { method: 'POST' });
+    const out = await resp.json();
+    btn.textContent = `Added ${out.inserted} rule${out.inserted === 1 ? '' : 's'} ✓`;
+  } catch (e) {
+    btn.textContent = 'Failed';
+  }
+}
+
+// ── Sandbox ────────────────────────────────────────────────────────────────
+async function sbxRun() {
+  const inbound = document.getElementById('sbx-inbound').value.trim();
+  if (!inbound) return;
+  const name = document.getElementById('sbx-name').value.trim() || 'Guest';
+  const phone = document.getElementById('sbx-phone').value.trim() || null;
+  const status = document.getElementById('sbx-status');
+  const out = document.getElementById('sbx-out');
+  const draftEl = document.getElementById('sbx-draft');
+  const metaEl = document.getElementById('sbx-meta');
+  status.textContent = 'Running…';
+  out.style.display = 'none';
+  try {
+    const resp = await fetch(`/portal/${TOKEN}/sandbox/preview`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ inbound_text: inbound, contact_name: name, phone }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail || 'Sandbox failed');
+    draftEl.textContent = data.draft || '(no draft generated)';
+    const bits = [];
+    if (data.fired_rules && data.fired_rules.length) {
+      bits.push(`${data.fired_rules.length} rule${data.fired_rules.length === 1 ? '' : 's'} fired`);
+    }
+    if (data.kb_used) bits.push('KB used');
+    if (data.memory_used) bits.push('memory used');
+    if (data.escalate) bits.push('⚠️ would escalate to owner');
+    metaEl.innerHTML = bits.map(b => `<span class="pill">${escapeHtml(b)}</span>`).join('');
+    out.style.display = 'block';
+    status.textContent = '';
+  } catch (e) {
+    status.textContent = e.message || 'Failed';
+    status.style.color = 'var(--red)';
+  }
+}
+
+// ── Util ───────────────────────────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Initial load
+loadKB();
+</script>
+</body>
+</html>
