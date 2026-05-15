@@ -62,6 +62,26 @@ Total ~12 days. Goal: move from "great Lagos SDR" → "addictive, impossible-to-
 
   Classifier is a single Haiku call (~200ms, ~₦2/call). Output injected into prompt as a `TONE GUIDANCE` block. Angry → auto-escalate, draft includes apology framing. Hot → brisk + confident, propose deposit. Drafts surface badges in HITL queue so owner sees the read at a glance. Files: new `services/inbound_classifier.py`, wire into `agent/brain.py` and `services/closer/brain.py` before draft generation.
 
+- [ ] **T0.2.5 Usage Quota & Tiered Billing System** (~3 days) — Critical economics safeguard raised 2026-05-15.
+  - **Layer 1 — per-plan monthly soft caps**: `clients.usage_limits` doc per feature (drafts, voice, receipts, classifier, memory_extract, sends). Plan defaults: Starter (1500 drafts / 200 voice / 200 receipts) → Growth (5000 / 800 / 1000) → Scale (unlimited / 3000 / unlimited). Overridable per client.
+  - **Layer 2 — real-time rate limits (anti-runaway)**: ungated hard ceilings. Max 20 voice/10min, 50 vision/hr, 100 drafts/hr per client. Trip = log + alert + 30-min auto-pause.
+  - **Layer 3 — owner-opt-in overage billing**: at-cap clients can toggle pay-as-you-go in portal (₦12/voice, ₦15/receipt, ₦6/draft) with a monthly ceiling cap. Overage billed via Paystack at month-end.
+  - **Graceful degradation when over cap + no overage**: voice → "voice note received, please listen"; receipt → "screenshot received, match manually"; drafts → owner can send manually, no AI.
+  - **80% warning WhatsApp**: owner gets a heads-up when any feature hits 80% of monthly cap, with one-tap upgrade and one-tap enable-overage.
+  - **Collections**: `usage_events` (per-call, indexed by client_id+feature+ts), `usage_quotas` (current-month totals, hourly materialised), `usage_overage_consent`.
+  - **Service**: `services/usage_meter.py` with `@meter(feature)` decorator. Pre-call: check quota + rate. Post-call: record event with actual cost. Single decorator wraps every cost-incurring call.
+  - **Wire-up**: Whisper, Receipt vision, Inbound Classifier, Drafter, Memory extractor.
+  - **UI**: usage bar chart per feature in owner portal, "enable overage" toggle, dashboard Control Tower per-client usage strip (green/amber/red).
+  - **Files**: new `services/usage_meter.py`, new `api/usage.py`, hooks in `tools/voice_whisper.py` + `tools/receipt_vision.py` + `services/inbound_classifier.py` + `agent/brain.py` + `services/client_memory.py`, portal usage tab, dashboard usage strip.
+
+- [ ] **T0.2.6 Custom-named Engine ("you bought an employee — name them")** (~2 hours) — Raised 2026-05-15. If we're selling an agentic employee, owners should be able to name them. Like Artisan's "Ava," like Lindy. Make ReachNG personal.
+  - **Schema**: `clients.agent_name` field, default `"ReachNG"`. Validated: 1-20 chars, alphanumeric + space.
+  - **Prompt injection**: every drafter call adds `Your name is {agent_name}. When introducing yourself or signing off, use this name.` to the system prompt. Inject in `agent/brain.py` + `services/closer/brain.py` after the brief block.
+  - **Surfaces**: HITL queue header (*"{agent_name} drafted this for {customer}"*), Owner Brief WhatsApp ("Morning, here's what {agent_name} did overnight"), Weekly Digest, Milestone messages, portal nav badge, scorecard PDF.
+  - **Portal Settings UI**: one input field, save → persists, takes effect on next draft.
+  - **Brand-safe defaults**: until owner sets a name, signs off generically ("the team at {business_name}"). Never says "ReachNG" in customer-facing messages.
+  - **Files**: `clients` schema, `agent/brain.py` + `services/closer/brain.py` (prompt prefix), portal Settings tab, `services/weekly_digest.py` + `services/milestone_engine.py` (use agent_name in copy).
+
 - [ ] **T0.3 Predictive co-pilot — chat with your agent** (~2 days) — Conversational owner→agent interface. Owner types into a chatbox in the dashboard:
   - "Who hasn't replied to me in 5 days?" → ranked list
   - "Show me leads I should call today" → 3 names + reasons
