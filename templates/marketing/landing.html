@@ -31,25 +31,62 @@
   </div>
   <p style="margin-top: 28px; font-size: 12px; color: var(--muted); letter-spacing: 0.04em;">Onboarding in small batches · Lagos only · Hand-built first 30 days</p>
 
-  <!-- Rotating proof strip — the four frames -->
-  <div style="margin-top: 48px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; max-width: 980px; margin-left: auto; margin-right: auto; text-align: left;">
-    <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; background: var(--surface);">
-      <div style="font-size: 11px; color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">⚡ Speed</div>
-      <p style="margin: 0; font-size: 13px; color: var(--muted-strong); line-height: 1.6;">Customer asked the price. <strong style="color:var(--text-strong)">EYO replied in 9 seconds</strong> — with your account number already in the message.</p>
+  <!-- Show-don't-tell: live-looking HITL approval mock -->
+  <div style="margin-top: 56px; max-width: 920px; margin-left: auto; margin-right: auto;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; text-align: left;" class="mock-grid">
+
+      <!-- Customer's incoming message -->
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; box-shadow: 0 8px 24px rgba(0,0,0,0.04);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#a8e6cf,#56cfa1); display:flex; align-items:center; justify-content:center; font-weight:700; color:#0a3d2a; font-size: 13px;">FA</div>
+            <div>
+              <div style="font-size: 13px; font-weight: 600; color: var(--text-strong);">Funke Adebayo</div>
+              <div style="font-size: 11px; color: var(--muted);">+234 803 ••• 41 · WhatsApp</div>
+            </div>
+          </div>
+          <div style="font-size: 11px; color: var(--muted);">11:47 PM</div>
+        </div>
+        <div style="background: #25D366; color: #fff; padding: 12px 14px; border-radius: 12px 12px 12px 4px; font-size: 14px; line-height: 1.5; max-width: 92%;">
+          🎤 Voice note · 0:34<br>
+          <span style="opacity: 0.85; font-size: 12px; font-style: italic; line-height: 1.6; display: block; margin-top: 6px;">"Hi, I want to book your rooftop for Saturday around 9pm, table of 6 — it's my friend's birthday. Do you still have something near the DJ booth? And how much is the deposit?"</span>
+        </div>
+        <div style="margin-top: 12px; font-size: 11px; color: var(--muted); display:flex; gap: 10px; align-items: center;">
+          <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#5dd28a;display:inline-block;"></span> Transcribed in 2.4s</span>
+          <span>·</span>
+          <span style="color: #ff5500; font-weight: 600;">🔥 HOT · qualifying</span>
+        </div>
+      </div>
+
+      <!-- EYO's draft awaiting tap -->
+      <div style="background: var(--surface); border: 1px solid var(--orange); border-radius: 14px; padding: 20px 22px; box-shadow: 0 12px 32px rgba(255,85,0,0.12); position: relative;">
+        <div style="position: absolute; top: -10px; left: 18px; background: var(--orange); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 100px; text-transform: uppercase;">EYO drafted · awaiting your tap</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; margin-bottom: 14px;">
+          <div style="font-size: 12px; color: var(--muted-strong);">Reply as <strong style="color: var(--text-strong);">Altitude Lagos</strong></div>
+          <div style="font-size: 11px; color: var(--muted);">drafted 9s ago</div>
+        </div>
+        <div style="background: var(--bg-2); border: 1px solid var(--border); padding: 14px 16px; border-radius: 10px; font-size: 13.5px; line-height: 1.65; color: var(--text-strong);">
+          Hey Funke! Yes, we have one DJ-booth booth left for Saturday 9pm — perfect for 6. Bottle minimum is ₦180,000 and we hold the table with a <strong>₦90,000 deposit</strong>.<br><br>
+          Send to <strong>GTBank · 0123456789 · Altitude Lagos Ltd</strong> and screenshot back — table's locked the moment it lands. 🎉
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 16px;">
+          <button style="flex:1; background: var(--orange); color:#fff; border:0; padding: 12px; border-radius: 9px; font-weight: 700; font-size: 13px; cursor: pointer; letter-spacing: 0.02em;">✓ Approve &amp; send</button>
+          <button style="background: transparent; color: var(--muted-strong); border: 1px solid var(--border); padding: 12px 14px; border-radius: 9px; font-weight: 600; font-size: 13px; cursor: pointer;">Edit</button>
+          <button style="background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 12px 14px; border-radius: 9px; font-weight: 600; font-size: 13px; cursor: pointer;">Skip</button>
+        </div>
+      </div>
+
     </div>
-    <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; background: var(--surface);">
-      <div style="font-size: 11px; color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">📉 Loss</div>
-      <p style="margin: 0; font-size: 13px; color: var(--muted-strong); line-height: 1.6;">Lagos SMEs lose <strong style="color:var(--text-strong)">40% of bookings</strong> to slow replies. EYO closes them before the customer scrolls away.</p>
-    </div>
-    <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; background: var(--surface);">
-      <div style="font-size: 11px; color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">📱 Pocket-mode</div>
-      <p style="margin: 0; font-size: 13px; color: var(--muted-strong); line-height: 1.6;">Approve sales <strong style="color:var(--text-strong)">from the back of a meeting</strong>, the school run, the bus, or bed. One tap. Sent.</p>
-    </div>
-    <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; background: var(--surface);">
-      <div style="font-size: 11px; color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">🌙 Off-hours</div>
-      <p style="margin: 0; font-size: 13px; color: var(--muted-strong); line-height: 1.6;">11:47pm enquiry? Sunday morning? Owambe Saturday? <strong style="color:var(--text-strong)">EYO already drafted the reply.</strong></p>
-    </div>
+    <p style="text-align: center; margin-top: 22px; font-size: 13px; color: var(--muted-strong); line-height: 1.65;">
+      ↑ This is what your phone shows you. Customer messages. EYO drafts. You tap. <strong style="color: var(--text-strong);">That's the whole product.</strong>
+    </p>
   </div>
+
+  <style>
+    @media (max-width: 720px) {
+      .mock-grid { grid-template-columns: 1fr !important; }
+    }
+  </style>
 
   <p id="wl-counter" style="margin-top: 14px; font-size: 13px; color: var(--muted-strong); letter-spacing: 0.02em; display: none;">
     <span style="display:inline-flex;align-items:center;gap:8px;">
