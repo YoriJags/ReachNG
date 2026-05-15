@@ -96,6 +96,7 @@ def queue_draft(
     profile_url: str | None = None,
     client_name: str | None = None, # required for prospecting gate; optional for transactional
     inbound_context: str | None = None, # inbound message that triggered this draft (for autopilot classifier)
+    classification: dict | None = None, # emotion/stage/urgency read from inbound_classifier (T0.2)
 ) -> str:
     """Store a generated message as a pending approval. Returns approval _id.
 
@@ -149,6 +150,9 @@ def queue_draft(
         "expires_at":    datetime.now(timezone.utc) + timedelta(hours=DRAFT_EXPIRY_HOURS),
         "actioned_at":   None,
         "edited_message": None,
+        # T0.2 — emotion / stage / urgency read of the inbound that triggered this draft
+        "classification": classification,
+        "escalated":      bool(classification and classification.get("escalate")),
     })
     log.info("draft_queued", contact=contact_name, channel=channel, source=source)
     return str(result.inserted_id)

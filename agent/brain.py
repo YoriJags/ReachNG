@@ -744,6 +744,15 @@ def handle_payment_reply(
         "rent_collector": "rent",
     }.get(product, "payment")
 
+    # ── Emotional read on the inbound (T0.2) ─────────────────────────────────
+    tone_block = ""
+    try:
+        from services.inbound_classifier import classify_inbound, format_tone_block
+        c = classify_inbound(reply_text, vertical=product)
+        tone_block = "\n\n" + format_tone_block(c) + "\n"
+    except Exception as _exc:
+        log.warning("classifier_inject_payment_failed", error=str(_exc))
+
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=400,
@@ -753,9 +762,10 @@ def handle_payment_reply(
                 f"You are a professional payment assistant for a Nigerian business. "
                 f"A debtor named {debtor_name} replied to a {product_label} reminder. "
                 f"Amount owed: ₦{amount_ngn:,.0f}. Due date: {due_date}.\n\n"
-                f"Their reply: \"{reply_text}\"\n\n"
-                f"Classify the reply and write a short, professional WhatsApp response in Nigerian English. "
-                f"Be warm but firm. Never aggressive. Max 3 sentences for the auto_reply.\n\n"
+                f"Their reply: \"{reply_text}\"\n"
+                f"{tone_block}"
+                f"\nClassify the reply and write a short, professional WhatsApp response in Nigerian English. "
+                f"Be warm but firm. Never aggressive. Honour the TONE GUIDANCE above. Max 3 sentences for the auto_reply.\n\n"
                 f"Return JSON only:\n"
                 f"{{\n"
                 f"  \"intent\": \"payment_claim\" | \"payment_plan_request\" | \"question\" | \"dispute\" | \"other\",\n"

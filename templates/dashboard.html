@@ -4930,13 +4930,34 @@ function renderApprovals(approvals) {
       ? `<span style="font-size:10px;background:#1a2a40;color:#4a90d9;border-radius:4px;padding:1px 6px;margin-left:6px;">${a.platform || "social"}</span>`
       : "";
 
+    // Emotion / stage / urgency badge (T0.2 — inbound classifier)
+    let emoBadge = "";
+    let escalationBanner = "";
+    if (a.classification) {
+      const c = a.classification;
+      const emoji = {
+        happy:"😊", neutral:"💬", frustrated:"😤", angry:"🔥",
+        first_touch:"👋", qualifying:"🔎", negotiating:"🤝", closing:"💸",
+        post_sale:"📦", complaint:"⚠️",
+        idle:"🌿", interested:"📈", hot:"🔥", on_fire:"🚨",
+      };
+      const bg = c.escalate ? "#3a1010" : "#0f1a26";
+      const fg = c.escalate ? "#ff7a7a" : "#7cb8ff";
+      emoBadge = `<div style="margin:6px 0 10px;font-size:11px;color:${fg};background:${bg};border:1px solid ${c.escalate ? "#5a2020" : "#1e2530"};border-radius:6px;padding:4px 9px;display:inline-flex;gap:8px;align-items:center;font-family:'JetBrains Mono',monospace;letter-spacing:0.03em;">${emoji[c.sentiment]||""} ${c.sentiment} · ${emoji[c.stage]||""} ${(c.stage||"").replace(/_/g," ")} · ${emoji[c.urgency]||""} ${(c.urgency||"").replace(/_/g," ")}</div>`;
+      if (c.escalate) {
+        escalationBanner = `<div style="margin:6px 0;font-size:11px;color:#ff7a7a;background:#2a0808;border-left:3px solid #ff5050;padding:6px 10px;border-radius:4px;">⚠ Owner attention recommended — ${c.reasoning || "elevated emotion or urgency"}</div>`;
+      }
+    }
+
     return `
-    <div class="approval-card">
+    <div class="approval-card" ${a.escalated ? 'style="border-left-color:#ff5050;"' : ""}>
       <div class="approval-header">
         <span class="approval-name">${a.contact_name || "Unknown"}</span>
         <span style="font-size:11px;color:#4a6070;">${channel}${sourceBadge}${igBadge}${profileLink}</span>
       </div>
       <div class="approval-meta">${sourceLabel(a)} &nbsp;·&nbsp; ${created}</div>
+      ${emoBadge}
+      ${escalationBanner}
       ${postCtx}
       ${subject}
       <div class="approval-message">${msg}</div>

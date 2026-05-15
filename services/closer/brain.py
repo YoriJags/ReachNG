@@ -15,6 +15,7 @@ and approves, edits, or skips. No outbound goes without a human tap.
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from typing import Optional
 
 import anthropic
@@ -156,6 +157,46 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
         except Exception as _e:
             log.warning("rules_inject_closer_failed", lead=lead_id, error=str(_e))
 
+    # ── Emotional read on the latest inbound (T0.2) ────────────────────────
+    classification_dict: Optional[dict] = None
+    try:
+        from services.inbound_classifier import classify_inbound, format_tone_block
+        if last_inbound and last_inbound.strip():
+            # Build a small thread-context window for sharper classification
+            recent_ctx = ""
+            try:
+                tail = (lead.get("thread") or [])[-4:]
+                recent_ctx = "\n".join(
+                    f"{(ev.get('direction') or '?')}: {(ev.get('body') or '')[:140]}"
+                    for ev in tail if ev.get("body")
+                )
+            except Exception:
+                recent_ctx = ""
+            c = classify_inbound(
+                last_inbound,
+                vertical=lead.get("vertical"),
+                recent_context=recent_ctx or None,
+                contact_name=contact_name,
+            )
+            classification_dict = c.to_dict()
+            system_prompt = system_prompt + "\n\n" + format_tone_block(c)
+            # Persist on the lead doc for HITL queue badges + auto-escalation.
+            try:
+                from database import get_db as _gdb
+                from bson import ObjectId
+                update = {"$set": {"last_classification": classification_dict,
+                                    "last_classified_at": datetime.now(timezone.utc)}}
+                if c.escalate:
+                    update["$set"]["escalation_flag"] = True
+                    update["$set"]["escalation_reason"] = (
+                        f"emotion read: {c.sentiment}/{c.stage}/{c.urgency}"
+                    )
+                _gdb()["closer_leads"].update_one({"_id": ObjectId(lead_id)}, update)
+            except Exception as _e:
+                log.warning("classification_persist_failed", lead=lead_id, error=str(_e))
+    except Exception as _e:
+        log.warning("classifier_inject_closer_failed", lead=lead_id, error=str(_e))
+
     # Render the actual draft using the assembled system prompt + lead thread.
     user_prompt = _render_user_prompt(lead, intent)
     settings = get_settings()
@@ -186,6 +227,7 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
             phone=lead.get("contact_phone"),
             source="closer",
             client_name=client_name,
+            classification=classification_dict,
         )
     except BriefIncompleteError as e:
         log.warning("closer_draft_blocked_brief", lead=lead_id, blockers=e.blockers)
