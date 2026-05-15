@@ -30,6 +30,25 @@
     <a href="/portal/demo" class="btn btn-ghost" target="_blank">See it run — 90 seconds</a>
   </div>
   <p style="margin-top: 28px; font-size: 12px; color: var(--muted); letter-spacing: 0.04em;">Onboarding in small batches · Lagos only · Hand-built first 30 days</p>
+  <p id="wl-counter" style="margin-top: 14px; font-size: 13px; color: var(--muted-strong); letter-spacing: 0.02em; display: none;">
+    <span style="display:inline-flex;align-items:center;gap:8px;">
+      <span style="width:8px;height:8px;border-radius:50%;background:#5dd28a;box-shadow:0 0 8px #5dd28a;display:inline-block;"></span>
+      <span><strong id="wl-count" style="color:var(--text-strong);">—</strong> Lagos businesses already on the list</span>
+    </span>
+  </p>
+  <script>
+    (async function () {
+      try {
+        const r = await fetch('/api/v1/waitlist/counter');
+        if (!r.ok) return;
+        const d = await r.json();
+        if (d.total && d.total > 0) {
+          document.getElementById('wl-count').textContent = d.total.toLocaleString();
+          document.getElementById('wl-counter').style.display = 'block';
+        }
+      } catch (e) { /* silent — counter is opportunistic */ }
+    })();
+  </script>
 </section>
 
 <!-- ── The line in the sand ─────────────────────────────────────────────── -->

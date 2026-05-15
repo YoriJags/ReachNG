@@ -141,7 +141,64 @@ def add_to_waitlist(
     _col().insert_one(doc)
     log.info("waitlist_joined", position=position, business=business_name, vertical=vertical)
     doc["_id"] = str(doc.pop("_id", "")) if "_id" in doc else ""
+
+    # ── WhatsApp confirmation (best-effort, non-blocking) ────────────────────
+    # Fire a warm "you're in" message via the platform Unipile line if a phone
+    # was given. Email confirmation is deferred to the email service when wired.
+    if phone_norm:
+        _send_waitlist_confirmation_async(
+            phone=phone_norm,
+            name=name,
+            position=position,
+            business_name=business_name,
+        )
     return doc
+
+
+# ─── Confirmation send ───────────────────────────────────────────────────────
+
+def _compose_confirmation(name: str, position: int, business_name: str) -> str:
+    """Warm, brand-voiced confirmation. Reads like EYO from ReachNG, not a bot."""
+    first = (name or "").split()[0] if name else ""
+    greet = f"Hi {first}," if first else "Hi,"
+    return (
+        f"{greet} EYO here from ReachNG.\n\n"
+        f"You're #{position} on the waitlist — saved you a spot for {business_name}.\n\n"
+        f"We're onboarding Lagos SMEs in small batches so the first 30 days feel hand-built (because they are). "
+        f"I'll WhatsApp you the moment your spot opens, with a quick onboarding link.\n\n"
+        f"While you wait, the live demo runs the same engine on real Lagos sample data: "
+        f"www.reachng.ng/portal/demo\n\n"
+        f"Any quick question — just reply here."
+    )
+
+
+def _send_waitlist_confirmation_async(*, phone: str, name: str, position: int, business_name: str) -> None:
+    """Schedule the confirmation send without blocking the HTTP response.
+    Never raises — confirmation failure must not break waitlist signup.
+    """
+    try:
+        from tools.outreach import send_whatsapp_for_client
+        import asyncio
+
+        text = _compose_confirmation(name=name, position=position, business_name=business_name)
+
+        async def _fire():
+            try:
+                await send_whatsapp_for_client(phone=phone, message=text, client_doc=None)
+                log.info("waitlist_confirmation_sent", position=position)
+            except Exception as e:
+                log.warning("waitlist_confirmation_send_failed", position=position, error=str(e))
+
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                asyncio.ensure_future(_fire())
+            else:
+                loop.run_until_complete(_fire())
+        except RuntimeError:
+            asyncio.run(_fire())
+    except Exception as e:
+        log.warning("waitlist_confirmation_dispatch_failed", error=str(e))
 
 
 # ─── Public: stats ────────────────────────────────────────────────────────────
