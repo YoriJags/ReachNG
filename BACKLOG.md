@@ -71,8 +71,30 @@ Total ~12 days. Goal: move from "great Lagos SDR" → "addictive, impossible-to-
   - **Collections**: `usage_events` (per-call, indexed by client_id+feature+ts), `usage_quotas` (current-month totals, hourly materialised), `usage_overage_consent`.
   - **Service**: `services/usage_meter.py` with `@meter(feature)` decorator. Pre-call: check quota + rate. Post-call: record event with actual cost. Single decorator wraps every cost-incurring call.
   - **Wire-up**: Whisper, Receipt vision, Inbound Classifier, Drafter, Memory extractor.
-  - **UI**: usage bar chart per feature in owner portal, "enable overage" toggle, dashboard Control Tower per-client usage strip (green/amber/red).
-  - **Files**: new `services/usage_meter.py`, new `api/usage.py`, hooks in `tools/voice_whisper.py` + `tools/receipt_vision.py` + `services/inbound_classifier.py` + `agent/brain.py` + `services/client_memory.py`, portal usage tab, dashboard usage strip.
+  - **Owner-facing UI**: usage bar chart per feature in portal, "enable overage" toggle with ceiling input, real-time ₦ spent this month.
+  - **Admin Billing Dashboard** (added 2026-05-15): new dashboard tab `Billing` with per-client rows: client name · plan · ₦ revenue · ₦ API cost MTD · margin % · top feature by spend · "you're at risk" flag if margin<70%. Sort by margin asc. Drill-in shows per-feature breakdown + last 7 days trend. This is the operator's single-pane view to prevent any runaway client surprising us at month-end.
+  - **ToS draft**: published rates per overage feature (₦12 voice / ₦15 receipt / ₦6 draft), monthly ceiling mechanism, soft-cap → graceful-degrade → overage path explained in plain English. Linked from signup flow + portal.
+  - **Files**: new `services/usage_meter.py`, new `api/usage.py`, hooks in `tools/voice_whisper.py` + `tools/receipt_vision.py` + `services/inbound_classifier.py` + `agent/brain.py` + `services/client_memory.py`, portal usage tab, dashboard `Billing` tab, ToS markdown at `templates/marketing/terms.html`.
+
+- [ ] **T0.2.7 Feature Menu / A La Carte Pricing** (~4-5 days) — Raised 2026-05-15. Move from fixed Starter/Growth/Scale tiers to a modular menu: customers compose their own plan from feature modules. Less decision fatigue → higher conversion + clearer perceived value.
+  - **Pricing model** (proposed; tune via T0.2.5 cost data once live):
+    - **Core Agent + HITL** (mandatory): ₦40K/mo — drafting, your-number sending, approval queue, vertical playbook, memory layer
+    - **Voice Notes**: +₦20K/mo (includes 200 transcriptions, then overage)
+    - **Receipt Catcher**: +₦15K/mo (includes 200 receipts, then overage)
+    - **Closer Pipeline + Nurture**: +₦25K/mo
+    - **KB + Rules Engine**: +₦20K/mo
+    - **Cash Recovery suite** (rent/invoice/fees chase): +₦30K/mo
+    - **Emotional Intelligence + Predictive Co-pilot**: +₦20K/mo
+    - **Outcomes Engine + Branded PDF**: included
+    - **Owner Brief + Weekly Digest**: included
+    - **Multi-location coordination**: +₦40K/mo
+    Worked example: Lagos restaurant ticks Core + Voice + Receipt + Closer = ₦100K/mo. Real-estate agency ticks Core + Receipt + Closer + KB + Cash Recovery = ₦130K/mo.
+  - **Pricing page rewrite**: configurator at `/pricing` — checkbox each module, live total in naira, save quote, signup with chosen modules.
+  - **Per-client feature flags**: `clients.enabled_features` array. Each cost-incurring call checks the flag before running (drafter, whisper, receipt, classifier, copilot). Feature off → graceful fallback ("voice transcription not enabled — voice note received").
+  - **Module purchase / upgrade UI**: in portal, owner sees the menu, can enable a module mid-cycle (pro-rated billing via Paystack).
+  - **Tiered "starter bundles"** kept as preset shortcuts ("Starter Bundle: Core + Voice + Closer = ₦85K — save ₦20K") so we don't lose the simplicity of presets entirely.
+  - **Trade-off note**: full a la carte adds decision fatigue; bundle presets soften that. Final pricing schedule needs cost data from T0.2.5 (run 30 days first, tune from real usage).
+  - **Files**: `api/marketing.py` PLAN_PRICING → module catalog, `templates/marketing/pricing.html` configurator, `api/clients.py` enabled_features on signup, gating decorator in `services/usage_meter.py`, portal module-purchase UI.
 
 - [ ] **T0.2.6 Custom-named Engine ("you bought an employee — name them")** (~2 hours) — Raised 2026-05-15. If we're selling an agentic employee, owners should be able to name them. Like Artisan's "Ava," like Lindy. Make ReachNG personal.
   - **Schema**: `clients.agent_name` field, default `"ReachNG"`. Validated: 1-20 chars, alphanumeric + space.
