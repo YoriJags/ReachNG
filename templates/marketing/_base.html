@@ -98,6 +98,11 @@
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Paper-grain texture — barely-there warmth on the cream surface.
+       Inline SVG noise tile so no extra HTTP request. ~6KB. */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.42  0 0 0 0 0.36  0 0 0 0 0.28  0 0 0 0.055 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size: 200px 200px;
+    background-repeat: repeat;
   }
   a { color: var(--accent); text-decoration: none; transition: color 0.15s; }
   a:hover { color: var(--accent-hover); }
@@ -119,7 +124,7 @@
     display: flex; justify-content: space-between; align-items: center; gap: 24px;
   }
   nav.site-nav .logo {
-    font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -0.5px;
+    font-family: var(--serif); font-size: 20px; font-weight: 400; letter-spacing: -0.3px;
     color: var(--text-strong);
   }
   nav.site-nav .logo span { color: var(--accent); font-style: italic; }
