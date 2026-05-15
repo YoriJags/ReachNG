@@ -100,7 +100,12 @@ async def get_portal_data(token: str):
         cash = None
 
     return {
-        "client": client_name,
+        "client": {
+            "name":       client_name,
+            "vertical":   vertical,
+            "agent_name": client.get("agent_name") or "EYO",
+        },
+        # Legacy flat keys preserved for older portal JS that reads them directly
         "vertical": vertical,
         "stats": stats,
         "roi": roi,
@@ -109,6 +114,22 @@ async def get_portal_data(token: str):
         "autopilot": client.get("autopilot", False),
         "holding_message": client.get("holding_message", ""),
     }
+
+
+@router.post("/{token}/agent-name")
+async def update_agent_name(token: str, payload: dict):
+    """Client-facing: rename the agent. Default is 'EYO'. 1-20 chars."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    name = (payload.get("agent_name") or "").strip()
+    if not (1 <= len(name) <= 20):
+        raise HTTPException(400, "agent_name must be 1-20 characters")
+    get_clients().update_one(
+        {"_id": client["_id"]},
+        {"$set": {"agent_name": name, "updated_at": datetime.now(timezone.utc)}},
+    )
+    return {"ok": True, "agent_name": name}
 
 
 @router.get("/missed-opportunities/{token}")

@@ -710,6 +710,60 @@
       </div>
     </div>
 
+    <!-- Agent identity (name + payment rail) -->
+    <div class="section-label">Your AI Employee</div>
+    <div id="agent-identity-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:240px;">
+          <label style="font-size:11px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;display:block;margin-bottom:6px;">Agent name (signed off in every message)</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input id="agent-name-input" type="text" maxlength="20" placeholder="EYO"
+                   style="flex:1;background:#0a0a0a;border:1px solid #2a3340;border-radius:6px;color:#e8e8e8;font-size:14px;padding:9px 12px;font-family:inherit;">
+            <button onclick="saveAgentName()" style="background:#ff5500;color:#fff;border:none;border-radius:6px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;">Save</button>
+          </div>
+          <div id="agent-name-status" style="font-size:11px;color:#6a7280;margin-top:6px;">1-20 characters. Defaults to <strong style="color:#e8e8e8;">EYO</strong> — your AI employee's name.</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid #1e2530;font-size:11px;color:#6a7280;line-height:1.6;">
+        💡 Customers see your agent sign off as <strong style="color:#e8e8e8;" id="agent-name-preview">EYO</strong> from your business — never as "ReachNG" or "an AI." The platform stays invisible.
+      </div>
+    </div>
+
+    <script>
+      (async function loadAgentName() {
+        try {
+          const r = await fetch(`/portal/data/{{ token }}`);
+          const d = await r.json();
+          const name = (d.client && d.client.agent_name) || 'EYO';
+          document.getElementById('agent-name-input').value = name;
+          document.getElementById('agent-name-preview').textContent = name;
+        } catch (e) { /* graceful */ }
+      })();
+      async function saveAgentName() {
+        const input = document.getElementById('agent-name-input');
+        const status = document.getElementById('agent-name-status');
+        const name = (input.value || '').trim();
+        if (!name || name.length > 20) {
+          status.innerHTML = '<span style="color:#ff7a7a;">Name must be 1-20 characters.</span>';
+          return;
+        }
+        status.textContent = 'Saving…';
+        try {
+          const r = await fetch(`/portal/{{ token }}/agent-name`, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({agent_name: name}),
+          });
+          if (!r.ok) { const t = await r.text(); throw new Error(t); }
+          document.getElementById('agent-name-preview').textContent = name;
+          status.innerHTML = '<span style="color:#5dd28a;">✓ Saved — every new draft now signs off as ' + name + '.</span>';
+          setTimeout(() => { status.innerHTML = '1-20 characters. Defaults to <strong style="color:#e8e8e8;">EYO</strong> — your AI employee\'s name.'; }, 5000);
+        } catch (e) {
+          status.innerHTML = '<span style="color:#ff7a7a;">' + (e.message || 'Save failed') + '</span>';
+        }
+      }
+    </script>
+
     <!-- Autopilot toggle -->
     <div class="section-label">AI Settings</div>
     <div id="autopilot-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;">
