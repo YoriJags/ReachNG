@@ -157,6 +157,7 @@ def classify_inbound(
     vertical: Optional[str] = None,
     recent_context: Optional[str] = None,
     contact_name: Optional[str] = None,
+    client_id: Optional[str] = None,   # T0.2.5 metering scope
 ) -> InboundClassification:
     """Classify a single inbound. Returns a safe default on any error — never raises."""
     if not (inbound_text or "").strip():
@@ -166,6 +167,16 @@ def classify_inbound(
     if not settings.anthropic_api_key:
         log.info("classifier_skipped_no_key")
         return _safe_default()
+
+    # T0.2.5 rate-limit gate
+    if client_id:
+        try:
+            from services.usage_meter import check_rate
+            if not check_rate(str(client_id), "classifier"):
+                log.warning("classifier_rate_limited", client_id=client_id)
+                return _safe_default()
+        except Exception:
+            pass
 
     user_block: list[str] = []
     if contact_name:
@@ -232,6 +243,13 @@ def classify_inbound(
         or stage == "complaint"
         or (urgency == "on_fire" and confidence >= 0.7)
     )
+
+    # T0.2.5: record metered call
+    try:
+        from services.usage_meter import record
+        record(client_id, "classifier", units=1)
+    except Exception:
+        pass
 
     return InboundClassification(
         sentiment=sentiment,

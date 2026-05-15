@@ -190,6 +190,7 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
                 vertical=lead.get("vertical"),
                 recent_context=recent_ctx or None,
                 contact_name=contact_name,
+                client_id=str(lead_client_id) if lead_client_id else None,
             )
             classification_dict = c.to_dict()
             system_prompt = system_prompt + "\n\n" + format_tone_block(c)
@@ -210,6 +211,15 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
     except Exception as _e:
         log.warning("classifier_inject_closer_failed", lead=lead_id, error=str(_e))
 
+    # T0.2.5 rate-limit gate — anti-runaway on the drafter
+    try:
+        from services.usage_meter import check_rate
+        if lead_client_id and not check_rate(str(lead_client_id), "drafter"):
+            log.warning("closer_drafter_rate_limited", lead=lead_id, client_id=str(lead_client_id))
+            return None
+    except Exception:
+        pass
+
     # Render the actual draft using the assembled system prompt + lead thread.
     user_prompt = _render_user_prompt(lead, intent)
     settings = get_settings()
@@ -224,6 +234,13 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
     except Exception as e:
         log.error("closer_drafter_failed", lead=lead_id, error=str(e))
         return None
+
+    # T0.2.5 record drafter call cost
+    try:
+        from services.usage_meter import record
+        record(str(lead_client_id) if lead_client_id else None, "drafter", units=1)
+    except Exception:
+        pass
 
     draft_text = (msg.content[0].text or "").strip()
     if not draft_text:

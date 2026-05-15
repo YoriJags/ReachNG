@@ -381,12 +381,29 @@ def learn_from_inbound(
     Scope-locked — refuses to run without (client_id, contact_phone).
     """
     cid, phone = _require_scope(client_id, contact_phone)
+
+    # T0.2.5 rate-limit gate — abuse-proofing extraction calls.
+    try:
+        from services.usage_meter import check_rate, record
+        if not check_rate(cid, "memory"):
+            log.warning("memory_extract_rate_limited", client_id=cid)
+            return 0
+    except Exception:
+        pass
+
     facts = extract_facts_from_message(ExtractionInput(
         inbound_text=inbound_text,
         last_outbound=last_outbound,
         contact_name=contact_name,
         vertical=vertical,
     ))
+    # Record cost regardless of whether facts were extracted — the Haiku
+    # call happened either way.
+    try:
+        from services.usage_meter import record as _rec
+        _rec(cid, "memory", units=1)
+    except Exception:
+        pass
     if not facts:
         return 0
     excerpt = (inbound_text or "")[:240]

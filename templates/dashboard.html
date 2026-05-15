@@ -2396,6 +2396,106 @@ function copyDemoPortalLink(btn){
     });
   </script>
 
+  <!-- Billing — per-client API cost vs revenue (T0.2.5) -->
+  <div class="ct-section">
+    <div class="ct-section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <span>Billing — API cost vs revenue (last 30 days)</span>
+      <button onclick="loadBilling()" style="background:transparent;border:1px solid #2a3340;color:#9aa0a8;font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;">Refresh</button>
+    </div>
+    <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Margin floor target: 80%. Anything red means a client is eating more in API cost than your usual margin can absorb — investigate before month-end.</p>
+
+    <div id="billing-totals" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;">
+      <div class="ct-kpi" style="border-color:#1e2530;padding:12px 14px;">
+        <div style="font-size:10px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:4px;">Total Revenue</div>
+        <div id="bil-revenue" style="font-size:18px;color:#fff;font-weight:700;letter-spacing:-0.3px;font-variant-numeric:tabular-nums;">—</div>
+      </div>
+      <div class="ct-kpi" style="border-color:#1e2530;padding:12px 14px;">
+        <div style="font-size:10px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:4px;">Total API Cost</div>
+        <div id="bil-cost" style="font-size:18px;color:#ffb84d;font-weight:700;letter-spacing:-0.3px;font-variant-numeric:tabular-nums;">—</div>
+      </div>
+      <div class="ct-kpi" style="border-color:#1e2530;padding:12px 14px;">
+        <div style="font-size:10px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:4px;">Margin</div>
+        <div id="bil-margin" style="font-size:18px;color:#5dd28a;font-weight:700;letter-spacing:-0.3px;font-variant-numeric:tabular-nums;">—</div>
+      </div>
+      <div class="ct-kpi" style="border-color:#1e2530;padding:12px 14px;">
+        <div style="font-size:10px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:4px;">Avg Margin %</div>
+        <div id="bil-margin-pct" style="font-size:18px;color:#fff;font-weight:700;letter-spacing:-0.3px;font-variant-numeric:tabular-nums;">—</div>
+      </div>
+      <div class="ct-kpi" style="border-color:#1e2530;padding:12px 14px;">
+        <div style="font-size:10px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:4px;">At Risk</div>
+        <div id="bil-at-risk" style="font-size:18px;color:#ff7a7a;font-weight:700;letter-spacing:-0.3px;font-variant-numeric:tabular-nums;">—</div>
+      </div>
+    </div>
+
+    <div style="background:#0a0a0a;border:1px solid #1e2530;border-radius:8px;overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;">
+        <thead>
+          <tr style="background:#0e1218;color:#6a7280;text-transform:uppercase;font-size:10px;letter-spacing:0.08em;">
+            <th style="text-align:left;padding:10px 14px;">Client</th>
+            <th style="text-align:left;padding:10px 14px;">Plan</th>
+            <th style="text-align:right;padding:10px 14px;">Revenue</th>
+            <th style="text-align:right;padding:10px 14px;">API Cost</th>
+            <th style="text-align:right;padding:10px 14px;">Margin</th>
+            <th style="text-align:right;padding:10px 14px;">%</th>
+            <th style="text-align:left;padding:10px 14px;">Top Spend</th>
+            <th style="text-align:right;padding:10px 14px;">Calls</th>
+          </tr>
+        </thead>
+        <tbody id="billing-rows">
+          <tr><td colspan="8" style="padding:24px;text-align:center;color:#555;">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function loadBilling() {
+      try {
+        const r = await fetch('/api/v1/admin/billing');
+        if (!r.ok) return;
+        const d = await r.json();
+        const fmtNgn = (n) => n == null ? '—' :
+          (Math.abs(n) >= 1_000_000) ? '₦' + (n/1_000_000).toFixed(2) + 'M' :
+          (Math.abs(n) >= 1_000)     ? '₦' + (n/1_000).toFixed(1)   + 'K' :
+                                        '₦' + Math.round(n).toLocaleString();
+        const t = d.totals || {};
+        document.getElementById('bil-revenue').textContent = fmtNgn(t.revenue_ngn);
+        document.getElementById('bil-cost').textContent    = fmtNgn(t.cost_ngn);
+        const marginEl = document.getElementById('bil-margin');
+        marginEl.textContent = fmtNgn(t.margin_ngn);
+        marginEl.style.color = (t.margin_ngn >= 0) ? '#5dd28a' : '#ff7a7a';
+        document.getElementById('bil-margin-pct').textContent = (t.avg_margin_pct == null ? '—' : t.avg_margin_pct + '%');
+        document.getElementById('bil-at-risk').textContent    = (t.at_risk_count || 0) + ' / ' + (t.client_count || 0);
+
+        const tbody = document.getElementById('billing-rows');
+        if (!d.rows || d.rows.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="padding:24px;text-align:center;color:#555;">No usage recorded yet — clients haven\'t consumed API calls in this window.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = d.rows.map(r => {
+          const pct = r.margin_pct == null ? '—' : r.margin_pct + '%';
+          const pctColor = r.margin_pct == null ? '#6a7280' :
+                           (r.margin_pct < 50)  ? '#ff7a7a' :
+                           (r.margin_pct < 70)  ? '#ffb84d' :
+                                                   '#5dd28a';
+          const riskBorder = r.at_risk ? 'border-left:3px solid #ff5050;' : 'border-left:3px solid transparent;';
+          return `<tr style="border-top:1px solid #1e2530;${riskBorder}">
+            <td style="padding:10px 14px;color:#e8e8e8;">${escHtml(r.name || '—')}</td>
+            <td style="padding:10px 14px;color:#9aa0a8;">${escHtml(r.plan || '—')}</td>
+            <td style="text-align:right;padding:10px 14px;color:#e8e8e8;">${fmtNgn(r.revenue_ngn)}</td>
+            <td style="text-align:right;padding:10px 14px;color:#ffb84d;">${fmtNgn(r.cost_ngn)}</td>
+            <td style="text-align:right;padding:10px 14px;color:${r.margin_ngn >= 0 ? '#5dd28a' : '#ff7a7a'};">${fmtNgn(r.margin_ngn)}</td>
+            <td style="text-align:right;padding:10px 14px;color:${pctColor};font-weight:700;">${pct}</td>
+            <td style="padding:10px 14px;color:#9aa0a8;">${escHtml(r.top_feature || '—')}</td>
+            <td style="text-align:right;padding:10px 14px;color:#9aa0a8;">${(r.calls || 0).toLocaleString()}</td>
+          </tr>`;
+        }).join('');
+      } catch (e) { console.error('billing load failed', e); }
+    }
+    // Lazy-load on Control Tower open
+    document.addEventListener('DOMContentLoaded', () => { try { loadBilling(); } catch (_) {} });
+  </script>
+
   <!-- MRR by Product Line -->
   <div class="ct-section">
     <div class="ct-section-title">MRR by Product Line</div>

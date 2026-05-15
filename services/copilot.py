@@ -362,6 +362,17 @@ def ask(*, client_id: str, question: str) -> dict:
     if not q:
         return {"ok": False, "error": "empty question"}
 
+    # T0.2.5 rate-limit gate — anti-abuse on the co-pilot
+    try:
+        from services.usage_meter import check_rate, record
+        if not check_rate(cid, "copilot"):
+            return {
+                "ok": True, "tool": "rate_limited",
+                "narration": "Slow down — too many co-pilot questions in the last minute. Try again shortly.",
+            }
+    except Exception:
+        pass
+
     plan = _plan(q)
     tool_name = plan.get("tool")
     if tool_name == "none" or tool_name not in TOOL_HANDLERS:
@@ -383,6 +394,11 @@ def ask(*, client_id: str, question: str) -> dict:
         return {"ok": False, "tool": tool_name, "error": str(e)}
 
     narration = _narrate(q, result)
+    try:
+        from services.usage_meter import record as _rec
+        _rec(cid, "copilot", units=1)
+    except Exception:
+        pass
     log.info("copilot_ask", client_id=cid, tool=tool_name)
     return {
         "ok":        True,

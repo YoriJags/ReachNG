@@ -103,6 +103,7 @@ async def _handle_image_attachment(
     image_bytes: bytes,
     mime_type: str,
     source: str | None,
+    client_id: str | None = None,    # T0.2.5 metering scope
 ) -> bool:
     """
     Try the Receipt Catcher pipeline on an inbound image.
@@ -122,6 +123,13 @@ async def _handle_image_attachment(
     except Exception as e:
         log.error("receipt_vision_crashed", error=str(e), phone=sender_phone)
         return False
+
+    # Record the vision call cost regardless of match outcome
+    try:
+        from services.usage_meter import record
+        record(client_id, "receipt", units=1)
+    except Exception:
+        pass
 
     if not receipt.is_receipt and receipt.confidence < 0.3:
         log.info("inbound_image_not_a_receipt", phone=sender_phone,
@@ -168,6 +176,23 @@ async def whatsapp_inbound(request: Request):
 
     is_meta = payload.get("object") == "whatsapp_business_account"
 
+    # ── Early client lookup (T0.2.5 metering) ────────────────────────────────
+    # Resolve the matched client BEFORE voice/receipt pipelines so we can
+    # meter their cost against the right tenant. Best-effort: if we can't
+    # match (e.g. Meta inbound where account_id is opaque), metering happens
+    # with client_id=None and the call still proceeds.
+    _early_client_id: str | None = None
+    try:
+        if not is_meta:
+            _account_id = (payload.get("data", {}) or {}).get("account_id") or payload.get("account_id")
+            if _account_id:
+                _early = _db()["clients"].find_one(
+                    {"whatsapp_account_id": _account_id, "active": True}, {"_id": 1})
+                if _early:
+                    _early_client_id = str(_early["_id"])
+    except Exception:
+        pass
+
     # ── Voice-note transcription (T0.1) — runs FIRST so transcript becomes text ──
     # If the inbound carries a voice note / audio attachment, transcribe it via
     # Whisper and substitute the transcript as the message body so every
@@ -190,6 +215,11 @@ async def whatsapp_inbound(request: Request):
                         voice_transcripts[sender] = format_for_draft(tr)
                         log.info("voice_note_transcribed", sender=sender,
                                  dur=tr.duration_seconds, chars=len(tr.text))
+                        try:
+                            from services.usage_meter import record
+                            record(_early_client_id, "voice", units=1)
+                        except Exception:
+                            pass
                 except Exception as e:
                     log.error("meta_audio_pipeline_failed", error=str(e), sender=sender)
         else:
@@ -207,6 +237,11 @@ async def whatsapp_inbound(request: Request):
                         voice_transcripts[sender_p] = format_for_draft(tr)
                         log.info("voice_note_transcribed", sender=sender_p,
                                  dur=tr.duration_seconds, chars=len(tr.text))
+                        try:
+                            from services.usage_meter import record
+                            record(_early_client_id, "voice", units=1)
+                        except Exception:
+                            pass
                 except Exception as e:
                     log.error("unipile_audio_pipeline_failed", error=str(e), sender=sender_p)
     except Exception as e:
@@ -228,7 +263,8 @@ async def whatsapp_inbound(request: Request):
                 try:
                     image_bytes, fetched_mime = await download_meta_media(media_id)
                     if await _handle_image_attachment(sender, image_bytes,
-                                                      fetched_mime or mime, "meta"):
+                                                      fetched_mime or mime, "meta",
+                                                      client_id=_early_client_id):
                         image_handled_for.add(sender)
                 except Exception as e:
                     log.error("meta_image_pipeline_failed", error=str(e), sender=sender)
@@ -242,7 +278,8 @@ async def whatsapp_inbound(request: Request):
                 try:
                     image_bytes, fetched_mime = await download_unipile_attachment(msg_id, att_id)
                     if await _handle_image_attachment(sender_p, image_bytes,
-                                                      fetched_mime or mime, "unipile"):
+                                                      fetched_mime or mime, "unipile",
+                                                      client_id=_early_client_id):
                         image_handled_for.add(sender_p)
                 except Exception as e:
                     log.error("unipile_image_pipeline_failed", error=str(e), sender=sender_p)
