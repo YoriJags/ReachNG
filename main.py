@@ -272,6 +272,7 @@ from api.platform_settings import router as platform_settings_router
 from api.waitlist import router as waitlist_router
 from api.copilot import router as copilot_router
 from api.billing import router as billing_router
+from api.pipeline import router as pipeline_router
 app.include_router(kb_router)
 app.include_router(client_rules_router)
 app.include_router(scorecard_router)
@@ -279,6 +280,7 @@ app.include_router(platform_settings_router)
 app.include_router(waitlist_router)
 app.include_router(copilot_router)
 app.include_router(billing_router)
+app.include_router(pipeline_router)
 
 app.include_router(dashboard_router, **_auth)
 
