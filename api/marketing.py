@@ -333,6 +333,7 @@ async def paystack_webhook(request: Request):
         "owner_name":      signup["owner_name"],
         "owner_phone":     signup["owner_phone"],
         "owner_email":     signup["owner_email"],
+        "agent_name":        "EYO",        # T0.2.6 — Lagos default, client can rename
         "preferred_channel": "whatsapp",
         "autopilot":       False,
         "signal_listening": False,

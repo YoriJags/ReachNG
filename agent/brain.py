@@ -23,6 +23,31 @@ def _load_prompt(filename: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _agent_identity_block(client_name: Optional[str]) -> str:
+    """Inject the agent's name (default EYO) so the drafter knows what to
+    sign off as. The customer should perceive the agent as the business's
+    employee, not as 'ReachNG'."""
+    if not client_name:
+        return ""
+    try:
+        import re as _re
+        from database import get_db
+        doc = get_db()["clients"].find_one(
+            {"name": {"$regex": f"^{_re.escape(client_name)}$", "$options": "i"}},
+            {"agent_name": 1},
+        )
+        name = (doc or {}).get("agent_name") or "EYO"
+    except Exception:
+        name = "EYO"
+    return (
+        f"AGENT IDENTITY:\n"
+        f"Your name is {name}. You are the in-house assistant for this business. "
+        f"When introducing yourself, signing off, or asked who you are, use this name. "
+        f"NEVER mention 'ReachNG', 'AI agent', 'chatbot', or any platform name to the customer — "
+        f"you are simply {name} from {client_name}."
+    )
+
+
 def _nigerian_context() -> str:
     """Universal Nigerian-market base layer. Injected under system.txt for every
     outbound draft so messages sound like they were written by someone living in
@@ -236,6 +261,11 @@ def generate_b2c_message(
             log.warning("brief_context_fetch_failed", client=client_name, error=str(exc))
 
     system = (brief_system + "\n\n" + ng_context + "\n\n" + base_system) if brief_system else (ng_context + "\n\n" + base_system)
+
+    # ── Agent identity (T0.2.6) — sign-off name + voice ownership ───────────
+    identity = _agent_identity_block(client_name)
+    if identity:
+        system = identity + "\n\n" + system
 
     # ── Resolve client_id once for KB / Rules / Memory injection ────────────
     resolved_client_id: Optional[str] = None
@@ -563,7 +593,8 @@ No explanations. No preamble. Just the message.
 """
 
     client_api = _get_client()
-    layered_system = f"{system}\n\n{_nigerian_context()}"
+    identity = _agent_identity_block(client_name)
+    layered_system = f"{identity}\n\n{system}\n\n{_nigerian_context()}" if identity else f"{system}\n\n{_nigerian_context()}"
     response = client_api.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=400,

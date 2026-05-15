@@ -106,6 +106,16 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
 
     # ── Inject memory, KB chunks, and active rules ───────────────────────────
     system_prompt = ctx["system_prompt"]
+
+    # ── Agent identity (T0.2.6) — sign-off name, customer perceives them
+    #    as the business's in-house employee, never as "ReachNG".
+    try:
+        from agent.brain import _agent_identity_block
+        identity = _agent_identity_block(client_name)
+        if identity:
+            system_prompt = identity + "\n\n" + system_prompt
+    except Exception as _e:
+        log.warning("identity_inject_closer_failed", error=str(_e))
     contact_phone = lead.get("contact_phone")
     lead_client_id = lead.get("client_id")
     last_inbound = (lead.get("inquiry_text") or "")

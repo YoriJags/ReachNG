@@ -62,6 +62,7 @@ class ClientUpsert(BaseModel):
     name: str
     vertical: str
     brief: str
+    agent_name: Optional[str] = None         # Defaults to "EYO" if not provided
     preferred_channel: str = "whatsapp"
     active: bool = True
     plan: PlanTier = "starter"
@@ -204,10 +205,17 @@ async def upsert_client(payload: ClientUpsert):
     now = datetime.now(timezone.utc)
     clients = get_clients()
 
+    # Normalise + validate agent_name (T0.2.6). Defaults to "EYO" — the
+    # Eyo Festival of Lagos. Clients can rename to anything they want.
+    agent_name = (payload.agent_name or "EYO").strip()
+    if not (1 <= len(agent_name) <= 20):
+        raise HTTPException(400, "agent_name must be 1-20 characters")
+
     set_doc = {
         "name":                  payload.name,
         "vertical":              payload.vertical,
         "brief":                 payload.brief,
+        "agent_name":            agent_name,
         "preferred_channel":     payload.preferred_channel,
         "active":                payload.active,
         "plan":                  payload.plan,
