@@ -96,8 +96,8 @@ Total ~12 days. Goal: move from "great Lagos SDR" → "addictive, impossible-to-
   - **Trade-off note**: full a la carte adds decision fatigue; bundle presets soften that. Final pricing schedule needs cost data from T0.2.5 (run 30 days first, tune from real usage).
   - **Files**: `api/marketing.py` PLAN_PRICING → module catalog, `templates/marketing/pricing.html` configurator, `api/clients.py` enabled_features on signup, gating decorator in `services/usage_meter.py`, portal module-purchase UI.
 
-- [ ] **T0.2.6 Custom-named Engine ("you bought an employee — name them")** (~2 hours) — Raised 2026-05-15. If we're selling an agentic employee, owners should be able to name them. Like Artisan's "Ava," like Lindy. Make ReachNG personal.
-  - **Schema**: `clients.agent_name` field, default `"ReachNG"`. Validated: 1-20 chars, alphanumeric + space.
+- [ ] **T0.2.6 Custom-named Engine ("you bought an employee — name them")** (~2 hours) — Raised 2026-05-15. If we're selling an agentic employee, owners should be able to name them. Like Artisan's "Ava," like Lindy. Make ReachNG personal. **Default agent name: `EYO`** (Yoruba — the Eyo Festival of Lagos. Uniquely Lagos, 3 letters, distinctive, easy to say globally.) Clients can rename in their portal.
+  - **Schema**: `clients.agent_name` field, default `"EYO"`. Validated: 1-20 chars, alphanumeric + space.
   - **Prompt injection**: every drafter call adds `Your name is {agent_name}. When introducing yourself or signing off, use this name.` to the system prompt. Inject in `agent/brain.py` + `services/closer/brain.py` after the brief block.
   - **Surfaces**: HITL queue header (*"{agent_name} drafted this for {customer}"*), Owner Brief WhatsApp ("Morning, here's what {agent_name} did overnight"), Weekly Digest, Milestone messages, portal nav badge, scorecard PDF.
   - **Portal Settings UI**: one input field, save → persists, takes effect on next draft.
