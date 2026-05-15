@@ -4,7 +4,7 @@
 
 Queued work waiting to be promoted into a phase: see [BACKLOG.md](./BACKLOG.md).
 
-Last updated: 2026-05-09
+Last updated: 2026-05-15
 
 ---
 
@@ -50,34 +50,33 @@ Apollo is inactive/expensive — Apify replaces it entirely. `tools/apollo_disco
 - [x] `tools/apify_discovery.py` — Google Search → domain → enrich pipeline; replaces Apollo in campaign runner
 - [x] `campaigns/base.py` — swapped `discover_apollo_leads` → `discover_apify_leads`; all variable/log references updated
 - [x] `tools/__init__.py` — exports `discover_apify_leads`; Apollo kept but noted deprecated
-- [ ] `APIFY_API_TOKEN` confirmed in Railway env (token exists locally — add to Railway)
-- [ ] Admin Control Tower — show `enrichment.decision_maker` + `enrichment.title` on lead detail; "Re-enrich" button
-- [ ] HITL drafter reads `enrichment.decision_maker` for personalization (replaces `[Partner Name]` fallback)
+- [x] `APIFY_API_TOKEN` reactivated in Railway env (2026-05-10)
+- [x] Admin Control Tower — `enrichment.decision_maker` + `enrichment.title` surfaced (operations_flow + dashboard lead detail)
+- [x] HITL drafter reads `enrichment.decision_maker` for personalization (2026-05-10)
 
-## Now — Phase 1.5: Business Brief + BYO Leads *(8 days, in progress)*
+## Shipped — Phase 1.5: Business Brief + BYO Leads *(complete)*
 
-The outreach machine extension. Clients upload their own lead lists; we draft personalised follow-ups using a per-client business brief layered over per-vertical primers. Enabled for sales-driven verticals only (real_estate, legal, insurance, fitness, events, auto, cooperatives).
+Module 0 (`services/brief/*` + `api/brief.py` + portal "Business Brief" tab + admin sub-tab + drafters routed through `assemble_context()`) and Module 1 (NDPR gate + `lead_imports` audit + portal "Lead Lists" tab + per-client guardrails + sequences via `services/sequences/engine.py`) all shipped. Wired across `api/portal.py`, `campaigns/b2c.py`, `portal_estate.html`.
 
-### Module 0 — Business Brief layer *(2 days)*
-- [ ] `services/brief/primers.py` — seed vertical primers (real_estate, legal, insurance, fitness, events, auto, cooperatives) in `vertical_primers` Mongo collection
-- [ ] `services/brief/store.py` — `BusinessBrief` Pydantic model (superset of CloserBrief), CRUD on `clients.business_brief`
-- [ ] `services/brief/context.py` — `assemble_context(client_id, intent)` merging primer + brief → returns system_prompt, tone, vocabulary, guardrails. **All AI drafters route through this.**
-- [ ] `services/brief/intake.py` — AI-assisted intake: URL + free-text → structured BusinessBrief draft
-- [ ] `api/brief.py` — admin + portal routers
-- [ ] Portal: new "Business Brief" tab with guided form + AI-assisted intake
-- [ ] Admin: Business Brief sub-tab on client detail
-- [ ] Wire Closer/chasers/invoice drafters through `assemble_context()` (back-compat: read business_brief, fall back to closer_brief)
+## Now — Tier-0 Engine: T0.4 Outcome Learning Loop *(~3 days, current phase)*
 
-### Module 1 — BYO Leads productisation *(6 days)*
-- [ ] Compliance gate — mandatory NDPR consent attestation at upload, one-time DPA modal, `lead_imports` audit collection
-- [ ] Per-vertical gating — `byo_leads_enabled` flag on `clients`, default ON for sales verticals only
-- [ ] Portal: "Lead Lists" tab — drag-drop CSV, pre-import preview, contacts table, campaign launcher
-- [ ] Admin: per-client Lead Lists sub-tab + override controls
-- [ ] Per-account guardrails — daily caps, pacing throttle, opt-out rate auto-pause, list quality score
-- [ ] Sequencing — single sequence per client (multi-sequence in v2)
-- [ ] Polish — sample CSV download, smart column mapper override, error report, test-send-to-one
+Source of truth: BACKLOG.md → "P0 — Tier-0 Engine sprint" → T0.4. Every approved draft tagged with `outcome_id`; positive customer reply → `win`, silence >7d or explicit no → `miss`. Weekly Sunday 23:00 Lagos job: Claude reviews wins vs misses per client and emits a `prompt_addendum` auto-merged into the client's BusinessBrief override. Agent improves per-client every week without manual tuning.
 
-## Next — Phase 2: Closer Brain *(2–3 days)*
+- [ ] `outcomes` Mongo collection — one doc per approved draft, indexed by `(client_id, status, created_at)`
+- [ ] `services/outcome_learning.py` — `tag_win()` / `tag_miss()` / `weekly_distil(client_id)`
+- [ ] Hook `tools/hitl.py` approval path to create the outcome doc
+- [ ] Webhook inbound: reply-classifier → tag win/miss against open outcomes for that contact
+- [ ] Scheduler: nightly 02:00 Lagos sweep — auto-mark `miss` after 7-day silence
+- [ ] Scheduler: weekly Sunday 23:00 Lagos — distil per-client wins/misses → write `clients.prompt_addendum`
+- [ ] `agent/brain.py` + `services/closer/brain.py` — inject `prompt_addendum` into system prompt
+- [ ] Portal: "Agent Learning" card — last addendum summary + last refresh timestamp
+- [ ] Admin: per-client view of recent wins/misses + addendum history
+
+## Next — Tier-0 Engine: T0.5 Proactive Intelligence *(~4 days)*
+
+5 starter behaviours per BACKLOG.md (stale revival, festival timing, birthday nudges, capacity nudges, booking reminders). Each = scheduler job → HITL drafts.
+
+## Later — Phase 2: Closer Brain *(2–3 days)*
 
 - [ ] New prompt tree: `agent/prompts/closer/real_estate.txt` — loads client's `closer_brief` + real estate vertical primer
 - [ ] Functions in `agent/brain.py`: `draft_qualifier()`, `draft_objection_handler()`, `draft_booking()`, `draft_followup()`, `classify_stage()`
