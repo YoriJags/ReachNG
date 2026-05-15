@@ -154,8 +154,46 @@ def queue_draft(
         "classification": classification,
         "escalated":      bool(classification and classification.get("escalate")),
     })
+    approval_id = str(result.inserted_id)
     log.info("draft_queued", contact=contact_name, channel=channel, source=source)
-    return str(result.inserted_id)
+
+    # ── Sales Alerter: real-time owner ping on hot/closing/escalated leads ───
+    # Fire-and-forget — never block the draft queue if the alert misbehaves.
+    if classification and client_name:
+        try:
+            from services.sales_alerter import alert_owner_about_draft
+            import asyncio, re as _re
+            # Resolve client_id from name (kept light — single indexed lookup)
+            _client_doc = get_db()["clients"].find_one(
+                {"name": {"$regex": f"^{_re.escape(client_name)}$", "$options": "i"}},
+                {"_id": 1},
+            )
+            if _client_doc and phone:
+                async def _fire():
+                    try:
+                        await alert_owner_about_draft(
+                            client_id=str(_client_doc["_id"]),
+                            contact_phone=phone,
+                            contact_name=contact_name or "lead",
+                            classification=classification,
+                            suggested_reply=message or "",
+                            inbound_excerpt=inbound_context,
+                            approval_id=approval_id,
+                        )
+                    except Exception as _e:
+                        log.warning("sales_alert_fire_failed", error=str(_e))
+                try:
+                    loop = asyncio.get_event_loop()
+                    if loop.is_running():
+                        asyncio.ensure_future(_fire())
+                    else:
+                        loop.run_until_complete(_fire())
+                except RuntimeError:
+                    asyncio.run(_fire())
+        except Exception as _e:
+            log.warning("sales_alert_dispatch_failed", error=str(_e))
+
+    return approval_id
 
 
 def get_pending(vertical: str | None = None, limit: int = 50) -> list[dict]:
@@ -167,12 +205,20 @@ def get_pending(vertical: str | None = None, limit: int = 50) -> list[dict]:
     }
     if vertical:
         query["vertical"] = vertical
-    return list(
-        get_approvals()
-        .find(query)
-        .sort("created_at", -1)  # newest first
-        .limit(limit)
-    )
+    # Sort: escalated first (1 > 0), then highest-urgency first via a
+    # computed bucket, then newest first. Owner sees angry/on_fire/closing
+    # leads at the top of their queue regardless of arrival time.
+    URGENCY_RANK = {"on_fire": 3, "hot": 2, "interested": 1, "idle": 0}
+    docs = list(get_approvals().find(query))
+    def _rank(d):
+        cls = d.get("classification") or {}
+        return (
+            1 if d.get("escalated") else 0,
+            URGENCY_RANK.get(cls.get("urgency"), 0),
+            d.get("created_at") or datetime.min.replace(tzinfo=timezone.utc),
+        )
+    docs.sort(key=_rank, reverse=True)
+    return docs[:limit]
 
 
 def get_approval_stats() -> dict:

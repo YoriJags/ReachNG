@@ -23,6 +23,59 @@ def _load_prompt(filename: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _payment_details_block(client_name: Optional[str]) -> str:
+    """Inject the client's payment details so the agent quotes the right rail.
+
+    Lagos pattern: bank transfer is the default. Most SMEs prefer
+    'transfer to GTB 0123456789, ABC Ltd' over Paystack. Paystack is opt-in.
+
+    Loaded from `clients` doc at draft time so changes flow through immediately.
+    """
+    if not client_name:
+        return ""
+    try:
+        import re as _re
+        from database import get_db
+        doc = get_db()["clients"].find_one(
+            {"name": {"$regex": f"^{_re.escape(client_name)}$", "$options": "i"}},
+            {"bank_name": 1, "bank_account_number": 1, "bank_account_name": 1,
+             "payment_pref": 1, "paystack_link": 1},
+        ) or {}
+    except Exception:
+        return ""
+    bank = doc.get("bank_name")
+    acct_num = doc.get("bank_account_number")
+    acct_name = doc.get("bank_account_name")
+    pref = (doc.get("payment_pref") or "bank_transfer")
+    paystack = doc.get("paystack_link")
+
+    has_bank = bank and acct_num and acct_name
+    has_paystack = bool(paystack)
+
+    if not (has_bank or has_paystack):
+        return ""
+
+    lines = ["PAYMENT DETAILS — quote these when the customer is ready to pay:"]
+    if pref == "bank_transfer" and has_bank:
+        lines.append(f"  Primary: bank transfer to {bank} {acct_num} — {acct_name}")
+        if has_paystack:
+            lines.append(f"  If they prefer card: {paystack}")
+    elif pref == "paystack" and has_paystack:
+        lines.append(f"  Primary: Paystack — {paystack}")
+        if has_bank:
+            lines.append(f"  If they prefer bank transfer: {bank} {acct_num} — {acct_name}")
+    elif pref == "both" and has_bank and has_paystack:
+        lines.append(f"  Bank transfer: {bank} {acct_num} — {acct_name}")
+        lines.append(f"  Or card: {paystack}")
+    elif has_bank:
+        lines.append(f"  Bank transfer to {bank} {acct_num} — {acct_name}")
+    elif has_paystack:
+        lines.append(f"  Paystack: {paystack}")
+    lines.append("  Never invent account numbers. If a customer asks for payment details "
+                 "and these are blank, escalate to the owner — do not guess.")
+    return "\n".join(lines)
+
+
 def _agent_identity_block(client_name: Optional[str]) -> str:
     """Inject the agent's name (default EYO) so the drafter knows what to
     sign off as. The customer should perceive the agent as the business's
@@ -266,6 +319,10 @@ def generate_b2c_message(
     identity = _agent_identity_block(client_name)
     if identity:
         system = identity + "\n\n" + system
+    # ── Payment details (bank-first Lagos pattern) ────────────────────────
+    payment = _payment_details_block(client_name)
+    if payment:
+        system = payment + "\n\n" + system
 
     # ── Resolve client_id once for KB / Rules / Memory injection ────────────
     resolved_client_id: Optional[str] = None
@@ -594,7 +651,9 @@ No explanations. No preamble. Just the message.
 
     client_api = _get_client()
     identity = _agent_identity_block(client_name)
-    layered_system = f"{identity}\n\n{system}\n\n{_nigerian_context()}" if identity else f"{system}\n\n{_nigerian_context()}"
+    payment = _payment_details_block(client_name)
+    prefix = "\n\n".join(p for p in [payment, identity] if p)
+    layered_system = f"{prefix}\n\n{system}\n\n{_nigerian_context()}" if prefix else f"{system}\n\n{_nigerian_context()}"
     response = client_api.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=400,

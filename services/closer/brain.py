@@ -110,10 +110,13 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
     # ── Agent identity (T0.2.6) — sign-off name, customer perceives them
     #    as the business's in-house employee, never as "ReachNG".
     try:
-        from agent.brain import _agent_identity_block
+        from agent.brain import _agent_identity_block, _payment_details_block
         identity = _agent_identity_block(client_name)
         if identity:
             system_prompt = identity + "\n\n" + system_prompt
+        payment = _payment_details_block(client_name)
+        if payment:
+            system_prompt = payment + "\n\n" + system_prompt
     except Exception as _e:
         log.warning("identity_inject_closer_failed", error=str(_e))
     contact_phone = lead.get("contact_phone")
@@ -227,6 +230,9 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
         return None
 
     # Queue through HITL — brief gate + caps still apply.
+    # The HITL layer fires the sales alerter automatically when classification
+    # is set; we pass `inbound_context=last_inbound` so the alert ping to the
+    # owner can include "They said: …" in the body.
     try:
         approval_id = queue_draft(
             contact_id=lead_id,                            # closer lead id doubles as contact id
@@ -238,6 +244,7 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
             source="closer",
             client_name=client_name,
             classification=classification_dict,
+            inbound_context=last_inbound,
         )
     except BriefIncompleteError as e:
         log.warning("closer_draft_blocked_brief", lead=lead_id, blockers=e.blockers)

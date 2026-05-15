@@ -63,6 +63,15 @@ class ClientUpsert(BaseModel):
     vertical: str
     brief: str
     agent_name: Optional[str] = None         # Defaults to "EYO" if not provided
+
+    # Payment details (Lagos pattern: bank transfer is the default rail.
+    # Paystack stays available but bank details are what the agent quotes first.)
+    bank_name: Optional[str] = None           # e.g. "GTBank", "Access Bank"
+    bank_account_number: Optional[str] = None # 10-digit NUBAN
+    bank_account_name: Optional[str] = None   # account-holder name shown to customers
+    payment_pref: str = "bank_transfer"       # "bank_transfer" | "paystack" | "both"
+    paystack_link: Optional[str] = None       # optional standing paystack page url
+
     preferred_channel: str = "whatsapp"
     active: bool = True
     plan: PlanTier = "starter"
@@ -211,11 +220,23 @@ async def upsert_client(payload: ClientUpsert):
     if not (1 <= len(agent_name) <= 20):
         raise HTTPException(400, "agent_name must be 1-20 characters")
 
+    # Normalise + validate payment details. Account number must be 10 digits
+    # (NUBAN) if provided. Account name max 64 chars. Pref must be valid.
+    bank_number = (payload.bank_account_number or "").strip()
+    if bank_number and (not bank_number.isdigit() or len(bank_number) != 10):
+        raise HTTPException(400, "bank_account_number must be 10 digits (NUBAN)")
+    payment_pref = payload.payment_pref if payload.payment_pref in {"bank_transfer", "paystack", "both"} else "bank_transfer"
+
     set_doc = {
         "name":                  payload.name,
         "vertical":              payload.vertical,
         "brief":                 payload.brief,
         "agent_name":            agent_name,
+        "bank_name":             (payload.bank_name or "").strip()[:40] or None,
+        "bank_account_number":   bank_number or None,
+        "bank_account_name":     (payload.bank_account_name or "").strip()[:64] or None,
+        "payment_pref":          payment_pref,
+        "paystack_link":         (payload.paystack_link or "").strip()[:300] or None,
         "preferred_channel":     payload.preferred_channel,
         "active":                payload.active,
         "plan":                  payload.plan,

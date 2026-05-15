@@ -142,6 +142,8 @@ async def lifespan(app: FastAPI):
     ensure_milestone_indexes()
     from services.platform_settings import ensure_settings_indexes
     ensure_settings_indexes()
+    from services.sales_alerter import ensure_sales_alert_indexes
+    ensure_sales_alert_indexes()
     from api.legal import ensure_legal_indexes
     ensure_payroll_indexes()
     ensure_rent_indexes()
