@@ -49,6 +49,40 @@ Locked sequence — build in this order. Total ~17 days.
 
 - [ ] **8. Pricing Settings panel** (~1.5 hours) — Mongo `platform_settings.pricing` doc with three plan amounts. Read from doc in `api/marketing.py::PLAN_PRICING` (fallback to defaults). Edit inline from dashboard Control Tower → Settings tab. Audit log on each change. Killer for testing price points without a deploy.
 
+## P0 — Tier-0 Engine sprint (queued 2026-05-15 — push ReachNG to world-class SDR)
+
+Total ~12 days. Goal: move from "great Lagos SDR" → "addictive, impossible-to-leave." Each item compounds on the foundations already shipped (HITL, vertical playbooks, Memory, KB+Rules, Outcomes Engine).
+
+- [ ] **T0.1 Voice-note inbound (Whisper)** (~1 day) — User has OPENAI_API_KEY (already provisioned). Unipile + Meta webhooks deliver audio attachments → download via `tools/inbound_media.py` (already built) → POST to OpenAI Whisper API → transcript flows into existing draft pipeline as if it were text. Drafts cite "voice note transcript:" in the queue UI so the operator knows the source. Falls back gracefully if Whisper unavailable. Files: extend `tools/inbound_media.py` with `transcribe_audio()`, new `tools/voice_whisper.py`, webhook image-branch sibling for audio in `api/webhooks.py`. **Add OPENAI_API_KEY to Railway env + `config.py` settings field.**
+
+- [ ] **T0.2 Emotional intelligence — tone-aware drafting** (~2 days) — Every inbound classified on 3 axes BEFORE drafting:
+  - sentiment ∈ {happy, neutral, frustrated, angry}
+  - stage ∈ {first_touch, qualifying, negotiating, closing, post_sale, complaint}
+  - urgency ∈ {idle, interested, hot, on_fire}
+
+  Classifier is a single Haiku call (~200ms, ~₦2/call). Output injected into prompt as a `TONE GUIDANCE` block. Angry → auto-escalate, draft includes apology framing. Hot → brisk + confident, propose deposit. Drafts surface badges in HITL queue so owner sees the read at a glance. Files: new `services/inbound_classifier.py`, wire into `agent/brain.py` and `services/closer/brain.py` before draft generation.
+
+- [ ] **T0.3 Predictive co-pilot — chat with your agent** (~2 days) — Conversational owner→agent interface. Owner types into a chatbox in the dashboard:
+  - "Who hasn't replied to me in 5 days?" → ranked list
+  - "Show me leads I should call today" → 3 names + reasons
+  - "Summarise this week" → plain English
+  - "Draft a follow-up to that Banana Island buyer from last month" → ready draft
+
+  Built on top of memory + scorecard + Mongo aggregations. Claude Haiku as the planner; the actual lookups are deterministic Mongo queries the agent assembles. Files: new `services/copilot.py` (intent → query plan → execute → narrate), new `api/copilot.py` with `POST /api/v1/copilot/ask`, dashboard sidebar widget.
+
+- [ ] **T0.4 Outcome-learning loop** (~3 days) — The moat that compounds. Every approved draft tagged with unique outcome_id. When a positive customer reply lands (book / pay / yes), tag conversation as `win`. When silence > 7 days or explicit `no`, tag `miss`. Weekly job: per client, Claude reviews wins vs misses and emits a `prompt_addendum` — auto-merged into that client's BusinessBrief override. Effect: the agent writes better drafts every week per client without anyone tuning manually. Files: new `services/outcome_learning.py`, `outcomes` collection (one per draft), `prompt_addendum` field on `clients` doc, weekly cron Sunday 23:00 Lagos.
+
+- [ ] **T0.5 Proactive intelligence engine** (~4 days, 5 starter behaviours) — The agent acts without being asked:
+  1. **Stale-lead revival** — leads quiet 14+ days, top 5 surfaced daily with draft each
+  2. **Festival timing** — Detty December, Sallah, Easter, Owambe season → vertical-specific campaign drafts a week before
+  3. **Birthday / anniversary nudges** — agent reads memory for date facts, queues warm check-in on the day
+  4. **Capacity nudges** — restaurant <40% on a Tuesday → flash promo draft to warmest leads
+  5. **Booking reminders** — 24h before a booked appointment, agent drafts a "still on?" reminder
+
+  Each behaviour is a scheduler job that produces draft suggestions for HITL — owner approves or skips. Files: new `services/proactive/` package (`stale.py`, `festivals.py`, `birthdays.py`, `capacity.py`, `reminders.py`), new `api/proactive.py` for dashboard surfacing.
+
+---
+
 - [ ] **9. Marketing site visual overhaul** (~half day, ~4-5 hrs) — Current orange/black palette is wrong for the audience. Re-skin all marketing pages (`templates/marketing/*`). **References**: 11x.ai (dark glass + glow + premium AI energy), Artisan.co (warm editorial cream + serif headlines + sophistication), Landbase.com (clean grid + Linear-esque minimal). **Direction to synthesise**: premium AI-era feel — likely a hybrid of Artisan's editorial typography (large serif headline + clean sans body) with 11x's depth and glow accents in section breaks. Apply across landing, pricing, about, contact, vertical landers, signup, signup_success. Token-driven CSS so dashboard + portal can adopt incrementally.
 
 ---
