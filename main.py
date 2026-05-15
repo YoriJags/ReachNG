@@ -144,6 +144,8 @@ async def lifespan(app: FastAPI):
     ensure_settings_indexes()
     from services.sales_alerter import ensure_sales_alert_indexes
     ensure_sales_alert_indexes()
+    from services.waitlist import ensure_waitlist_indexes
+    ensure_waitlist_indexes()
     from api.legal import ensure_legal_indexes
     ensure_payroll_indexes()
     ensure_rent_indexes()
@@ -265,10 +267,12 @@ from api.knowledge_base import router as kb_router
 from api.client_rules import router as client_rules_router
 from api.scorecard import router as scorecard_router
 from api.platform_settings import router as platform_settings_router
+from api.waitlist import router as waitlist_router
 app.include_router(kb_router)
 app.include_router(client_rules_router)
 app.include_router(scorecard_router)
 app.include_router(platform_settings_router)
+app.include_router(waitlist_router)
 
 app.include_router(dashboard_router, **_auth)
 

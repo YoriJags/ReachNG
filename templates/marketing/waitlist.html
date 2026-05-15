@@ -1,0 +1,135 @@
+{% extends "marketing/_base.html" %}
+
+{% block title %}Join the waitlist — ReachNG{% endblock %}
+{% block description %}ReachNG is opening to Lagos SMEs in waves. Join the waitlist — your AI sales employee, EYO, will WhatsApp you when your spot opens. Hand-onboarded. Built in Lagos.{% endblock %}
+
+{% block content %}
+
+<section class="hero" style="padding: 80px 24px 40px;">
+  <div class="eyebrow">Opening in waves · Hand-onboarded · Lagos only</div>
+  <h1 style="max-width: 800px;">Skip the queue at <em>your</em> business. Join the queue for <em>EYO</em>.</h1>
+  <p class="sub" style="max-width: 620px;">We're onboarding Lagos SMEs in small batches so your first 30 days are wow-quality, not a beta scramble. Drop your details and EYO will WhatsApp you the moment your spot opens.</p>
+  {% if total and total > 0 %}
+  <p style="margin-top: 20px; font-size: 13px; color: var(--muted); letter-spacing: 0.04em;">
+    <strong style="color: var(--text-strong);">{{ total }}</strong> Lagos businesses ahead of you on the list.
+  </p>
+  {% endif %}
+</section>
+
+<section style="padding-top: 0;">
+  <div class="inner" style="max-width: 640px;">
+
+    <div id="waitlist-success" style="display:none; background:#0e1e10; border:1px solid #2d5a36; border-left:4px solid #5dd28a; border-radius:10px; padding:28px 32px;">
+      <div style="font-size:11px; color:#5dd28a; text-transform:uppercase; letter-spacing:0.18em; font-weight:700; margin-bottom:8px;">You're in</div>
+      <h2 style="margin:0 0 12px; font-size:28px; color:var(--text-strong); letter-spacing:-0.5px;">You're #<span id="wl-position">—</span> on the list.</h2>
+      <p style="margin:0 0 12px; color:var(--muted-strong); line-height:1.7;">EYO will WhatsApp you the moment your spot opens. We onboard in small batches so your first 30 days are wow-quality — not a beta scramble.</p>
+      <p style="margin:0; color:var(--muted); font-size:13px;">In the meantime: take a look at how the agent runs on the <a href="/portal/demo" target="_blank" style="color:var(--orange);">live Lagos demo</a> — same engine, sample data.</p>
+    </div>
+
+    <form id="waitlist-form" style="display:grid; gap:18px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px;">
+      <h2 style="margin:0 0 4px; font-size:22px; color:var(--text-strong); letter-spacing:-0.3px;">Tell EYO who you are.</h2>
+      <p style="margin: 0 0 12px; color: var(--muted-strong); font-size: 14px;">We only ask what we'll actually use to onboard you.</p>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div>
+          <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">Your name</label>
+          <input type="text" name="name" required maxlength="80" style="width:100%; padding:11px 13px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; font-family:inherit;">
+        </div>
+        <div>
+          <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">Business name</label>
+          <input type="text" name="business_name" required maxlength="120" style="width:100%; padding:11px 13px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; font-family:inherit;">
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div>
+          <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">WhatsApp number</label>
+          <input type="tel" name="phone" placeholder="0816 458 3657" maxlength="24" style="width:100%; padding:11px 13px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; font-family:inherit;">
+        </div>
+        <div>
+          <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">Email <span style="font-size:10px;color:#555;">(optional if phone given)</span></label>
+          <input type="email" name="email" placeholder="you@business.ng" maxlength="120" style="width:100%; padding:11px 13px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; font-family:inherit;">
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div>
+          <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">What do you do?</label>
+          <select name="vertical" required style="width:100%; padding:11px 13px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; font-family:inherit;">
+            <option value="">— Select —</option>
+            <option value="hospitality">Restaurant / bar / lounge / hotel</option>
+            <option value="real_estate">Real estate</option>
+            <option value="education">School / education</option>
+            <option value="professional_services">Legal / professional services</option>
+            <option value="clinics">Clinic / wellness</option>
+            <option value="small_business">Beauty / wellness / small biz</option>
+            <option value="fitness">Gym / fitness</option>
+            <option value="logistics">Logistics / fleet</option>
+            <option value="events">Events / entertainment</option>
+            <option value="fintech">Fintech</option>
+            <option value="auto">Auto</option>
+            <option value="recruitment">Recruitment / agency</option>
+            <option value="other">Something else</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">City</label>
+          <input type="text" name="city" placeholder="Lagos" maxlength="60" style="width:100%; padding:11px 13px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; font-family:inherit;">
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">What's eating your time on WhatsApp? <span style="font-size:10px;color:#555;">(optional — helps us prioritise)</span></label>
+        <textarea name="brief_pain" rows="3" maxlength="600" placeholder="e.g. We lose ~5 weekend bookings to slow replies. Voice notes pile up at night." style="width:100%; padding:11px 13px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; font-family:inherit; resize:vertical;"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="margin-top:4px;">Join the waitlist →</button>
+      <p id="waitlist-error" style="margin:0; font-size:12px; color:#ff7a7a; display:none;"></p>
+      <p style="margin:0; font-size:11px; color:var(--muted); text-align:center;">We'll WhatsApp you when your spot opens. No spam. No newsletters.</p>
+    </form>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const form = document.getElementById('waitlist-form');
+    const success = document.getElementById('waitlist-success');
+    const errEl = document.getElementById('waitlist-error');
+    const preselected = "{{ preselected_vertical or '' }}";
+    if (preselected) {
+      const sel = form.querySelector('select[name="vertical"]');
+      if (sel) sel.value = preselected;
+    }
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errEl.style.display = 'none';
+      const fd = new FormData(form);
+      const payload = {};
+      for (const [k, v] of fd.entries()) {
+        if (v && String(v).trim()) payload[k] = String(v).trim();
+      }
+      // Capture utm/source if any
+      const params = new URLSearchParams(window.location.search);
+      const src = params.get('utm_source') || params.get('source');
+      if (src) payload.source = src;
+      try {
+        const r = await fetch('/api/v1/waitlist', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload),
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.detail || 'Could not join — try again.');
+        document.getElementById('wl-position').textContent = data.position;
+        form.style.display = 'none';
+        success.style.display = 'block';
+        success.scrollIntoView({behavior: 'smooth', block: 'start'});
+      } catch (err) {
+        errEl.textContent = err.message || 'Something went wrong.';
+        errEl.style.display = 'block';
+      }
+    });
+  })();
+</script>
+
+{% endblock %}
