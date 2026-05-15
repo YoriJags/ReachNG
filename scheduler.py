@@ -321,6 +321,36 @@ async def _client_morning_briefs():
         log.error("client_briefs_failed", error=str(e))
 
 
+async def _cohort_snapshot():
+    """Nightly: roll up the platform cohort stats for the landing-page tiles."""
+    try:
+        from services.cohort_stats import snapshot_cohort_stats
+        snapshot_cohort_stats(window_days=7)
+        log.info("cohort_snapshot_done")
+    except Exception as e:
+        log.error("cohort_snapshot_crashed", error=str(e))
+
+
+async def _milestone_sweep():
+    """Daily: scan every active client for newly-hit milestones."""
+    try:
+        from services.milestone_engine import check_milestones_all_clients
+        result = check_milestones_all_clients()
+        log.info("milestone_sweep_done", **result)
+    except Exception as e:
+        log.error("milestone_sweep_crashed", error=str(e))
+
+
+async def _weekly_digest():
+    """Monday 7am Lagos: WhatsApp weekly digest to each client owner."""
+    try:
+        from services.weekly_digest import send_weekly_digests
+        result = send_weekly_digests()
+        log.info("weekly_digest_done", **result)
+    except Exception as e:
+        log.error("weekly_digest_crashed", error=str(e))
+
+
 async def _scorecard_snapshot_all():
     """Nightly: materialise the per-client scorecard for every active client.
 
@@ -386,6 +416,27 @@ def setup_scheduler():
         _quality_audit_all,
         CronTrigger(hour=4, minute=0, timezone="Africa/Lagos"),
         id="quality_audit", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=900,
+    )
+
+    # Cohort stats nightly at 04:15 — runs AFTER scorecard snapshots are in
+    scheduler.add_job(
+        _cohort_snapshot,
+        CronTrigger(hour=4, minute=15, timezone="Africa/Lagos"),
+        id="cohort_snapshot", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=600,
+    )
+
+    # Milestone sweep daily at 04:30
+    scheduler.add_job(
+        _milestone_sweep,
+        CronTrigger(hour=4, minute=30, timezone="Africa/Lagos"),
+        id="milestone_sweep", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=900,
+    )
+
+    # Weekly owner digest — Mondays 07:00 Africa/Lagos
+    scheduler.add_job(
+        _weekly_digest,
+        CronTrigger(day_of_week="mon", hour=7, minute=0, timezone="Africa/Lagos"),
+        id="weekly_digest", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=1800,
     )
 
     scheduler.add_job(

@@ -136,6 +136,10 @@ async def lifespan(app: FastAPI):
     ensure_scorecard_indexes()
     from services.quality_metrics import ensure_quality_indexes
     ensure_quality_indexes()
+    from services.cohort_stats import ensure_cohort_indexes
+    ensure_cohort_indexes()
+    from services.milestone_engine import ensure_milestone_indexes
+    ensure_milestone_indexes()
     from api.legal import ensure_legal_indexes
     ensure_payroll_indexes()
     ensure_rent_indexes()

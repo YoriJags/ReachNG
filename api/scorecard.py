@@ -228,3 +228,54 @@ async def portal_quality(token: str, window_days: int = 14):
     client = _client_from_token(token)
     q = compute_quality(str(client["_id"]), window_days=window_days)
     return asdict(q)
+
+
+# ─── Public: cohort stats (for landing page) ──────────────────────────────────
+
+@router.get("/api/v1/cohort-stats")
+async def public_cohort_stats():
+    """Anonymised platform-wide aggregates. PUBLIC — no auth. Read from cache."""
+    from services.cohort_stats import latest_cohort_stats, format_summary_for_landing
+    raw = latest_cohort_stats() or {}
+    summary = format_summary_for_landing()
+    # Strip internal datetime objects for safe JSON
+    def _safe(v):
+        if isinstance(v, datetime):
+            return v.isoformat()
+        return v
+    raw_safe = {k: _safe(v) for k, v in raw.items()}
+    return {"summary": summary, "raw": raw_safe}
+
+
+# ─── Milestone events ─────────────────────────────────────────────────────────
+
+@router.get("/portal/{token}/milestones")
+async def portal_milestones(token: str, limit: int = 20):
+    client = _client_from_token(token)
+    from services.milestone_engine import get_events_col
+    rows = list(
+        get_events_col()
+        .find({"client_id": str(client["_id"])})
+        .sort("fired_at", -1)
+        .limit(min(50, limit))
+    )
+    for r in rows:
+        r["_id"] = str(r["_id"])
+        # Strip the heavy card_html — fetch it separately via card endpoint
+        r.pop("card_html", None)
+    return {"milestones": rows}
+
+
+@router.get("/portal/{token}/milestones/{event_id}/card", response_class=HTMLResponse)
+async def portal_milestone_card(token: str, event_id: str):
+    client = _client_from_token(token)
+    from services.milestone_engine import get_events_col
+    from bson import ObjectId
+    try:
+        row = get_events_col().find_one({"_id": ObjectId(event_id),
+                                          "client_id": str(client["_id"])})
+    except Exception:
+        row = None
+    if not row:
+        raise HTTPException(404, "milestone not found")
+    return HTMLResponse(row.get("card_html") or "<p>Card missing</p>")
