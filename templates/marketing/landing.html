@@ -1,7 +1,7 @@
 {% extends "marketing/_base.html" %}
 
-{% block title %}ReachNG — Your future customer is typing a WhatsApp right now. Here's what happens next.{% endblock %}
-{% block description %}A customer messages your business at 11:47pm. With ReachNG they get a reply in under a second, a personal draft in minutes — written in your voice, with their name, your pricing, a Paystack link. You tap approve from bed. Deposit hits before sunrise. Built in Lagos for Nigerian SMEs tired of typing WhatsApp replies at midnight.{% endblock %}
+{% block title %}ReachNG — While you were in a meeting, EYO closed three deposits.{% endblock %}
+{% block description %}An AI sales employee for Lagos SMEs. Voice notes, texts, transfer screenshots — your AI employee reads each one, drafts a personal reply in your tone with your bank details, and pings your phone the moment a lead is hot. You approve in seconds, from wherever you are. Built for the moments you can't be on your phone — meetings, school runs, owambe, sleep. HITL by design — no message leaves without your tap.{% endblock %}
 
 {% block schema %}
 <script type="application/ld+json">
@@ -23,13 +23,34 @@
 <!-- ── Hero ─────────────────────────────────────────────── -->
 <section class="hero">
   <div class="eyebrow">An AI sales employee for Lagos SMEs · Opening in waves</div>
-  <h1>Your customer messaged at 11:47pm. <em>EYO already drafted the reply.</em></h1>
-  <p class="sub">Voice note, text, or transfer screenshot — your AI employee reads it, drafts a personal reply in your tone with your bank account already in the message, and pings your phone the moment it's hot. You tap approve from bed. Deposit lands in your account before sunrise. <strong style="color:var(--text-strong)">You didn't type a word.</strong></p>
+  <h1>While you were in a meeting, <em>EYO closed three deposits.</em></h1>
+  <p class="sub">Voice note, text, or transfer screenshot — your AI employee reads it, drafts a personal reply in your tone with your bank details already in the message, and pings your phone the moment a lead is hot. You approve in seconds — from a meeting, the back of an Uber, the gym, or yes, bed. <strong style="color:var(--text-strong)">EYO covers every moment you can't be on your phone.</strong></p>
   <div class="hero-ctas">
     <a href="/waitlist" class="btn btn-primary">Join the waitlist →</a>
     <a href="/portal/demo" class="btn btn-ghost" target="_blank">See it run — 90 seconds</a>
   </div>
   <p style="margin-top: 28px; font-size: 12px; color: var(--muted); letter-spacing: 0.04em;">Onboarding in small batches · Lagos only · Hand-built first 30 days</p>
+
+  <!-- Rotating proof strip — the four frames -->
+  <div style="margin-top: 48px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; max-width: 980px; margin-left: auto; margin-right: auto; text-align: left;">
+    <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; background: var(--surface);">
+      <div style="font-size: 11px; color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">⚡ Speed</div>
+      <p style="margin: 0; font-size: 13px; color: var(--muted-strong); line-height: 1.6;">Customer asked the price. <strong style="color:var(--text-strong)">EYO replied in 9 seconds</strong> — with your account number already in the message.</p>
+    </div>
+    <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; background: var(--surface);">
+      <div style="font-size: 11px; color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">📉 Loss</div>
+      <p style="margin: 0; font-size: 13px; color: var(--muted-strong); line-height: 1.6;">Lagos SMEs lose <strong style="color:var(--text-strong)">40% of bookings</strong> to slow replies. EYO closes them before the customer scrolls away.</p>
+    </div>
+    <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; background: var(--surface);">
+      <div style="font-size: 11px; color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">📱 Pocket-mode</div>
+      <p style="margin: 0; font-size: 13px; color: var(--muted-strong); line-height: 1.6;">Approve sales <strong style="color:var(--text-strong)">from the back of a meeting</strong>, the school run, the bus, or bed. One tap. Sent.</p>
+    </div>
+    <div style="border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; background: var(--surface);">
+      <div style="font-size: 11px; color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">🌙 Off-hours</div>
+      <p style="margin: 0; font-size: 13px; color: var(--muted-strong); line-height: 1.6;">11:47pm enquiry? Sunday morning? Owambe Saturday? <strong style="color:var(--text-strong)">EYO already drafted the reply.</strong></p>
+    </div>
+  </div>
+
   <p id="wl-counter" style="margin-top: 14px; font-size: 13px; color: var(--muted-strong); letter-spacing: 0.02em; display: none;">
     <span style="display:inline-flex;align-items:center;gap:8px;">
       <span style="width:8px;height:8px;border-radius:50%;background:#5dd28a;box-shadow:0 0 8px #5dd28a;display:inline-block;"></span>
@@ -49,6 +70,33 @@
       } catch (e) { /* silent — counter is opportunistic */ }
     })();
   </script>
+</section>
+
+<!-- ── Meet EYO ─────────────────────────────────────────────── -->
+<section style="border-bottom: 1px solid var(--border);">
+  <div class="inner" style="max-width: 920px;">
+    <div class="section-label">First — who's EYO?</div>
+    <h2 class="section-h2">EYO is your AI sales employee. Named after the Eyo Festival of Lagos.</h2>
+    <p class="section-sub">Three letters, distinctly Lagos, easy to say. EYO is the default name your AI employee answers to from day one. You can rename it whatever fits your brand — Tola, Ada, Bisi, anything — and that's the name customers see in every reply.</p>
+
+    <div class="grid-3" style="margin-top: 40px;">
+      <div class="card" style="border-color: var(--border-strong);">
+        <div class="tag">What EYO does</div>
+        <h3>Reads every inbound. Drafts every reply.</h3>
+        <p style="line-height: 1.7;">Voice notes, texts, transfer screenshots, photos — EYO reads them, drafts a personal response in your tone with your pricing and bank details, and queues it for your tap. One employee. Every channel. Every hour.</p>
+      </div>
+      <div class="card" style="border-color: var(--border-strong);">
+        <div class="tag">What EYO doesn't do</div>
+        <h3>Send without your approval. Ever.</h3>
+        <p style="line-height: 1.7;">No autopilot loophole. No "until you turn it off." The architecture has <em>no path</em> to a sent message without your tap. EYO drafts; you decide. Your number, your voice, your reputation — fully yours.</p>
+      </div>
+      <div class="card" style="border-color: var(--orange);">
+        <div class="tag">You name them</div>
+        <h3>You bought an employee. Name them what you want.</h3>
+        <p style="line-height: 1.7;">From your portal, rename EYO to anything that fits — a Yoruba name, your founder's name, your brand mascot. That name signs off every customer-facing message. Customers think they're chatting with your team. They are.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ── The line in the sand ─────────────────────────────────────────────── -->
@@ -355,6 +403,36 @@
         <div class="tag">Human-in-the-loop</div>
         <h3>Your tap is the only path.</h3>
         <p style="line-height: 1.7;">Architecturally enforced — not a setting you have to remember to keep on. There is literally no code path that sends a message without your approval. Even with Autopilot on for the easy ones, anything risky (complaints, disputes, high-value) still routes back to your queue. The voice is yours. The reputation is yours.</p>
+      </div>
+      <div class="card">
+        <div class="tag">🎭 Emotional intelligence</div>
+        <h3>Knows the difference between angry and hot.</h3>
+        <p style="line-height: 1.7;">Before drafting a single word, EYO classifies the message on three axes: <em>sentiment</em> (happy / neutral / frustrated / angry), <em>stage</em> (first-touch / qualifying / negotiating / closing / complaint), and <em>urgency</em> (idle / interested / hot / on-fire). An angry refund gets a different opening than a hot Saturday booking. <strong style="color:var(--text-strong)">Drafts surface with a badge so you see the read at a glance.</strong></p>
+      </div>
+      <div class="card">
+        <div class="tag">🧠 Per-customer memory</div>
+        <h3>Remembers what they told you in March.</h3>
+        <p style="line-height: 1.7;">Every detail a customer ever shares — their budget, their wedding date, their kid's school year, their dietary preference, the colour they wanted — gets remembered against their number, scoped to your business only. EYO references it in every future reply. <strong style="color:var(--text-strong)">No customer ever has to repeat themselves to you again.</strong> Zero cross-client leakage, nightly self-tested.</p>
+      </div>
+      <div class="card">
+        <div class="tag">⚖️ Escalation ladders</div>
+        <h3>Rent chase that respects Lagos Tenancy Law.</h3>
+        <p style="line-height: 1.7;">Rent overdue, invoice unpaid, school fees stuck? EYO escalates through five stages over 60 days: <em>friendly → firm → serious → warning (with Lagos Tenancy Law) → final (with 7-day quit)</em>. Each message generated fresh, not a template. <strong style="color:var(--text-strong)">Recovers cash that normally slips 30 days into 7.</strong></p>
+      </div>
+      <div class="card">
+        <div class="tag">⚙️ Teach EYO your business</div>
+        <h3>Knowledge base + rules. In 30 minutes.</h3>
+        <p style="line-height: 1.7;">Upload your menu, pricing, FAQ, policies — EYO retrieves the right snippet on every reply. Set rules ("if they mention refund, escalate to me"; "if value over ₦1M, never autopilot"). Pick a vertical scenario bundle to pre-load. <strong style="color:var(--text-strong)">Sandbox lets you test drafts before any customer sees them.</strong></p>
+      </div>
+      <div class="card">
+        <div class="tag">💬 Chat with EYO</div>
+        <h3>"Who hasn't replied in 5 days?" Answered.</h3>
+        <p style="line-height: 1.7;">Type a question into the dashboard chatbox: <em>"Show me leads I should call today." "Summarise this week." "Draft a follow-up to the Banana Island buyer from last month."</em> EYO assembles the answer from your real pipeline data — not a generic AI guess. <strong style="color:var(--text-strong)">Your business, answered in plain English.</strong></p>
+      </div>
+      <div class="card">
+        <div class="tag">📊 Outcomes scorecard</div>
+        <h3>The numbers that matter, every week.</h3>
+        <p style="line-height: 1.7;">Per-client portal widget: ₦ closed via EYO-handled conversations, ₦ recovered from chase ladders, bookings confirmed, median response time before vs after, hours of typing saved, cost per booking. One-tap branded PDF export for investors or your own records. Plus a Monday-morning WhatsApp digest summarising last week.</p>
       </div>
     </div>
 
