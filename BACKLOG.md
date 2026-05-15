@@ -49,6 +49,12 @@ Locked sequence — build in this order. Total ~17 days.
 
 - [ ] **8. Pricing Settings panel** (~1.5 hours) — Mongo `platform_settings.pricing` doc with three plan amounts. Read from doc in `api/marketing.py::PLAN_PRICING` (fallback to defaults). Edit inline from dashboard Control Tower → Settings tab. Audit log on each change. Killer for testing price points without a deploy.
 
+## 🚨 BLOCKED — Railway deploy failing on healthcheck (2026-05-15 EOD)
+
+Latest commits build cleanly but `/health` never responds. Process crashes at startup. See `RESUME_NEXT_SESSION.md` for the debug path. Most likely a Python ImportError inside `api/copilot.py`, `api/billing.py`, or `services/usage_meter.py`. Resolve before any further code push.
+
+---
+
 ## P0 — Tier-0 Engine sprint (queued 2026-05-15 — push ReachNG to world-class SDR)
 
 Total ~12 days. Goal: move from "great Lagos SDR" → "addictive, impossible-to-leave." Each item compounds on the foundations already shipped (HITL, vertical playbooks, Memory, KB+Rules, Outcomes Engine).
