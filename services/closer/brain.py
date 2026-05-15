@@ -103,10 +103,17 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
         extra_context={"objection": objection} if objection else None,
     )
 
-    # ── Inject scoped client memory ──────────────────────────────────────────
+    # ── Inject memory, KB chunks, and active rules ───────────────────────────
     system_prompt = ctx["system_prompt"]
     contact_phone = lead.get("contact_phone")
     lead_client_id = lead.get("client_id")
+    last_inbound = (lead.get("inquiry_text") or "")
+    # Find the freshest inbound from the thread if available
+    for ev in reversed(lead.get("thread") or []):
+        if ev.get("direction") == "in" and ev.get("body"):
+            last_inbound = ev["body"]
+            break
+
     if lead_client_id and contact_phone:
         try:
             from services.client_memory import fetch_memory_block
@@ -119,6 +126,35 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
                 system_prompt = system_prompt + "\n\n" + mem
         except Exception as _e:
             log.warning("memory_inject_closer_failed", lead=lead_id, error=str(_e))
+
+    if lead_client_id:
+        try:
+            from services.knowledge_base import fetch_kb_block
+            kb = fetch_kb_block(str(lead_client_id), last_inbound)
+            if kb:
+                system_prompt = system_prompt + "\n\n" + kb
+        except Exception as _e:
+            log.warning("kb_inject_closer_failed", lead=lead_id, error=str(_e))
+
+        try:
+            from services.client_rules import fetch_rules_block
+            rules_block, escalate_flag = fetch_rules_block(str(lead_client_id), last_inbound, intent=intent)
+            if rules_block:
+                system_prompt = system_prompt + "\n\n" + rules_block
+            if escalate_flag:
+                # Stash escalation flag on the lead so the operator UI can render it
+                try:
+                    from database import get_db as _gdb
+                    from bson import ObjectId
+                    _gdb()["closer_leads"].update_one(
+                        {"_id": ObjectId(lead_id)},
+                        {"$set": {"escalation_flag": True,
+                                  "escalation_reason": "rule-triggered escalation"}},
+                    )
+                except Exception:
+                    pass
+        except Exception as _e:
+            log.warning("rules_inject_closer_failed", lead=lead_id, error=str(_e))
 
     # Render the actual draft using the assembled system prompt + lead thread.
     user_prompt = _render_user_prompt(lead, intent)

@@ -237,25 +237,52 @@ def generate_b2c_message(
 
     system = (brief_system + "\n\n" + ng_context + "\n\n" + base_system) if brief_system else (ng_context + "\n\n" + base_system)
 
-    # ── Inject scoped client memory if we have both client + phone ───────────
-    memory_block_text = ""
-    if client_name and phone:
+    # ── Resolve client_id once for KB / Rules / Memory injection ────────────
+    resolved_client_id: Optional[str] = None
+    if client_name:
         try:
             import re as _re
             from database import get_db as _get_db
-            from services.client_memory import fetch_memory_block
-            client_doc = _get_db()["clients"].find_one(
+            _client_doc = _get_db()["clients"].find_one(
                 {"name": {"$regex": f"^{_re.escape(client_name)}$", "$options": "i"}}
             )
-            cid = str(client_doc["_id"]) if client_doc else None
-            if cid:
-                memory_block_text = fetch_memory_block(
-                    client_id=cid, contact_phone=phone, requested_by="generate_b2c_message"
-                )
-                if memory_block_text:
-                    system = system + "\n\n" + memory_block_text
+            resolved_client_id = str(_client_doc["_id"]) if _client_doc else None
+        except Exception as _e:
+            log.warning("client_id_resolve_failed", error=str(_e))
+
+    # ── Inject scoped client memory if we have both client + phone ───────────
+    if resolved_client_id and phone:
+        try:
+            from services.client_memory import fetch_memory_block
+            mem_block = fetch_memory_block(
+                client_id=resolved_client_id, contact_phone=phone,
+                requested_by="generate_b2c_message",
+            )
+            if mem_block:
+                system = system + "\n\n" + mem_block
         except Exception as exc:
             log.warning("memory_inject_b2c_failed", error=str(exc))
+
+    # ── Inject KB chunks relevant to whatever notes/tags hint at ─────────────
+    if resolved_client_id:
+        try:
+            from services.knowledge_base import fetch_kb_block
+            kb_query = " ".join([s for s in (notes, " ".join(tags or [])) if s]) or customer_name
+            kb_block = fetch_kb_block(resolved_client_id, kb_query)
+            if kb_block:
+                system = system + "\n\n" + kb_block
+        except Exception as exc:
+            log.warning("kb_inject_b2c_failed", error=str(exc))
+
+    # ── Inject any active rules that match the inbound text (notes ~= inbound) ─
+    if resolved_client_id:
+        try:
+            from services.client_rules import fetch_rules_block
+            rules_block, _escalate = fetch_rules_block(resolved_client_id, notes or customer_name)
+            if rules_block:
+                system = system + "\n\n" + rules_block
+        except Exception as exc:
+            log.warning("rules_inject_b2c_failed", error=str(exc))
 
     notes_block = f"\nCustomer notes: {notes}" if notes else ""
     tags_block  = f"\nCustomer tags/segments: {', '.join(tags)}" if tags else ""

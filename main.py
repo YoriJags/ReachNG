@@ -128,6 +128,10 @@ async def lifespan(app: FastAPI):
     from services.brief import ensure_brief_indexes, seed_default_primers
     from services.client_memory import ensure_memory_indexes
     ensure_memory_indexes()
+    from services.knowledge_base import ensure_kb_indexes
+    ensure_kb_indexes()
+    from services.client_rules import ensure_rules_indexes
+    ensure_rules_indexes()
     from api.legal import ensure_legal_indexes
     ensure_payroll_indexes()
     ensure_rent_indexes()
@@ -241,6 +245,15 @@ app.include_router(legal_public_router,        prefix="/api/v1")  # token-gated,
 # Closer public: token-gated intake (webhook + email stub) + portal reads — no Basic Auth.
 app.include_router(closer_public_router,      prefix="/api/v1")
 app.include_router(client_signals_router,     prefix="/api/v1", **_auth)
+
+# Knowledge Base + Rules Engine — has BOTH admin (Basic Auth) and portal (token) routes
+# defined inside the same module. Mounted bare so both prefixes (/api/v1/... and /portal/...)
+# work without router-level auth.
+from api.knowledge_base import router as kb_router
+from api.client_rules import router as client_rules_router
+app.include_router(kb_router)
+app.include_router(client_rules_router)
+
 app.include_router(dashboard_router, **_auth)
 
 # Mount MCP server — exposes tools to Claude
