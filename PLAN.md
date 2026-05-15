@@ -58,19 +58,19 @@ Apollo is inactive/expensive — Apify replaces it entirely. `tools/apollo_disco
 
 Module 0 (`services/brief/*` + `api/brief.py` + portal "Business Brief" tab + admin sub-tab + drafters routed through `assemble_context()`) and Module 1 (NDPR gate + `lead_imports` audit + portal "Lead Lists" tab + per-client guardrails + sequences via `services/sequences/engine.py`) all shipped. Wired across `api/portal.py`, `campaigns/b2c.py`, `portal_estate.html`.
 
-## Now — Tier-0 Engine: T0.4 Outcome Learning Loop *(~3 days, current phase)*
+## Now — Tier-0 Engine: T0.4 Outcome Learning Loop *(foundation shipped 2026-05-15)*
 
 Source of truth: BACKLOG.md → "P0 — Tier-0 Engine sprint" → T0.4. Every approved draft tagged with `outcome_id`; positive customer reply → `win`, silence >7d or explicit no → `miss`. Weekly Sunday 23:00 Lagos job: Claude reviews wins vs misses per client and emits a `prompt_addendum` auto-merged into the client's BusinessBrief override. Agent improves per-client every week without manual tuning.
 
-- [ ] `outcomes` Mongo collection — one doc per approved draft, indexed by `(client_id, status, created_at)`
-- [ ] `services/outcome_learning.py` — `tag_win()` / `tag_miss()` / `weekly_distil(client_id)`
-- [ ] Hook `tools/hitl.py` approval path to create the outcome doc
-- [ ] Webhook inbound: reply-classifier → tag win/miss against open outcomes for that contact
-- [ ] Scheduler: nightly 02:00 Lagos sweep — auto-mark `miss` after 7-day silence
-- [ ] Scheduler: weekly Sunday 23:00 Lagos — distil per-client wins/misses → write `clients.prompt_addendum`
-- [ ] `agent/brain.py` + `services/closer/brain.py` — inject `prompt_addendum` into system prompt
-- [ ] Portal: "Agent Learning" card — last addendum summary + last refresh timestamp
-- [ ] Admin: per-client view of recent wins/misses + addendum history
+- [x] `outcomes` Mongo collection — indexed by `(client_id, status, created_at)`, unique sparse on `approval_id` for idempotency
+- [x] `services/outcome_learning.py` — `open_outcome_from_approval()` / `tag_from_inbound()` / `sweep_silence_to_miss()` / `distil_for_client()` / `distil_all_clients()` / `get_addendum_for_client()`
+- [x] Hook `tools/hitl.py::approve_draft` + `edit_draft` to open the outcome doc (best-effort, never blocks send)
+- [x] Webhook inbound: T0.2 classifier intent → `tag_from_inbound()` resolves open outcomes to win/miss
+- [x] Scheduler: nightly 02:00 Lagos `outcome_silence_sweep` — auto-miss after 7d silence
+- [x] Scheduler: weekly Sun 23:00 Lagos `outcome_weekly_distil` — Haiku per-client → `clients.prompt_addendum`
+- [x] `agent/brain.py` + `services/closer/brain.py` — inject `prompt_addendum` as "WEEKLY COACHING" block in system prompt
+- [ ] Portal: "Agent Learning" card — last addendum summary + last refresh timestamp *(tomorrow)*
+- [ ] Admin: per-client view of recent wins/misses + addendum history *(tomorrow)*
 
 ## Next — Tier-0 Engine: T0.5 Proactive Intelligence *(~4 days)*
 
