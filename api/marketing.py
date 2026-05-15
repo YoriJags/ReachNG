@@ -27,12 +27,24 @@ router = APIRouter(tags=["Marketing"])
 
 PAYSTACK_BASE = "https://api.paystack.co"
 
-# Plan tier → monthly fee in naira
+# Plan tier → monthly fee in naira.
+# DEPRECATED hardcoded constant — kept only for any legacy importer; live
+# pricing reads from `services.platform_settings.get_plan_pricing()` and is
+# editable from the Control Tower → Pricing tab (no deploy needed).
 PLAN_PRICING = {
     "starter": {"label": "Starter", "ngn": 80_000},
     "growth":  {"label": "Growth",  "ngn": 150_000},
     "scale":   {"label": "Scale",   "ngn": 300_000},
 }
+
+
+def _live_pricing() -> dict:
+    """Always-fresh pricing read. Falls back to PLAN_PRICING on any error."""
+    try:
+        from services.platform_settings import get_plan_pricing
+        return get_plan_pricing()
+    except Exception:
+        return PLAN_PRICING
 
 
 def _templates(request: Request):
@@ -120,7 +132,7 @@ async def contact_submit(payload: ContactSubmission):
 async def signup_page(request: Request, plan: Optional[str] = None):
     return _templates(request).TemplateResponse(request, "marketing/signup.html", {
         "selected_plan": (plan or "growth").lower(),
-        "plans": PLAN_PRICING,
+        "plans": _live_pricing(),
     })
 
 
@@ -199,7 +211,7 @@ async def signup_initialize(payload: SignupPayload, request: Request):
     if vertical not in SUPPORTED_SIGNUP_VERTICALS:
         raise HTTPException(400, f"Vertical '{payload.vertical}' not supported. Try one of: {sorted(SUPPORTED_SIGNUP_VERTICALS)}")
 
-    plan_info = PLAN_PRICING[payload.plan]
+    plan_info = _live_pricing()[payload.plan]
     base_ngn = plan_info["ngn"]
     if payload.annual:
         # Annual = 12 months × 0.85 (15% off)
@@ -316,7 +328,7 @@ async def paystack_webhook(request: Request):
         "active":          True,
         "plan":            signup["plan"],
         "payment_status":  "paid",
-        "monthly_fee_ngn": PLAN_PRICING.get(signup["plan"], {}).get("ngn"),
+        "monthly_fee_ngn": _live_pricing().get(signup["plan"], {}).get("ngn"),
         "paid_until":      paid_until,
         "owner_name":      signup["owner_name"],
         "owner_phone":     signup["owner_phone"],

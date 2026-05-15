@@ -2314,6 +2314,88 @@ function copyDemoPortalLink(btn){
     </div>
   </div>
 
+  <!-- Pricing Settings (live, no deploy) -->
+  <div class="ct-section">
+    <div class="ct-section-title">Pricing — live, no deploy needed</div>
+    <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Edit any tier and Save. Takes effect immediately for new signups + the /pricing public page.</p>
+    <div id="pricing-editor" style="display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:12px;">
+      <div class="ct-kpi" style="border-color:#1e2530;padding:14px;">
+        <div style="font-size:10px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:6px;">Starter</div>
+        <input type="text" id="px-starter-label" value="Starter" maxlength="32" style="width:100%;background:#0a0a0a;border:1px solid #1f2530;border-radius:6px;color:#e8e8e8;font-size:12px;padding:6px 8px;margin-bottom:6px;">
+        <div style="display:flex;align-items:baseline;gap:4px;">
+          <span style="color:#666;font-size:14px;">₦</span>
+          <input type="number" id="px-starter-ngn" min="1000" max="10000000" step="1000" value="80000" style="flex:1;background:#0a0a0a;border:1px solid #1f2530;border-radius:6px;color:#fff;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;padding:6px 8px;">
+        </div>
+      </div>
+      <div class="ct-kpi" style="border-color:#ff5500;padding:14px;">
+        <div style="font-size:10px;color:#ff5500;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:6px;">Growth</div>
+        <input type="text" id="px-growth-label" value="Growth" maxlength="32" style="width:100%;background:#0a0a0a;border:1px solid #1f2530;border-radius:6px;color:#e8e8e8;font-size:12px;padding:6px 8px;margin-bottom:6px;">
+        <div style="display:flex;align-items:baseline;gap:4px;">
+          <span style="color:#666;font-size:14px;">₦</span>
+          <input type="number" id="px-growth-ngn" min="1000" max="10000000" step="1000" value="150000" style="flex:1;background:#0a0a0a;border:1px solid #1f2530;border-radius:6px;color:#fff;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;padding:6px 8px;">
+        </div>
+      </div>
+      <div class="ct-kpi" style="border-color:#1e2530;padding:14px;">
+        <div style="font-size:10px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:6px;">Scale</div>
+        <input type="text" id="px-scale-label" value="Scale" maxlength="32" style="width:100%;background:#0a0a0a;border:1px solid #1f2530;border-radius:6px;color:#e8e8e8;font-size:12px;padding:6px 8px;margin-bottom:6px;">
+        <div style="display:flex;align-items:baseline;gap:4px;">
+          <span style="color:#666;font-size:14px;">₦</span>
+          <input type="number" id="px-scale-ngn" min="1000" max="10000000" step="1000" value="300000" style="flex:1;background:#0a0a0a;border:1px solid #1f2530;border-radius:6px;color:#fff;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;padding:6px 8px;">
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
+      <button class="btn btn-approve" style="font-size:12px;padding:8px 18px;" onclick="savePricing()">Save pricing</button>
+      <span id="pricing-status" style="font-size:11px;color:#6a7280;"></span>
+      <span id="pricing-audit-tail" style="font-size:10px;color:#444;margin-left:auto;"></span>
+    </div>
+  </div>
+
+  <script>
+    async function loadPricing() {
+      try {
+        const r = await fetch('/api/v1/admin/pricing');
+        if (!r.ok) return;
+        const d = await r.json();
+        const p = d.pricing || {};
+        for (const tier of ['starter','growth','scale']) {
+          if (p[tier]) {
+            document.getElementById(`px-${tier}-label`).value = p[tier].label || tier;
+            document.getElementById(`px-${tier}-ngn`).value   = p[tier].ngn || 0;
+          }
+        }
+        const tail = (d.audit || [])[0];
+        if (tail) {
+          document.getElementById('pricing-audit-tail').textContent =
+            `Last edit: ${new Date(tail.at).toLocaleString()} by ${tail.by || 'admin'}`;
+        }
+      } catch (e) { console.error('pricing load failed', e); }
+    }
+    async function savePricing() {
+      const body = {
+        starter: {label: document.getElementById('px-starter-label').value, ngn: parseInt(document.getElementById('px-starter-ngn').value, 10)},
+        growth:  {label: document.getElementById('px-growth-label').value,  ngn: parseInt(document.getElementById('px-growth-ngn').value,  10)},
+        scale:   {label: document.getElementById('px-scale-label').value,   ngn: parseInt(document.getElementById('px-scale-ngn').value,   10)},
+      };
+      const s = document.getElementById('pricing-status');
+      s.textContent = 'Saving…'; s.style.color = '#6a7280';
+      try {
+        const r = await fetch('/api/v1/admin/pricing', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+        if (!r.ok) { const t = await r.text(); throw new Error(t); }
+        s.textContent = '✓ Saved — live now'; s.style.color = '#5dd28a';
+        loadPricing();
+        setTimeout(() => { s.textContent = ''; }, 4000);
+      } catch (e) {
+        s.textContent = '✗ ' + (e.message || 'save failed'); s.style.color = '#ff7a7a';
+      }
+    }
+    // Lazy-load when Control Tower opens
+    document.addEventListener('DOMContentLoaded', () => {
+      // Best-effort initial load — Control Tower may be the default tab
+      try { loadPricing(); } catch (_) {}
+    });
+  </script>
+
   <!-- MRR by Product Line -->
   <div class="ct-section">
     <div class="ct-section-title">MRR by Product Line</div>

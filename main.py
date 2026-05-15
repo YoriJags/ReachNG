@@ -140,6 +140,8 @@ async def lifespan(app: FastAPI):
     ensure_cohort_indexes()
     from services.milestone_engine import ensure_milestone_indexes
     ensure_milestone_indexes()
+    from services.platform_settings import ensure_settings_indexes
+    ensure_settings_indexes()
     from api.legal import ensure_legal_indexes
     ensure_payroll_indexes()
     ensure_rent_indexes()
@@ -260,9 +262,11 @@ app.include_router(client_signals_router,     prefix="/api/v1", **_auth)
 from api.knowledge_base import router as kb_router
 from api.client_rules import router as client_rules_router
 from api.scorecard import router as scorecard_router
+from api.platform_settings import router as platform_settings_router
 app.include_router(kb_router)
 app.include_router(client_rules_router)
 app.include_router(scorecard_router)
+app.include_router(platform_settings_router)
 
 app.include_router(dashboard_router, **_auth)
 
