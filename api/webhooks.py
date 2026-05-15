@@ -385,6 +385,29 @@ async def _handle_message(
         except Exception as _e:
             log.warning("memory_learn_failed", error=str(_e))
 
+    # ── Outcome learning — resolve open outcomes from this inbound (T0.4) ───
+    # If the classifier reads this inbound as positive (booked/paid/yes) or
+    # negative (no/complaint), tag any open outcomes against this contact.
+    def _maybe_resolve_outcomes(client_doc: dict | None, body_text: str) -> None:
+        if not client_doc or not body_text or body_text.startswith("[Image received"):
+            return
+        try:
+            from services.inbound_classifier import classify_inbound
+            from services.outcome_learning import tag_from_inbound
+            cls = classify_inbound(body_text)
+            intent = (cls.get("intent") if isinstance(cls, dict) else None) or \
+                     (cls.get("stage") if isinstance(cls, dict) else None)
+            if not intent:
+                return
+            tag_from_inbound(
+                contact_phone=sender_phone,
+                client_id=str(client_doc["_id"]),
+                intent=intent,
+                raw_text=body_text,
+            )
+        except Exception as _e:
+            log.warning("outcome_resolve_failed", error=str(_e))
+
     # ── Holding Reply — universal across all verticals ────────────────────────
     # Fire instantly for any active client whose WhatsApp line received this
     # inbound, regardless of vertical or product wired underneath. Gated by
@@ -400,6 +423,8 @@ async def _handle_message(
                 await _maybe_send_holding_reply(matched_client, sender_phone)
                 # Learn durable facts from this inbound (scoped to client + contact)
                 _maybe_learn_memory(matched_client, message_body)
+                # Tag any open outcomes against this contact based on classifier
+                _maybe_resolve_outcomes(matched_client, message_body)
     except Exception as e:
         log.warning("holding_reply_lookup_failed", error=str(e))
 

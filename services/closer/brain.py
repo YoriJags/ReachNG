@@ -170,6 +170,18 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
         except Exception as _e:
             log.warning("rules_inject_closer_failed", lead=lead_id, error=str(_e))
 
+        # ── Inject weekly outcome-learning addendum (T0.4) ─────────────────
+        try:
+            from services.outcome_learning import get_addendum_for_client
+            from database import get_db as _gdb2
+            from bson import ObjectId as _OID
+            client_doc = _gdb2()["clients"].find_one({"_id": _OID(str(lead_client_id))}) if lead_client_id else None
+            addendum = get_addendum_for_client(client_doc)
+            if addendum:
+                system_prompt = system_prompt + "\n\n# WEEKLY COACHING (auto-learned from last week's wins/misses)\n" + addendum
+        except Exception as _e:
+            log.warning("outcome_addendum_inject_closer_failed", lead=lead_id, error=str(_e))
+
     # ── Emotional read on the latest inbound (T0.2) ────────────────────────
     classification_dict: Optional[dict] = None
     try:

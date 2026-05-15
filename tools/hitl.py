@@ -240,7 +240,9 @@ def approve_draft(approval_id: str) -> dict | None:
         _update_status(approval_id, ApprovalStatus.SKIPPED)
         log.warning("draft_expired_on_approve", approval_id=approval_id, contact=draft.get("contact_name"))
         return None
-    return _update_status(approval_id, ApprovalStatus.APPROVED)
+    updated = _update_status(approval_id, ApprovalStatus.APPROVED)
+    _open_outcome_safe(updated or draft)
+    return updated
 
 
 def skip_draft(approval_id: str) -> dict | None:
@@ -260,7 +262,21 @@ def edit_draft(approval_id: str, new_message: str) -> dict | None:
             "actioned_at": now,
         }},
     )
-    return col.find_one({"_id": ObjectId(approval_id)})
+    doc = col.find_one({"_id": ObjectId(approval_id)})
+    _open_outcome_safe(doc)
+    return doc
+
+
+def _open_outcome_safe(approval_doc: dict | None) -> None:
+    """Best-effort hook into outcome_learning. Never raises — outcome tracking
+    failure must not block an approval send."""
+    if not approval_doc:
+        return
+    try:
+        from services.outcome_learning import open_outcome_from_approval
+        open_outcome_from_approval(approval_doc)
+    except Exception as e:
+        log.warning("outcome_open_failed", error=str(e))
 
 
 def _enforce_brief_gate(*, source: str, client_name: str | None) -> None:

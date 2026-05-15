@@ -371,6 +371,16 @@ def generate_b2c_message(
         except Exception as exc:
             log.warning("rules_inject_b2c_failed", error=str(exc))
 
+    # ── Inject weekly outcome-learning addendum (T0.4) ──────────────────────
+    if client:
+        try:
+            from services.outcome_learning import get_addendum_for_client
+            addendum = get_addendum_for_client(client)
+            if addendum:
+                system = system + "\n\n# WEEKLY COACHING (auto-learned from last week's wins/misses)\n" + addendum
+        except Exception as exc:
+            log.warning("outcome_addendum_inject_b2c_failed", error=str(exc))
+
     notes_block = f"\nCustomer notes: {notes}" if notes else ""
     tags_block  = f"\nCustomer tags/segments: {', '.join(tags)}" if tags else ""
     fallback_brief_block = ""

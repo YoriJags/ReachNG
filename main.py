@@ -104,7 +104,9 @@ async def lifespan(app: FastAPI):
     from tools.invoices import ensure_invoice_indexes
     from tools.csv_import import ensure_b2c_indexes
     from api.b2c import _ensure_lead_imports_indexes
+    from services.outcome_learning import ensure_outcome_indexes
     ensure_approval_indexes()
+    ensure_outcome_indexes()
     ensure_roi_indexes()
     ensure_social_indexes()
     ensure_hooks_indexes()

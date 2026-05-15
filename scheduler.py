@@ -397,8 +397,42 @@ async def _isolation_audit():
         log.error("isolation_audit_crashed", error=str(e))
 
 
+async def _outcome_silence_sweep():
+    """Nightly 02:00 Lagos — mark stale `open` outcomes as miss=silence."""
+    try:
+        from services.outcome_learning import sweep_silence_to_miss
+        n = sweep_silence_to_miss()
+        log.info("outcome_silence_sweep_done", marked=n)
+    except Exception as e:
+        log.error("outcome_silence_sweep_crashed", error=str(e))
+
+
+async def _outcome_weekly_distil():
+    """Sunday 23:00 Lagos — distil last 7d wins/misses into per-client
+    prompt_addendum across all active paying clients."""
+    try:
+        from services.outcome_learning import distil_all_clients
+        result = distil_all_clients()
+        applied = sum(1 for v in result.values() if v)
+        log.info("outcome_weekly_distil_done", clients_seen=len(result), addendums_applied=applied)
+    except Exception as e:
+        log.error("outcome_weekly_distil_crashed", error=str(e))
+
+
 def setup_scheduler():
     """Register all jobs and return configured scheduler."""
+
+    # Outcome learning — nightly silence sweep + weekly distil
+    scheduler.add_job(
+        _outcome_silence_sweep,
+        CronTrigger(hour=2, minute=0, timezone="Africa/Lagos"),
+        id="outcome_silence_sweep", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=600,
+    )
+    scheduler.add_job(
+        _outcome_weekly_distil,
+        CronTrigger(day_of_week="sun", hour=23, minute=0, timezone="Africa/Lagos"),
+        id="outcome_weekly_distil", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=1800,
+    )
 
     scheduler.add_job(
         _isolation_audit,
