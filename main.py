@@ -94,6 +94,17 @@ async def lifespan(app: FastAPI):
             f"  Check MONGODB_URI in your .env\n"
             f"  Error: {exc}"
         ) from exc
+    # ── Defensive index init ────────────────────────────────────────────────
+    # Each ensure_*_indexes call is wrapped so a single failing collection
+    # never takes down the whole server. Past root cause of failed Railway
+    # healthchecks: one bad index call crashed the lifespan silently.
+    def _safe(label: str, fn):
+        try:
+            fn()
+            log.info("startup_ok", step=label)
+        except Exception as e:
+            log.error("startup_step_failed", step=label, error=str(e))
+
     from tools.hitl import ensure_approval_indexes
     from tools.roi import ensure_roi_indexes
     from tools.social import ensure_social_indexes
@@ -105,61 +116,61 @@ async def lifespan(app: FastAPI):
     from tools.csv_import import ensure_b2c_indexes
     from api.b2c import _ensure_lead_imports_indexes
     from services.outcome_learning import ensure_outcome_indexes
-    ensure_approval_indexes()
-    ensure_outcome_indexes()
-    ensure_roi_indexes()
-    ensure_social_indexes()
-    ensure_hooks_indexes()
-    ensure_ab_indexes()
-    ensure_referral_indexes()
-    ensure_competitor_indexes()
-    ensure_invoice_indexes()
-    ensure_b2c_indexes()
-    _ensure_lead_imports_indexes()
+    _safe("approvals",   ensure_approval_indexes)
+    _safe("outcomes",    ensure_outcome_indexes)
+    _safe("roi",         ensure_roi_indexes)
+    _safe("social",      ensure_social_indexes)
+    _safe("hooks",       ensure_hooks_indexes)
+    _safe("ab",          ensure_ab_indexes)
+    _safe("referral",    ensure_referral_indexes)
+    _safe("competitor",  ensure_competitor_indexes)
+    _safe("invoices",    ensure_invoice_indexes)
+    _safe("b2c",         ensure_b2c_indexes)
+    _safe("lead_imports", _ensure_lead_imports_indexes)
     from api.school_fees import ensure_school_fees_indexes
-    ensure_school_fees_indexes()
+    _safe("school_fees", ensure_school_fees_indexes)
     from services.fleet_dispatcher.store import ensure_indexes as ensure_fleet_indexes
-    ensure_fleet_indexes()
+    _safe("fleet",       ensure_fleet_indexes)
     from services.legal_review.store import ensure_legal_indexes
-    ensure_legal_indexes()
+    _safe("legal_review", ensure_legal_indexes)
     from services.loan_officer.store import ensure_indexes as ensure_loan_indexes
-    ensure_loan_indexes()
+    _safe("loan",        ensure_loan_indexes)
     from services.hr_suite.payroll import ensure_payroll_indexes
     from services.estate.rent_roll import ensure_rent_indexes
     from services.closer import ensure_closer_indexes
     from services.brief import ensure_brief_indexes, seed_default_primers
     from services.client_memory import ensure_memory_indexes
-    ensure_memory_indexes()
+    _safe("memory",      ensure_memory_indexes)
     from services.knowledge_base import ensure_kb_indexes
-    ensure_kb_indexes()
+    _safe("kb",          ensure_kb_indexes)
     from services.client_rules import ensure_rules_indexes
-    ensure_rules_indexes()
+    _safe("rules",       ensure_rules_indexes)
     from services.scorecard import ensure_scorecard_indexes
-    ensure_scorecard_indexes()
+    _safe("scorecard",   ensure_scorecard_indexes)
     from services.quality_metrics import ensure_quality_indexes
-    ensure_quality_indexes()
+    _safe("quality",     ensure_quality_indexes)
     from services.cohort_stats import ensure_cohort_indexes
-    ensure_cohort_indexes()
+    _safe("cohort",      ensure_cohort_indexes)
     from services.milestone_engine import ensure_milestone_indexes
-    ensure_milestone_indexes()
+    _safe("milestone",   ensure_milestone_indexes)
     from services.platform_settings import ensure_settings_indexes
-    ensure_settings_indexes()
+    _safe("settings",    ensure_settings_indexes)
     from services.sales_alerter import ensure_sales_alert_indexes
-    ensure_sales_alert_indexes()
+    _safe("sales_alert", ensure_sales_alert_indexes)
     from services.waitlist import ensure_waitlist_indexes
-    ensure_waitlist_indexes()
+    _safe("waitlist",    ensure_waitlist_indexes)
     from services.usage_meter import ensure_usage_indexes
-    ensure_usage_indexes()
-    from api.legal import ensure_legal_indexes
-    ensure_payroll_indexes()
-    ensure_rent_indexes()
-    ensure_closer_indexes()
-    ensure_brief_indexes()
-    seed_default_primers()
-    ensure_legal_indexes()
-    ensure_capacity_indexes()
+    _safe("usage",       ensure_usage_indexes)
+    from api.legal import ensure_legal_indexes as ensure_legal_api_indexes
+    _safe("payroll",     ensure_payroll_indexes)
+    _safe("rent",        ensure_rent_indexes)
+    _safe("closer",      ensure_closer_indexes)
+    _safe("brief",       ensure_brief_indexes)
+    _safe("primers",     seed_default_primers)
+    _safe("legal_api",   ensure_legal_api_indexes)
+    _safe("capacity",    ensure_capacity_indexes)
     from tools.client_signal_listener import ensure_signal_indexes
-    ensure_signal_indexes()
+    _safe("signals",     ensure_signal_indexes)
     scheduler = setup_scheduler()
     scheduler.start()
     log.info("scheduler_started", jobs=[job.id for job in scheduler.get_jobs()])
