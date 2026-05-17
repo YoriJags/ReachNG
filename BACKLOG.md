@@ -50,10 +50,81 @@ Locked sequence — build in this order. Total ~17 days.
 - [ ] **7b. Landing page nurture drip** (~1 day, depends on Fix #1 Resend live) — Capture interest beyond just waitlist signup. (1) JS event-bind: capture clicks on hero CTA, pricing rows, vertical demo previews, "WhatsApp us" buttons → POST `/api/v1/marketing/interaction` with `{event, anon_id (cookie), email?, ts}`. (2) Cookie-bridge: on waitlist submit, link the anon_id to the email; back-fill any prior interactions to that email. (3) Drip scheduler: 3-email warm sequence (Day 0 confirm — done in Fix #1, Day 2 vertical-specific demo deep-dive, Day 5 case study + soft CTA to demo call). Uses Resend. Lives in `services/nurture/landing_drip.py` + new `marketing_interactions` collection. Owner can pause from Control Tower. **Blocked until Resend send is verified working.**
 
 - [ ] **8. Pricing Settings panel** (~1.5 hours) — Mongo `platform_settings.pricing` doc with three plan amounts. Read from doc in `api/marketing.py::PLAN_PRICING` (fallback to defaults). Edit inline from dashboard Control Tower → Settings tab. Audit log on each change. Killer for testing price points without a deploy.
+- [ ] **7b. Landing nurture drip** (~1 day) — **NOW UNBLOCKED** (Resend confirmed working 2026-05-17). 3-email warm sequence after waitlist signup (Day 0 confirm done · Day 2 vertical-specific deep-dive · Day 5 case study + soft CTA). Lives in `services/nurture/landing_drip.py`. Defer until first 5 pilot applications arrive (so the Day-2 email can reference real signal).
+
+---
+
+## P1 — Pre-pilot operational gaps (raised 2026-05-17 after demand-engine ship)
+
+Things that aren't features but block actual paid clients. These matter when the first 5 pilots want to go live.
+
+- [ ] **WhatsApp pairing flow** (~1-2 days) — Critical. Without this, no pilot can go live. Choose: Unipile QR-pair (one mobile scan → number connected) OR Meta Cloud API (more involved, requires business verification). Need a self-serve `/portal/{token}/connect-whatsapp` page that walks the founder through. Today this is manual.
+- [ ] **Onboarding wizard** (~2-3 days) — DEFERRED until 5 pilots inform what to ask. Codex-spec'd: Business Basics → Voice & Tone → Offer & Pricing → Lead Qualification → Approval Rules → Test EYO → Go-Live Checklist. Lives at `/portal/{token}/onboard`. Build this AFTER manual onboarding the first 5.
+- [ ] **Pass-2 guided demo: per-vertical** (~3 hrs) — Today's guided tour at `/portal/demo` is hospitality-only. Build vertical variants for `/portal/demo/real_estate` and `/portal/demo/professional_services` (Banana Island PoF storyline + Greenview Fri-6pm storyline). Education + clinics + small_business deferred until demand signal.
+- [ ] **Education + small_business Control Room overlays** (~2 hrs) — Currently fall back to hospitality overlay. Add overlay entries OR keep hidden from public pills (already done in `744776e`). Build when first signup applies in either vertical.
+- [ ] **Fix #2: Paystack welcome email** (~30 min) — DEFERRED per Codex's "de-emphasize self-serve" call. Wire when self-serve checkout is re-prioritized.
+- [ ] **Fix #3: Inbound email → HITL** (~3-4 hrs) — DEFERRED. Email replies route to dashboard same as WhatsApp inbound. Build when email channel is active for clients.
+
+---
+
+## Process items (not buildable — execute live)
+
+- [ ] **Live test with 5 Lagos prospects** — THE NEXT MOVE per Codex. Pick 2 luxury RE + 2 legal + 1 hospo. Send one-line WhatsApp asking "what is this and who is it for?" Track 5-second-test pass rate, calculator engagement, waitlist conversion, triage verdicts.
+- [ ] **First paid client → public case study** (~1 week post-pilot) — Lives at `/case-studies/[client]`. Anchor: one screenshot, one pull-quote, one number.
+- [ ] **Founder authority cadence** (ongoing, 20 min/day) — Yori posts 3×/week on Twitter + LinkedIn. Theme: "what the agent did this week" with screenshots.
 
 ## ✅ Railway deploy — green (2026-05-16)
 
 The defensive `_safe()` wrap in the lifespan fixed it. All 33 ensure_*_indexes calls log `startup_ok` on boot. Application startup complete. `GET /health → 200 OK`. www.reachng.ng is live with all latest work (HBR + WhatsApp Nigeria research anchors, trimmed 8-section landing, premium positioning, lean_scraper internal engine).
+
+---
+
+## ✅ Pre-launch demand engine — shipped 2026-05-17 (massive day)
+
+Single session pushed the prelaunch funnel from "impressive landing" to a proper demand engine. ~20 commits.
+
+**Email infra**
+- [x] Resend integrated as transactional provider (Go54 SMTP egress was blocked from Railway). `tools/outreach.py::send_email` accepts `html=` + `force_smtp=True`. Domain `reachng.ng` verified in Resend with DKIM + SPF + bounce-MX. Fix #1 (waitlist confirmation email) live.
+- [x] Waitlist phone-index bug fixed (sparse → partial filter; explicit-null collisions on email-only signups).
+- [x] Re-fire confirmation on duplicate waitlist submit (no more silent no-ops).
+
+**Waitlist → Pilot Application funnel**
+- [x] "Apply for the pilot" form with 5 qualifying fields: `enquiry_volume`, `avg_deal_value`, `top_pains` (multi), `trust_ai_draft`, `sample_customer_message`. Soft outside ("Join early access"), sharp inside.
+- [x] Auto-triage classifier: `priority_pilot` / `pilot_candidate` / `qualified` / `curious`. Computed at insert.
+- [x] Admin dashboard "Early Access" tab embedded in `templates/dashboard.html` — sorted-by-triage rows with badges, sample-message blockquote, invite / delete / wipe-all actions.
+- [x] Branded HTML confirmation email (cream + sienna) replaces the plain-text version.
+
+**Landing v2 (visual mocks + positioning)**
+- [x] Hero rewrite: "EYO carries the WhatsApp conversation until you need to step in." Premium ICP named upfront.
+- [x] Single conversion motion across page: "Join early access" everywhere. `/pricing` dropped from nav + footer.
+- [x] First-7-Days timeline section replaces the "Meet EYO" reveal. Truthful tone-learning mechanic copy.
+- [x] Three new mocks: tone before/after, receipt catcher (with wrong-amount edge case), 7am owner brief phone mock.
+- [x] **Leakage calculator** with two sliders + animated ₦ total + Resend email capture. `/api/v1/calculator/leakage` endpoint. 30% labeled as "estimate, not a measurement."
+
+**Cinematic guided demo at /portal/demo**
+- [x] Phone-first 90-sec guided story, 6 scenes (Cold-open → Voice note → EYO drafts → Receipt → Owner brief → Control Room → CTA).
+- [x] Sticky progress rail, sample-data badges per scene, cream/sienna palette matching landing.
+- [x] Compressed timeline: one night arc (Sat 11:47pm → Sun 7:02am).
+- [x] Scroll-driven animations: waveform, transcript reveal, tag cascade, typing dots, extracted-fields stagger, match-row flash.
+
+**EYO Control Room** (replaces old dark dashboard at `/portal/demo/dashboard`)
+- [x] Cream/sienna prospect-facing surface, separate from operator-view dashboard.
+- [x] 4 metric tiles with count-up: Conversations held / Drafts ready / Owner needed / Money matched.
+- [x] 3-col main: Drafts (WhatsApp-style cards) | Story timeline | Money EYO matched (full receipt-extraction visualisation).
+- [x] Full-width Leak Radar row with idle-lead cards + Before/After EYO comparison.
+- [x] 5-col kanban with manifesto-compliant labels (New · Reply ready · Awaiting tap · Money matched · Follow-up).
+- [x] Interactive Approve / Skip / Edit (demo-only): tap Approve → card flips to "Sent from your WhatsApp · just now."
+- [x] Motion: pulse-ring on first pending draft, typing dots, match-flash, scroll-activated timeline dots.
+
+**Tier 2: Per-vertical Control Rooms**
+- [x] `CONTROL_ROOM_OVERLAYS` per vertical in `services/demo_datasets.py`. Hospitality + Real estate (Crown Realty, Banana Island, ₦12M PoF + Zenith ₦12M viewing deposit, diaspora buyer storyline) + Legal (Greenview Partners, Fri 6pm → Mon 7am arc, ₦300k UBA consult fee, conflict check, partner sign-off).
+- [x] `/portal/demo/{vertical}` redirects to `/portal/demo` if no real dataset (no more silent hospitality fallback under another vertical's name).
+
+**Positioning shift**
+- [x] "EYO closes deals" → "EYO carries the conversation until you need to step in." Applies to landing hero, page title, section labels, guided demo cold-open + Scene 4, Control Room footer CTA, waitlist email, waitlist success copy, landing final CTA.
+
+**Net-new items raised today (queued)**
+- See P1 "Pre-pilot operational gaps" below — WhatsApp pairing flow, Onboarding wizard, Pass-2 guided tour per vertical, etc.
 
 ---
 
