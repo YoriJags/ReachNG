@@ -10612,5 +10612,196 @@ function escHtml(str) {
   });
 </script>
 
+<!-- ─── T0.3 Predictive Co-pilot — floating chat widget ───────────────────────── -->
+<style>
+  .copilot-fab {
+    position: fixed; right: 22px; bottom: 22px; z-index: 99;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent) 0%, #ff7a3a 100%);
+    color: #fff; font-size: 22px; font-weight: 600; line-height: 56px; text-align: center;
+    cursor: pointer; box-shadow: 0 8px 24px rgba(255,85,0,0.35), 0 2px 6px rgba(0,0,0,0.25);
+    transition: transform 0.16s; user-select: none;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .copilot-fab:hover { transform: translateY(-2px) scale(1.04); }
+  .copilot-fab .dot {
+    position: absolute; top: 8px; right: 8px; width: 8px; height: 8px;
+    background: #5dd28a; border-radius: 50%; box-shadow: 0 0 6px #5dd28a;
+  }
+  .copilot-panel {
+    position: fixed; right: 22px; bottom: 92px; z-index: 100;
+    width: 380px; max-height: 70vh;
+    background: #0f1218; border: 1px solid #1f2530; border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    display: none; flex-direction: column; overflow: hidden;
+  }
+  .copilot-panel.open { display: flex; }
+  .copilot-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; border-bottom: 1px solid #1e2530;
+    background: linear-gradient(180deg, #161a22 0%, #11141b 100%);
+  }
+  .copilot-head .ttl { font-size: 13px; font-weight: 700; color: #e8e8e8; letter-spacing: -0.1px; }
+  .copilot-head .sub { font-size: 10px; color: #6a7280; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+  .copilot-head .close {
+    background: none; border: none; color: #6a7280; font-size: 18px; cursor: pointer;
+    width: 28px; height: 28px; border-radius: 6px; line-height: 1;
+  }
+  .copilot-head .close:hover { background: #1a1f2a; color: #fff; }
+  .copilot-body {
+    flex: 1; overflow-y: auto; padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 10px;
+    font-size: 13px;
+  }
+  .copilot-msg { padding: 10px 12px; border-radius: 10px; line-height: 1.55; }
+  .copilot-msg.user { background: #1a2030; color: #e8e8e8; align-self: flex-end; max-width: 86%; }
+  .copilot-msg.eyo  { background: #161a22; color: #d9d9d9; border: 1px solid #1e2530; max-width: 92%; }
+  .copilot-msg .meta { font-size: 10px; color: #6a7280; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 700; }
+  .copilot-empty { color: #6a7280; font-size: 12px; text-align: center; padding: 24px 8px; line-height: 1.6; }
+  .copilot-empty .suggest {
+    display: inline-block; margin: 4px 3px; padding: 5px 10px;
+    border: 1px solid #1e2530; border-radius: 999px;
+    font-size: 11px; color: #b0b5be; cursor: pointer; background: #11141b;
+  }
+  .copilot-empty .suggest:hover { border-color: var(--accent); color: var(--accent); }
+  .copilot-foot {
+    display: flex; gap: 8px; padding: 12px 14px;
+    border-top: 1px solid #1e2530; background: #0c0f15;
+  }
+  .copilot-foot select {
+    background: #11141b; border: 1px solid #1e2530; border-radius: 7px;
+    color: #d9d9d9; font-size: 11px; padding: 6px 8px; max-width: 130px;
+  }
+  .copilot-foot input {
+    flex: 1; background: #11141b; border: 1px solid #1e2530; border-radius: 7px;
+    color: #e8e8e8; font-size: 13px; padding: 8px 10px; font-family: inherit;
+  }
+  .copilot-foot input:focus { outline: none; border-color: var(--accent); }
+  .copilot-foot button {
+    background: var(--accent); border: none; border-radius: 7px;
+    color: #fff; font-size: 12px; font-weight: 700; padding: 0 14px; cursor: pointer;
+  }
+  .copilot-foot button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .cp-typing { font-size: 11px; color: #6a7280; padding: 0 16px 8px; font-style: italic; display: none; }
+  .cp-typing.show { display: block; }
+</style>
+
+<div class="copilot-fab" id="copilot-fab" onclick="cpToggle()" title="Ask EYO (Predictive Co-pilot)">
+  ✦<div class="dot"></div>
+</div>
+
+<div class="copilot-panel" id="copilot-panel" role="dialog" aria-label="Ask EYO">
+  <div class="copilot-head">
+    <div>
+      <div class="ttl">Ask EYO</div>
+      <div class="sub">Predictive co-pilot</div>
+    </div>
+    <button class="close" onclick="cpToggle()" aria-label="Close">×</button>
+  </div>
+  <div class="copilot-body" id="copilot-body">
+    <div class="copilot-empty" id="copilot-empty">
+      Ask anything about a client's pipeline. Try:
+      <div style="margin-top:10px;">
+        <span class="suggest" onclick="cpAsk(this.textContent)">Who's hot today?</span>
+        <span class="suggest" onclick="cpAsk(this.textContent)">What's in my queue?</span>
+        <span class="suggest" onclick="cpAsk(this.textContent)">Who hasn't replied in 5 days?</span>
+        <span class="suggest" onclick="cpAsk(this.textContent)">How did this week go?</span>
+      </div>
+    </div>
+  </div>
+  <div class="cp-typing" id="cp-typing">EYO is thinking…</div>
+  <div class="copilot-foot">
+    <select id="cp-client" aria-label="Client scope"></select>
+    <input id="cp-input" type="text" placeholder="Ask EYO…" onkeydown="if(event.key==='Enter')cpAsk()" />
+    <button id="cp-send" onclick="cpAsk()">Send</button>
+  </div>
+</div>
+
+<script>
+  let _cpClientId = null;
+
+  async function cpLoadClients() {
+    try {
+      const r = await fetch('/clients/');
+      if (!r.ok) return;
+      const clients = await r.json();
+      const sel = document.getElementById('cp-client');
+      sel.innerHTML = '<option value="">— pick client —</option>' +
+        clients.filter(c => c.active !== false)
+          .map(c => `<option value="${c.id}">${(c.name || '').slice(0, 24)}</option>`).join('');
+      sel.onchange = () => { _cpClientId = sel.value || null; };
+    } catch (e) { /* silent */ }
+  }
+
+  function cpToggle() {
+    const p = document.getElementById('copilot-panel');
+    p.classList.toggle('open');
+    if (p.classList.contains('open')) {
+      setTimeout(() => document.getElementById('cp-input').focus(), 60);
+      if (!document.getElementById('cp-client').options.length) cpLoadClients();
+    }
+  }
+
+  function cpAddMsg(role, text, meta) {
+    const empty = document.getElementById('copilot-empty');
+    if (empty) empty.remove();
+    const body = document.getElementById('copilot-body');
+    const div = document.createElement('div');
+    div.className = 'copilot-msg ' + (role === 'user' ? 'user' : 'eyo');
+    if (meta) {
+      const m = document.createElement('div');
+      m.className = 'meta';
+      m.textContent = meta;
+      div.appendChild(m);
+    }
+    const t = document.createElement('div');
+    t.textContent = text;
+    div.appendChild(t);
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  async function cpAsk(prefill) {
+    const input = document.getElementById('cp-input');
+    const q = (prefill || input.value || '').trim();
+    if (!q) return;
+    if (!_cpClientId) {
+      cpAddMsg('eyo', 'Pick a client from the dropdown below first — I scope answers to one client at a time.', 'EYO');
+      return;
+    }
+    input.value = '';
+    const btn = document.getElementById('cp-send');
+    btn.disabled = true;
+    cpAddMsg('user', q);
+    document.getElementById('cp-typing').classList.add('show');
+    try {
+      const r = await fetch('/api/v1/copilot/ask', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ client_id: _cpClientId, question: q }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.detail || 'request failed');
+      const tool = data.tool || 'unknown';
+      const narr = data.narration || '(no response)';
+      cpAddMsg('eyo', narr, tool === 'none' ? 'EYO' : `EYO · ${tool}`);
+    } catch (e) {
+      cpAddMsg('eyo', 'Sorry — that didn\'t go through. ' + (e.message || ''), 'EYO · error');
+    } finally {
+      btn.disabled = false;
+      document.getElementById('cp-typing').classList.remove('show');
+      input.focus();
+    }
+  }
+
+  // Keyboard shortcut: Ctrl/Cmd + . to toggle
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === '.') {
+      e.preventDefault();
+      cpToggle();
+    }
+  });
+</script>
+
 </body>
 </html>
