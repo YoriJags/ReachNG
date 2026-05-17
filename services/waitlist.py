@@ -42,7 +42,20 @@ def _col():
 def ensure_waitlist_indexes() -> None:
     col = _col()
     col.create_index([("position", ASCENDING)], unique=True)
-    col.create_index([("phone", ASCENDING)], unique=True, sparse=True)
+    # Drop legacy sparse phone index if present — sparse doesn't skip explicit
+    # nulls, which crashed email-only signups with DuplicateKeyError.
+    try:
+        existing = col.index_information()
+        if "phone_1" in existing and existing["phone_1"].get("sparse"):
+            col.drop_index("phone_1")
+    except Exception:
+        pass
+    col.create_index(
+        [("phone", ASCENDING)],
+        unique=True,
+        name="phone_1",
+        partialFilterExpression={"phone": {"$type": "string"}},
+    )
     col.create_index([("email", ASCENDING)], sparse=True)
     col.create_index([("created_at", DESCENDING)])
     col.create_index([("vertical", ASCENDING)])
