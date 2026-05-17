@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     meta_phone_number_id: str | None = Field(default=None, env="META_PHONE_NUMBER_ID")
     meta_access_token: str | None = Field(default=None, env="META_ACCESS_TOKEN")
 
+    # Resend — transactional email API (HTTPS, no SMTP egress required)
+    resend_api_key: str | None = Field(default=None, env="RESEND_API_KEY")
+    resend_from_email: str = Field(default="EYO from ReachNG <hello@reachng.ng>", env="RESEND_FROM_EMAIL")
+
     # Gmail SMTP/IMAP — email sending and reply polling (replaces Unipile for email)
     gmail_address: str | None = Field(default=None, env="GMAIL_ADDRESS")
     gmail_app_password: str | None = Field(default=None, env="GMAIL_APP_PASSWORD")

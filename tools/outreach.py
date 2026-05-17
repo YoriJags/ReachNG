@@ -134,6 +134,33 @@ async def send_email(
     """
     settings = get_settings()
 
+    # ── Resend path (preferred for transactional — HTTPS, no SMTP egress) ────
+    resend_key = settings.resend_api_key
+    if resend_key and (force_smtp or not (settings.unipile_dsn and settings.unipile_api_key and settings.unipile_email_account_id)):
+        try:
+            payload: dict = {
+                "from":    settings.resend_from_email,
+                "to":      [to_email],
+                "subject": subject,
+                "text":    body,
+            }
+            if reply_to:
+                payload["reply_to"] = reply_to
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                resp = await client.post(
+                    "https://api.resend.com/emails",
+                    headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"},
+                    json=payload,
+                )
+                resp.raise_for_status()
+                data = resp.json()
+                msg_id = data.get("id", "resend-email")
+                log.info("email_sent_resend", to=to_email, message_id=msg_id)
+                return {"success": True, "message_id": msg_id, "provider": "resend"}
+        except Exception as e:
+            log.warning("resend_email_failed_falling_back", to=to_email, error=str(e))
+            # fall through to Unipile or Gmail
+
     # ── Unipile path ──────────────────────────────────────────────────────────
     dsn        = settings.unipile_dsn
     api_key    = settings.unipile_api_key
