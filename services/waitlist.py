@@ -96,6 +96,12 @@ def add_to_waitlist(
     city: Optional[str] = None,
     brief_pain: Optional[str] = None,
     source: Optional[str] = None,
+    # Pilot-application qualifying fields (2026-05-17 — see Codex landing audit)
+    enquiry_volume: Optional[str] = None,           # <20 | 20-100 | 100+
+    avg_deal_value: Optional[str] = None,           # <50k | 50k-500k | 500k-5M | 5M+
+    top_pains: Optional[list] = None,               # multi: slow_replies, missed_followups, voice_notes, deposit_chase, unqualified_leads
+    trust_ai_draft: Optional[str] = None,           # yes | maybe | no
+    sample_customer_message: Optional[str] = None,  # the gold field — real customer enquiry text
 ) -> dict:
     """Insert a new waitlist entry. Returns the persisted doc + position.
 
@@ -153,6 +159,18 @@ def add_to_waitlist(
 
     now = datetime.now(timezone.utc)
     position = _next_position()
+
+    # Sanitise qualifying inputs against fixed vocabularies
+    _vol_allowed = {"<20", "20-100", "100+"}
+    _val_allowed = {"<50k", "50k-500k", "500k-5M", "5M+"}
+    _pain_allowed = {"slow_replies", "missed_followups", "voice_notes", "deposit_chase", "unqualified_leads", "after_hours"}
+    _trust_allowed = {"yes", "maybe", "no"}
+    vol = (enquiry_volume or "").strip() if (enquiry_volume or "").strip() in _vol_allowed else None
+    val = (avg_deal_value or "").strip() if (avg_deal_value or "").strip() in _val_allowed else None
+    pains_clean = [p for p in (top_pains or []) if isinstance(p, str) and p in _pain_allowed][:8]
+    trust = (trust_ai_draft or "").strip().lower() if (trust_ai_draft or "").strip().lower() in _trust_allowed else None
+    sample = (sample_customer_message or "").strip()[:1200] or None
+
     doc = {
         "position":      position,
         "name":          name[:80],
@@ -163,6 +181,12 @@ def add_to_waitlist(
         "city":          (city or "").strip()[:60] or None,
         "brief_pain":    (brief_pain or "").strip()[:600] or None,
         "source":        (source or "direct").strip()[:32],
+        # Pilot-application signal fields
+        "enquiry_volume":          vol,
+        "avg_deal_value":          val,
+        "top_pains":               pains_clean or None,
+        "trust_ai_draft":          trust,
+        "sample_customer_message": sample,
         "created_at":    now,
         "invited_at":    None,
         "signed_up_at":  None,
@@ -249,16 +273,16 @@ def _compose_confirmation_email(name: str, position: int, business_name: str) ->
     """
     first = (name or "").split()[0] if name else ""
     greet = f"Hi {first}," if first else "Hi,"
-    subject = f"You're #{position} on the ReachNG waitlist"
+    subject = f"Got your pilot application for {business_name}"
 
     text = (
         f"{greet}\n\n"
-        f"EYO here from ReachNG. You're #{position} on the waitlist — saved you a spot for {business_name}.\n\n"
+        f"EYO here from ReachNG. Got your pilot application for {business_name}.\n\n"
         f"What happens next:\n"
-        f"  1. We onboard Lagos businesses in small batches so the first 30 days feel hand-built (because they are).\n"
-        f"  2. When your spot opens, I'll WhatsApp + email you a quick onboarding link.\n"
-        f"  3. First call is a 30-min pairing where we connect your WhatsApp number — you're up and running by the end of it.\n\n"
-        f"While you wait, the live demo runs the engine on realistic Lagos sample data: https://www.reachng.ng/portal/demo\n\n"
+        f"  1. We're reading every application carefully — picking the Lagos businesses where EYO will create the most revenue.\n"
+        f"  2. Within 24-48 hours I'll WhatsApp you a tailored mini-demo: how EYO would reply to your actual enquiries, in your voice.\n"
+        f"  3. If it lands, we book a 30-min pairing call to connect your WhatsApp number — you're live by the end of it.\n\n"
+        f"While you wait, the engine runs on realistic Lagos sample data: https://www.reachng.ng/portal/demo\n\n"
         f"Any quick question — just reply to this email.\n\n"
         f"— EYO\n"
         f"   On behalf of the team at ReachNG\n"
@@ -279,23 +303,23 @@ def _compose_confirmation_email(name: str, position: int, business_name: str) ->
           </div>
         </td></tr>
 
-        <!-- position banner -->
+        <!-- pilot banner -->
         <tr><td style="padding:32px 36px 8px 36px;">
-          <div style="font-size:11px;letter-spacing:1.5px;font-weight:600;color:#7a6a3f;text-transform:uppercase;margin-bottom:8px;">You're in</div>
-          <div style="font-family:Georgia,'Times New Roman',serif;font-size:36px;font-weight:600;line-height:1.1;color:#1a1a1a;">
-            You're #{position} on the list.
+          <div style="font-size:11px;letter-spacing:1.5px;font-weight:600;color:#7a6a3f;text-transform:uppercase;margin-bottom:8px;">Application received</div>
+          <div style="font-family:Georgia,'Times New Roman',serif;font-size:32px;font-weight:600;line-height:1.15;color:#1a1a1a;">
+            We're reading every pilot application carefully.
           </div>
         </td></tr>
 
         <!-- body -->
         <tr><td style="padding:24px 36px 8px 36px;font-size:15px;line-height:1.65;color:#3d3a33;">
           <p style="margin:0 0 16px 0;">{greet}</p>
-          <p style="margin:0 0 16px 0;">EYO here from ReachNG. Saved you a spot for <strong>{business_name}</strong>.</p>
+          <p style="margin:0 0 16px 0;">EYO here from ReachNG. Got your application for <strong>{business_name}</strong>.</p>
           <p style="margin:24px 0 12px 0;font-weight:600;color:#1a1a1a;">What happens next</p>
           <ol style="margin:0 0 16px 0;padding-left:20px;">
-            <li style="margin-bottom:8px;">We onboard Lagos businesses in small batches so the first 30 days feel hand-built — because they are.</li>
-            <li style="margin-bottom:8px;">When your spot opens, I'll WhatsApp + email you a quick onboarding link.</li>
-            <li style="margin-bottom:0;">First call is a 30-min pairing where we connect your WhatsApp number — you're up and running by the end of it.</li>
+            <li style="margin-bottom:8px;">We're hand-picking the Lagos businesses where EYO will create the most revenue right now.</li>
+            <li style="margin-bottom:8px;">Within 24-48 hours I'll WhatsApp you a tailored mini-demo — how EYO would reply to your actual enquiries, in your voice.</li>
+            <li style="margin-bottom:0;">If it lands, we book a 30-min pairing call to connect your WhatsApp number — you're live by the end of it.</li>
           </ol>
         </td></tr>
 

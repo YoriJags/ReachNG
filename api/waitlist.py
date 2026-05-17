@@ -38,6 +38,12 @@ class WaitlistJoin(BaseModel):
     city:          Optional[str] = Field(None, max_length=60)
     brief_pain:    Optional[str] = Field(None, max_length=600)
     source:        Optional[str] = Field(None, max_length=32)
+    # Pilot-application qualifying fields (2026-05-17)
+    enquiry_volume:           Optional[str]       = Field(None, max_length=12)
+    avg_deal_value:           Optional[str]       = Field(None, max_length=12)
+    top_pains:                Optional[list[str]] = Field(None, max_length=8)
+    trust_ai_draft:           Optional[str]       = Field(None, max_length=12)
+    sample_customer_message:  Optional[str]       = Field(None, max_length=1200)
 
 
 @router.post("/api/v1/waitlist")
@@ -52,6 +58,11 @@ async def public_join(payload: WaitlistJoin):
             city=payload.city,
             brief_pain=payload.brief_pain,
             source=payload.source,
+            enquiry_volume=payload.enquiry_volume,
+            avg_deal_value=payload.avg_deal_value,
+            top_pains=payload.top_pains,
+            trust_ai_draft=payload.trust_ai_draft,
+            sample_customer_message=payload.sample_customer_message,
         )
     except ValueError as e:
         raise HTTPException(400, str(e))
@@ -59,7 +70,7 @@ async def public_join(payload: WaitlistJoin):
         "position":      doc["position"],
         "business_name": doc["business_name"],
         "total_on_list": waitlist_total(),
-        "message":       f"You're #{doc['position']}. EYO will WhatsApp you when your spot opens.",
+        "message":       f"Application received for {doc['business_name']}. EYO will WhatsApp you within 24-48h with a tailored demo.",
     }
 
 
