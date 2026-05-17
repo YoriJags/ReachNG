@@ -123,17 +123,33 @@ def add_to_waitlist(
     if not phone_norm and not email:
         raise ValueError("provide either a WhatsApp number or an email")
 
-    # Already on the list? Return the existing entry instead of throwing.
+    # Already on the list? Re-fire the confirmation(s) and return the existing
+    # entry. Resending on duplicate submit is intentional: the user clearly
+    # wants a reminder of their position, and it makes the system observable
+    # in logs during testing.
+    def _resend_for(existing: dict) -> dict:
+        existing_id = str(existing.get("_id", ""))
+        existing["_id"] = existing_id
+        pos = int(existing.get("position") or 0)
+        biz = existing.get("business_name") or business_name
+        nm  = existing.get("name") or name
+        ph  = existing.get("phone")
+        em  = existing.get("email")
+        if ph:
+            _send_waitlist_confirmation_async(phone=ph, name=nm, position=pos, business_name=biz)
+        if em:
+            _send_waitlist_email_async(to_email=em, name=nm, position=pos, business_name=biz)
+        log.info("waitlist_resent", position=pos)
+        return existing
+
     if phone_norm:
         existing = _col().find_one({"phone": phone_norm})
         if existing:
-            existing["_id"] = str(existing["_id"])
-            return existing
+            return _resend_for(existing)
     if email:
         existing = _col().find_one({"email": email})
         if existing:
-            existing["_id"] = str(existing["_id"])
-            return existing
+            return _resend_for(existing)
 
     now = datetime.now(timezone.utc)
     position = _next_position()
