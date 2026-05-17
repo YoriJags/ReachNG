@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How EYO works — 90-second guided tour · ReachNG</title>
+<meta name="description" content="See how EYO replies to WhatsApp leads, drafts the close, catches bank transfers, and briefs you every morning. Sample Lagos data. Same product flow.">
+<style>
+  :root {
+    /* Match landing palette: warm cream + deep ink + burnt sienna */
+    --bg: #FAF6EE; --bg2: #F5EFE0;
+    --paper: #ffffff; --paper-soft: #FBF8F1;
+    --ink: #1a1a1a; --ink2: #3d3a33; --muted: #7a6a3f; --muted2: #9a8e6e;
+    --accent: #B85C38; --accent2: #ff5c00;
+    --line: #E8DEC8; --line-soft: #F1E8D4;
+    --green: #2e7d32; --wa-green: #25D366;
+    --gold: #d3a52e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  a { color: var(--accent); text-decoration: none; }
+
+  /* Sample data banner — always visible */
+  .sample-banner {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(211, 165, 46, 0.12);
+    border-bottom: 1px solid rgba(211, 165, 46, 0.35);
+    color: #7a5a10;
+    padding: 7px 16px;
+    text-align: center;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+  .sample-banner .pip {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); margin-right: 8px; vertical-align: middle;
+    animation: blink 1.6s step-end infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  /* Sticky progress rail */
+  .rail {
+    position: fixed; top: 36px; left: 0; right: 0;
+    background: rgba(250, 246, 238, 0.92);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(12px);
+    z-index: 90;
+    padding: 12px 24px;
+  }
+  .rail-inner {
+    max-width: 1180px; margin: 0 auto;
+    display: flex; align-items: center; gap: 14px;
+    overflow-x: auto;
+  }
+  .rail-brand {
+    font-family: Georgia, serif; font-size: 15px; font-weight: 600;
+    color: var(--ink); letter-spacing: -0.3px; white-space: nowrap;
+  }
+  .rail-brand .ng { color: var(--accent); }
+  .rail-steps { display: flex; gap: 6px; flex: 1; }
+  .rail-step {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 11px; border-radius: 100px;
+    font-size: 11px; font-weight: 600; color: var(--muted2);
+    letter-spacing: 0.2px; white-space: nowrap;
+    border: 1px solid transparent;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    text-decoration: none;
+  }
+  .rail-step .n {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--line); color: var(--muted);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+  }
+  .rail-step.active {
+    background: rgba(184,92,56,0.08); color: var(--accent);
+    border-color: rgba(184,92,56,0.25);
+  }
+  .rail-step.active .n { background: var(--accent); color: #fff; }
+  .rail-cta {
+    background: var(--ink); color: var(--bg);
+    padding: 7px 14px; border-radius: 100px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+    text-decoration: none; white-space: nowrap;
+  }
+
+  /* Scene container */
+  .scene {
+    min-height: 100vh;
+    padding: 120px 24px 60px 24px;
+    display: flex; align-items: center;
+    border-bottom: 1px solid var(--line-soft);
+    position: relative;
+  }
+  .scene-inner {
+    max-width: 1180px; margin: 0 auto; width: 100%;
+    display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 56px;
+    align-items: center;
+  }
+  .scene-left { max-width: 460px; }
+  .scene-right { display: flex; justify-content: center; align-items: center; }
+
+  .scene-num {
+    font-family: Georgia, serif; font-size: 12px; color: var(--muted2);
+    letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .scene-num strong { color: var(--accent); font-size: 18px; font-style: italic; }
+  .eyebrow {
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;
+    color: var(--accent); margin-bottom: 14px;
+  }
+  h1.scene-h {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(30px, 4.2vw, 46px); line-height: 1.1;
+    letter-spacing: -1px; font-weight: 600; color: var(--ink);
+    margin-bottom: 18px;
+  }
+  h1.scene-h em { color: var(--accent); font-style: italic; }
+  .scene-sub {
+    font-size: 16px; color: var(--ink2); line-height: 1.7;
+    margin-bottom: 28px;
+  }
+  .scene-micro {
+    margin-top: 22px; font-size: 12px; color: var(--muted);
+    letter-spacing: 0.4px;
+  }
+  .scene-micro strong { color: var(--ink); }
+
+  .scene-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--ink); color: var(--bg);
+    padding: 12px 22px; border-radius: 100px;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+    text-decoration: none;
+  }
+  .scene-cta.ghost {
+    background: transparent; color: var(--ink); border: 1px solid var(--line);
+    margin-left: 8px;
+  }
+
+  /* Phone-frame WhatsApp mock */
+  .phone {
+    background: #1a1a1a; border-radius: 38px; padding: 12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04);
+    max-width: 380px; width: 100%;
+  }
+  .phone-screen { background: #ECE5DD; border-radius: 28px; overflow: hidden; }
+  .wa-header {
+    background: #075E54; color: #fff; padding: 14px 18px 12px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .wa-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+  }
+  .wa-pad { padding: 16px 14px 22px 14px; min-height: 380px; }
+  .stamp-row { text-align: center; margin-bottom: 14px; }
+  .wa-stamp {
+    display: inline-block; background: rgba(255,255,255,0.85);
+    color: #5a5a5a; font-size: 10px; padding: 3px 10px; border-radius: 8px;
+    letter-spacing: 0.3px;
+  }
+
+  .wa-msg-customer {
+    background: #fff; color: #1a1a1a;
+    padding: 10px 13px; border-radius: 12px 12px 12px 4px;
+    font-size: 13px; line-height: 1.5; max-width: 88%;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.06);
+    margin-bottom: 8px;
+  }
+  .voice-row {
+    display: flex; align-items: center; gap: 8px; padding: 4px 0 2px 0;
+  }
+  .voice-play {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #25D366; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+  .voice-wave { display: flex; gap: 2px; align-items: center; flex: 1; height: 22px; }
+  .voice-wave span {
+    display: inline-block; width: 2px; background: #25D366;
+    border-radius: 1px;
+    animation: wave 1.4s ease-in-out infinite;
+  }
+  @keyframes wave {
+    0%, 100% { transform: scaleY(0.6); }
+    50% { transform: scaleY(1); }
+  }
+  .voice-dur { font-size: 11px; color: #555; }
+
+  .typing-dots {
+    display: inline-flex; gap: 3px; padding: 4px 0;
+  }
+  .typing-dots span {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #999; animation: typing 1.2s ease-in-out infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes typing {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-2px); }
+  }
+
+  .voice-transcript {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px dashed rgba(0,0,0,0.08);
+    font-style: italic; font-size: 12px; color: #4a4a4a; line-height: 1.55;
+    opacity: 0; max-height: 0; overflow: hidden;
+    transition: opacity 0.6s ease, max-height 0.8s ease;
+  }
+  .voice-transcript.show { opacity: 1; max-height: 140px; }
+  .timestamp-row { font-size: 10px; color: #999; text-align: right; margin-top: 2px; }
+
+  /* Tags */
+  .tags-row {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; padding: 0 4px;
+  }
+  .tag {
+    font-size: 10px; padding: 3px 9px; border-radius: 100px;
+    font-weight: 700; letter-spacing: 0.5px;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .tag.show { opacity: 1; transform: translateY(0); }
+  .tag-hot { background: #ff5c00; color: #fff; }
+  .tag-cool { background: rgba(0,0,0,0.06); color: #555; border: 1px solid rgba(0,0,0,0.08); }
+
+  /* EYO draft */
+  .eyo-draft-card {
+    background: var(--paper); border: 1px solid var(--accent);
+    border-radius: 16px; padding: 18px 20px;
+    box-shadow: 0 16px 40px rgba(184,92,56,0.18);
+    position: relative; max-width: 420px; width: 100%;
+  }
+  .eyo-tag {
+    position: absolute; top: -10px; left: 16px;
+    background: var(--accent); color: #fff;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    padding: 3px 10px; border-radius: 100px; text-transform: uppercase;
+  }
+  .eyo-draft-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 6px 0 12px 0; padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 11px; color: var(--muted);
+  }
+  .eyo-draft-body {
+    color: var(--ink); font-size: 13.5px; line-height: 1.65;
+    background: var(--paper-soft); padding: 12px 14px;
+    border-radius: 10px 10px 4px 10px;
+    border: 1px solid var(--line-soft);
+  }
+  .eyo-actions {
+    margin-top: 14px; display: flex; gap: 8px;
+  }
+  .btn-approve {
+    flex: 1; background: var(--accent); color: #fff; border: 0;
+    padding: 10px; border-radius: 8px; font-size: 12.5px; font-weight: 700;
+    letter-spacing: 0.3px; cursor: pointer;
+  }
+  .btn-edit, .btn-skip {
+    background: transparent; color: var(--ink2);
+    border: 1px solid var(--line); padding: 10px 15px;
+    border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  }
+
+  /* Receipt extraction */
+  .receipt-screenshot {
+    background: linear-gradient(135deg, #fff8e1, #fff3c4);
+    border: 1px solid #f9a825; border-radius: 12px; padding: 14px;
+    font-family: 'Courier New', monospace; max-width: 240px;
+  }
+  .receipt-bank-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .receipt-bank { font-weight: 700; color: #f57f17; font-size: 13px; }
+  .receipt-status {
+    background: #2e7d32; color: #fff; font-size: 9px;
+    padding: 2px 7px; border-radius: 3px; letter-spacing: 0.5px;
+    font-family: -apple-system, sans-serif;
+  }
+  .receipt-amount { font-size: 19px; font-weight: 700; margin-bottom: 6px; color: var(--ink); }
+  .receipt-details { font-size: 10.5px; color: #5a5a5a; line-height: 1.7; }
+
+  .extracted-fields {
+    background: var(--paper-soft); border: 1px solid var(--line-soft);
+    border-radius: 10px; padding: 12px 14px; margin: 12px 0;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 5px 16px;
+    font-size: 12px;
+  }
+  .extracted-fields .field-key { color: var(--muted); }
+  .extracted-fields .field-val { color: var(--ink); font-weight: 600; }
+  .extracted-fields .field {
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .extracted-fields.show .field { opacity: 1; transform: translateY(0); }
+  .extracted-fields.show .field:nth-child(1) { transition-delay: 0s; }
+  .extracted-fields.show .field:nth-child(2) { transition-delay: 0.08s; }
+  .extracted-fields.show .field:nth-child(3) { transition-delay: 0.16s; }
+  .extracted-fields.show .field:nth-child(4) { transition-delay: 0.24s; }
+  .extracted-fields.show .field:nth-child(5) { transition-delay: 0.32s; }
+  .extracted-fields.show .field:nth-child(6) { transition-delay: 0.4s; }
+
+  .match-row {
+    background: rgba(46,125,50,0.08);
+    border: 1px solid rgba(46,125,50,0.3);
+    border-radius: 10px; padding: 9px 12px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--ink); margin-bottom: 12px;
+    opacity: 0; transform: scale(0.96);
+    transition: opacity 0.5s ease 0.5s, transform 0.5s ease 0.5s;
+  }
+  .match-row.show { opacity: 1; transform: scale(1); }
+  .match-check {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #2e7d32; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+
+  /* Owner Brief bubble */
+  .brief-bubble {
+    background: #fff; border-radius: 12px 12px 12px 4px;
+    padding: 14px 16px; max-width: 96%; margin: 0 auto;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.06);
+    font-size: 12.5px; line-height: 1.65; color: #1a1a1a;
+  }
+  .brief-h {
+    font-weight: 700; color: var(--accent); font-size: 11px;
+    letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .brief-section {
+    border-top: 1px solid #f0ebe1; padding-top: 10px; margin-bottom: 10px;
+  }
+  .brief-section:first-of-type { border-top: 0; padding-top: 0; }
+
+  /* Cold open hero */
+  .cold-open {
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    text-align: center; padding: 160px 24px 80px 24px; min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .cold-open .eyebrow { margin-bottom: 16px; }
+  .cold-open h1 {
+    font-family: Georgia, serif; font-size: clamp(40px, 6.5vw, 72px);
+    line-height: 1.05; letter-spacing: -1.5px; font-weight: 600;
+    max-width: 820px; margin: 0 auto 20px auto; color: var(--ink);
+  }
+  .cold-open h1 em { color: var(--accent); font-style: italic; }
+  .cold-open .sub {
+    font-size: 18px; color: var(--ink2); max-width: 620px;
+    margin: 0 auto 36px auto; line-height: 1.6;
+  }
+  .cold-open .btns {
+    display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+  }
+  .cold-open .btn-primary {
+    background: var(--ink); color: var(--bg);
+    padding: 14px 26px; border-radius: 100px;
+    font-size: 14px; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .cold-open .btn-ghost {
+    background: transparent; color: var(--ink); border: 1px solid var(--line);
+    padding: 14px 26px; border-radius: 100px;
+    font-size: 14px; font-weight: 600;
+  }
+
+  /* Dashboard reveal */
+  .dashboard-frame-wrap {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 16px; overflow: hidden;
+    height: 520px; position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.12);
+  }
+  .dashboard-frame-wrap iframe { width: 100%; height: 100%; border: 0; }
+  .dashboard-overlay {
+    position: absolute; inset: auto 0 0 0; height: 30%;
+    background: linear-gradient(180deg, transparent, rgba(250,246,238,0.95));
+    pointer-events: none;
+  }
+  .dashboard-cta {
+    position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: var(--bg); text-decoration: none;
+    padding: 11px 22px; border-radius: 100px; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  /* Final CTA scene */
+  .final-cta {
+    background: linear-gradient(180deg, var(--bg) 0%, rgba(184,92,56,0.10) 100%);
+    text-align: center;
+    min-height: auto; padding: 120px 24px 100px 24px;
+  }
+  .final-cta-inner {
+    max-width: 780px; margin: 0 auto;
+    display: block; text-align: center;
+  }
+  .final-cta h1 {
+    font-family: Georgia, serif; font-size: clamp(40px, 6.5vw, 64px);
+    line-height: 1.05; letter-spacing: -1.5px; margin-bottom: 18px;
+    color: var(--ink);
+  }
+  .final-cta .sub {
+    font-size: 17px; color: var(--ink2); max-width: 560px; margin: 0 auto 32px auto;
+    line-height: 1.65;
+  }
+  .final-cta .btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .final-cta .btn-primary {
+    background: var(--accent); color: #fff; text-decoration: none;
+    padding: 14px 28px; border-radius: 100px; font-size: 14px; font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .final-cta .btn-ghost {
+    background: transparent; color: var(--ink2); border: 1px solid var(--line);
+    text-decoration: none;
+    padding: 14px 28px; border-radius: 100px; font-size: 14px; font-weight: 600;
+  }
+  .verticals-row {
+    margin-top: 36px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  }
+  .vertical-pill {
+    background: var(--paper); border: 1px solid var(--line);
+    color: var(--ink2); padding: 8px 14px; border-radius: 100px;
+    font-size: 12px; font-weight: 600; text-decoration: none;
+  }
+  .vertical-pill:hover { background: var(--paper-soft); border-color: var(--accent); color: var(--accent); }
+
+  /* Reveal-on-scroll */
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.show { opacity: 1; transform: translateY(0); }
+
+  /* Sample-data badge on each scene */
+  .sample-badge {
+    position: absolute; top: 110px; right: 24px;
+    background: rgba(211, 165, 46, 0.12); color: #7a5a10;
+    padding: 4px 10px; border-radius: 100px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+    border: 1px solid rgba(211, 165, 46, 0.3);
+  }
+  .sample-badge .pip {
+    display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--gold); margin-right: 6px; vertical-align: middle;
+    animation: blink 1.6s step-end infinite;
+  }
+
+  @media (max-width: 880px) {
+    .rail { padding: 10px 14px; }
+    .rail-steps { gap: 4px; }
+    .rail-step .label { display: none; }
+    .scene { padding: 130px 18px 60px 18px; }
+    .scene-inner { grid-template-columns: 1fr; gap: 32px; }
+    .scene-left { order: 2; max-width: 100%; }
+    .scene-right { order: 1; }
+    .sample-badge { display: none; }
+    .cold-open { padding: 140px 20px 60px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sample-banner"><span class="pip"></span>Sample Lagos data · Same product flow</div>
+
+<nav class="rail">
+  <div class="rail-inner">
+    <a href="/" class="rail-brand">Reach<span class="ng">NG</span></a>
+    <div class="rail-steps">
+      <a href="#scene-1" class="rail-step" data-step="1"><span class="n">1</span><span class="label">Voice</span></a>
+      <a href="#scene-2" class="rail-step" data-step="2"><span class="n">2</span><span class="label">Draft</span></a>
+      <a href="#scene-3" class="rail-step" data-step="3"><span class="n">3</span><span class="label">Receipt</span></a>
+      <a href="#scene-4" class="rail-step" data-step="4"><span class="n">4</span><span class="label">Brief</span></a>
+      <a href="#scene-5" class="rail-step" data-step="5"><span class="n">5</span><span class="label">Portal</span></a>
+    </div>
+    <a href="/waitlist" class="rail-cta">Join early access →</a>
+  </div>
+</nav>
+
+<!-- ── Cold Open ────────────────────────────────────────────────────────── -->
+<section class="cold-open" id="open">
+  <div class="eyebrow">90-second guided tour · Sample Lagos data</div>
+  <h1>Saturday, 11:47pm. <em>A high-value lead</em> just messaged.</h1>
+  <p class="sub">Watch one night with EYO — voice note to deposit to morning brief. The same flow runs for your business, with your voice and your prices.</p>
+  <div class="btns">
+    <a href="#scene-1" class="btn-primary">Start 90-sec tour →</a>
+    <a href="/portal/demo/dashboard" class="btn-ghost">Skip to dashboard</a>
+  </div>
+</section>
+
+<!-- ── Scene 1: Voice Note Lands ───────────────────────────────────────── -->
+<section class="scene" id="scene-1">
+  <div class="sample-badge"><span class="pip"></span>Sample data</div>
+  <div class="scene-inner">
+    <div class="scene-left reveal">
+      <div class="scene-num">Scene <strong>01</strong> · Voice note</div>
+      <div class="eyebrow">Saturday · 11:47 PM</div>
+      <h1 class="scene-h">A 34-second voice note lands.</h1>
+      <p class="scene-sub">Across Lagos, this is the moment most bookings die. The owner's asleep. The customer waits, gives up, books elsewhere.</p>
+      <p class="scene-micro"><strong>Without EYO:</strong> reply tomorrow morning · maybe</p>
+      <div style="margin-top:24px;"><a href="#scene-2" class="scene-cta">See what EYO does →</a></div>
+    </div>
+    <div class="scene-right reveal">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="wa-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="wa-avatar" style="background:linear-gradient(135deg,#a8e6cf,#56cfa1);color:#0a3d2a;">FA</div>
+              <div><div style="font-size:13px;font-weight:600;">Funke Adebayo</div><div style="font-size:10px;opacity:0.85;">+234 803 ••• 41</div></div>
+            </div>
+            <div style="font-size:11px;opacity:0.8;">11:47 PM</div>
+          </div>
+          <div class="wa-pad">
+            <div class="stamp-row"><span class="wa-stamp">SATURDAY · 11:47 PM</span></div>
+            <div class="wa-msg-customer">
+              <div class="voice-row">
+                <div class="voice-play">▶</div>
+                <div class="voice-wave" id="wave1"></div>
+                <div class="voice-dur">0:34</div>
+              </div>
+              <div class="timestamp-row">11:47 PM ✓✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Scene 2: EYO Drafts (transcript + tags + reply) ─────────────────── -->
+<section class="scene" id="scene-2">
+  <div class="sample-badge"><span class="pip"></span>Sample data</div>
+  <div class="scene-inner">
+    <div class="scene-left reveal">
+      <div class="scene-num">Scene <strong>02</strong> · Draft</div>
+      <div class="eyebrow">2.4 seconds later</div>
+      <h1 class="scene-h">EYO transcribes, tags, <em>drafts</em>.</h1>
+      <p class="scene-sub">Voice note transcribed. Intent classified. Reply drafted in your voice with your bank details. <strong style="color:var(--ink);">Nothing sends without your tap.</strong></p>
+      <p class="scene-micro"><strong>With EYO:</strong> reply ready in 2.4s · one-tap approve</p>
+      <div style="margin-top:24px;"><a href="#scene-3" class="scene-cta">She paid · what next? →</a></div>
+    </div>
+    <div class="scene-right reveal" id="scene-2-right" style="display:flex;flex-direction:column;gap:18px;align-items:center;">
+      <!-- Transcript phone (compact) -->
+      <div class="phone" style="max-width:340px;">
+        <div class="phone-screen">
+          <div class="wa-header" style="padding:11px 16px 9px 16px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="wa-avatar" style="background:linear-gradient(135deg,#a8e6cf,#56cfa1);color:#0a3d2a;width:26px;height:26px;font-size:11px;">FA</div>
+              <div style="font-size:12px;font-weight:600;">Funke Adebayo</div>
+            </div>
+            <div style="font-size:10px;opacity:0.8;">11:47 PM</div>
+          </div>
+          <div class="wa-pad" style="min-height:auto;padding:14px 12px 16px 12px;">
+            <div class="wa-msg-customer">
+              <div class="voice-row">
+                <div class="voice-play" style="width:24px;height:24px;font-size:11px;">▶</div>
+                <div class="voice-wave" id="wave2" style="height:18px;"></div>
+                <div class="voice-dur">0:34</div>
+              </div>
+              <div class="voice-transcript show">"Hi, I want to book your rooftop for Saturday around 9pm, table of 6 — it's my friend's birthday. Do you still have something near the DJ booth? And how much is the deposit?"</div>
+            </div>
+            <div class="tags-row" id="tags-row-2">
+              <span class="tag tag-hot">🔥 HOT</span>
+              <span class="tag tag-cool">booking</span>
+              <span class="tag tag-cool">deposit question</span>
+              <span class="tag tag-cool">qualifying</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- EYO draft card -->
+      <div class="eyo-draft-card">
+        <div class="eyo-tag">EYO · awaiting your tap</div>
+        <div class="eyo-draft-header">
+          <span>Reply as <strong style="color:var(--ink);">Mercury Lagos</strong></span>
+          <span id="draft-status-2"><div class="typing-dots"><span></span><span></span><span></span></div></span>
+        </div>
+        <div class="eyo-draft-body" id="draft-body-2" style="opacity:0;transition:opacity 0.6s ease;">
+          Hey Funke 🙌 yes, we still have one 9pm table for 6 right by the DJ booth — perfect for a birthday. Deposit is ₦90k to lock it (account below 👇). I can hold it for 10 mins while you confirm.<br><br>
+          <strong>Mercury Lagos · GTBank · 0123456789</strong>
+        </div>
+        <div class="eyo-actions">
+          <button class="btn-approve">✓ Approve &amp; send</button>
+          <button class="btn-edit">Edit</button>
+          <button class="btn-skip">Skip</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Scene 3: Receipt Catcher ────────────────────────────────────────── -->
+<section class="scene" id="scene-3">
+  <div class="sample-badge"><span class="pip"></span>Sample data</div>
+  <div class="scene-inner">
+    <div class="scene-left reveal">
+      <div class="scene-num">Scene <strong>03</strong> · Receipt</div>
+      <div class="eyebrow">Sunday · 11:23 AM</div>
+      <h1 class="scene-h">She sent a transfer screenshot. <em>EYO booked it.</em></h1>
+      <p class="scene-sub">Lagos runs on bank transfers — GTB, OPay, Kuda, UBA, PalmPay. EYO reads the screenshot in 3 seconds, matches it to the open booking, drafts the receipt.</p>
+      <p class="scene-micro"><strong>3.2 seconds</strong> · bank screenshot → matched booking → drafted receipt</p>
+      <div style="margin-top:24px;"><a href="#scene-4" class="scene-cta">Monday morning brief →</a></div>
+    </div>
+    <div class="scene-right reveal" style="display:flex;flex-direction:column;gap:18px;align-items:center;">
+      <!-- WhatsApp incoming with screenshot -->
+      <div class="phone" style="max-width:300px;">
+        <div class="phone-screen">
+          <div class="wa-header" style="padding:11px 16px 9px 16px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="wa-avatar" style="background:linear-gradient(135deg,#fce4a8,#f5b942);color:#7a4a00;width:26px;height:26px;font-size:11px;">BO</div>
+              <div style="font-size:12px;font-weight:600;">Bola Olajide</div>
+            </div>
+            <div style="font-size:10px;opacity:0.8;">11:23 AM</div>
+          </div>
+          <div class="wa-pad" style="min-height:auto;padding:14px 12px 18px 12px;">
+            <div class="receipt-screenshot">
+              <div class="receipt-bank-row">
+                <div class="receipt-bank">GTBank</div>
+                <div class="receipt-status">SUCCESSFUL</div>
+              </div>
+              <div class="receipt-amount">₦450,000.00</div>
+              <div class="receipt-details">From: BOLA O. OLAJIDE<br>To: MERCURY LAGOS LTD<br>Ref: TABLE BOOKING SAT<br>17 May 2026 · 11:22:48</div>
+            </div>
+            <div style="margin-top:10px;background:#25D366;color:#fff;padding:8px 11px;border-radius:12px 12px 12px 4px;font-size:12px;max-width:75%;">☝🏾 Sent. Pls confirm.</div>
+          </div>
+        </div>
+      </div>
+      <!-- EYO extracted + matched + drafted -->
+      <div class="eyo-draft-card">
+        <div class="eyo-tag">EYO · read · matched · drafted</div>
+        <div class="eyo-draft-header">
+          <span>Reply as <strong style="color:var(--ink);">Mercury Lagos</strong></span>
+          <span>processed in 3.2s</span>
+        </div>
+        <div class="extracted-fields" id="extracted-3">
+          <div class="field"><span class="field-key">Bank:</span> <span class="field-val">GTBank</span></div>
+          <div class="field"><span class="field-key">Status:</span> <span class="field-val" style="color:#2e7d32;">Successful</span></div>
+          <div class="field"><span class="field-key">Amount:</span> <span class="field-val">₦450,000</span></div>
+          <div class="field"><span class="field-key">Ref:</span> <span class="field-val">Table booking Sat</span></div>
+          <div class="field"><span class="field-key">From:</span> <span class="field-val">Bola O. Olajide</span></div>
+          <div class="field"><span class="field-key">At:</span> <span class="field-val">11:22:48</span></div>
+        </div>
+        <div class="match-row" id="match-3">
+          <div class="match-check">✓</div>
+          <div><strong>Matched</strong> to booking <span style="color:var(--muted);">#MER-2614 · Sat 9pm · DJ booth · ₦450k deposit</span></div>
+        </div>
+        <div class="eyo-draft-body">
+          Got it Bola 🙏 ₦450k deposit confirmed against your Saturday 9pm booking (booth near the DJ, table of 6). Receipt #MER-2614. Doors open 8:30pm — see you Saturday.
+        </div>
+        <div class="eyo-actions">
+          <button class="btn-approve">✓ Approve &amp; send</button>
+          <button class="btn-edit">Edit</button>
+          <button class="btn-skip">Skip</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Scene 4: Owner Brief ─────────────────────────────────────────────── -->
+<section class="scene" id="scene-4">
+  <div class="sample-badge"><span class="pip"></span>Sample data</div>
+  <div class="scene-inner">
+    <div class="scene-left reveal">
+      <div class="scene-num">Scene <strong>04</strong> · Brief</div>
+      <div class="eyebrow">Monday · 7:02 AM</div>
+      <h1 class="scene-h">Your morning brief. <em>Before coffee.</em></h1>
+      <p class="scene-sub">Every morning at 7am Lagos time, EYO drops a WhatsApp summary: last night's signals, this morning's queue, where revenue almost slipped, your slowest reply.</p>
+      <p class="scene-micro"><strong>5-minute read.</strong> Then you go run your day.</p>
+      <div style="margin-top:24px;"><a href="#scene-5" class="scene-cta">See the dashboard →</a></div>
+    </div>
+    <div class="scene-right reveal">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="wa-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="wa-avatar" style="background:linear-gradient(135deg,#B85C38,#ff7e30);color:#fff;">E</div>
+              <div><div style="font-size:13px;font-weight:600;">EYO</div><div style="font-size:10px;opacity:0.85;">online · 7:02 AM</div></div>
+            </div>
+          </div>
+          <div class="wa-pad">
+            <div class="stamp-row"><span class="wa-stamp">MONDAY · 7:02 AM</span></div>
+            <div class="brief-bubble">
+              <div class="brief-h">📋 Last night · 11pm → 6am</div>
+              <div class="brief-section" style="border-top:0;padding-top:0;"><strong>12 messages</strong> · <strong>8 drafted</strong> · <strong>2 🔥 HOT</strong></div>
+              <div class="brief-section">
+                <div style="font-weight:600;color:#2e7d32;font-size:11px;margin-bottom:4px;">💰 ₦450k collected</div>
+                <div style="font-size:11.5px;color:#4a4a4a;">Bola Olajide · GTB transfer · matched to Saturday booking</div>
+              </div>
+              <div class="brief-section">
+                <div style="font-weight:600;color:var(--accent);font-size:11px;margin-bottom:4px;">🔥 Awaiting your tap</div>
+                <div style="font-size:11.5px;color:#4a4a4a;line-height:1.6;">• Funke A. — Sat 9pm DJ booth (deposit confirmed)<br>• Tunde K. — corporate event, 80 guests</div>
+              </div>
+              <div class="brief-section">
+                <div style="font-weight:600;color:#c62828;font-size:11px;margin-bottom:4px;">⚠️ Leak alert</div>
+                <div style="font-size:11.5px;color:#4a4a4a;">2 enquiries idle 18hrs · drafts ready</div>
+              </div>
+              <div class="brief-section">
+                <div style="font-weight:600;color:#1a1a1a;font-size:11px;margin-bottom:4px;">⚡ Slowest reply</div>
+                <div style="font-size:11.5px;color:#4a4a4a;">4 min (vs 6 hrs before EYO)</div>
+              </div>
+              <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f0ebe1;font-size:11px;color:var(--accent);font-weight:600;">Tap to open the queue →</div>
+              <div style="font-size:9.5px;color:#999;text-align:right;margin-top:6px;">7:02 AM ✓✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Scene 5: Portal Reveal ──────────────────────────────────────────── -->
+<section class="scene" id="scene-5" style="background:linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);">
+  <div class="sample-badge"><span class="pip"></span>Sample data</div>
+  <div class="scene-inner" style="grid-template-columns: 1fr;">
+    <div class="scene-left reveal" style="max-width:680px;margin:0 auto;text-align:center;">
+      <div class="scene-num">Scene <strong>05</strong> · Portal</div>
+      <div class="eyebrow">Behind every brief</div>
+      <h1 class="scene-h" style="margin-left:auto;margin-right:auto;">The portal keeps every <em>lead, draft, receipt</em> organised.</h1>
+      <p class="scene-sub" style="max-width:580px;margin-left:auto;margin-right:auto;">Approval queue, lead pipeline, capacity grid, holding-reply settings. Mobile-friendly. Built for tapping while you walk.</p>
+    </div>
+    <div class="scene-right reveal" style="margin-top:32px;">
+      <div class="dashboard-frame-wrap" style="max-width:980px;margin:0 auto;width:100%;">
+        <iframe src="/portal/demo/dashboard?embed=1" loading="lazy" title="ReachNG dashboard sample"></iframe>
+        <div class="dashboard-overlay"></div>
+        <a class="dashboard-cta" href="/portal/demo/dashboard" target="_blank">Open the full dashboard ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Final CTA ───────────────────────────────────────────────────────── -->
+<section class="final-cta" id="cta">
+  <div class="final-cta-inner">
+    <div class="eyebrow">90-second tour · complete</div>
+    <h1>Want EYO to run this story for <em>your</em> business?</h1>
+    <p class="sub">Apply for early access. Within 48 hours, priority applicants get a tailored WhatsApp demo — how EYO would reply to your actual enquiries.</p>
+    <div class="btns">
+      <a href="/waitlist" class="btn-primary">Join early access →</a>
+      <a href="/" class="btn-ghost">Back to home</a>
+    </div>
+
+    <div class="verticals-row">
+      <a href="/portal/demo/hospitality" class="vertical-pill">🍽 Hospitality</a>
+      <a href="/portal/demo/real_estate" class="vertical-pill">🏛 Real estate</a>
+      <a href="/portal/demo/professional_services" class="vertical-pill">⚖ Legal &amp; advisory</a>
+      <a href="/portal/demo/clinics" class="vertical-pill">🩺 Clinics</a>
+    </div>
+
+    <p style="margin-top:36px;font-size:11px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;">Sample Lagos data shown above. Same product flow for every Lagos business.</p>
+  </div>
+</section>
+
+<script>
+// Reveal on scroll
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('show');
+      // Trigger inner animations for specific scenes
+      if (e.target.closest('#scene-2')) {
+        // tag pills cascade
+        const tags = document.querySelectorAll('#tags-row-2 .tag');
+        tags.forEach((t, i) => setTimeout(() => t.classList.add('show'), 200 + i * 120));
+        // EYO typing → body
+        setTimeout(() => {
+          const status = document.getElementById('draft-status-2');
+          const body = document.getElementById('draft-body-2');
+          if (status) status.innerHTML = '<span style="color:#999;">drafted 9s ago</span>';
+          if (body) body.style.opacity = '1';
+        }, 1400);
+      }
+      if (e.target.closest('#scene-3')) {
+        setTimeout(() => {
+          const ex = document.getElementById('extracted-3');
+          if (ex) ex.classList.add('show');
+        }, 300);
+        setTimeout(() => {
+          const m = document.getElementById('match-3');
+          if (m) m.classList.add('show');
+        }, 800);
+      }
+    }
+  });
+}, { threshold: 0.18 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// Scene-rail active state
+const sceneIds = ['scene-1','scene-2','scene-3','scene-4','scene-5'];
+const railSteps = document.querySelectorAll('.rail-step');
+const sceneIo = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      const idx = sceneIds.indexOf(id);
+      if (idx >= 0) {
+        railSteps.forEach(s => s.classList.remove('active'));
+        const target = document.querySelector(`.rail-step[data-step="${idx+1}"]`);
+        if (target) target.classList.add('active');
+      }
+    }
+  });
+}, { threshold: 0.4 });
+sceneIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) sceneIo.observe(el);
+});
+
+// Voice waveform synth (decorative)
+function buildWave(el) {
+  if (!el) return;
+  const bars = 26;
+  let html = "";
+  for (let i = 0; i < bars; i++) {
+    const h = 4 + Math.round(Math.sin(i * 0.5) * 6 + Math.random() * 8);
+    const delay = (i * 0.04).toFixed(2);
+    html += `<span style="height:${h}px;animation-delay:${delay}s;opacity:${i < 18 ? 1 : 0.3};"></span>`;
+  }
+  el.innerHTML = html;
+}
+buildWave(document.getElementById('wave1'));
+buildWave(document.getElementById('wave2'));
+</script>
+
+</body>
+</html>

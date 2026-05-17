@@ -318,7 +318,20 @@ async def run_resurrection(token: str, request: Request):
 
 @router.get("/demo", response_class=HTMLResponse)
 async def demo_portal(request: Request):
-    """Public demo portal — defaults to hospitality (Mercury). Same product, vertical-tailored sample data."""
+    """Public demo — 90-second guided product tour.
+
+    Phone-first cinematic walk-through (voice note → EYO draft → receipt
+    catcher → owner brief → dashboard reveal). Cold prospects land here.
+    Direct dashboard view available at /portal/demo/dashboard.
+    """
+    templates = request.app.state.templates
+    return templates.TemplateResponse(request, "portal_demo_guided.html", {"vertical": "hospitality"})
+
+
+@router.get("/demo/dashboard", response_class=HTMLResponse)
+async def demo_portal_dashboard(request: Request):
+    """Raw operator-view dashboard with sample data. Linked from the guided
+    tour Scene 5 ('Open the full dashboard'). Defaults to hospitality."""
     from services.demo_datasets import get_dataset
     templates = request.app.state.templates
     return templates.TemplateResponse(request, "portal_demo.html", {"data": get_dataset(None), "vertical": "hospitality"})
@@ -330,6 +343,7 @@ async def demo_portal_vertical(vertical: str, request: Request):
 
     Same engine as /portal/demo, just loads a different sample dataset so prospects
     in any Lagos SME vertical see themselves in the product within 5 seconds.
+    Pass 2: this will also become a guided tour with vertical-specific scenes.
     """
     from services.demo_datasets import get_dataset
     templates = request.app.state.templates
