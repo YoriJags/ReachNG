@@ -29,7 +29,7 @@
     <a href="/waitlist" class="btn btn-primary">Join early access →</a>
     <a href="/portal/demo" class="btn btn-ghost" target="_blank">See it run — 90 seconds</a>
   </div>
-  <p style="margin-top: 28px; font-size: 12px; color: var(--muted); letter-spacing: 0.04em;">5 Lagos businesses per week · Hand-onboarded · Within 24-48h we WhatsApp you a tailored demo</p>
+  <p style="margin-top: 28px; font-size: 12px; color: var(--muted); letter-spacing: 0.04em;">5 Lagos businesses per week · Hand-onboarded · Priority applicants get a tailored WhatsApp demo within 48 hours</p>
 
   <!-- Show-don't-tell: live-looking HITL approval mock -->
   <div style="margin-top: 56px; max-width: 920px; margin-left: auto; margin-right: auto;">
@@ -123,7 +123,7 @@
       </div>
       <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;">
         <div style="font-size: 11px; color: var(--muted); letter-spacing: 0.12em; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Day 2</div>
-        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: var(--muted-strong);">EYO learns your tone from your last 50 sent messages. Picks up your voice — short or warm, formal or casual.</p>
+        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: var(--muted-strong);">With your permission, EYO learns from examples you choose — recent replies, scripts, FAQs, price lists, and your never-say list.</p>
       </div>
       <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px;">
         <div style="font-size: 11px; color: var(--muted); letter-spacing: 0.12em; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Day 3</div>
@@ -227,7 +227,7 @@
 
     <div style="margin-top: 28px; padding: 22px 28px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--orange); border-radius: 10px; max-width: 760px; margin-left: auto; margin-right: auto;">
       <p style="margin: 0; font-size: 14px; line-height: 1.7; color: var(--muted-strong);">
-        EYO learns your voice from your last 50 sent messages on Day 2 of onboarding. Short or warm, formal or casual — your tone, your vocabulary, your way of greeting customers. <strong style="color: var(--text-strong);">Every draft routes through your tap before it sends.</strong> Nothing leaves without you.
+        <strong style="color: var(--text-strong);">With your permission</strong>, EYO learns from examples you choose — recent replies, scripts, FAQs, price lists, and the never-say list. Short or warm, formal or casual — your tone, your vocabulary. <strong style="color: var(--text-strong);">Every draft routes through your tap before it sends.</strong> Nothing leaves without you.
       </p>
     </div>
   </div>
@@ -372,7 +372,7 @@
   <div class="inner" style="max-width: 1000px;">
     <div class="section-label" style="color: var(--orange);">Money · the part that catches itself</div>
     <h2 class="section-h2">Customer just sent a bank-transfer screenshot. EYO already booked it.</h2>
-    <p class="section-sub" style="max-width: 720px;">Lagos runs on bank transfers. GTB, OPay, Kuda, UBA, PalmPay — screenshots, slips, share-photos. EYO reads them in 3 seconds, matches them to the right invoice, and drafts the receipt. <strong style="color: var(--text-strong);">Even when the customer sent the wrong amount.</strong></p>
+    <p class="section-sub" style="max-width: 720px;">Lagos runs on bank transfers. GTB, OPay, Kuda, UBA, PalmPay — screenshots, slips, share-photos. EYO reads them in 3 seconds, matches them to the right invoice, and drafts the receipt.</p>
 
     <div style="margin-top: 44px; display: grid; grid-template-columns: 1fr 1.05fr; gap: 22px; align-items: start;" class="mock-grid">
 
@@ -455,8 +455,25 @@
       </div>
     </div>
 
-    <p style="margin-top: 36px; text-align: center; font-size: 15px; color: var(--muted-strong); max-width: 720px; margin-left: auto; margin-right: auto; line-height: 1.7;">
-      Bank screenshot to receipt in <strong style="color: var(--text-strong);">3.2 seconds</strong>, including a wrong-amount catch. <span style="color: var(--orange);">Try doing that with WhatsApp Business alone.</span>
+    <!-- Wrong-amount edge case — small mock showing EYO catches under/overpayments -->
+    <div style="margin-top: 32px; max-width: 760px; margin-left: auto; margin-right: auto;">
+      <div style="font-size: 11px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; margin-bottom: 12px; text-align: center;">And when the amount doesn't match</div>
+      <div style="background: var(--surface); border: 1px solid var(--border); border-left: 3px solid #c62828; border-radius: 10px; padding: 16px 20px; display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center;">
+        <div style="background: rgba(198,40,40,0.08); border-radius: 8px; padding: 10px 14px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6; color: var(--text-strong);">
+          Expected: <strong>₦450,000</strong><br>
+          Received: <strong style="color: #c62828;">₦400,000</strong>
+        </div>
+        <div>
+          <div style="font-size: 10px; color: #c62828; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 6px;">EYO drafts a balance follow-up</div>
+          <div style="font-size: 13px; color: var(--muted-strong); line-height: 1.6; font-style: italic;">
+            "Thanks Bola, we've received ₦400k against your booking #ALT-2614. Balance of ₦50k still due — same account. Want me to send the link again?"
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top: 32px; text-align: center; font-size: 15px; color: var(--muted-strong); max-width: 720px; margin-left: auto; margin-right: auto; line-height: 1.7;">
+      Bank screenshot to receipt in <strong style="color: var(--text-strong);">3.2 seconds</strong>. <span style="color: var(--orange);">Try doing that with WhatsApp Business alone.</span>
     </p>
   </div>
 </section>
