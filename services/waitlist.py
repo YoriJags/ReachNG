@@ -299,7 +299,7 @@ def _compose_confirmation_email(name: str, position: int, business_name: str) ->
         f"EYO here from ReachNG. Got you on the early access list for {business_name}.\n\n"
         f"What happens next:\n"
         f"  1. We're onboarding Lagos businesses in small batches so the first 30 days feel hand-built.\n"
-        f"  2. Based on your answers, we may invite you into one of the first pilot batches. Priority applicants get a tailored WhatsApp demo within 48 hours — how EYO would reply to your actual enquiries.\n"
+        f"  2. Based on your answers, we may invite you into one of the first pilot batches. Priority applicants get a tailored WhatsApp demo within 48 hours — how EYO would carry your actual conversations.\n"
         f"  3. First call is a 30-min pairing where we connect your WhatsApp number — you're live by the end of it.\n\n"
         f"While you wait, the engine runs on realistic Lagos sample data: https://www.reachng.ng/portal/demo\n\n"
         f"Any quick question — just reply to this email.\n\n"
