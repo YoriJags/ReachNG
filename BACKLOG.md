@@ -49,9 +49,25 @@ Locked sequence — build in this order. Total ~17 days.
 
 - [ ] **8. Pricing Settings panel** (~1.5 hours) — Mongo `platform_settings.pricing` doc with three plan amounts. Read from doc in `api/marketing.py::PLAN_PRICING` (fallback to defaults). Edit inline from dashboard Control Tower → Settings tab. Audit log on each change. Killer for testing price points without a deploy.
 
-## 🚨 BLOCKED — Railway deploy failing on healthcheck (2026-05-15 EOD)
+## ✅ Railway deploy — green (2026-05-16)
 
-Latest commits build cleanly but `/health` never responds. Process crashes at startup. See `RESUME_NEXT_SESSION.md` for the debug path. Most likely a Python ImportError inside `api/copilot.py`, `api/billing.py`, or `services/usage_meter.py`. Resolve before any further code push.
+The defensive `_safe()` wrap in the lifespan fixed it. All 33 ensure_*_indexes calls log `startup_ok` on boot. Application startup complete. `GET /health → 200 OK`. www.reachng.ng is live with all latest work (HBR + WhatsApp Nigeria research anchors, trimmed 8-section landing, premium positioning, lean_scraper internal engine).
+
+---
+
+## P0 — LeanScrape product family (queued 2026-05-17)
+
+**Three-product ladder. ReachNG is the internal customer of every layer at cost.**
+
+- [x] ~~**1. leanscrape OSS library**~~ — shipped 2026-05-17 at `c:/VIIBE/leanscrape/`. MIT-licensed Python package. 3-tier fetcher (httpx → curl_cffi → Playwright), multi-LLM (Claude/GPT-4o-mini/Gemini), SqliteCache, ProxyPool, schema-driven extraction. 1,394 lines. Not yet pushed to GitHub — user does the `git init` + `gh repo create`. PyPI publish blocked until first paid client (focus on ReachNG revenue first).
+
+- [ ] **2. leanscrape Cloud (hosted SaaS, private repo)** (~1 week) — When OSS hits ~100 GitHub stars OR people start opening issues asking for hosted version. FastAPI service at `api.leanscrape.com`. API key auth, Paystack/Stripe metered billing, managed Playwright cluster + residential proxy pool + shared cache. Tiers: Starter $29/mo (1K scrapes), Pro $99/mo (10K scrapes). ReachNG uses internally at API-cost only (no markup).
+
+- [ ] **3. Enrich premium add-on** (~3-4 days after Cloud ships) — Multi-source aggregation API. Input: domain or business name. Output: structured profile (decision-maker names, direct emails, phone numbers, social handles, tech stack, employee band, news mentions). Chained pipeline = website scrape + DDG search + LinkedIn-style lookup + email-pattern guessing + SMTP probe + tech-stack fingerprinting. Pricing: $0.05/enrich pay-as-you-go OR $499/mo for 15K. ReachNG uses internally for `tools/apify_enrich.py` replacement (kill remaining Apify spend).
+
+**Strategic sequence: OSS drives adoption → traction signals when to build Cloud → Cloud customers signal which Enrich fields to ship first.** Don't build Cloud or Enrich before OSS has 100+ stars / 500+ PyPI installs — that's the YC playbook (Stripe / Supabase / Vercel all did this).
+
+**ReachNG benefits regardless of external adoption**: lean_scraper engine already lives at `services/lean_scraper.py` and saves ~₦40K/month in Apify spend per active campaign.
 
 ---
 
