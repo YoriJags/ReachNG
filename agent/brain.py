@@ -101,6 +101,49 @@ def _agent_identity_block(client_name: Optional[str]) -> str:
     )
 
 
+def _resolve_client_id(client_name: Optional[str]) -> Optional[str]:
+    """Look up client_id from client_name. Returns None if no match. Cheap lookup."""
+    if not client_name:
+        return None
+    try:
+        import re as _re
+        from database import get_db
+        doc = get_db()["clients"].find_one(
+            {"name": {"$regex": f"^{_re.escape(client_name)}$", "$options": "i"}},
+            {"_id": 1},
+        )
+        return str(doc["_id"]) if doc else None
+    except Exception:
+        return None
+
+
+def _meter_drafter_gate(client_name: Optional[str]) -> bool:
+    """T0.2.5 — anti-runaway rate-limit gate before any Haiku drafter call.
+    Returns True if the call is allowed, False if it would exceed the hard
+    per-minute ceiling for this client. Never raises.
+    """
+    client_id = _resolve_client_id(client_name)
+    if not client_id:
+        return True   # platform-level / no-client draft — skip metering
+    try:
+        from services.usage_meter import check_rate
+        return check_rate(client_id, "drafter")
+    except Exception:
+        return True   # metering down — don't block real work
+
+
+def _meter_drafter_record(client_name: Optional[str], *, channel: str = "whatsapp") -> None:
+    """T0.2.5 — record a successful drafter call. Best-effort, never raises."""
+    client_id = _resolve_client_id(client_name)
+    if not client_id:
+        return
+    try:
+        from services.usage_meter import record
+        record(client_id=client_id, feature="drafter", units=1, extra={"channel": channel})
+    except Exception:
+        pass
+
+
 def _nigerian_context() -> str:
     """Universal Nigerian-market base layer. Injected under system.txt for every
     outbound draft so messages sound like they were written by someone living in
@@ -300,6 +343,11 @@ def generate_b2c_message(
     Otherwise we fall back to the loose free-text `client_brief` for back-compat.
     Returns {"message": str} for WhatsApp or {"subject": str, "message": str} for email.
     """
+    # T0.2.5 — rate-limit gate
+    if not _meter_drafter_gate(client_name):
+        log.warning("drafter_rate_limited_b2c", client=client_name)
+        return {"message": "(rate-limited — please tap retry in a moment)"}
+
     base_system = _load_prompt("system.txt")
     ng_context = _nigerian_context()
 
@@ -417,6 +465,9 @@ No explanations. No preamble. Just the message.
     )
 
     raw = response.content[0].text.strip()
+
+    # T0.2.5 — record successful drafter call
+    _meter_drafter_record(client_name, channel=channel)
 
     if channel == "email":
         try:
@@ -606,11 +657,17 @@ def generate_outreach_message_for_client(
     enrichment_context: Optional[str] = None,
     contact_name: Optional[str] = None,
     contact_title: Optional[str] = None,
+    client_name: Optional[str] = None,   # T0.2.5 — metering scope (callers pass paying-client name)
 ) -> dict:
     """
     Generate a message using a client-specific context prompt instead of the
     generic vertical prompt. Used when a ReachNG client has a custom brief.
     """
+    # T0.2.5 — rate-limit gate
+    if not _meter_drafter_gate(client_name):
+        log.warning("drafter_rate_limited_outreach", client=client_name)
+        return {"message": "(rate-limited — please tap retry in a moment)"}
+
     system = _load_prompt("system.txt")
 
     location_hint = ""
@@ -680,11 +737,14 @@ No explanations. No preamble. Just the message.
                 raw = raw.split("```")[1]
                 if raw.startswith("json"):
                     raw = raw[4:]
+            _meter_drafter_record(client_name, channel=channel)
             return json.loads(raw.strip())
         except Exception:
             log.warning("client_email_parse_failed", raw=raw)
+            _meter_drafter_record(client_name, channel=channel)
             return {"subject": f"Quick question for {business_name}", "message": raw}
 
+    _meter_drafter_record(client_name, channel=channel)
     return {"message": raw}
 
 

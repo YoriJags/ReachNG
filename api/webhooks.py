@@ -119,17 +119,11 @@ async def _handle_image_attachment(
         return False
 
     try:
-        receipt = await extract_receipt(image_bytes, mime_type)
+        # T0.2.5 — extract_receipt now records its own usage event + rate-limits internally
+        receipt = await extract_receipt(image_bytes, mime_type, client_id=client_id)
     except Exception as e:
         log.error("receipt_vision_crashed", error=str(e), phone=sender_phone)
         return False
-
-    # Record the vision call cost regardless of match outcome
-    try:
-        from services.usage_meter import record
-        record(client_id, "receipt", units=1)
-    except Exception:
-        pass
 
     if not receipt.is_receipt and receipt.confidence < 0.3:
         log.info("inbound_image_not_a_receipt", phone=sender_phone,
@@ -210,16 +204,13 @@ async def whatsapp_inbound(request: Request):
                 media_id, mime = aud
                 try:
                     audio_bytes, fetched_mime = await download_meta_media(media_id)
-                    tr = await transcribe_voice_note(audio_bytes, fetched_mime or mime)
+                    # T0.2.5 — transcribe_voice_note now records its own usage event + rate-limits internally
+                    tr = await transcribe_voice_note(audio_bytes, fetched_mime or mime,
+                                                      client_id=_early_client_id)
                     if tr and tr.text:
                         voice_transcripts[sender] = format_for_draft(tr)
                         log.info("voice_note_transcribed", sender=sender,
                                  dur=tr.duration_seconds, chars=len(tr.text))
-                        try:
-                            from services.usage_meter import record
-                            record(_early_client_id, "voice", units=1)
-                        except Exception:
-                            pass
                 except Exception as e:
                     log.error("meta_audio_pipeline_failed", error=str(e), sender=sender)
         else:
@@ -232,16 +223,12 @@ async def whatsapp_inbound(request: Request):
                 msg_id, att_id, mime = aud
                 try:
                     audio_bytes, fetched_mime = await download_unipile_attachment(msg_id, att_id)
-                    tr = await transcribe_voice_note(audio_bytes, fetched_mime or mime)
+                    tr = await transcribe_voice_note(audio_bytes, fetched_mime or mime,
+                                                      client_id=_early_client_id)
                     if tr and tr.text:
                         voice_transcripts[sender_p] = format_for_draft(tr)
                         log.info("voice_note_transcribed", sender=sender_p,
                                  dur=tr.duration_seconds, chars=len(tr.text))
-                        try:
-                            from services.usage_meter import record
-                            record(_early_client_id, "voice", units=1)
-                        except Exception:
-                            pass
                 except Exception as e:
                     log.error("unipile_audio_pipeline_failed", error=str(e), sender=sender_p)
     except Exception as e:

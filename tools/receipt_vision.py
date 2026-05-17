@@ -98,9 +98,13 @@ Return ONLY a JSON object with these keys (no preamble, no markdown):
 
 # ─── Public API ───────────────────────────────────────────────────────────────
 
-async def extract_receipt(image_bytes: bytes, mime_type: str) -> ReceiptData:
+async def extract_receipt(image_bytes: bytes, mime_type: str,
+                           client_id: Optional[str] = None) -> ReceiptData:
     """
     Run a Nigerian bank-receipt extraction over an image.
+
+    `client_id` enables T0.2.5 metering — pass it from the webhook caller so
+    every vision call is rate-limited + recorded against that client's bill.
 
     Synchronous Anthropic client wrapped — Anthropic Python SDK is sync, but the
     call is short enough to run inline. If we ever batch, move to AsyncAnthropic.
@@ -110,6 +114,17 @@ async def extract_receipt(image_bytes: bytes, mime_type: str) -> ReceiptData:
         log.warning("anthropic_key_missing_for_receipt_vision")
         return ReceiptData(is_receipt=False, confidence=0.0,
                            extraction_notes="ANTHROPIC_API_KEY not set")
+
+    # T0.2.5 — anti-runaway rate-limit gate (20 vision calls/min per client)
+    if client_id:
+        try:
+            from services.usage_meter import check_rate
+            if not check_rate(str(client_id), "receipt"):
+                log.warning("receipt_vision_rate_limited", client_id=client_id)
+                return ReceiptData(is_receipt=False, confidence=0.0,
+                                   extraction_notes="rate-limited by usage meter")
+        except Exception:
+            pass
 
     # Normalise mime — Anthropic accepts image/jpeg, image/png, image/gif, image/webp
     mime = (mime_type or "image/jpeg").lower().split(";")[0].strip()
@@ -143,7 +158,22 @@ async def extract_receipt(image_bytes: bytes, mime_type: str) -> ReceiptData:
         block.text for block in resp.content if getattr(block, "type", None) == "text"
     ).strip()
 
-    return _parse_json_to_receipt(raw)
+    receipt = _parse_json_to_receipt(raw)
+
+    # T0.2.5 — record successful usage event
+    if client_id:
+        try:
+            from services.usage_meter import record
+            record(
+                client_id=str(client_id),
+                feature="receipt",
+                units=1,
+                extra={"is_receipt": bool(receipt.is_receipt), "amount": receipt.amount_ngn},
+            )
+        except Exception:
+            pass
+
+    return receipt
 
 
 def _parse_json_to_receipt(raw: str) -> ReceiptData:

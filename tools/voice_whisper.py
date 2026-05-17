@@ -70,6 +70,7 @@ async def transcribe_voice_note(
     audio_bytes: bytes,
     mime_type: str = "audio/ogg",
     language_hint: Optional[str] = "en",
+    client_id: Optional[str] = None,   # T0.2.5 — metering scope
 ) -> Optional[VoiceTranscript]:
     """Transcribe a voice-note via OpenAI Whisper.
 
@@ -95,6 +96,16 @@ async def transcribe_voice_note(
     if len(audio_bytes) > 25 * 1024 * 1024:
         log.warning("whisper_skipped_oversized", size=len(audio_bytes))
         return None
+
+    # T0.2.5 — anti-runaway rate-limit gate (20 voice/min per client)
+    if client_id:
+        try:
+            from services.usage_meter import check_rate
+            if not check_rate(str(client_id), "voice"):
+                log.warning("whisper_rate_limited", client_id=client_id)
+                return None
+        except Exception:
+            pass   # never let metering break the actual call
 
     filename = _filename_for(mime_type)
     headers = {"Authorization": f"Bearer {settings.openai_api_key}"}
@@ -133,6 +144,20 @@ async def transcribe_voice_note(
     if not text:
         log.info("whisper_empty_transcript")
         return None
+
+    # T0.2.5 — record successful usage event (best-effort, never blocks return)
+    if client_id:
+        try:
+            from services.usage_meter import record
+            dur = body.get("duration") or 0
+            record(
+                client_id=str(client_id),
+                feature="voice",
+                units=1,
+                extra={"duration_s": float(dur), "chars": len(text)},
+            )
+        except Exception:
+            pass
 
     return VoiceTranscript(
         text=text,
