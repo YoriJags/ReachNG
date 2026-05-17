@@ -142,12 +142,20 @@ def add_to_waitlist(
     log.info("waitlist_joined", position=position, business=business_name, vertical=vertical)
     doc["_id"] = str(doc.pop("_id", "")) if "_id" in doc else ""
 
-    # ── WhatsApp confirmation (best-effort, non-blocking) ────────────────────
-    # Fire a warm "you're in" message via the platform Unipile line if a phone
-    # was given. Email confirmation is deferred to the email service when wired.
+    # ── Confirmations (best-effort, non-blocking) ────────────────────────────
+    # Fire WhatsApp + email in parallel. Email is the system of record (visible
+    # to the signup days later); WhatsApp gives instant reassurance. Both fire
+    # if both contact channels were given so the signup has a written trail.
     if phone_norm:
         _send_waitlist_confirmation_async(
             phone=phone_norm,
+            name=name,
+            position=position,
+            business_name=business_name,
+        )
+    if email:
+        _send_waitlist_email_async(
+            to_email=email,
             name=name,
             position=position,
             business_name=business_name,
@@ -199,6 +207,67 @@ def _send_waitlist_confirmation_async(*, phone: str, name: str, position: int, b
             asyncio.run(_fire())
     except Exception as e:
         log.warning("waitlist_confirmation_dispatch_failed", error=str(e))
+
+
+# ─── Email confirmation (parallel channel to WhatsApp) ───────────────────────
+
+def _compose_confirmation_email(name: str, position: int, business_name: str) -> tuple[str, str]:
+    """Returns (subject, body) for the waitlist confirmation email.
+
+    Slightly longer than the WhatsApp version because email is a permanent
+    record — the recipient may re-read it days later when their spot opens.
+    """
+    first = (name or "").split()[0] if name else ""
+    greet = f"Hi {first}," if first else "Hi,"
+    subject = f"You're #{position} on the ReachNG waitlist"
+    body = (
+        f"{greet}\n\n"
+        f"EYO here from ReachNG. You're #{position} on the waitlist — saved you a spot for {business_name}.\n\n"
+        f"What happens next:\n"
+        f"  1. We onboard Lagos businesses in small batches so the first 30 days feel hand-built (because they are).\n"
+        f"  2. When your spot opens, I'll WhatsApp + email you a quick onboarding link.\n"
+        f"  3. First call is a 30-min pairing where we connect your WhatsApp number — you're up and running by the end of it.\n\n"
+        f"While you wait, the live demo runs the engine on realistic Lagos sample data: https://www.reachng.ng/portal/demo\n\n"
+        f"Any quick question — just reply to this email.\n\n"
+        f"— EYO\n"
+        f"   On behalf of the team at ReachNG\n"
+        f"   hello@reachng.ng · Lagos"
+    )
+    return subject, body
+
+
+def _send_waitlist_email_async(*, to_email: str, name: str, position: int, business_name: str) -> None:
+    """Fire-and-forget email confirmation. Never raises — confirmation failure
+    must not break waitlist signup."""
+    try:
+        from tools.outreach import send_email
+        import asyncio
+
+        subject, body = _compose_confirmation_email(name=name, position=position, business_name=business_name)
+
+        async def _fire():
+            try:
+                await send_email(
+                    to_email=to_email,
+                    subject=subject,
+                    body=body,
+                    reply_to="hello@reachng.ng",
+                    force_smtp=True,
+                )
+                log.info("waitlist_email_sent", position=position)
+            except Exception as e:
+                log.warning("waitlist_email_send_failed", position=position, error=str(e))
+
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                asyncio.ensure_future(_fire())
+            else:
+                loop.run_until_complete(_fire())
+        except RuntimeError:
+            asyncio.run(_fire())
+    except Exception as e:
+        log.warning("waitlist_email_dispatch_failed", error=str(e))
 
 
 # ─── Public: stats ────────────────────────────────────────────────────────────

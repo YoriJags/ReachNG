@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     # Gmail SMTP/IMAP — email sending and reply polling (replaces Unipile for email)
     gmail_address: str | None = Field(default=None, env="GMAIL_ADDRESS")
     gmail_app_password: str | None = Field(default=None, env="GMAIL_APP_PASSWORD")
+    # Override SMTP host/port for non-Gmail mailboxes (e.g. Go54-hosted hello@reachng.ng).
+    # Defaults preserve the existing Gmail SSL behaviour when unset.
+    smtp_host: str = Field(default="smtp.gmail.com", env="SMTP_HOST")
+    smtp_port: int = Field(default=465, env="SMTP_PORT")
+    smtp_use_ssl: bool = Field(default=True, env="SMTP_USE_SSL")
 
     # Unipile — kept optional for clients still using it in agency mode
     unipile_api_key: str | None = Field(default=None, env="UNIPILE_API_KEY")

@@ -120,11 +120,17 @@ async def send_email(
     body: str,
     reply_to: Optional[str] = None,
     account_id: Optional[str] = None,  # kept for call-site compatibility
+    force_smtp: bool = False,
 ) -> dict:
     """
     Send email via Unipile if configured, otherwise fall back to Gmail SMTP.
     Unipile requires: UNIPILE_DSN + UNIPILE_API_KEY + UNIPILE_EMAIL_ACCOUNT_ID.
     Gmail fallback requires: GMAIL_ADDRESS + GMAIL_APP_PASSWORD.
+
+    force_smtp=True bypasses Unipile entirely — use for transactional sends
+    that must originate from hello@reachng.ng (waitlist, Paystack welcome
+    when no client mailbox exists yet, etc.) rather than a client's connected
+    Unipile account.
     """
     settings = get_settings()
 
@@ -133,7 +139,7 @@ async def send_email(
     api_key    = settings.unipile_api_key
     email_acct = settings.unipile_email_account_id
 
-    if dsn and api_key and email_acct:
+    if not force_smtp and dsn and api_key and email_acct:
         base_url = f"https://{dsn}"
         payload: dict = {
             "account_id": email_acct,
@@ -167,6 +173,10 @@ async def send_email(
         log.error("email_credentials_missing")
         return {"success": False, "error": "No email provider configured (Unipile or Gmail)"}
 
+    smtp_host = settings.smtp_host
+    smtp_port = settings.smtp_port
+    use_ssl   = settings.smtp_use_ssl
+
     def _send_sync():
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
@@ -176,9 +186,15 @@ async def send_email(
             msg["Reply-To"] = reply_to
         msg.attach(MIMEText(body, "plain"))
         context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(gmail_address, app_password)
-            server.sendmail(gmail_address, to_email, msg.as_string())
+        if use_ssl:
+            with smtplib.SMTP_SSL(smtp_host, smtp_port, context=context) as server:
+                server.login(gmail_address, app_password)
+                server.sendmail(gmail_address, to_email, msg.as_string())
+        else:
+            with smtplib.SMTP(smtp_host, smtp_port) as server:
+                server.starttls(context=context)
+                server.login(gmail_address, app_password)
+                server.sendmail(gmail_address, to_email, msg.as_string())
 
     try:
         await asyncio.to_thread(_send_sync)
