@@ -121,6 +121,7 @@ async def send_email(
     reply_to: Optional[str] = None,
     account_id: Optional[str] = None,  # kept for call-site compatibility
     force_smtp: bool = False,
+    html: Optional[str] = None,
 ) -> dict:
     """
     Send email via Unipile if configured, otherwise fall back to Gmail SMTP.
@@ -144,6 +145,8 @@ async def send_email(
                 "subject": subject,
                 "text":    body,
             }
+            if html:
+                payload["html"] = html
             if reply_to:
                 payload["reply_to"] = reply_to
             async with httpx.AsyncClient(timeout=15.0) as client:

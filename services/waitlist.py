@@ -240,16 +240,18 @@ def _send_waitlist_confirmation_async(*, phone: str, name: str, position: int, b
 
 # ─── Email confirmation (parallel channel to WhatsApp) ───────────────────────
 
-def _compose_confirmation_email(name: str, position: int, business_name: str) -> tuple[str, str]:
-    """Returns (subject, body) for the waitlist confirmation email.
+def _compose_confirmation_email(name: str, position: int, business_name: str) -> tuple[str, str, str]:
+    """Returns (subject, text, html) for the waitlist confirmation email.
 
-    Slightly longer than the WhatsApp version because email is a permanent
-    record — the recipient may re-read it days later when their spot opens.
+    HTML version uses ReachNG's brand palette (cream bg, serif headers,
+    burnt-sienna accents). Plain text version is included for clients
+    that don't render HTML.
     """
     first = (name or "").split()[0] if name else ""
     greet = f"Hi {first}," if first else "Hi,"
     subject = f"You're #{position} on the ReachNG waitlist"
-    body = (
+
+    text = (
         f"{greet}\n\n"
         f"EYO here from ReachNG. You're #{position} on the waitlist — saved you a spot for {business_name}.\n\n"
         f"What happens next:\n"
@@ -262,7 +264,73 @@ def _compose_confirmation_email(name: str, position: int, business_name: str) ->
         f"   On behalf of the team at ReachNG\n"
         f"   hello@reachng.ng · Lagos"
     )
-    return subject, body
+
+    html = f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{subject}</title></head>
+<body style="margin:0;padding:0;background:#FAF6EE;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#1a1a1a;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#FAF6EE;padding:40px 16px;">
+    <tr><td align="center">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="560" style="max-width:560px;background:#ffffff;border-radius:14px;border:1px solid #E8DEC8;overflow:hidden;">
+        <!-- header -->
+        <tr><td style="padding:32px 36px 20px 36px;border-bottom:1px solid #F1E8D4;">
+          <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:600;color:#1a1a1a;letter-spacing:-0.5px;">
+            Reach<span style="color:#B85C38;">NG</span>
+          </div>
+        </td></tr>
+
+        <!-- position banner -->
+        <tr><td style="padding:32px 36px 8px 36px;">
+          <div style="font-size:11px;letter-spacing:1.5px;font-weight:600;color:#7a6a3f;text-transform:uppercase;margin-bottom:8px;">You're in</div>
+          <div style="font-family:Georgia,'Times New Roman',serif;font-size:36px;font-weight:600;line-height:1.1;color:#1a1a1a;">
+            You're #{position} on the list.
+          </div>
+        </td></tr>
+
+        <!-- body -->
+        <tr><td style="padding:24px 36px 8px 36px;font-size:15px;line-height:1.65;color:#3d3a33;">
+          <p style="margin:0 0 16px 0;">{greet}</p>
+          <p style="margin:0 0 16px 0;">EYO here from ReachNG. Saved you a spot for <strong>{business_name}</strong>.</p>
+          <p style="margin:24px 0 12px 0;font-weight:600;color:#1a1a1a;">What happens next</p>
+          <ol style="margin:0 0 16px 0;padding-left:20px;">
+            <li style="margin-bottom:8px;">We onboard Lagos businesses in small batches so the first 30 days feel hand-built — because they are.</li>
+            <li style="margin-bottom:8px;">When your spot opens, I'll WhatsApp + email you a quick onboarding link.</li>
+            <li style="margin-bottom:0;">First call is a 30-min pairing where we connect your WhatsApp number — you're up and running by the end of it.</li>
+          </ol>
+        </td></tr>
+
+        <!-- CTA -->
+        <tr><td style="padding:16px 36px 36px 36px;" align="left">
+          <p style="margin:0 0 16px 0;font-size:15px;line-height:1.65;color:#3d3a33;">
+            While you wait, see the engine on real Lagos sample data:
+          </p>
+          <a href="https://www.reachng.ng/portal/demo" style="display:inline-block;background:#1a1a1a;color:#FAF6EE;text-decoration:none;padding:12px 22px;border-radius:8px;font-size:14px;font-weight:600;letter-spacing:0.2px;">Open the live demo →</a>
+        </td></tr>
+
+        <!-- reply prompt -->
+        <tr><td style="padding:0 36px 32px 36px;font-size:14px;line-height:1.6;color:#5a5a5a;border-top:1px solid #F1E8D4;padding-top:24px;">
+          Any quick question — just reply to this email.
+        </td></tr>
+
+        <!-- signature -->
+        <tr><td style="padding:0 36px 36px 36px;font-size:14px;line-height:1.6;color:#3d3a33;">
+          — EYO<br>
+          <span style="color:#7a6a3f;">On behalf of the team at ReachNG</span><br>
+          <a href="mailto:hello@reachng.ng" style="color:#B85C38;text-decoration:none;">hello@reachng.ng</a> · Lagos
+        </td></tr>
+      </table>
+
+      <!-- footer -->
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="560" style="max-width:560px;margin-top:16px;">
+        <tr><td style="text-align:center;font-size:12px;color:#9a8e6e;line-height:1.5;padding:8px 16px;">
+          You're receiving this because you joined the ReachNG waitlist at reachng.ng.
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>"""
+
+    return subject, text, html
 
 
 def _send_waitlist_email_async(*, to_email: str, name: str, position: int, business_name: str) -> None:
@@ -272,7 +340,7 @@ def _send_waitlist_email_async(*, to_email: str, name: str, position: int, busin
         from tools.outreach import send_email
         import asyncio
 
-        subject, body = _compose_confirmation_email(name=name, position=position, business_name=business_name)
+        subject, body, html = _compose_confirmation_email(name=name, position=position, business_name=business_name)
 
         async def _fire():
             try:
@@ -280,6 +348,7 @@ def _send_waitlist_email_async(*, to_email: str, name: str, position: int, busin
                     to_email=to_email,
                     subject=subject,
                     body=body,
+                    html=html,
                     reply_to="hello@reachng.ng",
                     force_smtp=True,
                 )
