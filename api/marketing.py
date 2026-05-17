@@ -138,12 +138,14 @@ async def calculator_leakage(payload: LeakageCalc, request: Request):
             from tools.outreach import send_email
             biz = (payload.business_name or "your business").strip()
             first_name = biz.split(" ")[0] if biz else "there"
-            subject = f"Your WhatsApp leakage estimate · ~₦{monthly_loss//1_000_000}M/month"
+            subject = f"WhatsApp leakage estimate · ~₦{monthly_loss//1_000_000}M/month (working assumption)"
             text = (
                 f"Hi,\n\n"
                 f"EYO here from ReachNG. You ran the WhatsApp leakage calculator for {biz}.\n\n"
-                f"At {payload.enquiries_per_week} enquiries/week × ₦{payload.avg_deal_value_naira:,} avg deal\n"
-                f"× 30% conservative leakage from slow replies, you're losing roughly:\n\n"
+                f"This is an estimate, not a measurement. The maths:\n\n"
+                f"  {payload.enquiries_per_week} enquiries/week × ₦{payload.avg_deal_value_naira:,} avg deal\n"
+                f"  × 30% working assumption for slow-reply leakage\n\n"
+                f"= roughly:\n\n"
                 f"  • ₦{weekly_loss:,} per week\n"
                 f"  • ₦{monthly_loss:,} per month\n\n"
                 f"Why 30%? HBR found that leads not replied to within 5 minutes are\n"
