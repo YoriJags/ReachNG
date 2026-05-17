@@ -301,13 +301,187 @@
   .chip-reply { background: rgba(184,92,56,0.10); color: var(--accent); border: 1px solid rgba(184,92,56,0.25); }
   .chip-event { background: rgba(0,0,0,0.05); color: #555; border: 1px solid rgba(0,0,0,0.08); }
 
+  /* Money panel — receipt extraction visualised */
+  .panel-count.good { color: var(--green); background: var(--green-soft); border-color: rgba(46,125,50,0.30); }
+  .mini-receipt {
+    background: linear-gradient(135deg, #fff8e1, #fff3c4);
+    border: 1px solid #f9a825; border-radius: 10px; padding: 12px 14px;
+    font-family: 'Courier New', monospace; margin-bottom: 14px;
+  }
+  .mini-receipt-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .mini-bank { font-weight: 700; color: #f57f17; font-size: 13px; }
+  .mini-status {
+    background: #2e7d32; color: #fff; font-size: 9px;
+    padding: 2px 7px; border-radius: 3px; letter-spacing: 0.5px;
+    font-family: -apple-system, sans-serif;
+  }
+  .mini-amount { font-size: 22px; font-weight: 700; margin-bottom: 6px; color: var(--ink); }
+  .mini-details { font-size: 10.5px; color: #5a5a5a; line-height: 1.65; }
+
+  .mini-extracted {
+    background: var(--paper-soft); border: 1px solid var(--line-soft);
+    border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;
+  }
+  .mini-field-head {
+    font-size: 9px; color: var(--accent); letter-spacing: 0.8px;
+    text-transform: uppercase; font-weight: 700; margin-bottom: 8px;
+  }
+  .mini-field-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px;
+    font-size: 11px;
+  }
+  .mini-field { display: flex; flex-direction: column; opacity: 0; transform: translateY(4px);
+    transition: opacity 0.4s ease, transform 0.4s ease; }
+  .mini-field .k { color: var(--muted); font-size: 9px; letter-spacing: 0.4px; text-transform: uppercase; }
+  .mini-field .v { color: var(--ink); font-weight: 700; }
+  .mini-extracted.show .mini-field { opacity: 1; transform: translateY(0); }
+  .mini-extracted.show .mini-field:nth-child(1) { transition-delay: 0s; }
+  .mini-extracted.show .mini-field:nth-child(2) { transition-delay: 0.08s; }
+  .mini-extracted.show .mini-field:nth-child(3) { transition-delay: 0.16s; }
+  .mini-extracted.show .mini-field:nth-child(4) { transition-delay: 0.24s; }
+
+  .match-row {
+    background: var(--green-soft); border: 1px solid rgba(46,125,50,0.30);
+    border-radius: 10px; padding: 10px 12px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--ink); margin-bottom: 14px;
+    opacity: 0; transform: scale(0.96);
+    transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.4s ease;
+  }
+  .match-row.show {
+    opacity: 1; transform: scale(1);
+    animation: match-flash 1.4s ease-out 0.4s;
+  }
+  @keyframes match-flash {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(46,125,50,0); }
+    30% { box-shadow: 0 0 0 8px rgba(46,125,50,0.18); }
+  }
+  .match-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--green); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .match-sub { font-size: 11px; color: var(--muted); }
+
+  .receipt-draft {
+    background: linear-gradient(180deg, rgba(184,92,56,0.04), rgba(184,92,56,0.02));
+    border: 1px solid rgba(184,92,56,0.25);
+    border-radius: 10px 10px 4px 10px;
+    padding: 10px 12px; font-size: 12px; color: var(--ink);
+    line-height: 1.55;
+  }
+  .receipt-draft .lbl {
+    display: block; font-size: 9px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .receipt-meta {
+    margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line-soft);
+    font-size: 10.5px; color: var(--muted2); letter-spacing: 0.3px; text-align: center;
+  }
+
+  /* Leak Radar */
+  .leak-panel {
+    margin-bottom: 32px;
+    background: linear-gradient(180deg, var(--paper), var(--paper-soft));
+    border-left: 3px solid var(--red);
+  }
+  .leak-eyebrow {
+    font-size: 11px; color: var(--red); letter-spacing: 1.2px;
+    text-transform: uppercase; font-weight: 700;
+  }
+  .leak-cta-pill {
+    background: var(--red-soft); color: var(--red); border: 1px solid rgba(198,40,40,0.30);
+    font-size: 10px; font-weight: 700; padding: 4px 11px; border-radius: 100px;
+    letter-spacing: 0.4px;
+  }
+  .leak-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    margin-bottom: 16px;
+  }
+  .leak-card {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .leak-card-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .leak-name { font-weight: 600; font-size: 13px; color: var(--ink); }
+  .leak-meta { font-size: 10px; color: var(--red); font-weight: 600; letter-spacing: 0.3px; }
+  .leak-tag {
+    margin-left: auto; background: rgba(255,92,0,0.10); color: var(--accent2);
+    border: 1px solid rgba(255,92,0,0.25);
+    font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 100px;
+    letter-spacing: 0.3px;
+  }
+  .leak-msg {
+    background: var(--paper-soft); border: 1px solid var(--line-soft);
+    border-radius: 8px; padding: 8px 12px;
+    font-size: 12px; color: var(--ink2); line-height: 1.55; font-style: italic;
+    margin-bottom: 8px;
+  }
+  .leak-action {
+    font-size: 11px; color: var(--accent); font-weight: 600;
+  }
+  .leak-compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    padding-top: 14px; border-top: 1px solid var(--line-soft);
+  }
+  .lc-lbl {
+    font-size: 10px; color: var(--muted); letter-spacing: 0.8px;
+    text-transform: uppercase; font-weight: 700; margin-bottom: 4px;
+  }
+  .lc-val { font-size: 12.5px; line-height: 1.55; color: var(--ink2); }
+  .lc-val strong { color: var(--ink); }
+  .lc-val.good strong { color: var(--green); }
+  .lc-val.bad strong { color: var(--red); }
+
+  /* Pulse on first pending draft card */
+  .draft-card.pulse {
+    position: relative;
+  }
+  .draft-card.pulse::before {
+    content: ''; position: absolute; inset: -2px;
+    border-radius: 12px; border: 2px solid var(--accent);
+    opacity: 0; animation: pulse-ring 2.4s ease-out infinite;
+    pointer-events: none;
+  }
+  @keyframes pulse-ring {
+    0% { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.02); }
+  }
+
+  /* Typing dots on draft #1 (replaces tag while drafting) */
+  .typing-dots { display: inline-flex; gap: 3px; padding: 2px 6px; vertical-align: middle; }
+  .typing-dots span {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--accent); animation: typing 1.2s ease-in-out infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes typing {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-2px); }
+  }
+
+  /* Timeline scroll-activation */
+  .tl-item { opacity: 0.35; transition: opacity 0.5s ease; }
+  .tl-item.in-view { opacity: 1; }
+
   @media (max-width: 1080px) {
     .main { grid-template-columns: 1fr; }
     .kanban { grid-template-columns: repeat(2, 1fr); }
+    .leak-grid { grid-template-columns: 1fr; }
+    .leak-compare { grid-template-columns: 1fr; }
   }
   @media (max-width: 640px) {
     .tiles { grid-template-columns: repeat(2, 1fr); }
     .kanban { grid-template-columns: 1fr; }
+    .topbar { padding: 12px 16px; }
   }
 </style>
 </head>
@@ -434,38 +608,101 @@
       </div>
     </div>
 
-    <!-- RIGHT: Money & leaks -->
-    <div class="panel">
+    <!-- RIGHT: Money EYO matched -->
+    <div class="panel money-panel">
       <div class="panel-head">
-        <div class="panel-title">Money &amp; leaks</div>
-      </div>
-      <div class="stat-row good">
-        <span class="lbl">Money EYO matched</span>
-        <span class="val">₦450,000</span>
-      </div>
-      <div class="stat-row">
-        <span class="lbl">Pending your tap</span>
-        <span class="val">{{ data.hitl_drafts | length }}</span>
-      </div>
-      <div class="stat-row bad">
-        <span class="lbl">Idle enquiries</span>
-        <span class="val">2</span>
-      </div>
-      <div class="stat-row">
-        <span class="lbl">Fastest reply</span>
-        <span class="val">2.4 s</span>
-      </div>
-      <div class="stat-row">
-        <span class="lbl">Slowest reply</span>
-        <span class="val">4 min</span>
+        <div class="panel-title">Money EYO matched</div>
+        <span class="panel-count good">₦450k</span>
       </div>
 
-      <div class="compare">
-        <strong>Before EYO:</strong> median reply 6 hrs · most overnight enquiries lost by morning.<br>
-        <strong>After EYO:</strong> 4 min worst case · ₦450k caught while you slept.
+      <!-- Mini receipt screenshot -->
+      <div class="mini-receipt">
+        <div class="mini-receipt-head">
+          <div class="mini-bank">GTBank</div>
+          <div class="mini-status">SUCCESSFUL</div>
+        </div>
+        <div class="mini-amount">₦450,000.00</div>
+        <div class="mini-details">From: BOLA O. OLAJIDE<br>To: MERCURY LAGOS LTD<br>Ref: TABLE BOOKING SAT</div>
+      </div>
+
+      <!-- Extracted fields (cascade-in on scroll) -->
+      <div class="mini-extracted" id="mini-extracted">
+        <div class="mini-field-head">Extracted by EYO · 3.2s</div>
+        <div class="mini-field-grid">
+          <div class="mini-field"><span class="k">Amount</span><span class="v">₦450,000</span></div>
+          <div class="mini-field"><span class="k">Sender</span><span class="v">Bola Olajide</span></div>
+          <div class="mini-field"><span class="k">Bank</span><span class="v">GTBank</span></div>
+          <div class="mini-field"><span class="k">Ref</span><span class="v">Table booking Sat</span></div>
+        </div>
+      </div>
+
+      <!-- Green match-row with flash animation -->
+      <div class="match-row" id="match-row-money">
+        <div class="match-check">✓</div>
+        <div>Matched to <strong>booking #MER-2614</strong><br><span class="match-sub">Sat 9pm · DJ booth · ₦450k deposit</span></div>
+      </div>
+
+      <!-- Drafted receipt -->
+      <div class="receipt-draft">
+        <span class="lbl">Receipt drafted · awaiting tap</span>
+        Got it Bola 🙏 ₦450k deposit confirmed against your Saturday 9pm booking. Receipt #MER-2614. Doors open 8:30pm — see you Saturday.
+      </div>
+
+      <div class="receipt-meta">
+        Works for GTB · OPay · Kuda · UBA · PalmPay · POS slips
       </div>
     </div>
 
+  </div>
+
+  <!-- ── Leak Radar (full-width row) ──────────────────────────────── -->
+  <div class="panel leak-panel">
+    <div class="panel-head">
+      <div>
+        <div class="leak-eyebrow">⚠ Revenue leak radar</div>
+        <div class="panel-title" style="margin-top:4px;">2 enquiries idle · drafts ready · just need your tap</div>
+      </div>
+      <span class="leak-cta-pill">Before EYO: lost by morning</span>
+    </div>
+
+    <div class="leak-grid">
+      <div class="leak-card">
+        <div class="leak-card-head">
+          <div class="draft-avatar" style="background:linear-gradient(135deg,#f5a89c,#d36b54);color:#5a1e0e;">AI</div>
+          <div>
+            <div class="leak-name">Adunni Igwe</div>
+            <div class="leak-meta">Idle 18 hrs · last activity Sat 11:42 PM</div>
+          </div>
+          <span class="leak-tag">🔥 HOT</span>
+        </div>
+        <div class="leak-msg">"Hi, are you hosting a private dinner for 12 next Friday? Budget around ₦800k."</div>
+        <div class="leak-action">EYO has a draft ready · awaiting your tap</div>
+      </div>
+
+      <div class="leak-card">
+        <div class="leak-card-head">
+          <div class="draft-avatar" style="background:linear-gradient(135deg,#ffd194,#d1913c);color:#4a2e10;">SO</div>
+          <div>
+            <div class="leak-name">Seun Oladipo</div>
+            <div class="leak-meta">Idle 22 hrs · last activity Sat 8:14 PM</div>
+          </div>
+          <span class="leak-tag">qualifying</span>
+        </div>
+        <div class="leak-msg">"Just sent 50k as deposit — pls confirm receipt and the table number 🙏"</div>
+        <div class="leak-action">Bank screenshot received · awaiting your tap</div>
+      </div>
+    </div>
+
+    <div class="leak-compare">
+      <div>
+        <div class="lc-lbl">Before EYO</div>
+        <div class="lc-val bad">Median reply <strong>6 hrs</strong> · most overnight enquiries gone by morning</div>
+      </div>
+      <div>
+        <div class="lc-lbl">After EYO</div>
+        <div class="lc-val good">Worst reply <strong>4 min</strong> · ₦450k caught while you slept</div>
+      </div>
+    </div>
   </div>
 
   <!-- Kanban -->
@@ -543,7 +780,7 @@
 
 <script>
 // Count-up animation on metric tiles when they enter view
-const io = new IntersectionObserver((entries) => {
+const countIo = new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (!e.isIntersecting) return;
     const el = e.target;
@@ -560,10 +797,47 @@ const io = new IntersectionObserver((entries) => {
       else el.textContent = prefix + (Number.isInteger(target) ? target : target.toFixed(1)) + suffix;
     }
     requestAnimationFrame(step);
-    io.unobserve(el);
+    countIo.unobserve(el);
   });
 }, { threshold: 0.5 });
-document.querySelectorAll('.tile-value[data-count]').forEach(el => io.observe(el));
+document.querySelectorAll('.tile-value[data-count]').forEach(el => countIo.observe(el));
+
+// Pulse the first pending draft card (the one needing attention now)
+const firstDraft = document.querySelector('.panel .draft-card');
+if (firstDraft) firstDraft.classList.add('pulse');
+
+// Typing-dots → drafted body on the first card
+const firstDraftBody = firstDraft && firstDraft.querySelector('.draft-eyo');
+if (firstDraftBody) {
+  const originalHtml = firstDraftBody.innerHTML;
+  firstDraftBody.innerHTML = '<span class="lbl">EYO drafting</span><div class="typing-dots"><span></span><span></span><span></span></div>';
+  setTimeout(() => { firstDraftBody.innerHTML = originalHtml; }, 1400);
+}
+
+// Money panel: cascade extracted fields + flash match-row when scrolled in
+const moneyIo = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const extracted = document.getElementById('mini-extracted');
+    const matchRow = document.getElementById('match-row-money');
+    if (extracted) setTimeout(() => extracted.classList.add('show'), 200);
+    if (matchRow) setTimeout(() => matchRow.classList.add('show'), 700);
+    moneyIo.unobserve(e.target);
+  });
+}, { threshold: 0.35 });
+const moneyPanel = document.querySelector('.money-panel');
+if (moneyPanel) moneyIo.observe(moneyPanel);
+
+// Timeline: light up dots as they enter view
+const tlIo = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in-view');
+      tlIo.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.6, rootMargin: '0px 0px -20% 0px' });
+document.querySelectorAll('.tl-item').forEach(el => tlIo.observe(el));
 </script>
 
 </body>
