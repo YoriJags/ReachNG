@@ -47,6 +47,8 @@ Locked sequence — build in this order. Total ~17 days.
 
 - [ ] **7. Nurture Sequences trigger** (~1 day) — Code exists but never triggers. Add scheduler job to detect leads quiet for N days (configurable per stage), draft contextual revival message referencing last conversation, queue to HITL. Per-vertical timing. Already shown on landing page.
 
+- [ ] **7b. Landing page nurture drip** (~1 day, depends on Fix #1 Resend live) — Capture interest beyond just waitlist signup. (1) JS event-bind: capture clicks on hero CTA, pricing rows, vertical demo previews, "WhatsApp us" buttons → POST `/api/v1/marketing/interaction` with `{event, anon_id (cookie), email?, ts}`. (2) Cookie-bridge: on waitlist submit, link the anon_id to the email; back-fill any prior interactions to that email. (3) Drip scheduler: 3-email warm sequence (Day 0 confirm — done in Fix #1, Day 2 vertical-specific demo deep-dive, Day 5 case study + soft CTA to demo call). Uses Resend. Lives in `services/nurture/landing_drip.py` + new `marketing_interactions` collection. Owner can pause from Control Tower. **Blocked until Resend send is verified working.**
+
 - [ ] **8. Pricing Settings panel** (~1.5 hours) — Mongo `platform_settings.pricing` doc with three plan amounts. Read from doc in `api/marketing.py::PLAN_PRICING` (fallback to defaults). Edit inline from dashboard Control Tower → Settings tab. Audit log on each change. Killer for testing price points without a deploy.
 
 ## ✅ Railway deploy — green (2026-05-16)
