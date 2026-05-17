@@ -334,6 +334,134 @@ SMALL_BUSINESS = {
 }
 
 
+# ─── Control Room overlays — per-vertical story scaffolding ─────────────────
+# Each vertical (Pass 2: hospitality + real_estate + professional_services for
+# now) gets an optional `control_room` block that the Control Room template
+# uses instead of the hardcoded hospitality narrative. Falls back gracefully.
+
+CONTROL_ROOM_HOSPITALITY = {
+    "header_overline":  "11:00 PM → 7:00 AM · Sample Lagos data",
+    "header_title":     "Last night at Altitude Lagos.",
+    "tile_conv":        {"value": 12, "sub": "EYO replied + qualified overnight"},
+    "tile_owner":       {"value": 2,  "sub": "Final handshake on you"},
+    "tile_money":       {"value_text": "₦450k", "count": 450, "prefix": "₦", "suffix": "k", "sub": "Transfer screenshot · auto-reconciled"},
+    "money_panel": {
+        "panel_count":   "₦450k",
+        "bank":          "GTBank",
+        "amount_text":   "₦450,000.00",
+        "from":          "BOLA O. OLAJIDE",
+        "to":            "MERCURY LAGOS LTD",
+        "ref":           "TABLE BOOKING SAT",
+        "match_ref":     "#MER-2614",
+        "match_detail":  "Sat 9pm · DJ booth · ₦450k deposit",
+        "draft":         "Got it Bola 🙏 ₦450k deposit confirmed against your Saturday 9pm booking. Receipt #MER-2614. Doors open 8:30pm — see you Saturday.",
+    },
+    "timeline": [
+        {"glyph": "🎤", "state": "active",    "time": "SAT · 11:47 PM", "text": "<strong>Voice note received</strong> · Funke A. asking about Sat 9pm booking"},
+        {"glyph": "⚡", "state": "active",    "time": "SAT · 11:47 PM", "text": "<strong>Transcribed in 2.4s</strong> · tagged <span style='color:var(--accent2);font-weight:700;'>HOT</span> · booking · deposit-question"},
+        {"glyph": "✎", "state": "active",    "time": "SAT · 11:50 PM", "text": "<strong>Draft created</strong> in Altitude voice · awaiting tap"},
+        {"glyph": "₦", "state": "confirmed", "time": "SAT · 11:56 PM", "text": "<strong>Transfer screenshot matched</strong> · GTB ₦450k → booking #MER-2614"},
+        {"glyph": "✉", "state": "confirmed", "time": "SAT · 11:56 PM", "text": "<strong>Receipt drafted</strong> · auto-acknowledged with booking ref"},
+        {"glyph": "⚠", "state": "",          "time": "SUN · 04:12 AM", "text": "<strong>Leak detected</strong> · 2 enquiries idle 18hrs, drafts pre-built"},
+        {"glyph": "📋","state": "active",    "time": "SUN · 07:02 AM", "text": "<strong>Owner brief sent</strong> via WhatsApp · 5-minute morning read"},
+    ],
+    "leak_cards": [
+        {"initials": "AI", "avatar": "linear-gradient(135deg,#f5a89c,#d36b54)", "avatar_color": "#5a1e0e", "name": "Adunni Igwe", "idle": "Idle 18 hrs · last activity Sat 11:42 PM", "tag": "🔥 HOT",
+         "msg": "Hi, are you hosting a private dinner for 12 next Friday? Budget around ₦800k.",
+         "action": "EYO has a draft ready · awaiting your tap"},
+        {"initials": "SO", "avatar": "linear-gradient(135deg,#ffd194,#d1913c)", "avatar_color": "#4a2e10", "name": "Seun Oladipo", "idle": "Idle 22 hrs · last activity Sat 8:14 PM", "tag": "qualifying",
+         "msg": "Just sent 50k as deposit — pls confirm receipt and the table number 🙏",
+         "action": "Bank screenshot received · awaiting your tap"},
+    ],
+}
+
+CONTROL_ROOM_REAL_ESTATE = {
+    "header_overline":  "11:00 PM → 7:00 AM · Sample Lagos data",
+    "header_title":     "Last night at Crown Realty Lagos.",
+    "tile_conv":        {"value": 9,  "sub": "EYO qualified + sent details overnight"},
+    "tile_owner":       {"value": 3,  "sub": "PoF verified · viewing handshake on you"},
+    "tile_money":       {"value_text": "₦12M", "count": 12, "prefix": "₦", "suffix": "M", "sub": "Banana Island viewing deposit · auto-reconciled"},
+    "money_panel": {
+        "panel_count":   "₦12M",
+        "bank":          "Zenith Bank",
+        "amount_text":   "₦12,000,000.00",
+        "from":          "DAMILOLA O. AKINOLA",
+        "to":            "CROWN REALTY LTD",
+        "ref":           "VIEWING DEPOSIT BANANA",
+        "match_ref":     "#CRL-0418",
+        "match_detail":  "3BR Banana Island · viewing Sat 4pm · ₦12M refundable",
+        "draft":         "Received Damilola — ₦12M viewing deposit confirmed for the 3-bed Banana Island unit. Receipt #CRL-0418. Adeola will host you Saturday 4pm at the gate. Refundable if you walk away.",
+    },
+    "timeline": [
+        {"glyph": "🎤", "state": "active",    "time": "SAT · 11:31 PM", "text": "<strong>Voice note received</strong> · Damilola O. asking about the Banana Island 3-bed"},
+        {"glyph": "⚡", "state": "active",    "time": "SAT · 11:31 PM", "text": "<strong>Transcribed in 2.1s</strong> · tagged <span style='color:var(--accent2);font-weight:700;'>HOT</span> · diaspora buyer · ₦600M range"},
+        {"glyph": "📋","state": "active",    "time": "SAT · 11:33 PM", "text": "<strong>PoF requested</strong> · politely · Crown's standard for ₦500M+ enquiries"},
+        {"glyph": "✓", "state": "confirmed", "time": "SAT · 11:48 PM", "text": "<strong>PoF screenshot received</strong> · Stanbic IBTC · funds verified by EYO"},
+        {"glyph": "₦", "state": "confirmed", "time": "SAT · 11:56 PM", "text": "<strong>Viewing deposit matched</strong> · Zenith ₦12M → booking #CRL-0418"},
+        {"glyph": "📅","state": "active",    "time": "SUN · 00:14 AM", "text": "<strong>Viewing booked</strong> · Sat 4pm · Adeola assigned · calendar synced"},
+        {"glyph": "📋","state": "active",    "time": "SUN · 07:02 AM", "text": "<strong>Owner brief sent</strong> · 3 hot buyers · 1 PoF pending · 1 viewing confirmed"},
+    ],
+    "leak_cards": [
+        {"initials": "OI", "avatar": "linear-gradient(135deg,#c9d8f0,#7a9bd4)", "avatar_color": "#1e2e4a", "name": "Obinna I.", "idle": "Idle 14 hrs · last activity Sun 02:08 AM", "tag": "🔥 HOT",
+         "msg": "I'm a diaspora buyer in London — what's your best 4-bed in Ikoyi under ₦800M? Open to viewing next Sat.",
+         "action": "EYO drafted shortlist + PoF request · awaiting your tap"},
+        {"initials": "FE", "avatar": "linear-gradient(135deg,#ffd194,#d1913c)", "avatar_color": "#4a2e10", "name": "Folake E.", "idle": "PoF requested 19 hrs ago · no reply", "tag": "qualifying",
+         "msg": "Pls send the floor plan and details for the Eko Atlantic 5-bed.",
+         "action": "Holding reply sent · EYO will nudge in 4 hrs unless you tap"},
+    ],
+}
+
+CONTROL_ROOM_PROFESSIONAL_SERVICES = {
+    "header_overline":  "FRIDAY 6:00 PM → MONDAY 7:00 AM · Sample Lagos data",
+    "header_title":     "Over the weekend at Greenview Partners.",
+    "tile_conv":        {"value": 7,  "sub": "EYO qualified + scoped matters"},
+    "tile_owner":       {"value": 2,  "sub": "Partner sign-off needed Monday"},
+    "tile_money":       {"value_text": "₦300k", "count": 300, "prefix": "₦", "suffix": "k", "sub": "Consultation fee · paid for Monday 11am"},
+    "money_panel": {
+        "panel_count":   "₦300k",
+        "bank":          "UBA",
+        "amount_text":   "₦300,000.00",
+        "from":          "TUNDE K. ADEBANJO",
+        "to":            "GREENVIEW PARTNERS LLP",
+        "ref":           "CONSULT FEE FINTECH CBN",
+        "match_ref":     "#GVP-2218",
+        "match_detail":  "Fintech CBN licensing memo · Mon 11am · Partner Olu",
+        "draft":         "Received Mr Adebanjo — ₦300k consultation fee confirmed. Booked in for Monday 11am with Olu (fintech regulation lead). Conflict check cleared, calendar invite sent. Pre-call brief reaches you Sunday evening.",
+    },
+    "timeline": [
+        {"glyph": "✉", "state": "active",    "time": "FRI · 6:14 PM",  "text": "<strong>Email received</strong> · Tunde K. asking for CBN fintech licensing memo, urgent"},
+        {"glyph": "⚡", "state": "active",    "time": "FRI · 6:14 PM",  "text": "<strong>Matter scoped</strong> · tagged <span style='color:var(--accent2);font-weight:700;'>HOT</span> · regulation · paid-consult prospect"},
+        {"glyph": "✓", "state": "active",    "time": "FRI · 6:17 PM",  "text": "<strong>Conflict check run</strong> · cross-referenced existing clients · clear to engage"},
+        {"glyph": "💼","state": "active",    "time": "FRI · 6:21 PM",  "text": "<strong>Consult fee quoted</strong> · ₦300k · 60 mins · in Olu's calendar"},
+        {"glyph": "₦", "state": "confirmed", "time": "FRI · 7:08 PM",  "text": "<strong>Consultation fee matched</strong> · UBA ₦300k → matter #GVP-2218"},
+        {"glyph": "📅","state": "confirmed", "time": "FRI · 7:09 PM",  "text": "<strong>Booked Monday 11am</strong> · calendar invite sent · Olu assigned"},
+        {"glyph": "📋","state": "active",    "time": "MON · 07:02 AM", "text": "<strong>Partner brief sent</strong> · pre-call summary · 2 matters need sign-off"},
+    ],
+    "leak_cards": [
+        {"initials": "EM", "avatar": "linear-gradient(135deg,#c9d8f0,#7a9bd4)", "avatar_color": "#1e2e4a", "name": "Emeka M.", "idle": "Idle 36 hrs · weekend enquiry", "tag": "🔥 HOT",
+         "msg": "Looking for counsel on a ₦4Bn cross-border acquisition. When can we speak this week?",
+         "action": "EYO drafted scoping questions + partner availability · awaiting your tap"},
+        {"initials": "AB", "avatar": "linear-gradient(135deg,#ffd194,#d1913c)", "avatar_color": "#4a2e10", "name": "Adesua B.", "idle": "Conflict check pending 8 hrs", "tag": "qualifying",
+         "msg": "Need a retainer for property dispute (Banana Island). My counterparty may overlap your client list.",
+         "action": "Holding reply sent · partner sign-off needed before next step"},
+    ],
+}
+
+
+CONTROL_ROOM_OVERLAYS: dict[str, dict] = {
+    "hospitality":           CONTROL_ROOM_HOSPITALITY,
+    "real_estate":           CONTROL_ROOM_REAL_ESTATE,
+    "professional_services": CONTROL_ROOM_PROFESSIONAL_SERVICES,
+}
+
+
+def get_control_room(vertical: Optional[str] = None) -> dict:
+    """Return Control Room overlay for vertical (falls back to hospitality)."""
+    if not vertical:
+        return CONTROL_ROOM_HOSPITALITY
+    return CONTROL_ROOM_OVERLAYS.get(vertical.lower(), CONTROL_ROOM_HOSPITALITY)
+
+
 DATASETS: dict[str, dict] = {
     "hospitality":           HOSPITALITY,
     "real_estate":           REAL_ESTATE,

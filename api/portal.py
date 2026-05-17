@@ -334,10 +334,11 @@ async def demo_portal_dashboard(request: Request, embed: int = 0):
     guided tour. Linked from Scene 5 'Open the Control Room'. Defaults to
     hospitality. Pass ?embed=1 for iframe rendering (hides chrome).
     """
-    from services.demo_datasets import get_dataset
+    from services.demo_datasets import get_dataset, get_control_room
     templates = request.app.state.templates
     return templates.TemplateResponse(request, "portal_control_room.html",
-        {"data": get_dataset(None), "vertical": "hospitality", "embed": bool(embed)})
+        {"data": get_dataset(None), "cr": get_control_room(None),
+         "vertical": "hospitality", "embed": bool(embed)})
 
 
 @router.get("/demo/{vertical}", response_class=HTMLResponse)
@@ -346,13 +347,14 @@ async def demo_portal_vertical(vertical: str, request: Request, embed: int = 0):
     cream/sienna design, vertical-tailored sample data. Only renders for
     verticals with real datasets — otherwise redirects to the guided tour.
     """
-    from services.demo_datasets import get_dataset, list_verticals
+    from services.demo_datasets import get_dataset, list_verticals, get_control_room
     if vertical.lower() not in list_verticals():
         from fastapi.responses import RedirectResponse
         return RedirectResponse(url="/portal/demo", status_code=307)
     templates = request.app.state.templates
     return templates.TemplateResponse(request, "portal_control_room.html",
-        {"data": get_dataset(vertical), "vertical": vertical.lower(), "embed": bool(embed)})
+        {"data": get_dataset(vertical), "cr": get_control_room(vertical),
+         "vertical": vertical.lower(), "embed": bool(embed)})
 
 
 @router.get("/demo/operator/raw", response_class=HTMLResponse)

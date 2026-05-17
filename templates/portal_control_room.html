@@ -527,16 +527,16 @@
   <!-- Header -->
   <div class="header">
     <div class="eyebrow">EYO Control Room</div>
-    <h1>Last night at <em>{{ data.brand }}</em>.</h1>
-    <div class="sub">11:00 PM → 7:00 AM · {{ data.category }} · Sample Lagos data</div>
+    <h1>{{ cr.header_title }}</h1>
+    <div class="sub">{{ cr.header_overline }}</div>
   </div>
 
   <!-- Metric tiles -->
   <div class="tiles">
     <div class="tile accent">
       <div class="tile-label">Conversations held</div>
-      <div class="tile-value" data-count="12">12</div>
-      <div class="tile-sub">EYO replied + qualified overnight</div>
+      <div class="tile-value" data-count="{{ cr.tile_conv.value }}">{{ cr.tile_conv.value }}</div>
+      <div class="tile-sub">{{ cr.tile_conv.sub }}</div>
     </div>
     <div class="tile">
       <div class="tile-label">Drafts ready</div>
@@ -545,13 +545,13 @@
     </div>
     <div class="tile hot">
       <div class="tile-label">Owner needed</div>
-      <div class="tile-value" data-count="2">2</div>
-      <div class="tile-sub">Final handshake on you</div>
+      <div class="tile-value" data-count="{{ cr.tile_owner.value }}">{{ cr.tile_owner.value }}</div>
+      <div class="tile-sub">{{ cr.tile_owner.sub }}</div>
     </div>
     <div class="tile money">
       <div class="tile-label">Money matched</div>
-      <div class="tile-value" data-count="450" data-prefix="₦" data-suffix="k">₦450k</div>
-      <div class="tile-sub">Transfer screenshot · auto-reconciled</div>
+      <div class="tile-value" data-count="{{ cr.tile_money.count }}" data-prefix="{{ cr.tile_money.prefix }}" data-suffix="{{ cr.tile_money.suffix }}">{{ cr.tile_money.value_text }}</div>
+      <div class="tile-sub">{{ cr.tile_money.sub }}</div>
     </div>
   </div>
 
@@ -601,41 +601,13 @@
         <div class="panel-title">What happened overnight</div>
       </div>
       <div class="timeline">
-        <div class="tl-item active">
-          <div class="tl-dot">🎤</div>
-          <div class="tl-time">SAT · 11:47 PM</div>
-          <div class="tl-body"><strong>Voice note received</strong> · Funke A. asking about Sat 9pm booking</div>
+        {% for item in cr.timeline %}
+        <div class="tl-item {{ item.state }}">
+          <div class="tl-dot">{{ item.glyph }}</div>
+          <div class="tl-time">{{ item.time }}</div>
+          <div class="tl-body">{{ item.text | safe }}</div>
         </div>
-        <div class="tl-item active">
-          <div class="tl-dot">⚡</div>
-          <div class="tl-time">SAT · 11:47 PM</div>
-          <div class="tl-body"><strong>Transcribed in 2.4s</strong> · tagged <span style="color:var(--accent2);font-weight:700;">HOT</span> · booking · deposit-question</div>
-        </div>
-        <div class="tl-item active">
-          <div class="tl-dot">✎</div>
-          <div class="tl-time">SAT · 11:50 PM</div>
-          <div class="tl-body"><strong>Draft created</strong> in {{ data.brand }} voice · awaiting tap</div>
-        </div>
-        <div class="tl-item confirmed">
-          <div class="tl-dot">₦</div>
-          <div class="tl-time">SAT · 11:56 PM</div>
-          <div class="tl-body"><strong>Transfer screenshot matched</strong> · GTB ₦450k → booking #MER-2614</div>
-        </div>
-        <div class="tl-item confirmed">
-          <div class="tl-dot">✉</div>
-          <div class="tl-time">SAT · 11:56 PM</div>
-          <div class="tl-body"><strong>Receipt drafted</strong> · auto-acknowledged with booking ref</div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-dot">⚠</div>
-          <div class="tl-time">SUN · 04:12 AM</div>
-          <div class="tl-body"><strong>Leak detected</strong> · 2 enquiries idle 18hrs, drafts pre-built</div>
-        </div>
-        <div class="tl-item active">
-          <div class="tl-dot">📋</div>
-          <div class="tl-time">SUN · 07:02 AM</div>
-          <div class="tl-body"><strong>Owner brief sent</strong> via WhatsApp · 5-minute morning read</div>
-        </div>
+        {% endfor %}
       </div>
     </div>
 
@@ -643,40 +615,40 @@
     <div class="panel money-panel">
       <div class="panel-head">
         <div class="panel-title">Money EYO matched</div>
-        <span class="panel-count good">₦450k</span>
+        <span class="panel-count good">{{ cr.money_panel.panel_count }}</span>
       </div>
 
       <!-- Mini receipt screenshot -->
       <div class="mini-receipt">
         <div class="mini-receipt-head">
-          <div class="mini-bank">GTBank</div>
+          <div class="mini-bank">{{ cr.money_panel.bank }}</div>
           <div class="mini-status">SUCCESSFUL</div>
         </div>
-        <div class="mini-amount">₦450,000.00</div>
-        <div class="mini-details">From: BOLA O. OLAJIDE<br>To: MERCURY LAGOS LTD<br>Ref: TABLE BOOKING SAT</div>
+        <div class="mini-amount">{{ cr.money_panel.amount_text }}</div>
+        <div class="mini-details">From: {{ cr.money_panel.from }}<br>To: {{ cr.money_panel.to }}<br>Ref: {{ cr.money_panel.ref }}</div>
       </div>
 
       <!-- Extracted fields (cascade-in on scroll) -->
       <div class="mini-extracted" id="mini-extracted">
         <div class="mini-field-head">Extracted by EYO · 3.2s</div>
         <div class="mini-field-grid">
-          <div class="mini-field"><span class="k">Amount</span><span class="v">₦450,000</span></div>
-          <div class="mini-field"><span class="k">Sender</span><span class="v">Bola Olajide</span></div>
-          <div class="mini-field"><span class="k">Bank</span><span class="v">GTBank</span></div>
-          <div class="mini-field"><span class="k">Ref</span><span class="v">Table booking Sat</span></div>
+          <div class="mini-field"><span class="k">Amount</span><span class="v">{{ cr.money_panel.amount_text.split('.')[0] }}</span></div>
+          <div class="mini-field"><span class="k">Sender</span><span class="v">{{ cr.money_panel.from.split(' ')[0].title() }} {{ cr.money_panel.from.split(' ')[-1].title() }}</span></div>
+          <div class="mini-field"><span class="k">Bank</span><span class="v">{{ cr.money_panel.bank }}</span></div>
+          <div class="mini-field"><span class="k">Ref</span><span class="v">{{ cr.money_panel.ref.title() }}</span></div>
         </div>
       </div>
 
       <!-- Green match-row with flash animation -->
       <div class="match-row" id="match-row-money">
         <div class="match-check">✓</div>
-        <div>Matched to <strong>booking #MER-2614</strong><br><span class="match-sub">Sat 9pm · DJ booth · ₦450k deposit</span></div>
+        <div>Matched to <strong>{{ cr.money_panel.match_ref }}</strong><br><span class="match-sub">{{ cr.money_panel.match_detail }}</span></div>
       </div>
 
       <!-- Drafted receipt -->
       <div class="receipt-draft">
         <span class="lbl">Receipt drafted · awaiting tap</span>
-        Got it Bola 🙏 ₦450k deposit confirmed against your Saturday 9pm booking. Receipt #MER-2614. Doors open 8:30pm — see you Saturday.
+        {{ cr.money_panel.draft }}
       </div>
 
       <div class="receipt-meta">
@@ -697,31 +669,20 @@
     </div>
 
     <div class="leak-grid">
+      {% for lk in cr.leak_cards %}
       <div class="leak-card">
         <div class="leak-card-head">
-          <div class="draft-avatar" style="background:linear-gradient(135deg,#f5a89c,#d36b54);color:#5a1e0e;">AI</div>
+          <div class="draft-avatar" style="background:{{ lk.avatar }};color:{{ lk.avatar_color }};">{{ lk.initials }}</div>
           <div>
-            <div class="leak-name">Adunni Igwe</div>
-            <div class="leak-meta">Idle 18 hrs · last activity Sat 11:42 PM</div>
+            <div class="leak-name">{{ lk.name }}</div>
+            <div class="leak-meta">{{ lk.idle }}</div>
           </div>
-          <span class="leak-tag">🔥 HOT</span>
+          <span class="leak-tag">{{ lk.tag }}</span>
         </div>
-        <div class="leak-msg">"Hi, are you hosting a private dinner for 12 next Friday? Budget around ₦800k."</div>
-        <div class="leak-action">EYO has a draft ready · awaiting your tap</div>
+        <div class="leak-msg">"{{ lk.msg }}"</div>
+        <div class="leak-action">{{ lk.action }}</div>
       </div>
-
-      <div class="leak-card">
-        <div class="leak-card-head">
-          <div class="draft-avatar" style="background:linear-gradient(135deg,#ffd194,#d1913c);color:#4a2e10;">SO</div>
-          <div>
-            <div class="leak-name">Seun Oladipo</div>
-            <div class="leak-meta">Idle 22 hrs · last activity Sat 8:14 PM</div>
-          </div>
-          <span class="leak-tag">qualifying</span>
-        </div>
-        <div class="leak-msg">"Just sent 50k as deposit — pls confirm receipt and the table number 🙏"</div>
-        <div class="leak-action">Bank screenshot received · awaiting your tap</div>
-      </div>
+      {% endfor %}
     </div>
 
     <div class="leak-compare">
