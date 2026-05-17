@@ -107,6 +107,114 @@ class ContactSubmission(BaseModel):
     message: Optional[str] = Field(default="", max_length=4000)
 
 
+class LeakageCalc(BaseModel):
+    enquiries_per_week: int = Field(..., ge=1, le=2000)
+    avg_deal_value_naira: int = Field(..., ge=1000, le=1_000_000_000)
+    email: Optional[str] = Field(None, max_length=120)
+    business_name: Optional[str] = Field(None, max_length=120)
+
+
+@router.post("/api/v1/calculator/leakage", include_in_schema=False)
+async def calculator_leakage(payload: LeakageCalc, request: Request):
+    """Compute weekly + monthly revenue leakage and (optionally) email the
+    result. Anchor: HBR's "5-minute rule" — leads that wait >5 min are 9x
+    less likely to close. We use 30% as the leakage rate (conservative)
+    for prospects who aren't replying within 5 minutes.
+    """
+    LEAKAGE_RATE = 0.30  # conservative; the HBR 9x gap implies more
+    weekly_loss  = int(payload.enquiries_per_week * payload.avg_deal_value_naira * LEAKAGE_RATE)
+    monthly_loss = weekly_loss * 4
+
+    response = {
+        "weekly_loss":   weekly_loss,
+        "monthly_loss":  monthly_loss,
+        "leakage_rate":  LEAKAGE_RATE,
+        "emailed":       False,
+    }
+
+    if payload.email and "@" in payload.email:
+        # Fire-and-forget email via Resend (same path as waitlist confirmations).
+        try:
+            from tools.outreach import send_email
+            biz = (payload.business_name or "your business").strip()
+            first_name = biz.split(" ")[0] if biz else "there"
+            subject = f"Your WhatsApp leakage estimate · ~₦{monthly_loss//1_000_000}M/month"
+            text = (
+                f"Hi,\n\n"
+                f"EYO here from ReachNG. You ran the WhatsApp leakage calculator for {biz}.\n\n"
+                f"At {payload.enquiries_per_week} enquiries/week × ₦{payload.avg_deal_value_naira:,} avg deal\n"
+                f"× 30% conservative leakage from slow replies, you're losing roughly:\n\n"
+                f"  • ₦{weekly_loss:,} per week\n"
+                f"  • ₦{monthly_loss:,} per month\n\n"
+                f"Why 30%? HBR found that leads not replied to within 5 minutes are\n"
+                f"9× less likely to close. WhatsApp Business penetration in Nigeria is\n"
+                f"95%+, so customers expect minute-level replies. Most Lagos owners\n"
+                f"can't physically maintain that — and lose the deal to whoever can.\n\n"
+                f"What EYO does about it:\n"
+                f"  1. Replies first, in your voice, with your price + bank details\n"
+                f"  2. Carries the conversation — qualifies, follows up, catches payments\n"
+                f"  3. Brings you in only at the moment a human handshake matters\n\n"
+                f"If you'd like to see how this would run on your actual enquiries,\n"
+                f"join early access: https://www.reachng.ng/waitlist\n\n"
+                f"— EYO\n"
+                f"   On behalf of the team at ReachNG\n"
+                f"   hello@reachng.ng · Lagos"
+            )
+            html = f"""<!DOCTYPE html>
+<html><body style="margin:0;padding:0;background:#FAF6EE;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a1a;">
+<table role="presentation" width="100%" style="background:#FAF6EE;padding:40px 16px;"><tr><td align="center">
+<table role="presentation" width="560" style="max-width:560px;background:#fff;border-radius:14px;border:1px solid #E8DEC8;overflow:hidden;">
+  <tr><td style="padding:32px 36px 18px 36px;border-bottom:1px solid #F1E8D4;">
+    <div style="font-family:Georgia,serif;font-size:22px;font-weight:600;letter-spacing:-0.5px;">Reach<span style="color:#B85C38;">NG</span></div>
+  </td></tr>
+  <tr><td style="padding:32px 36px 8px 36px;">
+    <div style="font-size:11px;letter-spacing:1.5px;font-weight:600;color:#7a6a3f;text-transform:uppercase;margin-bottom:8px;">WhatsApp leakage estimate</div>
+    <div style="font-family:Georgia,serif;font-size:32px;font-weight:600;line-height:1.15;">{biz}: roughly ₦{monthly_loss//1_000_000}M/month leaking.</div>
+  </td></tr>
+  <tr><td style="padding:18px 36px 0 36px;font-size:14px;line-height:1.65;color:#3d3a33;">
+    <p style="margin:0 0 12px 0;">Based on what you entered:</p>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#FBF8F1;border:1px solid #F1E8D4;border-radius:10px;padding:14px 16px;margin-bottom:18px;">
+      <tr><td style="font-size:13px;padding:4px 0;color:#7a6a3f;">Enquiries / week</td><td align="right" style="font-weight:700;">{payload.enquiries_per_week}</td></tr>
+      <tr><td style="font-size:13px;padding:4px 0;color:#7a6a3f;">Avg deal value</td><td align="right" style="font-weight:700;">₦{payload.avg_deal_value_naira:,}</td></tr>
+      <tr><td style="font-size:13px;padding:4px 0;color:#7a6a3f;">Conservative leakage</td><td align="right" style="font-weight:700;">30%</td></tr>
+      <tr><td style="font-size:13px;padding:4px 0;color:#7a6a3f;border-top:1px solid #E8DEC8;padding-top:10px;">Weekly loss</td><td align="right" style="border-top:1px solid #E8DEC8;padding-top:10px;font-weight:700;color:#c62828;">₦{weekly_loss:,}</td></tr>
+      <tr><td style="font-size:13px;padding:4px 0;color:#7a6a3f;">Monthly loss</td><td align="right" style="font-weight:700;color:#c62828;">₦{monthly_loss:,}</td></tr>
+    </table>
+    <p style="margin:0 0 12px 0;font-weight:600;">Why 30%?</p>
+    <p style="margin:0 0 16px 0;">HBR found that leads not replied to within 5 minutes are <strong>9× less likely</strong> to close. Nigeria has 95%+ WhatsApp Business penetration, so customers expect minute-level replies. Most Lagos owners physically can't — and lose the deal to whoever can.</p>
+    <p style="margin:24px 0 12px 0;font-weight:600;">What EYO does about it</p>
+    <ol style="margin:0 0 18px 0;padding-left:20px;">
+      <li style="margin-bottom:6px;">Replies first, in your voice, with your price + bank details</li>
+      <li style="margin-bottom:6px;">Carries the conversation — qualifies, follows up, catches payments</li>
+      <li>Brings you in only when a human handshake matters</li>
+    </ol>
+  </td></tr>
+  <tr><td style="padding:8px 36px 32px 36px;" align="left">
+    <a href="https://www.reachng.ng/waitlist" style="display:inline-block;background:#1a1a1a;color:#FAF6EE;text-decoration:none;padding:12px 22px;border-radius:8px;font-size:14px;font-weight:600;">See how it would handle your enquiries →</a>
+  </td></tr>
+  <tr><td style="padding:0 36px 32px 36px;font-size:14px;color:#3d3a33;border-top:1px solid #F1E8D4;padding-top:24px;">
+    — EYO<br><span style="color:#7a6a3f;">On behalf of the team at ReachNG</span><br>
+    <a href="mailto:hello@reachng.ng" style="color:#B85C38;text-decoration:none;">hello@reachng.ng</a> · Lagos
+  </td></tr>
+</table>
+</td></tr></table></body></html>"""
+            await send_email(
+                to_email=payload.email,
+                subject=subject,
+                body=text,
+                html=html,
+                reply_to="hello@reachng.ng",
+                force_smtp=True,
+            )
+            response["emailed"] = True
+            log.info("calculator_leakage_emailed", to=payload.email,
+                     weekly=weekly_loss, monthly=monthly_loss)
+        except Exception as e:
+            log.warning("calculator_leakage_email_failed", error=str(e))
+
+    return response
+
+
 @router.post("/api/v1/contact", include_in_schema=False)
 async def contact_submit(payload: ContactSubmission):
     """Capture inbound contact form submissions. Stored to MongoDB; operator gets a

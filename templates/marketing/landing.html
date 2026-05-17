@@ -630,6 +630,136 @@
   </div>
 </section>
 
+<!-- ── Leakage Calculator — quantify pain in ₦ ──────────────────────── -->
+<section style="background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="inner" style="max-width: 980px;">
+    <div class="section-label" style="color: var(--orange);">The cost of slow replies</div>
+    <h2 class="section-h2">How much money is leaking out of your WhatsApp right now?</h2>
+    <p class="section-sub" style="max-width: 720px;">Adjust the two numbers below. The total updates live. We can email it to you — no signup required.</p>
+
+    <div style="margin-top: 44px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center;" class="calc-grid">
+
+      <!-- Sliders -->
+      <div>
+        <div style="margin-bottom: 28px;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
+            <label for="calc-enq" style="font-size:12px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;font-weight:600;">WhatsApp enquiries per week</label>
+            <span id="calc-enq-val" style="font-family:Georgia,serif;font-size:28px;font-weight:600;color:var(--text-strong);letter-spacing:-1px;">25</span>
+          </div>
+          <input type="range" id="calc-enq" min="5" max="500" step="1" value="25" style="width:100%;accent-color:var(--orange);">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.3px;">
+            <span>5</span><span>500+</span>
+          </div>
+        </div>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
+            <label for="calc-val" style="font-size:12px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;font-weight:600;">Avg customer value (₦)</label>
+            <span id="calc-val-val" style="font-family:Georgia,serif;font-size:28px;font-weight:600;color:var(--text-strong);letter-spacing:-1px;">₦500k</span>
+          </div>
+          <input type="range" id="calc-val" min="20000" max="20000000" step="10000" value="500000" style="width:100%;accent-color:var(--orange);">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.3px;">
+            <span>₦20k</span><span>₦20M+</span>
+          </div>
+        </div>
+
+        <p style="margin-top:24px;font-size:11px;color:var(--muted);line-height:1.7;letter-spacing:0.2px;">
+          Math: enquiries × deal value × <strong style="color:var(--muted-strong);">30% conservative leakage</strong>. HBR found leads not replied to within 5 min are <strong style="color:var(--muted-strong);">9× less likely to close</strong>.
+        </p>
+      </div>
+
+      <!-- Animated total -->
+      <div style="text-align:center;padding:24px;background:linear-gradient(180deg, rgba(255,85,0,0.04), rgba(255,85,0,0.10));border:1px solid rgba(255,85,0,0.25);border-radius:14px;">
+        <div style="font-size:11px;color:var(--orange);letter-spacing:0.15em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">Conservative monthly leak</div>
+        <div id="calc-monthly" style="font-family:Georgia,serif;font-size:clamp(40px, 7vw, 64px);font-weight:600;line-height:1;letter-spacing:-2px;color:var(--text-strong);">₦1.5M</div>
+        <div style="margin-top:14px;display:flex;justify-content:center;gap:16px;font-size:12px;color:var(--muted-strong);">
+          <span>Weekly: <strong id="calc-weekly" style="color:var(--text-strong);">₦375k</strong></span>
+          <span>·</span>
+          <span>Yearly: <strong id="calc-yearly" style="color:var(--text-strong);">₦18M</strong></span>
+        </div>
+
+        <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border);">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+            <input type="email" id="calc-email" placeholder="your-email@business.ng" style="flex:1;min-width:180px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 13px;color:var(--text);font-size:13px;font-family:inherit;">
+            <button id="calc-email-btn" onclick="emailLeakage()" style="background:#1a1a1a;color:#fff;border:0;padding:10px 16px;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:0.3px;cursor:pointer;white-space:nowrap;">Email me this →</button>
+          </div>
+          <div id="calc-email-status" style="font-size:11px;color:var(--muted);min-height:14px;letter-spacing:0.2px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  @media (max-width: 760px) { .calc-grid { grid-template-columns: 1fr !important; } }
+</style>
+
+<script>
+  (function() {
+    const enq = document.getElementById('calc-enq');
+    const val = document.getElementById('calc-val');
+    const enqVal = document.getElementById('calc-enq-val');
+    const valVal = document.getElementById('calc-val-val');
+    const monthly = document.getElementById('calc-monthly');
+    const weekly = document.getElementById('calc-weekly');
+    const yearly = document.getElementById('calc-yearly');
+    const LEAK = 0.30;
+
+    function fmtN(n) {
+      if (n >= 1_000_000_000) return '₦' + (n / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
+      if (n >= 1_000_000)     return '₦' + (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+      if (n >= 1_000)         return '₦' + Math.round(n / 1_000) + 'k';
+      return '₦' + n;
+    }
+    function recalc() {
+      const e = parseInt(enq.value);
+      const v = parseInt(val.value);
+      enqVal.textContent = e;
+      valVal.textContent = fmtN(v);
+      const wkly = Math.round(e * v * LEAK);
+      const mtly = wkly * 4;
+      const yrly = wkly * 52;
+      weekly.textContent = fmtN(wkly);
+      monthly.textContent = fmtN(mtly);
+      yearly.textContent = fmtN(yrly);
+    }
+    enq.addEventListener('input', recalc);
+    val.addEventListener('input', recalc);
+    recalc();
+
+    window.emailLeakage = async function() {
+      const status = document.getElementById('calc-email-status');
+      const btn    = document.getElementById('calc-email-btn');
+      const email  = document.getElementById('calc-email').value.trim();
+      if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        status.textContent = 'Enter a valid email first.';
+        status.style.color = '#ff7a7a';
+        return;
+      }
+      btn.disabled = true; btn.textContent = 'Sending…';
+      try {
+        const r = await fetch('/api/v1/calculator/leakage', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            enquiries_per_week:    parseInt(enq.value),
+            avg_deal_value_naira:  parseInt(val.value),
+            email: email,
+          }),
+        });
+        if (!r.ok) throw new Error('Send failed');
+        status.textContent = '✓ Sent. Check your inbox (and spam folder) in a minute.';
+        status.style.color = '#5dd28a';
+        btn.textContent = 'Sent ✓';
+      } catch (e) {
+        status.textContent = 'Could not send right now — try again in a moment.';
+        status.style.color = '#ff7a7a';
+        btn.disabled = false; btn.textContent = 'Email me this →';
+      }
+    };
+  })();
+</script>
+
 <!-- ── Final CTA — with folded trust signals ─────────────────────────────────────────────── -->
 <section style="background: linear-gradient(180deg, transparent 0%, rgba(255,85,0,0.08) 100%); text-align: center;">
   <div class="inner" style="max-width: 760px;">
