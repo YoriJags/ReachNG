@@ -1886,6 +1886,7 @@ function copyDemoPortalLink(btn){
   <button class="tab-btn" onclick="switchTab('activate', this); loadActivateTab();" title="Lead Resurrection · Missed Opp Radar · Sales Copilot">Activate <span class="tab-badge" id="tab-badge-activate"></span></button>
   <button class="tab-btn" onclick="switchTab('approvals', this)" title="HITL message queue · Replies · Closer · Invoices">Recover <span class="tab-badge" id="tab-badge-approvals"></span></button>
   <button class="tab-btn" onclick="switchTab('clients', this)" title="Client setup · Briefs · Campaigns · Control Tower">Clients</button>
+  <button class="tab-btn" onclick="switchTab('waitlist', this); loadWaitlist();" title="Pre-launch waitlist · review interest · invite in batches">Waitlist <span class="tab-badge" id="tab-badge-waitlist"></span></button>
   <button class="tab-btn" onclick="switchTab('tools', this)" title="Discovery health · Signal leads · Tools · Flow">System</button>
 </nav>
 
@@ -3233,6 +3234,25 @@ function copyDemoPortalLink(btn){
     </div>
     <div id="inv-stats" style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;"></div>
     <div id="inv-list"></div>
+  </div>
+</div>
+
+<!-- ── Waitlist (pre-launch capture) ─────────────────────────────────────── -->
+<div class="tab-panel" id="tab-waitlist">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;gap:16px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:11px;letter-spacing:1.5px;font-weight:600;color:#7a6a3f;text-transform:uppercase;margin-bottom:6px;">Pre-launch capture</div>
+      <h2 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#fff;letter-spacing:-0.3px;">Waitlist</h2>
+      <div style="color:#8a8a8a;font-size:12px;margin-top:4px;">Invite in small batches. Keep the first 30 days wow-quality.</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <div id="waitlist-stats" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <button onclick="refreshWaitlist()" style="background:#1a1a1a;color:#fff;border:1px solid #333;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">↻ Refresh</button>
+      <button onclick="wipeWaitlist()" style="background:#a23b2a;color:#fff;border:0;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Wipe (pre-launch)</button>
+    </div>
+  </div>
+  <div id="waitlist-table-wrap" style="background:#0e0e0e;border:1px solid #1f1f1f;border-radius:10px;overflow:hidden;">
+    <div style="padding:40px;text-align:center;color:#7a7a7a;font-size:13px;">Loading…</div>
   </div>
 </div>
 
@@ -5271,6 +5291,94 @@ function switchProduct(product, pill) {
   if (product === "build_os")   { mchLoadResults(); }
   if (product === "fleet_os")   { fdLoadIncidents(); frLoadRoutes(); foLoadDashboard(); }
   if (product === "estate_os")  { estLoadOverview(); }
+}
+
+// ── Waitlist (pre-launch capture) ──────────────────────────────────────
+async function loadWaitlist() {
+  const wrap = document.getElementById("waitlist-table-wrap");
+  const stats = document.getElementById("waitlist-stats");
+  if (!wrap) return;
+  wrap.innerHTML = `<div style="padding:40px;text-align:center;color:#7a7a7a;font-size:13px;">Loading…</div>`;
+  try {
+    const r = await fetch("/admin/waitlist/data");
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const d = await r.json();
+    const verticalsHtml = (d.top_verticals || []).map(v =>
+      `<span style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:999px;padding:4px 10px;font-size:11px;color:#bbb;letter-spacing:0.3px;">${v.vertical} <strong style="color:#fff;">${v.count}</strong></span>`
+    ).join("");
+    stats.innerHTML =
+      `<span style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:999px;padding:4px 10px;font-size:11px;color:#bbb;">Total <strong style="color:#fff;">${d.total}</strong></span>` + verticalsHtml;
+
+    const badge = document.getElementById("tab-badge-waitlist");
+    if (badge) badge.textContent = d.total > 0 ? d.total : "";
+
+    if (!d.rows || !d.rows.length) {
+      wrap.innerHTML = `<div style="padding:60px 24px;text-align:center;color:#7a7a7a;">
+        <div style="font-family:Georgia,serif;font-size:18px;color:#fff;margin-bottom:6px;">No one on the list yet.</div>
+        Once people sign up at <a href="https://www.reachng.ng/waitlist" target="_blank" style="color:#B85C38;">reachng.ng/waitlist</a>, they'll show here.
+      </div>`;
+      return;
+    }
+    const rowsHtml = d.rows.map(r => {
+      const joined = (r.created_at || "").slice(0, 16).replace("T", " ");
+      const invited = r.invited_at ? `<br><span style="color:#3fa169;font-weight:600;font-size:10px;letter-spacing:0.5px;">INVITED ${(r.invited_at || "").slice(0,10)}</span>` : "";
+      const inviteBtn = r.invited_at ? "" :
+        `<button onclick="inviteWaitlist(${r.position})" style="background:#1a1a1a;color:#fff;border:1px solid #333;padding:5px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;">Mark invited</button>`;
+      return `<tr id="wl-row-${r.position}" style="border-top:1px solid #1a1a1a;">
+        <td style="padding:10px 12px;font-family:Georgia,serif;font-size:16px;font-weight:600;color:#B85C38;">${r.position}</td>
+        <td style="padding:10px 12px;"><div style="font-weight:600;color:#fff;">${escapeHtml(r.name || "")}</div><div style="color:#999;font-size:11px;">${escapeHtml(r.business_name || "")}${r.city ? " · " + escapeHtml(r.city) : ""}</div></td>
+        <td style="padding:10px 12px;"><span style="background:#1a1a1a;border:1px solid #2a2a2a;padding:2px 8px;border-radius:5px;font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;">${escapeHtml(r.vertical || "")}</span></td>
+        <td style="padding:10px 12px;font-size:11px;color:#bbb;line-height:1.5;">${r.phone ? "📱 " + escapeHtml(r.phone) + "<br>" : ""}${r.email ? "✉ " + escapeHtml(r.email) : ""}</td>
+        <td style="padding:10px 12px;font-style:italic;font-size:11px;color:#aaa;max-width:280px;">${escapeHtml(r.brief_pain || "—")}</td>
+        <td style="padding:10px 12px;font-size:10px;color:#777;">${escapeHtml(r.source || "")}</td>
+        <td style="padding:10px 12px;font-size:10px;color:#777;">${joined}${invited}</td>
+        <td style="padding:10px 12px;display:flex;gap:6px;flex-wrap:wrap;">
+          ${inviteBtn}
+          <button onclick="deleteWaitlist(${r.position})" style="background:transparent;color:#999;border:1px solid #333;padding:5px 10px;border-radius:5px;font-size:11px;cursor:pointer;">Delete</button>
+        </td>
+      </tr>`;
+    }).join("");
+    wrap.innerHTML = `<table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#151515;">
+          <th style="padding:10px 12px;text-align:left;font-size:10px;color:#777;letter-spacing:1px;text-transform:uppercase;font-weight:600;">#</th>
+          <th style="padding:10px 12px;text-align:left;font-size:10px;color:#777;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Who</th>
+          <th style="padding:10px 12px;text-align:left;font-size:10px;color:#777;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Vertical</th>
+          <th style="padding:10px 12px;text-align:left;font-size:10px;color:#777;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Contact</th>
+          <th style="padding:10px 12px;text-align:left;font-size:10px;color:#777;letter-spacing:1px;text-transform:uppercase;font-weight:600;">What they're facing</th>
+          <th style="padding:10px 12px;text-align:left;font-size:10px;color:#777;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Source</th>
+          <th style="padding:10px 12px;text-align:left;font-size:10px;color:#777;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Joined</th>
+          <th style="padding:10px 12px;text-align:left;font-size:10px;color:#777;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>`;
+  } catch (e) {
+    wrap.innerHTML = `<div style="padding:40px;text-align:center;color:#a23b2a;font-size:13px;">Failed to load: ${e.message}</div>`;
+  }
+}
+function refreshWaitlist() { loadWaitlist(); }
+async function inviteWaitlist(pos) {
+  if (!confirm("Mark #" + pos + " as invited?")) return;
+  const r = await fetch("/admin/waitlist/" + pos + "/invite", { method: "POST" });
+  if (r.ok) loadWaitlist();
+  else alert("Failed: " + r.status);
+}
+async function deleteWaitlist(pos) {
+  if (!confirm("Delete #" + pos + "? This cannot be undone.")) return;
+  const r = await fetch("/admin/waitlist/" + pos, { method: "DELETE" });
+  if (r.ok) { const row = document.getElementById("wl-row-" + pos); if (row) row.remove(); }
+  else alert("Failed: " + r.status);
+}
+async function wipeWaitlist() {
+  if (!confirm("WIPE THE ENTIRE WAITLIST? Deletes every entry permanently.")) return;
+  if (!confirm("Sure? This is irreversible.")) return;
+  const r = await fetch("/admin/waitlist/wipe", { method: "POST" });
+  if (r.ok) loadWaitlist();
+  else alert("Failed: " + r.status);
+}
+function escapeHtml(s) {
+  return (s || "").toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
 function switchTab(name, btn) {

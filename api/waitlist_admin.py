@@ -5,36 +5,30 @@ Auth: same Basic Auth as dashboard. Routes are mounted under /admin/waitlist.
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 
 from auth import require_auth
 from services.waitlist import (
     _col,
     list_waitlist,
     mark_invited,
-    waitlist_total,
     waitlist_public_counter,
 )
 
 router = APIRouter(prefix="/admin/waitlist", tags=["waitlist-admin"])
-templates = Jinja2Templates(directory="templates")
 
 
-@router.get("", response_class=HTMLResponse)
-def waitlist_page(request: Request, _: str = Depends(require_auth)) -> HTMLResponse:
-    rows     = list_waitlist(limit=500)
-    counter  = waitlist_public_counter()
-    return templates.TemplateResponse(
-        "admin/waitlist.html",
-        {
-            "request":       request,
-            "rows":          rows,
-            "total":         counter["total"],
-            "top_verticals": counter["top_verticals"],
-        },
-    )
+@router.get("/data")
+def waitlist_data(_: str = Depends(require_auth)) -> JSONResponse:
+    """Returns rows + counter as JSON for inline dashboard render."""
+    rows    = list_waitlist(limit=500)
+    counter = waitlist_public_counter()
+    return JSONResponse({
+        "rows":          rows,
+        "total":         counter["total"],
+        "top_verticals": counter["top_verticals"],
+    })
 
 
 @router.post("/{position}/invite")
