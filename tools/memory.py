@@ -80,6 +80,28 @@ def upsert_contact(
         category=category,
     )
 
+    # Lead Quality Scorer — produce a Hot/Warm/Cold verdict + reasons from the
+    # richer signal set (decision-maker, email quality, recency, anti-signals).
+    # Best-effort — falls back to base score on any error.
+    quality_verdict = None
+    quality_reasons: list[str] = []
+    quality_negatives: list[str] = []
+    quality_score_rich = lead_score
+    try:
+        from tools.lead_scorer import score_lead
+        stub = {
+            "vertical": vertical, "rating": rating, "phone": phone, "email": email,
+            "website": website, "category": category, "contact_name": contact_name,
+            "contact_title": contact_title,
+        }
+        ls = score_lead(stub)
+        quality_verdict = ls.verdict
+        quality_reasons = ls.reasons
+        quality_negatives = ls.negatives
+        quality_score_rich = ls.score
+    except Exception:
+        pass
+
     state = _extract_state(address)
 
     doc = {
@@ -87,6 +109,10 @@ def upsert_contact(
         "name": name,
         "vertical": vertical,
         "lead_score": lead_score,
+        "quality_score": quality_score_rich,
+        "quality_verdict": quality_verdict,
+        "quality_reasons": quality_reasons,
+        "quality_negatives": quality_negatives,
         "updated_at": now,
     }
     # Only include indexed fields when they have values — avoids unique-index

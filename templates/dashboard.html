@@ -10422,14 +10422,29 @@ async function loadPipeline() {
       const cards = grouped[col.status] || [];
       const cardHtml = cards.length === 0
         ? `<div style="color:#1e3040;font-size:11px;text-align:center;padding:16px;">Empty</div>`
-        : cards.map(c => `
+        : cards.map(c => {
+            // Hot/Warm/Cold verdict pill (Lead Quality Scorer)
+            const verdict = c.quality_verdict || null;
+            const verdictColors = {
+              hot:  {bg: "#3a1a0a", fg: "#ff7a3a", border: "#5a2a1a"},
+              warm: {bg: "#2a2208", fg: "#ffb84d", border: "#4a3a18"},
+              cold: {bg: "#0e1a24", fg: "#5d8aa8", border: "#1e3040"},
+            };
+            const vc = verdictColors[verdict] || null;
+            const verdictPill = vc
+              ? `<span style="display:inline-block;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:1px 6px;border-radius:3px;background:${vc.bg};color:${vc.fg};border:1px solid ${vc.border};margin-right:4px;">${verdict}</span>`
+              : "";
+            const scoreNum = c.quality_score ?? c.lead_score;
+            return `
           <div style="background:#0a1520;border:1px solid #1e2530;border-radius:6px;padding:10px 12px;margin-bottom:8px;cursor:pointer;"
-               onclick="${c.phone ? `window.open('https://wa.me/${c.phone.replace(/[^0-9]/g,'')}','_blank')` : ''}">
+               onclick="${c.phone ? `window.open('https://wa.me/${c.phone.replace(/[^0-9]/g,'')}','_blank')` : ''}"
+               title="${(c.quality_reasons || []).join(' · ')}">
             <div style="font-size:12px;font-weight:600;color:#c0d0e0;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(c.name || "—")}</div>
             <div style="font-size:10px;color:#4a6070;">${escHtml(c.category || c.vertical || "")} ${c.rating ? "· ★" + c.rating : ""}</div>
             ${col.wonFlag && c.deal_value_ngn ? `<div style="font-size:10px;color:#ff5c00;margin-top:2px;">₦${Number(c.deal_value_ngn).toLocaleString()}</div>` : ""}
-            ${!col.wonFlag && c.lead_score ? `<div style="font-size:10px;color:#ff5c00;margin-top:2px;">Score ${c.lead_score}</div>` : ""}
-          </div>`).join("");
+            ${!col.wonFlag ? `<div style="margin-top:4px;display:flex;align-items:center;gap:4px;">${verdictPill}${scoreNum ? `<span style="font-size:10px;color:#ff5c00;">Score ${scoreNum}</span>` : ""}</div>` : ""}
+          </div>`;
+          }).join("");
 
       return `
         <div style="min-width:200px;flex:1;background:#080d14;border:1px solid #0e1a26;border-radius:8px;padding:12px;${col.wonFlag ? 'border-color:#ff5c0030;' : ''}">

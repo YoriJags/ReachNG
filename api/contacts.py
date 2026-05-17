@@ -48,6 +48,32 @@ async def list_contacts(
         .skip(skip)
         .limit(limit)
     )
+
+    # Lazy-backfill: any contact that pre-dates the Lead Quality Scorer
+    # gets scored on-the-fly here AND persisted back so the next read is free.
+    try:
+        from tools.lead_scorer import score_lead
+        col = get_contacts()
+        for c in contacts:
+            if c.get("quality_verdict"):
+                continue
+            ls = score_lead(c)
+            c["quality_score"]     = ls.score
+            c["quality_verdict"]   = ls.verdict
+            c["quality_reasons"]   = ls.reasons
+            c["quality_negatives"] = ls.negatives
+            try:
+                col.update_one({"_id": c["_id"]}, {"$set": {
+                    "quality_score":     ls.score,
+                    "quality_verdict":   ls.verdict,
+                    "quality_reasons":   ls.reasons,
+                    "quality_negatives": ls.negatives,
+                }})
+            except Exception:
+                pass
+    except Exception:
+        pass
+
     return [_serialise(c) for c in contacts]
 
 

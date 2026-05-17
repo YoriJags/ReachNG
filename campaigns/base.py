@@ -210,30 +210,54 @@ class BaseCampaign:
                 seen_emails.add(email)
             return False
 
-        # Sort: temperature DESC (hot first), then lead_score DESC within same temp
-        # Signal leads come first as they carry the strongest purchase intent
-        from tools.scoring import score_contact
+        # Sort by Lead Quality Scorer verdict (hot → warm → cold) + score DESC.
+        # Pre-filter cold leads from prospecting campaigns so we don't waste
+        # drafter spend on businesses with near-zero close probability.
+        # Manual lead_temperature still takes precedence (operator override).
+        from tools.lead_scorer import score_lead
+        VERDICT_RANK = {"hot": 3, "warm": 2, "cold": 1}
+
         def _sort_key(b: dict) -> tuple:
             temp = b.get("lead_temperature", 0)
-            score = score_contact(
-                vertical=self.vertical,
-                rating=b.get("rating"),
-                has_phone=bool(b.get("phone")),
-                has_website=bool(b.get("website")),
-                category=b.get("category"),
-            )
-            return (temp, score)
+            try:
+                stub = {
+                    "vertical":   self.vertical,
+                    "rating":     b.get("rating"),
+                    "phone":      b.get("phone"),
+                    "email":      b.get("email"),
+                    "website":    b.get("website"),
+                    "category":   b.get("category"),
+                    "contact_name": b.get("contact_name"),
+                    "contact_title": b.get("contact_title"),
+                    "enrichment": b.get("enrichment"),
+                }
+                ls = score_lead(stub)
+                b["quality_verdict"] = ls.verdict
+                b["quality_score"]   = ls.score
+                b["quality_reasons"] = ls.reasons
+                verdict_rank = VERDICT_RANK.get(ls.verdict, 0)
+                rich_score = ls.score
+            except Exception:
+                verdict_rank = 0
+                rich_score = 0
+            return (temp, verdict_rank, rich_score)
 
         all_leads = signal_leads + ig_leads + social_leads + apify_leads + maps_leads
         all_leads.sort(key=_sort_key, reverse=True)
         businesses = [b for b in all_leads if not _is_duplicate(b)]
 
-        hot_count  = sum(1 for b in businesses if b.get("lead_temperature", 0) == 2)
-        warm_count = sum(1 for b in businesses if b.get("lead_temperature", 0) == 1)
+        # Drop hard-cold leads from prospecting — save drafter spend.
+        # Operators can still reach them manually via the dashboard.
+        cold_dropped = sum(1 for b in businesses if b.get("quality_verdict") == "cold")
+        businesses = [b for b in businesses if b.get("quality_verdict") != "cold"]
+
+        hot_count  = sum(1 for b in businesses if b.get("quality_verdict") == "hot")
+        warm_count = sum(1 for b in businesses if b.get("quality_verdict") == "warm")
         log.info("discovery_done", vertical=self.vertical, maps=len(maps_leads),
                  apify=len(apify_leads), social=len(social_leads), signal=len(signal_leads),
                  instagram=len(ig_leads),
-                 total_deduped=len(businesses), hot=hot_count, warm=warm_count)
+                 total_deduped=len(businesses), hot=hot_count, warm=warm_count,
+                 cold_dropped=cold_dropped)
 
         for biz in businesses:
             # Hard cap — stop once we've sent/queued/dry-run'd enough
