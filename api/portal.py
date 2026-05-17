@@ -330,36 +330,41 @@ async def demo_portal(request: Request):
 
 @router.get("/demo/dashboard", response_class=HTMLResponse)
 async def demo_portal_dashboard(request: Request, embed: int = 0):
-    """Raw operator-view dashboard with sample data. Linked from the guided
-    tour Scene 5 ('Open the full dashboard'). Defaults to hospitality.
-
-    Pass `?embed=1` to render without the demo banner/topbar/footer chrome —
-    used when iframed inside the guided tour for visual coherence.
+    """Prospect-facing EYO Control Room — cream/sienna design matching the
+    guided tour. Linked from Scene 5 'Open the Control Room'. Defaults to
+    hospitality. Pass ?embed=1 for iframe rendering (hides chrome).
     """
     from services.demo_datasets import get_dataset
     templates = request.app.state.templates
-    return templates.TemplateResponse(request, "portal_demo.html",
+    return templates.TemplateResponse(request, "portal_control_room.html",
         {"data": get_dataset(None), "vertical": "hospitality", "embed": bool(embed)})
 
 
 @router.get("/demo/{vertical}", response_class=HTMLResponse)
 async def demo_portal_vertical(vertical: str, request: Request, embed: int = 0):
-    """Public demo portal for a specific vertical — same product, vertical-tailored sample data.
-
-    Same engine as /portal/demo, just loads a different sample dataset so prospects
-    in any Lagos SME vertical see themselves in the product within 5 seconds.
-    Pass 2: this will also become a guided tour with vertical-specific scenes.
-    Only renders for verticals with real datasets — otherwise falls back to default.
+    """Vertical-specific EYO Control Room sample. Same prospect-facing
+    cream/sienna design, vertical-tailored sample data. Only renders for
+    verticals with real datasets — otherwise redirects to the guided tour.
     """
     from services.demo_datasets import get_dataset, list_verticals
     if vertical.lower() not in list_verticals():
-        # No real dataset — redirect to guided tour instead of silently
-        # falling back to hospitality data with a different label
         from fastapi.responses import RedirectResponse
         return RedirectResponse(url="/portal/demo", status_code=307)
     templates = request.app.state.templates
-    return templates.TemplateResponse(request, "portal_demo.html",
+    return templates.TemplateResponse(request, "portal_control_room.html",
         {"data": get_dataset(vertical), "vertical": vertical.lower(), "embed": bool(embed)})
+
+
+@router.get("/demo/operator/raw", response_class=HTMLResponse)
+async def demo_portal_operator_raw(request: Request):
+    """Dark operator-view dashboard preserved for internal reference and
+    for clients who want to see the production UI. Not linked from the
+    public funnel.
+    """
+    from services.demo_datasets import get_dataset
+    templates = request.app.state.templates
+    return templates.TemplateResponse(request, "portal_demo.html",
+        {"data": get_dataset(None), "vertical": "hospitality", "embed": False})
 
 
 @router.get("/{token}", response_class=HTMLResponse)

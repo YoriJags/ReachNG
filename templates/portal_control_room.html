@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EYO Control Room — {{ data.brand }} · ReachNG</title>
+<meta name="description" content="Sample EYO Control Room — overnight signals, awaiting taps, money matched, leaks. Sample Lagos data.">
+<style>
+  :root {
+    --bg: #FAF6EE; --bg2: #F5EFE0;
+    --paper: #ffffff; --paper-soft: #FBF8F1;
+    --ink: #1a1a1a; --ink2: #3d3a33; --muted: #7a6a3f; --muted2: #9a8e6e;
+    --accent: #B85C38; --accent2: #ff5c00;
+    --line: #E8DEC8; --line-soft: #F1E8D4;
+    --green: #2e7d32; --green-soft: rgba(46,125,50,0.10);
+    --red: #c62828; --red-soft: rgba(198,40,40,0.08);
+    --wa-green: #25D366;
+    --gold: #d3a52e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+  a { color: var(--accent); text-decoration: none; }
+
+  /* Sample data banner */
+  body.embed-mode .sample-banner,
+  body.embed-mode .topbar { display: none; }
+  body.embed-mode { background: transparent; }
+  body.embed-mode .wrap { padding-top: 12px; }
+
+  .sample-banner {
+    background: rgba(211, 165, 46, 0.12);
+    border-bottom: 1px solid rgba(211, 165, 46, 0.35);
+    color: #7a5a10;
+    padding: 8px 16px; text-align: center;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+  }
+  .sample-banner .pip {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); margin-right: 8px; vertical-align: middle;
+    animation: blink 1.6s step-end infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  .topbar {
+    padding: 14px 32px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(250, 246, 238, 0.92); backdrop-filter: blur(10px);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .topbar-brand {
+    font-family: Georgia, serif; font-size: 17px; font-weight: 600;
+    color: var(--ink); letter-spacing: -0.3px;
+  }
+  .topbar-brand .ng { color: var(--accent); }
+  .topbar-back {
+    font-size: 12px; color: var(--muted); font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 32px 24px 80px 24px; }
+
+  /* Header */
+  .header { margin-bottom: 28px; }
+  .header .eyebrow {
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    font-weight: 700; color: var(--accent); margin-bottom: 8px;
+  }
+  .header h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(28px, 4.2vw, 40px); line-height: 1.1;
+    letter-spacing: -1px; font-weight: 600; color: var(--ink);
+  }
+  .header h1 em { color: var(--accent); font-style: italic; }
+  .header .sub {
+    margin-top: 8px; font-size: 13px; color: var(--muted);
+    letter-spacing: 0.3px;
+  }
+
+  /* Metric tiles */
+  .tiles {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    margin-bottom: 32px;
+  }
+  .tile {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px 20px;
+    position: relative; overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .tile:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+  .tile-label {
+    font-size: 10px; color: var(--muted); letter-spacing: 1.2px;
+    text-transform: uppercase; font-weight: 700; margin-bottom: 10px;
+  }
+  .tile-value {
+    font-family: Georgia, serif; font-size: 32px; font-weight: 600;
+    letter-spacing: -1px; color: var(--ink); line-height: 1;
+  }
+  .tile-sub {
+    margin-top: 8px; font-size: 11px; color: var(--muted2);
+  }
+  .tile.accent { border-left: 3px solid var(--accent); }
+  .tile.money .tile-value { color: var(--green); }
+  .tile.hot .tile-value { color: var(--accent2); }
+
+  /* Main 3-column */
+  .main {
+    display: grid; grid-template-columns: 1.15fr 0.85fr 0.85fr; gap: 16px;
+    margin-bottom: 32px;
+  }
+  .panel {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 12px; padding: 20px; height: fit-content;
+  }
+  .panel-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .panel-title {
+    font-family: Georgia, serif; font-size: 17px; font-weight: 600;
+    color: var(--ink); letter-spacing: -0.3px;
+  }
+  .panel-count {
+    background: var(--paper-soft); color: var(--accent);
+    border: 1px solid var(--line);
+    font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 100px;
+  }
+
+  /* Approval queue card */
+  .draft-card {
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 12px;
+    background: var(--paper-soft);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .draft-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 6px 16px rgba(184,92,56,0.10);
+  }
+  .draft-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .draft-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(135deg, #a8e6cf, #56cfa1);
+    color: #0a3d2a; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 12px;
+  }
+  .draft-name { font-weight: 600; font-size: 13px; color: var(--ink); }
+  .draft-meta { font-size: 10px; color: var(--muted2); }
+  .draft-tag {
+    margin-left: auto;
+    background: rgba(184,92,56,0.10); color: var(--accent);
+    border: 1px solid rgba(184,92,56,0.25);
+    font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 100px;
+    letter-spacing: 0.3px; text-transform: capitalize;
+  }
+  .draft-inbound {
+    background: #fff; border: 1px solid var(--line-soft);
+    border-radius: 10px 10px 10px 4px;
+    padding: 8px 12px; font-size: 12px; color: var(--ink2);
+    line-height: 1.55; margin-bottom: 8px;
+  }
+  .draft-inbound .lbl {
+    display: block; font-size: 9px; color: var(--muted2);
+    text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .draft-eyo {
+    background: linear-gradient(180deg, rgba(184,92,56,0.04), rgba(184,92,56,0.02));
+    border: 1px solid rgba(184,92,56,0.25);
+    border-radius: 10px 10px 4px 10px;
+    padding: 8px 12px; font-size: 12px; color: var(--ink);
+    line-height: 1.55; margin-bottom: 10px;
+  }
+  .draft-eyo .lbl {
+    display: block; font-size: 9px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .draft-actions { display: flex; gap: 6px; }
+  .ba {
+    flex: 1; background: var(--accent); color: #fff; border: 0;
+    padding: 8px; border-radius: 6px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.3px; cursor: pointer;
+  }
+  .be, .bs {
+    background: transparent; color: var(--ink2);
+    border: 1px solid var(--line); padding: 8px 12px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+  }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 8px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 12px; top: 4px; bottom: 4px;
+    width: 2px; background: var(--line);
+  }
+  .tl-item {
+    position: relative; padding-left: 28px; padding-bottom: 16px;
+  }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-dot {
+    position: absolute; left: 4px; top: 4px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--paper); border: 2px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+  }
+  .tl-item.active .tl-dot {
+    background: var(--accent); border-color: var(--accent);
+    color: #fff;
+  }
+  .tl-item.confirmed .tl-dot {
+    background: var(--green); border-color: var(--green); color: #fff;
+  }
+  .tl-time {
+    font-size: 10px; color: var(--muted2); letter-spacing: 0.5px;
+    font-weight: 600; text-transform: uppercase; margin-bottom: 2px;
+  }
+  .tl-body {
+    font-size: 12.5px; color: var(--ink2); line-height: 1.5;
+  }
+  .tl-body strong { color: var(--ink); }
+
+  /* Revenue & Leaks */
+  .stat-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--line-soft);
+    font-size: 13px;
+  }
+  .stat-row:last-child { border-bottom: 0; }
+  .stat-row .lbl { color: var(--muted); font-size: 12px; }
+  .stat-row .val { color: var(--ink); font-weight: 700; }
+  .stat-row.good .val { color: var(--green); }
+  .stat-row.bad  .val { color: var(--red); }
+  .compare {
+    margin-top: 14px; padding: 10px 12px;
+    background: var(--paper-soft); border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 11px; color: var(--muted); line-height: 1.55;
+  }
+  .compare strong { color: var(--ink); }
+
+  /* Kanban */
+  .kanban-wrap { margin-top: 16px; }
+  .kanban-head {
+    display: flex; justify-content: space-between; align-items: end;
+    margin-bottom: 16px;
+  }
+  .kanban-head .panel-title { font-size: 19px; }
+  .kanban {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+  }
+  .col {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 10px; padding: 14px;
+    min-height: 240px;
+  }
+  .col-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 10px; border-bottom: 1px solid var(--line-soft);
+    margin-bottom: 12px;
+  }
+  .col-title {
+    font-size: 11px; color: var(--muted); letter-spacing: 1px;
+    text-transform: uppercase; font-weight: 700;
+  }
+  .col-count {
+    background: var(--paper-soft); color: var(--muted);
+    font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 100px;
+  }
+  .col.hot .col-title { color: var(--accent); }
+  .col.hot .col-count { color: var(--accent); background: rgba(184,92,56,0.10); }
+  .col.paid .col-title { color: var(--green); }
+  .col.paid .col-count { color: var(--green); background: var(--green-soft); }
+
+  .lead-card {
+    background: var(--paper-soft); border: 1px solid var(--line-soft);
+    border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+    cursor: pointer; transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .lead-card:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .lead-name { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+  .lead-detail { font-size: 11px; color: var(--muted); line-height: 1.45; }
+  .lead-chips { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; }
+  .chip {
+    font-size: 9px; padding: 1px 6px; border-radius: 100px;
+    font-weight: 700; letter-spacing: 0.3px;
+  }
+  .chip-hot { background: var(--accent2); color: #fff; }
+  .chip-voice { background: rgba(37,211,102,0.15); color: #0a6a3f; border: 1px solid rgba(37,211,102,0.35); }
+  .chip-deposit { background: rgba(46,125,50,0.10); color: var(--green); border: 1px solid rgba(46,125,50,0.30); }
+  .chip-reply { background: rgba(184,92,56,0.10); color: var(--accent); border: 1px solid rgba(184,92,56,0.25); }
+  .chip-event { background: rgba(0,0,0,0.05); color: #555; border: 1px solid rgba(0,0,0,0.08); }
+
+  @media (max-width: 1080px) {
+    .main { grid-template-columns: 1fr; }
+    .kanban { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .kanban { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body{% if embed %} class="embed-mode"{% endif %}>
+
+{% if not embed %}
+<div class="sample-banner"><span class="pip"></span>Sample Lagos data · Prospect-facing control room</div>
+<nav class="topbar">
+  <a href="/portal/demo" class="topbar-brand">Reach<span class="ng">NG</span> · EYO Control Room</a>
+  <a href="/portal/demo" class="topbar-back">← Back to guided tour</a>
+</nav>
+{% endif %}
+
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="eyebrow">EYO Control Room</div>
+    <h1>Last night at <em>{{ data.brand }}</em>.</h1>
+    <div class="sub">11:00 PM → 7:00 AM · {{ data.category }} · Sample Lagos data</div>
+  </div>
+
+  <!-- Metric tiles -->
+  <div class="tiles">
+    <div class="tile accent">
+      <div class="tile-label">WhatsApp messages</div>
+      <div class="tile-value" data-count="12">12</div>
+      <div class="tile-sub">Inbound overnight</div>
+    </div>
+    <div class="tile">
+      <div class="tile-label">Drafts ready</div>
+      <div class="tile-value" data-count="{{ data.hitl_drafts | length }}">{{ data.hitl_drafts | length }}</div>
+      <div class="tile-sub">Awaiting your tap</div>
+    </div>
+    <div class="tile hot">
+      <div class="tile-label">Hot leads</div>
+      <div class="tile-value" data-count="2">2</div>
+      <div class="tile-sub">Deposit-ready</div>
+    </div>
+    <div class="tile money">
+      <div class="tile-label">Money matched</div>
+      <div class="tile-value" data-count="450" data-prefix="₦" data-suffix="k">₦450k</div>
+      <div class="tile-sub">Transfer screenshot · auto-reconciled</div>
+    </div>
+  </div>
+
+  <!-- Main 3-column -->
+  <div class="main">
+
+    <!-- LEFT: Drafts waiting for your tap -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Drafts waiting for your tap</div>
+        <span class="panel-count">{{ data.hitl_drafts | length }}</span>
+      </div>
+      {% for d in data.hitl_drafts %}
+      <div class="draft-card">
+        <div class="draft-head">
+          <div class="draft-avatar">{{ d.initials }}</div>
+          <div>
+            <div class="draft-name">{{ d.name }}</div>
+            <div class="draft-meta">{{ d.time }}</div>
+          </div>
+          <span class="draft-tag">{{ d.tag_label }}</span>
+        </div>
+        <div class="draft-inbound">
+          <span class="lbl">They said</span>
+          {{ d.inbound | truncate(160) }}
+        </div>
+        <div class="draft-eyo">
+          <span class="lbl">EYO drafted</span>
+          {{ d.draft | truncate(220) }}
+        </div>
+        <div class="draft-actions">
+          <button class="ba">✓ Approve &amp; send</button>
+          <button class="be">Edit</button>
+          <button class="bs">Skip</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- CENTER: What happened overnight (story timeline) -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">What happened overnight</div>
+      </div>
+      <div class="timeline">
+        <div class="tl-item active">
+          <div class="tl-dot">🎤</div>
+          <div class="tl-time">SAT · 11:47 PM</div>
+          <div class="tl-body"><strong>Voice note received</strong> · Funke A. asking about Sat 9pm booking</div>
+        </div>
+        <div class="tl-item active">
+          <div class="tl-dot">⚡</div>
+          <div class="tl-time">SAT · 11:47 PM</div>
+          <div class="tl-body"><strong>Transcribed in 2.4s</strong> · tagged <span style="color:var(--accent2);font-weight:700;">HOT</span> · booking · deposit-question</div>
+        </div>
+        <div class="tl-item active">
+          <div class="tl-dot">✎</div>
+          <div class="tl-time">SAT · 11:50 PM</div>
+          <div class="tl-body"><strong>Draft created</strong> in {{ data.brand }} voice · awaiting tap</div>
+        </div>
+        <div class="tl-item confirmed">
+          <div class="tl-dot">₦</div>
+          <div class="tl-time">SAT · 11:56 PM</div>
+          <div class="tl-body"><strong>Transfer screenshot matched</strong> · GTB ₦450k → booking #MER-2614</div>
+        </div>
+        <div class="tl-item confirmed">
+          <div class="tl-dot">✉</div>
+          <div class="tl-time">SAT · 11:56 PM</div>
+          <div class="tl-body"><strong>Receipt drafted</strong> · auto-acknowledged with booking ref</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot">⚠</div>
+          <div class="tl-time">SUN · 04:12 AM</div>
+          <div class="tl-body"><strong>Leak detected</strong> · 2 enquiries idle 18hrs, drafts pre-built</div>
+        </div>
+        <div class="tl-item active">
+          <div class="tl-dot">📋</div>
+          <div class="tl-time">SUN · 07:02 AM</div>
+          <div class="tl-body"><strong>Owner brief sent</strong> via WhatsApp · 5-minute morning read</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Money & leaks -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Money &amp; leaks</div>
+      </div>
+      <div class="stat-row good">
+        <span class="lbl">Money EYO matched</span>
+        <span class="val">₦450,000</span>
+      </div>
+      <div class="stat-row">
+        <span class="lbl">Pending your tap</span>
+        <span class="val">{{ data.hitl_drafts | length }}</span>
+      </div>
+      <div class="stat-row bad">
+        <span class="lbl">Idle enquiries</span>
+        <span class="val">2</span>
+      </div>
+      <div class="stat-row">
+        <span class="lbl">Fastest reply</span>
+        <span class="val">2.4 s</span>
+      </div>
+      <div class="stat-row">
+        <span class="lbl">Slowest reply</span>
+        <span class="val">4 min</span>
+      </div>
+
+      <div class="compare">
+        <strong>Before EYO:</strong> median reply 6 hrs · most overnight enquiries lost by morning.<br>
+        <strong>After EYO:</strong> 4 min worst case · ₦450k caught while you slept.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Kanban -->
+  <div class="kanban-wrap">
+    <div class="kanban-head">
+      <div>
+        <div class="eyebrow" style="color:var(--accent);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Pipeline</div>
+        <div class="panel-title">Leads that need attention</div>
+      </div>
+      <span style="font-size:11px;color:var(--muted);letter-spacing:0.4px;">Drag-to-stage in the live product</span>
+    </div>
+
+    {% set col_new = data.pipeline | selectattr('status', 'equalto', 'new') | list %}
+    {% set col_pending = data.pipeline | selectattr('status', 'equalto', 'pending') | list %}
+    {% set col_replied = data.pipeline | selectattr('status', 'equalto', 'replied') | list %}
+    {% set col_confirmed = data.pipeline | selectattr('status', 'equalto', 'confirmed') | list %}
+
+    <div class="kanban">
+      <div class="col">
+        <div class="col-head"><span class="col-title">New</span><span class="col-count">{{ col_new | length }}</span></div>
+        {% for r in col_new %}
+        <div class="lead-card">
+          <div class="lead-name">{{ r.col1 }}</div>
+          <div class="lead-detail">{{ r.col2 }} · {{ r.col3 }}</div>
+          <div class="lead-chips"><span class="chip chip-reply">Reply ready</span></div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="col">
+        <div class="col-head"><span class="col-title">Drafted</span><span class="col-count">{{ col_replied | length }}</span></div>
+        {% for r in col_replied %}
+        <div class="lead-card">
+          <div class="lead-name">{{ r.col1 }}</div>
+          <div class="lead-detail">{{ r.col2 }} · {{ r.col3 }}</div>
+          <div class="lead-chips"><span class="chip chip-event">Drafted</span></div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="col hot">
+        <div class="col-head"><span class="col-title">Awaiting your tap</span><span class="col-count">{{ col_pending | length }}</span></div>
+        {% for r in col_pending %}
+        <div class="lead-card">
+          <div class="lead-name">{{ r.col1 }}</div>
+          <div class="lead-detail">{{ r.col2 }} · {{ r.col3 }}</div>
+          <div class="lead-chips"><span class="chip chip-hot">🔥 HOT</span></div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="col paid">
+        <div class="col-head"><span class="col-title">Paid</span><span class="col-count">{{ col_confirmed | length }}</span></div>
+        {% for r in col_confirmed %}
+        <div class="lead-card">
+          <div class="lead-name">{{ r.col1 }}</div>
+          <div class="lead-detail">{{ r.col2 }} · {{ r.col3 }}</div>
+          <div class="lead-chips"><span class="chip chip-deposit">Money matched</span></div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="col">
+        <div class="col-head"><span class="col-title">Follow-up</span><span class="col-count">0</span></div>
+        <div style="font-size:11px;color:var(--muted2);font-style:italic;padding:8px 0;">EYO will nudge stale leads automatically.</div>
+      </div>
+    </div>
+  </div>
+
+  {% if not embed %}
+  <div style="margin-top:48px;text-align:center;padding:32px 24px;border-top:1px solid var(--line);">
+    <div style="font-family:Georgia,serif;font-size:24px;font-weight:600;color:var(--ink);margin-bottom:10px;">Want this for your business?</div>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:24px;">Priority applicants get a tailored WhatsApp demo within 48 hours.</p>
+    <a href="/waitlist" style="display:inline-block;background:var(--accent);color:#fff;text-decoration:none;padding:14px 26px;border-radius:100px;font-size:14px;font-weight:700;letter-spacing:0.3px;">Join early access →</a>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+// Count-up animation on metric tiles when they enter view
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = parseFloat(el.dataset.count || '0');
+    const prefix = el.dataset.prefix || '';
+    const suffix = el.dataset.suffix || '';
+    const dur = 800; const start = performance.now();
+    function step(t) {
+      const p = Math.min((t - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const v = target * eased;
+      el.textContent = prefix + (target >= 100 ? Math.round(v) : v.toFixed(1).replace(/\.0$/, '')) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = prefix + (Number.isInteger(target) ? target : target.toFixed(1)) + suffix;
+    }
+    requestAnimationFrame(step);
+    io.unobserve(el);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.tile-value[data-count]').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
