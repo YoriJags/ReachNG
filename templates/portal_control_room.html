@@ -440,6 +440,33 @@
   .lc-val.good strong { color: var(--green); }
   .lc-val.bad strong { color: var(--red); }
 
+  /* Approve / Skip / Edit demo states */
+  .draft-status {
+    display: none;
+    margin-top: 10px;
+    background: var(--green-soft); border: 1px solid rgba(46,125,50,0.30);
+    border-radius: 8px; padding: 9px 12px;
+    align-items: center; gap: 10px;
+    animation: approve-flash 1.6s ease-out;
+  }
+  .draft-card.approved .draft-actions { display: none; }
+  .draft-card.approved .draft-status { display: flex; }
+  .draft-card.approved { border-color: var(--green); }
+  .draft-card.skipped { opacity: 0.4; }
+  .draft-card.skipped .draft-actions { display: none; }
+  .draft-card.editing { border-color: var(--accent); box-shadow: 0 8px 24px rgba(184,92,56,0.18); }
+  .ds-tick {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--green); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .ds-text { font-size: 12px; color: var(--green); font-weight: 700; letter-spacing: 0.2px; }
+  @keyframes approve-flash {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(46,125,50,0); }
+    30% { box-shadow: 0 0 0 6px rgba(46,125,50,0.20); }
+  }
+
   /* Pulse on first pending draft card */
   .draft-card.pulse {
     position: relative;
@@ -556,9 +583,13 @@
           {{ d.draft | truncate(220) }}
         </div>
         <div class="draft-actions">
-          <button class="ba">✓ Approve &amp; send</button>
-          <button class="be">Edit</button>
-          <button class="bs">Skip</button>
+          <button class="ba" onclick="approveDraft(this)">✓ Approve &amp; send</button>
+          <button class="be" onclick="this.closest('.draft-card').classList.add('editing'); this.disabled = true;">Edit</button>
+          <button class="bs" onclick="this.closest('.draft-card').classList.add('skipped');">Skip</button>
+        </div>
+        <div class="draft-status" aria-hidden="true">
+          <div class="ds-tick">✓</div>
+          <div class="ds-text">Sent from your WhatsApp · just now</div>
         </div>
       </div>
       {% endfor %}
@@ -727,22 +758,22 @@
         <div class="lead-card">
           <div class="lead-name">{{ r.col1 }}</div>
           <div class="lead-detail">{{ r.col2 }} · {{ r.col3 }}</div>
-          <div class="lead-chips"><span class="chip chip-reply">Reply ready</span></div>
+          <div class="lead-chips"><span class="chip chip-voice">🎤 voice note</span></div>
         </div>
         {% endfor %}
       </div>
       <div class="col">
-        <div class="col-head"><span class="col-title">Drafted</span><span class="col-count">{{ col_replied | length }}</span></div>
+        <div class="col-head"><span class="col-title">Reply ready</span><span class="col-count">{{ col_replied | length }}</span></div>
         {% for r in col_replied %}
         <div class="lead-card">
           <div class="lead-name">{{ r.col1 }}</div>
           <div class="lead-detail">{{ r.col2 }} · {{ r.col3 }}</div>
-          <div class="lead-chips"><span class="chip chip-event">Drafted</span></div>
+          <div class="lead-chips"><span class="chip chip-reply">draft ready</span></div>
         </div>
         {% endfor %}
       </div>
       <div class="col hot">
-        <div class="col-head"><span class="col-title">Awaiting your tap</span><span class="col-count">{{ col_pending | length }}</span></div>
+        <div class="col-head"><span class="col-title">Awaiting tap</span><span class="col-count">{{ col_pending | length }}</span></div>
         {% for r in col_pending %}
         <div class="lead-card">
           <div class="lead-name">{{ r.col1 }}</div>
@@ -752,18 +783,18 @@
         {% endfor %}
       </div>
       <div class="col paid">
-        <div class="col-head"><span class="col-title">Paid</span><span class="col-count">{{ col_confirmed | length }}</span></div>
+        <div class="col-head"><span class="col-title">Money matched</span><span class="col-count">{{ col_confirmed | length }}</span></div>
         {% for r in col_confirmed %}
         <div class="lead-card">
           <div class="lead-name">{{ r.col1 }}</div>
           <div class="lead-detail">{{ r.col2 }} · {{ r.col3 }}</div>
-          <div class="lead-chips"><span class="chip chip-deposit">Money matched</span></div>
+          <div class="lead-chips"><span class="chip chip-deposit">deposit sent</span></div>
         </div>
         {% endfor %}
       </div>
       <div class="col">
         <div class="col-head"><span class="col-title">Follow-up</span><span class="col-count">0</span></div>
-        <div style="font-size:11px;color:var(--muted2);font-style:italic;padding:8px 0;">EYO will nudge stale leads automatically.</div>
+        <div style="font-size:11px;color:var(--muted2);font-style:italic;padding:8px 0;">EYO nudges stale leads automatically.</div>
       </div>
     </div>
   </div>
@@ -801,6 +832,21 @@ const countIo = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.5 });
 document.querySelectorAll('.tile-value[data-count]').forEach(el => countIo.observe(el));
+
+// Approve / skip handler — flips card into "Sent from your WhatsApp" state
+function approveDraft(btn) {
+  const card = btn.closest('.draft-card');
+  if (!card) return;
+  card.classList.add('approved');
+  card.classList.remove('pulse');
+  // tile increment
+  const draftsTile = document.querySelector('.tile:nth-child(2) .tile-value');
+  if (draftsTile && draftsTile.textContent && !isNaN(parseInt(draftsTile.textContent))) {
+    const cur = parseInt(draftsTile.textContent);
+    if (cur > 0) draftsTile.textContent = cur - 1;
+  }
+}
+window.approveDraft = approveDraft;
 
 // Pulse the first pending draft card (the one needing attention now)
 const firstDraft = document.querySelector('.panel .draft-card');
