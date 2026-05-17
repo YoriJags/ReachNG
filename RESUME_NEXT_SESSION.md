@@ -1,149 +1,97 @@
 # ReachNG — Resume Memo (read this first in a fresh chat)
 
-**Last session: 2026-05-15 EOD. Domain live at www.reachng.ng.**
+**Last audit: 2026-05-17. Domain live at www.reachng.ng (Railway healthy).**
 
-This memo is the single source of truth for: what's shipped, what's broken, what to build next. Open BACKLOG.md afterward for the full queue.
-
----
-
-## 🚨 URGENT — Railway is failing health-check on the latest deploy
-
-**Symptom:** Build succeeds, image pushes, but `/health` never responds. Replica never becomes healthy. Latest deploy attempts:
-- `2026-05-15T15:59 UTC` — 1/1 replicas never became healthy
-
-**Most likely cause:** a Python ImportError at startup. Build log only shows pip output; the actual traceback is in **Railway → Service → "Deploy Logs"** tab (not "Build Logs").
-
-**Steps to fix on resume:**
-1. Open Railway → ReachNG service → **Deploy Logs** (or `railway logs --service reachng` from CLI)
-2. Look for the most recent Python traceback — it'll name the failing import/symbol
-3. Fix the import or remove the offending router registration in `main.py` lines 268-274
-4. The recent additions that are most suspicious:
-   - `from api.copilot import router as copilot_router` (line 273)
-   - `from api.billing import router as billing_router` (line 274)
-   - All files exist locally — issue is probably an import *inside* one of them, or a missing `ensure_*_indexes` call in the lifespan
-5. As a last resort, comment out lines 273-274 (and the matching `app.include_router` calls) — the rest of the system is independent
-
-**Until this is fixed, no further code work should ship — every push will fail the same way.**
+This is the canonical state file. Before claiming anything is "to build," verify against the audit table below — the backlog has been chronically out of date.
 
 ---
 
-## ✅ What's live and working (before the broken deploy)
+## ✅ State of Railway
 
-The previous successful deploy is still serving traffic via Railway's last-good replica or via DNS cache. Confirmed live behaviour:
-
-- **Public landing site** at `www.reachng.ng` — full marketing pages, premium cream/serif design
-- **`/waitlist`** — public form, persists to `waitlist` collection, position number returned, WhatsApp confirmation auto-fires via platform Unipile line
-- **`/portal/{token}`** — client portal with Outcomes Scorecard widget at top + AI Settings (EYO agent name input)
-- **`/dashboard`** — operator Control Tower with Pricing editor, emotion badges on approval queue, HITL approve/edit/skip
-- **`/portal/demo`** + 5 vertical demos — Altitude Lagos, Sapphire Estates, Lagoon British, Adesina & Co, Glow Studio
+**Healthy.** All 33 `ensure_*_indexes` calls log `startup_ok` at boot. `GET /health → 200`. Scheduler running 21 jobs. The defensive `_safe()` wrap in `main.py` lifespan is the fix that held — even if a single index call fails, the server still boots.
 
 ---
 
-## 🏗️ What's been built this run
+## ✅ Fully shipped + wired in production code
 
-### Outcomes Engine — fully shipped (5 layers)
-- Per-client Scorecard (₦ closed, hours saved, response time, approval rate, cost/booking)
-- Quality Metrics + drift alarm (approval rate drop >15pt fires)
-- Cohort Stats endpoint (`/api/v1/cohort-stats`) for landing-page social proof
-- Weekly Owner Digest (Mon 7am Lagos, Haiku-composed, HITL-gated)
-- Milestone Engine (13 milestone types, branded HTML cards, auto-tweet drafter)
+These are done. Do not rebuild. Cross-referenced against actual files / line numbers.
 
-### T0.1 Voice Notes (Whisper)
-- `tools/voice_whisper.py` + audio extractors in `tools/inbound_media.py`
-- Webhook audio branch in `api/webhooks.py` — transcript flows into existing drafter
-- `OPENAI_API_KEY` set on Railway
-
-### T0.2 Emotional Intelligence
-- `services/inbound_classifier.py` — sentiment/stage/urgency on every inbound
-- Injected into `agent/brain.py::handle_payment_reply` + `services/closer/brain.py::draft_next_move`
-- Auto-escalation on angry/complaint/on_fire
-- Dashboard HITL queue renders emotion badges + red banner
-
-### T0.2.5 Usage Quota (partial)
-- `services/usage_meter.py` exists with `meter()` decorator, `check_rate()`, `record()`, `usage_for_client()`, `billing_table()`
-- `api/billing.py` exists with admin endpoints
-- **NOT YET WIRED** into Whisper / Receipt / Classifier / Drafter / Memory call sites
-- Admin Billing dashboard tab not built
-
-### T0.2.6 EYO Custom-named Engine
-- `clients.agent_name` field, default "EYO"
-- `_agent_identity_block()` in `agent/brain.py` — every draft signs off as the named agent
-- Wired into `agent/brain.py` + `services/closer/brain.py`
-- Portal Settings UI for client to rename — shipped in commit `6d02cfa`
-- `/portal/{token}/agent-name` endpoint accepts rename
-
-### T0.3 Predictive Co-pilot (partial)
-- `services/copilot.py` — Haiku planner + 5 tools (quiet_leads / pending_approvals / hot_leads / summarise_week / find_contact) + narrator
-- `api/copilot.py` — `POST /api/v1/copilot/ask` (Basic Auth)
-- **Dashboard chat widget NOT built** — backend exists but no operator UI
-
-### Waitlist System
-- `services/waitlist.py` — add + list + position calc + auto WhatsApp confirmation
-- `api/waitlist.py` — public POST + counter endpoint + admin list/invite
-- `/waitlist` page renders cleanly, form persists, success card shows position
-- Hero CTA + nav CTA all swapped to "Join the waitlist"
-- Live social-proof counter on hero (hidden until >0 signups)
-
-### Pricing Settings Panel
-- `services/platform_settings.py` — generic settings with audit trail
-- `api/platform_settings.py` — GET/POST `/api/v1/admin/pricing`
-- Dashboard Control Tower has live-edit pricing card (no deploy needed)
-
-### Sales Alerter (shipped earlier)
-- Real-time WhatsApp ping to owner when classifier flags a hot/escalated draft
-- Throttled (max 1 alert per contact/client per hour)
-
-### Bank Account Details (shipped earlier)
-- Client doc now has `bank_name`, `bank_account_number`, `bank_account_name`, `payment_pref`, `paystack_link`
-- `_payment_details_block()` in `agent/brain.py` injects payment rail into drafter prompts
-- Drafter quotes bank transfer first (Lagos default), Paystack as secondary option
-
-### Landing Page (story complete)
-- Hero: *"Your customer messaged at 11:47pm. EYO already drafted the reply."*
-- Crystal-clear problem statement section
-- 4-objection killer section (DIY / VA / chatbot / WhatsApp transcription)
-- Three pillars (Instant ack / 19 vertical playbooks / chase-the-money)
-- "Anatomy of a deal closed at 11:47pm" — 6-step Close Engine narrative
-- Pain stories per vertical
-- Appetizer section (Receipt Catcher, Voice Note Listener, Closer, Nurture, Lead Quality Scorer, Owner Brief, HITL)
-- Vertical demo cards
-- Trust pillars
-- Final CTA → waitlist
-- **Design system**: premium cream + burnt-sienna + Instrument Serif + paper-grain bg
+| Item | Location | Wiring |
+|---|---|---|
+| Voice Notes (Whisper) | `tools/voice_whisper.py` | webhook audio branch |
+| Receipt Catcher | `tools/receipt_vision.py` + `services/receipt_match.py` | webhook image branch (`_handle_image_attachment`) |
+| Inbound Media downloader | `tools/inbound_media.py` | Meta + Unipile audio/image |
+| Emotional Intelligence classifier | `services/inbound_classifier.py` | injected before every draft via `agent/brain.py` + closer brain |
+| Predictive Co-pilot | `services/copilot.py` + `api/copilot.py` + dashboard widget at `templates/dashboard.html:10517` | floating bubble + chat panel + 5 tools |
+| Outcome Learning Loop | `services/outcome_learning.py` | `tools/hitl.py:271` + scheduler `sweep_silence_to_miss` + `distil_all_clients` + `tag_from_inbound` in webhooks |
+| Client Memory + Isolation | `services/client_memory.py` | scope-locked reads/writes, nightly isolation test |
+| Knowledge Base | `services/knowledge_base.py` | retrieved at draft time |
+| Client Rules Engine | `services/client_rules.py` | rule-match injected into drafter prompt |
+| Outcomes Engine — Scorecard | `services/scorecard.py` + `api/scorecard.py` | portal widget + admin endpoints + PDF export |
+| Outcomes Engine — Quality Metrics | `services/quality_metrics.py` | nightly drift audit + alert collection |
+| Outcomes Engine — Cohort Stats | `services/cohort_stats.py` | `/api/v1/cohort-stats` public endpoint + landing-page counter |
+| Outcomes Engine — Weekly Digest | `services/weekly_digest.py` | Monday 7am Lagos scheduled |
+| Outcomes Engine — Milestone Engine | `services/milestone_engine.py` | daily milestone sweep + auto-tweet drafter |
+| Sales Alerter | `services/sales_alerter.py` | fired from `tools/hitl.py:164` on hot/escalated drafts |
+| Waitlist + WhatsApp confirm | `services/waitlist.py` + `api/waitlist.py` | `/waitlist` page + confirmation via Unipile |
+| EYO Custom Agent Name | `_agent_identity_block()` in `agent/brain.py` | injected at both drafter entry points |
+| Pricing Settings Panel | `services/platform_settings.py` + `api/platform_settings.py` | Control Tower → Pricing inline editor |
+| Bank account fields | `api/clients.py` (lines 69-72 with NUBAN validation) | injected into drafter via `_payment_details_block` |
+| Closer dashboard tab | `templates/dashboard.html:2811` | lead list + thread view + approve/edit/skip |
+| Lean Scraper (in-house) | `services/lean_scraper.py` | replaces Apify spend in ReachNG pipelines |
+| Landing page rewrite | `templates/marketing/landing.html` | 8 sections, HBR + WhatsApp Nigeria stats, premium positioning |
+| LeanScrape OSS package | `c:/VIIBE/leanscrape/` (separate dir) | local commit done; awaiting `gh repo create` + push |
 
 ---
 
-## 🎯 Next sprint priorities (in order)
+## ⚠️ Partially shipped — finish next
 
-1. **🔥 FIX RAILWAY DEPLOY** (urgent — see top of memo)
-2. **T0.2.5 wire-up** (~1 day) — actually decorate Whisper/Receipt/Classifier/Drafter/Memory with `@meter()` so the existing usage_meter.py records events. Build the Admin Billing dashboard tab so per-client cost/margin is visible.
-3. **T0.3 Co-pilot dashboard widget** (~half day) — backend works, just needs a sidebar chatbox in `templates/dashboard.html` that POSTs to `/api/v1/copilot/ask`.
-4. **T0.4 Outcome Learning Loop** (~3 days) — the moat that compounds. Tag every approved draft, weekly review wins vs misses, auto-tune client prompt.
-5. **T0.5 Proactive Intelligence** (~4 days) — stale-lead revival / festival timing / birthday nudges / capacity nudges / booking reminders.
-6. **T0.2.7 A La Carte Pricing** (~4-5 days) — defer until you have real usage data from #2 above.
+### T0.2.5 — Usage Quota system (cost-control safety net)
 
----
+**Backend:** `services/usage_meter.py` exists (305 lines) with `check_rate()`, `record()`, `usage_for_client()`, `billing_table()`, `meter()` decorator.
 
-## 📁 Where things live
+**API:** `api/billing.py` exists (48 lines) with admin endpoints.
 
-| What | Where |
-|---|---|
-| Active backlog | `BACKLOG.md` |
-| Last deploy commit | `git log -1` |
-| Dashboard | `templates/dashboard.html` |
-| Portal | `templates/portal.html` |
-| Landing site | `templates/marketing/*.html` |
-| Agent prompts | `agent/prompts/*.txt` |
-| Tier-0 services | `services/{scorecard,quality_metrics,cohort_stats,milestone_engine,weekly_digest,client_memory,inbound_classifier,copilot,usage_meter,waitlist,platform_settings,sales_alerter}.py` |
+**Already wired:** `check_rate()` is called inside `services/inbound_classifier.py` and `services/client_memory.py`.
+
+**NOT YET WIRED — this is what's left:**
+1. `@meter` decorator (or inline `check_rate` + `record`) on `tools/voice_whisper.py::transcribe_voice_note` — Whisper costs add up fastest
+2. Same on `tools/receipt_vision.py::extract_receipt` — vision costs are higher per call
+3. Same on `agent/brain.py` drafter calls — every Haiku message-generation call
+4. Admin Billing dashboard tab in `templates/dashboard.html` showing per-client cost + margin + usage trendline
+
+**Est: ~1 day to finish.**
 
 ---
 
-## 🧠 Strategic frames to remember
+## ❌ Genuinely not built
 
-- **EYO is the default agent name.** Clients can rename in portal. Customer-facing replies never say "ReachNG."
-- **Waitlist is the funnel.** No self-serve signup yet. Hand-onboard first batch for wow-quality.
-- **Bank transfer is the default Lagos payment rail.** Paystack is the secondary option, not primary.
-- **HITL is architectural.** Every outbound draft routes through `tools/hitl.py::queue_draft()`. No bypass.
-- **Mongo, not Supabase.** Migration would cost weeks for zero functional gain right now.
+| Item | Effort | Files to create |
+|---|---|---|
+| **T0.5 Proactive Intelligence** | ~4 days | `services/proactive/{stale,festivals,birthdays,capacity,reminders}.py` + scheduler jobs |
+| **Lead Quality Scorer** | ~1 day | `tools/lead_scorer.py` + hook into `campaigns/base.py` queue sort + dashboard column |
+| **Nurture Sequences trigger** | ~1 day | scheduler job in `scheduler.py` + draft-quiet-leads logic in services/closer |
+| **T0.2.7 A La Carte Pricing** | ~4-5 days | `clients.enabled_features` array + `/pricing` configurator UI + feature gating |
+| **Marketing visual overhaul (full re-skin)** | ~half day | re-skin remaining marketing templates beyond landing |
+| **GitHub push for leanscrape** | 5 min | `cd c:/VIIBE/leanscrape && gh repo create leanscrape --public --source=. --push` |
 
-Pick up from #1 (fix Railway) when you resume.
+---
+
+## Next priority
+
+**1. Finish T0.2.5 wire-up + Admin Billing dashboard.** This is the cost-control safety net before any paying client signs up off the waitlist.
+
+After that, the priority order:
+2. Push leanscrape to GitHub (5 min — start the discovery clock)
+3. Lead Quality Scorer (1 day — saves Apify-like spend on cold leads)
+4. Nurture Sequences trigger (1 day — re-closes dead leads)
+5. T0.5 Proactive Intelligence (4 days — the agent-acts-without-being-asked moat)
+6. T0.2.7 A La Carte Pricing (4-5 days — defer until usage data exists)
+
+---
+
+## Reading rules for the next chat
+
+- **Always grep before building.** The backlog has been wrong. Trust the code.
+- **The CLAUDE.md and BACKLOG.md are NOT canonical state.** This file is.
+- **If you're about to start an item:** grep first to confirm it's not already shipped.
