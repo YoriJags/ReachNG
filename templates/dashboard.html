@@ -1886,7 +1886,7 @@ function copyDemoPortalLink(btn){
   <button class="tab-btn" onclick="switchTab('activate', this); loadActivateTab();" title="Lead Resurrection · Missed Opp Radar · Sales Copilot">Activate <span class="tab-badge" id="tab-badge-activate"></span></button>
   <button class="tab-btn" onclick="switchTab('approvals', this)" title="HITL message queue · Replies · Closer · Invoices">Recover <span class="tab-badge" id="tab-badge-approvals"></span></button>
   <button class="tab-btn" onclick="switchTab('clients', this)" title="Client setup · Briefs · Campaigns · Control Tower">Clients</button>
-  <button class="tab-btn" onclick="switchTab('waitlist', this); loadWaitlist();" title="Pilot applications · qualifying signal · pick this week's batch">Pilot Apps <span class="tab-badge" id="tab-badge-waitlist"></span></button>
+  <button class="tab-btn" onclick="switchTab('waitlist', this); loadWaitlist();" title="Early access list · auto-triaged into Priority / Pilot / Qualified / Curious · pick this week's batch">Early Access <span class="tab-badge" id="tab-badge-waitlist"></span></button>
   <button class="tab-btn" onclick="switchTab('tools', this)" title="Discovery health · Signal leads · Tools · Flow">System</button>
 </nav>
 
@@ -3241,9 +3241,9 @@ function copyDemoPortalLink(btn){
 <div class="tab-panel" id="tab-waitlist">
   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;gap:16px;flex-wrap:wrap;">
     <div>
-      <div style="font-size:11px;letter-spacing:1.5px;font-weight:600;color:#7a6a3f;text-transform:uppercase;margin-bottom:6px;">Pre-launch · pilot applications</div>
-      <h2 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#fff;letter-spacing:-0.3px;">Pilot Applications</h2>
-      <div style="color:#8a8a8a;font-size:12px;margin-top:4px;">Pick this week's batch by signal: deal value × enquiry volume × pain match.</div>
+      <div style="font-size:11px;letter-spacing:1.5px;font-weight:600;color:#7a6a3f;text-transform:uppercase;margin-bottom:6px;">Public: early access · Internal: auto-triaged</div>
+      <h2 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#fff;letter-spacing:-0.3px;">Early Access List</h2>
+      <div style="color:#8a8a8a;font-size:12px;margin-top:4px;">Sorted by triage: Priority → Pilot candidate → Qualified → Curious. Pick this week's batch from the top.</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
       <div id="waitlist-stats" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
@@ -5323,6 +5323,12 @@ async function loadWaitlist() {
     const trustLabels = { yes:"Trusts AI", maybe:"Maybe", no:"Skeptical" };
     const trustColors = { yes:"#3fa169", maybe:"#d3a52e", no:"#a23b2a" };
     const valColors = { "5M+":"#3fa169", "500k-5M":"#3fa169", "50k-500k":"#d3a52e", "<50k":"#777" };
+    const triageLabels = { priority_pilot:"🔥 Priority", pilot_candidate:"⭐ Pilot candidate", qualified:"✓ Qualified", curious:"Curious" };
+    const triageColors = { priority_pilot:"#B85C38", pilot_candidate:"#d3a52e", qualified:"#3fa169", curious:"#666" };
+
+    // Sort: priority_pilot → pilot_candidate → qualified → curious, then by position desc
+    const triageRank = { priority_pilot:0, pilot_candidate:1, qualified:2, curious:3 };
+    d.rows.sort((a,b) => (triageRank[a.triage] ?? 9) - (triageRank[b.triage] ?? 9) || (b.position||0) - (a.position||0));
 
     const rowsHtml = d.rows.map(r => {
       const joined = (r.created_at || "").slice(0, 16).replace("T", " ");
@@ -5341,12 +5347,15 @@ async function loadWaitlist() {
       const sampleMsg = r.sample_customer_message ?
         `<div style="margin-top:6px;padding:8px 10px;background:#0a0a0a;border-left:2px solid #B85C38;font-style:italic;color:#ccc;font-size:11px;line-height:1.5;">"${escapeHtml(r.sample_customer_message)}"</div>` : "";
 
+      const triageBadge = r.triage ?
+        `<div style="margin-top:6px;"><span style="display:inline-block;background:${triageColors[r.triage]}22;border:1px solid ${triageColors[r.triage]};color:${triageColors[r.triage]};padding:2px 9px;border-radius:5px;font-size:11px;font-weight:700;letter-spacing:0.3px;">${escapeHtml(triageLabels[r.triage] || r.triage)}</span></div>` : "";
       return `<tr id="wl-row-${r.position}" style="border-top:1px solid #1a1a1a;vertical-align:top;">
         <td style="padding:12px;font-family:Georgia,serif;font-size:16px;font-weight:600;color:#B85C38;">${r.position}</td>
         <td style="padding:12px;">
           <div style="font-weight:600;color:#fff;">${escapeHtml(r.name || "")}</div>
           <div style="color:#999;font-size:11px;">${escapeHtml(r.business_name || "")}${r.city ? " · " + escapeHtml(r.city) : ""}</div>
           <div style="margin-top:4px;"><span style="background:#1a1a1a;border:1px solid #2a2a2a;padding:1px 7px;border-radius:4px;font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;">${escapeHtml(r.vertical || "")}</span></div>
+          ${triageBadge}
         </td>
         <td style="padding:12px;font-size:11px;color:#bbb;line-height:1.6;">${r.phone ? "📱 " + escapeHtml(r.phone) + "<br>" : ""}${r.email ? "✉ " + escapeHtml(r.email) : ""}</td>
         <td style="padding:12px;">

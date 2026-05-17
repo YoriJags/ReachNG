@@ -70,7 +70,7 @@ async def public_join(payload: WaitlistJoin):
         "position":      doc["position"],
         "business_name": doc["business_name"],
         "total_on_list": waitlist_total(),
-        "message":       f"Application received for {doc['business_name']}. EYO will WhatsApp you within 24-48h with a tailored demo.",
+        "message":       f"You're on the early access list. Based on your answers, we may invite you into the first pilot batch.",
     }
 
 

@@ -171,6 +171,23 @@ def add_to_waitlist(
     trust = (trust_ai_draft or "").strip().lower() if (trust_ai_draft or "").strip().lower() in _trust_allowed else None
     sample = (sample_customer_message or "").strip()[:1200] or None
 
+    # Internal triage status — computed from the qualifying signal.
+    # Hidden from the public form (which just says "early access").
+    # Admin dashboard surfaces this so we pick the right batch to onboard.
+    high_value   = val in {"500k-5M", "5M+"}
+    mid_value    = val == "50k-500k"
+    high_volume  = vol in {"20-100", "100+"}
+    trust_ok     = trust in {"yes", "maybe"}
+    has_sample   = bool(sample)
+    if high_value and high_volume and trust_ok and has_sample:
+        triage = "priority_pilot"
+    elif high_value and (high_volume or trust_ok):
+        triage = "pilot_candidate"
+    elif (high_value or (mid_value and high_volume)) or trust_ok:
+        triage = "qualified"
+    else:
+        triage = "curious"
+
     doc = {
         "position":      position,
         "name":          name[:80],
@@ -181,12 +198,14 @@ def add_to_waitlist(
         "city":          (city or "").strip()[:60] or None,
         "brief_pain":    (brief_pain or "").strip()[:600] or None,
         "source":        (source or "direct").strip()[:32],
-        # Pilot-application signal fields
+        # Pilot-application signal fields (collected softly under "help us prioritise")
         "enquiry_volume":          vol,
         "avg_deal_value":          val,
         "top_pains":               pains_clean or None,
         "trust_ai_draft":          trust,
         "sample_customer_message": sample,
+        # Internal triage — never exposed publicly
+        "triage":         triage,
         "created_at":    now,
         "invited_at":    None,
         "signed_up_at":  None,
@@ -273,15 +292,15 @@ def _compose_confirmation_email(name: str, position: int, business_name: str) ->
     """
     first = (name or "").split()[0] if name else ""
     greet = f"Hi {first}," if first else "Hi,"
-    subject = f"Got your pilot application for {business_name}"
+    subject = f"You're on the ReachNG early access list"
 
     text = (
         f"{greet}\n\n"
-        f"EYO here from ReachNG. Got your pilot application for {business_name}.\n\n"
+        f"EYO here from ReachNG. Got you on the early access list for {business_name}.\n\n"
         f"What happens next:\n"
-        f"  1. We're reading every application carefully — picking the Lagos businesses where EYO will create the most revenue.\n"
-        f"  2. Within 24-48 hours I'll WhatsApp you a tailored mini-demo: how EYO would reply to your actual enquiries, in your voice.\n"
-        f"  3. If it lands, we book a 30-min pairing call to connect your WhatsApp number — you're live by the end of it.\n\n"
+        f"  1. We're onboarding Lagos businesses in small batches so the first 30 days feel hand-built.\n"
+        f"  2. Based on your answers, we may invite you into one of the first pilot batches. If so, I'll WhatsApp you within 24-48 hours with a tailored demo — how EYO would reply to your actual enquiries.\n"
+        f"  3. First call is a 30-min pairing where we connect your WhatsApp number — you're live by the end of it.\n\n"
         f"While you wait, the engine runs on realistic Lagos sample data: https://www.reachng.ng/portal/demo\n\n"
         f"Any quick question — just reply to this email.\n\n"
         f"— EYO\n"
@@ -303,23 +322,23 @@ def _compose_confirmation_email(name: str, position: int, business_name: str) ->
           </div>
         </td></tr>
 
-        <!-- pilot banner -->
+        <!-- early access banner -->
         <tr><td style="padding:32px 36px 8px 36px;">
-          <div style="font-size:11px;letter-spacing:1.5px;font-weight:600;color:#7a6a3f;text-transform:uppercase;margin-bottom:8px;">Application received</div>
+          <div style="font-size:11px;letter-spacing:1.5px;font-weight:600;color:#7a6a3f;text-transform:uppercase;margin-bottom:8px;">You're in</div>
           <div style="font-family:Georgia,'Times New Roman',serif;font-size:32px;font-weight:600;line-height:1.15;color:#1a1a1a;">
-            We're reading every pilot application carefully.
+            You're on the early access list.
           </div>
         </td></tr>
 
         <!-- body -->
         <tr><td style="padding:24px 36px 8px 36px;font-size:15px;line-height:1.65;color:#3d3a33;">
           <p style="margin:0 0 16px 0;">{greet}</p>
-          <p style="margin:0 0 16px 0;">EYO here from ReachNG. Got your application for <strong>{business_name}</strong>.</p>
+          <p style="margin:0 0 16px 0;">EYO here from ReachNG. Got you on the list for <strong>{business_name}</strong>.</p>
           <p style="margin:24px 0 12px 0;font-weight:600;color:#1a1a1a;">What happens next</p>
           <ol style="margin:0 0 16px 0;padding-left:20px;">
-            <li style="margin-bottom:8px;">We're hand-picking the Lagos businesses where EYO will create the most revenue right now.</li>
-            <li style="margin-bottom:8px;">Within 24-48 hours I'll WhatsApp you a tailored mini-demo — how EYO would reply to your actual enquiries, in your voice.</li>
-            <li style="margin-bottom:0;">If it lands, we book a 30-min pairing call to connect your WhatsApp number — you're live by the end of it.</li>
+            <li style="margin-bottom:8px;">We're onboarding Lagos businesses in small batches so the first 30 days feel hand-built.</li>
+            <li style="margin-bottom:8px;">Based on your answers, we may invite you into one of the first pilot batches. If so, I'll WhatsApp you within 24-48 hours with a tailored demo.</li>
+            <li style="margin-bottom:0;">First call is a 30-min pairing where we connect your WhatsApp number — you're live by the end of it.</li>
           </ol>
         </td></tr>
 

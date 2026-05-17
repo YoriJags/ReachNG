@@ -1,17 +1,17 @@
 {% extends "marketing/_base.html" %}
 
-{% block title %}Apply for the first Lagos EYO pilot — ReachNG{% endblock %}
-{% block description %}We're hand-picking the first Lagos businesses where EYO creates the most revenue. If your business lives in WhatsApp, apply and we'll show you how EYO would handle your actual enquiries.{% endblock %}
+{% block title %}Join the early access list — ReachNG{% endblock %}
+{% block description %}We're onboarding Lagos businesses in small batches. Tell us a little about your WhatsApp workflow so we can prioritise the businesses EYO can help fastest.{% endblock %}
 
 {% block content %}
 
 <section class="hero" style="padding: 80px 24px 40px;">
-  <div class="eyebrow">Pilot application · 5 Lagos businesses per week · Hand-picked</div>
-  <h1 style="max-width: 820px;">Apply for the first Lagos <em>EYO</em> pilot.</h1>
-  <p class="sub" style="max-width: 660px;">We're hand-picking the Lagos businesses where EYO will create the most revenue right now. Apply below — within 24-48 hours we'll WhatsApp you a tailored mini-demo of how EYO would handle your actual enquiries.</p>
+  <div class="eyebrow">Early access · Small batches · Hand-onboarded · Lagos</div>
+  <h1 style="max-width: 820px;">Join the <em>early access</em> list.</h1>
+  <p class="sub" style="max-width: 660px;">We're onboarding Lagos businesses in small batches. Tell us a little about your WhatsApp workflow so we can prioritise the businesses EYO can help fastest.</p>
   {% if total and total > 0 %}
   <p style="margin-top: 20px; font-size: 13px; color: var(--muted); letter-spacing: 0.04em;">
-    <strong style="color: var(--text-strong);">{{ total }}</strong> Lagos businesses applied so far.
+    <strong style="color: var(--text-strong);">{{ total }}</strong> Lagos businesses already on the list.
   </p>
   {% endif %}
 </section>
@@ -20,15 +20,15 @@
   <div class="inner" style="max-width: 720px;">
 
     <div id="waitlist-success" style="display:none; background:#0e1e10; border:1px solid #2d5a36; border-left:4px solid #5dd28a; border-radius:10px; padding:28px 32px;">
-      <div style="font-size:11px; color:#5dd28a; text-transform:uppercase; letter-spacing:0.18em; font-weight:700; margin-bottom:8px;">Application received</div>
-      <h2 style="margin:0 0 12px; font-size:26px; color:var(--text-strong); letter-spacing:-0.5px;">We're reading every pilot application carefully.</h2>
-      <p style="margin:0 0 12px; color:var(--muted-strong); line-height:1.7;">Within 24-48 hours EYO will WhatsApp you a tailored mini-demo — how it would reply to your actual enquiries, in your voice. If it lands, we book a 30-min pairing call.</p>
+      <div style="font-size:11px; color:#5dd28a; text-transform:uppercase; letter-spacing:0.18em; font-weight:700; margin-bottom:8px;">You're in</div>
+      <h2 style="margin:0 0 12px; font-size:26px; color:var(--text-strong); letter-spacing:-0.5px;">You're on the early access list.</h2>
+      <p style="margin:0 0 12px; color:var(--muted-strong); line-height:1.7;">Based on your answers, we may invite you into the first pilot batch. If so, EYO will WhatsApp you within 24-48 hours with a tailored demo — how it would reply to your actual enquiries.</p>
       <p style="margin:0; color:var(--muted); font-size:13px;">In the meantime: see the agent on the <a href="/portal/demo" target="_blank" style="color:var(--orange);">live Lagos demo</a> — same engine, sample data.</p>
     </div>
 
     <form id="waitlist-form" style="display:grid; gap:18px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px;">
       <h2 style="margin:0 0 4px; font-size:22px; color:var(--text-strong); letter-spacing:-0.3px;">Tell EYO about your business.</h2>
-      <p style="margin: 0 0 12px; color: var(--muted-strong); font-size: 14px;">~2 minutes. The more honest your answers, the better the demo we'll send back.</p>
+      <p style="margin: 0 0 12px; color: var(--muted-strong); font-size: 14px;">~2 minutes. Required fields first, then a few optional questions to help us place you in the right onboarding batch.</p>
 
       <!-- Section: who -->
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px;">
@@ -74,9 +74,10 @@
         </div>
       </div>
 
-      <!-- Section: signal -->
+      <!-- Section: signal — soft framing, hard signal -->
       <div style="border-top:1px solid var(--border); padding-top:18px; margin-top:4px;">
-        <div style="font-size:11px; color:var(--orange); text-transform:uppercase; letter-spacing:0.12em; font-weight:700; margin-bottom:14px;">Where the pain lives</div>
+        <div style="font-size:11px; color:var(--orange); text-transform:uppercase; letter-spacing:0.12em; font-weight:700; margin-bottom:4px;">Help us prioritise</div>
+        <p style="margin:0 0 14px 0; font-size:12px; color:var(--muted);">Optional. This helps us place you in the right onboarding batch.</p>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom:14px;">
           <div>
@@ -132,9 +133,9 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary" style="margin-top:8px;">Submit pilot application →</button>
+      <button type="submit" class="btn btn-primary" style="margin-top:8px;">Join early access →</button>
       <p id="waitlist-error" style="margin:0; font-size:12px; color:#ff7a7a; display:none;"></p>
-      <p style="margin:0; font-size:11px; color:var(--muted); text-align:center;">We'll WhatsApp + email you within 24-48h with a tailored mini-demo. No spam. No newsletters.</p>
+      <p style="margin:0; font-size:11px; color:var(--muted); text-align:center;">We'll WhatsApp + email you when your spot opens. No spam. No newsletters.</p>
     </form>
   </div>
 </section>
