@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     smtp_host: str = Field(default="smtp.gmail.com", env="SMTP_HOST")
     smtp_port: int = Field(default=465, env="SMTP_PORT")
     smtp_use_ssl: bool = Field(default=True, env="SMTP_USE_SSL")
+    # IMAP polling for inbound replies. Default points at Gmail; override
+    # for Go54 / Zoho / cPanel mailboxes via env (e.g. imap.go54mail.com:993).
+    imap_host: str = Field(default="imap.gmail.com", env="IMAP_HOST")
+    imap_port: int = Field(default=993, env="IMAP_PORT")
 
     # Unipile — kept optional for clients still using it in agency mode
     unipile_api_key: str | None = Field(default=None, env="UNIPILE_API_KEY")

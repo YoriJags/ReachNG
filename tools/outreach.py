@@ -291,8 +291,10 @@ async def check_email_replies() -> list[dict]:
     def _poll_imap() -> list[dict]:
         import re
         messages = []
+        imap_host = settings.imap_host
+        imap_port = settings.imap_port
         try:
-            with imaplib.IMAP4_SSL("imap.gmail.com") as mail:
+            with imaplib.IMAP4_SSL(imap_host, imap_port) as mail:
                 mail.login(gmail_address, app_password)
                 mail.select("inbox")
                 _, data = mail.search(None, "UNSEEN")
@@ -319,7 +321,7 @@ async def check_email_replies() -> list[dict]:
                         "body": body[:2000],
                     })
         except Exception as e:
-            log.error("gmail_imap_poll_failed", error=str(e))
+            log.error("imap_poll_failed", host=imap_host, error=str(e))
         return messages
 
     return await asyncio.to_thread(_poll_imap)
