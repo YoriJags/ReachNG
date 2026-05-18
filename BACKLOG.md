@@ -60,7 +60,7 @@ Things that aren't features but block actual paid clients. These matter when the
 
 - [ ] **WhatsApp pairing flow** (~1-2 days) — Critical. Without this, no pilot can go live. Choose: Unipile QR-pair (one mobile scan → number connected) OR Meta Cloud API (more involved, requires business verification). Need a self-serve `/portal/{token}/connect-whatsapp` page that walks the founder through. Today this is manual.
 - [ ] **Onboarding wizard** (~2-3 days) — DEFERRED until 5 pilots inform what to ask. Codex-spec'd: Business Basics → Voice & Tone → Offer & Pricing → Lead Qualification → Approval Rules → Test EYO → Go-Live Checklist. Lives at `/portal/{token}/onboard`. Build this AFTER manual onboarding the first 5.
-- [ ] **Pass-2 guided demo: per-vertical** (~3 hrs) — Today's guided tour at `/portal/demo` is hospitality-only. Build vertical variants for `/portal/demo/real_estate` and `/portal/demo/professional_services` (Banana Island PoF storyline + Greenview Fri-6pm storyline). Education + clinics + small_business deferred until demand signal.
+- [ ] **Pass-2 guided demo: per-vertical** (~3 hrs) — Today's guided tour at `/portal/demo` is hospitality-only. Build vertical variants for `/portal/demo/real_estate` and `/portal/demo/professional_services` (Victoria Island PoF storyline + Greenview Fri-6pm storyline). Education + clinics + small_business deferred until demand signal.
 - [ ] **Education + small_business Control Room overlays** (~2 hrs) — Currently fall back to hospitality overlay. Add overlay entries OR keep hidden from public pills (already done in `744776e`). Build when first signup applies in either vertical.
 - [ ] **Fix #2: Paystack welcome email** (~30 min) — DEFERRED per Codex's "de-emphasize self-serve" call. Wire when self-serve checkout is re-prioritized.
 - [ ] **Fix #3: Inbound email → HITL** (~3-4 hrs) — DEFERRED. Email replies route to dashboard same as WhatsApp inbound. Build when email channel is active for clients.
@@ -117,7 +117,7 @@ Single session pushed the prelaunch funnel from "impressive landing" to a proper
 - [x] Motion: pulse-ring on first pending draft, typing dots, match-flash, scroll-activated timeline dots.
 
 **Tier 2: Per-vertical Control Rooms**
-- [x] `CONTROL_ROOM_OVERLAYS` per vertical in `services/demo_datasets.py`. Hospitality + Real estate (Crown Realty, Banana Island, ₦12M PoF + Zenith ₦12M viewing deposit, diaspora buyer storyline) + Legal (Greenview Partners, Fri 6pm → Mon 7am arc, ₦300k UBA consult fee, conflict check, partner sign-off).
+- [x] `CONTROL_ROOM_OVERLAYS` per vertical in `services/demo_datasets.py`. Hospitality + Real estate (Crown Realty, Victoria Island, ₦12M PoF + Zenith ₦12M viewing deposit, diaspora buyer storyline) + Legal (Greenview Partners, Fri 6pm → Mon 7am arc, ₦300k UBA consult fee, conflict check, partner sign-off).
 - [x] `/portal/demo/{vertical}` redirects to `/portal/demo` if no real dataset (no more silent hospitality fallback under another vertical's name).
 
 **Positioning shift**
@@ -203,7 +203,7 @@ Total ~12 days. Goal: move from "great Lagos SDR" → "addictive, impossible-to-
   - "Who hasn't replied to me in 5 days?" → ranked list
   - "Show me leads I should call today" → 3 names + reasons
   - "Summarise this week" → plain English
-  - "Draft a follow-up to that Banana Island buyer from last month" → ready draft
+  - "Draft a follow-up to that Victoria Island buyer from last month" → ready draft
 
   Built on top of memory + scorecard + Mongo aggregations. Claude Haiku as the planner; the actual lookups are deterministic Mongo queries the agent assembles. Files: new `services/copilot.py` (intent → query plan → execute → narrate), new `api/copilot.py` with `POST /api/v1/copilot/ask`, dashboard sidebar widget.
 
@@ -396,7 +396,7 @@ Risks and gaps surfaced by the 2026-05-09 pressure test. Each is small but compo
 - [ ] **PayNudge** — Google Sheets source + Paystack pay-link on existing `services/debt_collector/`. 1 day.
 - [ ] **HITL draft confidence score** — 1-line Haiku call on each draft → `confidence: high/medium/low` + risk tag. Operator approves 30 in 90s instead of 6 mins. ~$0.0001/draft.
 - [ ] **"Almost lost" widget on client portal** — surfaces expired drafts + after-hours unanswered enquiries. Pure DB query, no new infra. Sells autopilot internally.
-- [ ] **ROI screenshot generator** — auto-PNG "Mercury saved 47h, ₦2.4M tracked this month" client posts to IG/X. Uses existing ReportLab + Pillow.
+- [ ] **ROI screenshot generator** — auto-PNG "Altitude saved 47h, ₦2.4M tracked this month" client posts to IG/X. Uses existing ReportLab + Pillow.
 
 ## P2 — Larger builds (2–5 days)
 

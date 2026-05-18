@@ -172,7 +172,7 @@ async def ask_client_data(client_name: str, question: str) -> dict:
     Claude reasons over their PDFs, spreadsheets, and documents to answer.
 
     Examples:
-    - ask_client_data("Mercury Lagos", "Which nights had the highest revenue last month?")
+    - ask_client_data("Altitude Lagos", "Which nights had the highest revenue last month?")
     - ask_client_data("Apex Haulage", "Which driver had the most breakdowns this year?")
     - ask_client_data("Okafor & Associates", "Find all contracts expiring in the next 90 days")
 

@@ -26,7 +26,7 @@ Same `agent/brain.py`. Same HITL queue. Same playbook DB. Different front-ends.
 3. **Close Deals** — Closer brain, payment links, owner approval queue
 4. **Retain Customers** — birthday/renewal nudges, win-back campaigns, review requests
 
-Verticals stay as **demo language** (Mercury, Sapphire, Lagoon BIS, Adesina, Glow Studio). Internal architecture is workflow-first.
+Verticals stay as **demo language** (Altitude, Sapphire, Lagoon BIS, Adesina, Glow Studio). Internal architecture is workflow-first.
 
 ---
 

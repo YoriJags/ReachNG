@@ -106,7 +106,7 @@ Lift: Google understands what you are without guessing. Faster ranking, eligibil
 Right now if you paste your demo URL into WhatsApp, IG DM, or Twitter, you get a naked link. Add this to every public template:
 
 ```html
-<meta property="og:title" content="ReachNG — Mercury Lagos Demo">
+<meta property="og:title" content="ReachNG — Altitude Lagos Demo">
 <meta property="og:description" content="See how a Lagos rooftop venue handles 47 enquiries / week with zero leakage.">
 <meta property="og:image" content="https://reachng.ng/static/og-mercury.png">
 <meta property="og:url" content="https://www.reachng.ng/portal/demo">
@@ -149,7 +149,7 @@ Don't compete on generic global terms ("AI sales agent", "WhatsApp automation").
 - "Lagos restaurant booking software"
 
 **Long-tail (high intent, low competition):**
-- "Mercury Lagos reservation" (and other branded venue terms — captures returnees)
+- "Altitude Lagos reservation" (and other branded venue terms — captures returnees)
 - "AI for [vertical] Lagos" (5 vertical pages × 5 search terms)
 - "Reservation deposit Paystack restaurant"
 - "Auto reply WhatsApp Lagos"

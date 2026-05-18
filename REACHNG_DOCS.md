@@ -362,7 +362,7 @@ Without a client-specific Unipile account ID, all messages send from YOUR person
 
 ### Demo Portal (`/portal/demo`)
 - Public — no auth
-- Hardcoded sample data (Mercury Real Estate: 47 contacted, 12 replied, 3 converted)
+- Hardcoded sample data (Altitude Real Estate: 47 contacted, 12 replied, 3 converted)
 - Use for pitch decks and investor demos
 
 ---

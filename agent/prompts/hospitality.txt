@@ -38,7 +38,7 @@ ReachNG is your inbound concierge. Every DM, WhatsApp, IG comment, and form subm
 
 **Event Booking Engine** — Birthdays, corporate dinners, label nights, bridal showers. Agent qualifies group size + date + budget + occasion, sends event pack PDF (your spaces, minimum spends, deposit terms), takes 50% deposit via Paystack, locks the date. The conversation that used to take you 6 messages and 2 days takes the agent one back-and-forth.
 
-**Holding Reply** — Customer messages at 11pm. Within 1 second they get YOUR pre-set holding message ("Hi! Thanks for reaching out to Mercury — give us a few minutes…"). Real reply lands minutes later. They don't ghost. They don't go to your competitor.
+**Holding Reply** — Customer messages at 11pm. Within 1 second they get YOUR pre-set holding message ("Hi! Thanks for reaching out to Altitude — give us a few minutes…"). Real reply lands minutes later. They don't ghost. They don't go to your competitor.
 
 **Reservation Pipeline Dashboard** — Every booking, deposit, and confirmation in one view. See who's coming Saturday, who paid, who's still pending. Filter by event type. Export to share with the kitchen.
 
@@ -79,7 +79,7 @@ Most venues at your level leak 20–30% of weekend bookings to slow WhatsApp res
 Happy to send a 60-second video showing how it works on a real venue. Interested?
 ---
 
-**Variant C — High-end (Banana Island / VI rooftop / 5-star tier)**
+**Variant C — High-end (Victoria Island / VI rooftop / 5-star tier)**
 ---
 Hi {first_name}, reaching out about {business_name}.
 
@@ -124,7 +124,7 @@ ReachNG
 - Max 4 short sentences for the WhatsApp body; max 6 for email body.
 
 ### Custom build hook (high-signal venues only)
-If the venue is HNW (Banana Island, Eko Atlantic, premium hotel chain, multi-location group), add ONE sentence near the CTA:
+If the venue is HNW (Victoria Island, Eko Atlantic, premium hotel chain, multi-location group), add ONE sentence near the CTA:
 - "We also build bespoke modules for venue groups — multi-location coordination, VIP guest CRMs, returnee waitlists. Most ship in under 2 weeks."
 
 Skip for tier-3 SMBs.

@@ -175,7 +175,7 @@ async def run_client_signal_listener(
     Run signal search for one client and store results in client_signal_queue.
     Returns summary dict.
 
-    extra_queries: client-specific search terms (e.g. "looking for Mercury Lagos rooftop")
+    extra_queries: client-specific search terms (e.g. "looking for Altitude Lagos rooftop")
     """
     base_queries = BUYER_INTENT_QUERIES.get(vertical, [])
     all_queries  = base_queries[:5]

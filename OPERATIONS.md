@@ -115,14 +115,14 @@ Use the **Client Onboarding** section on the dashboard.
 
 ### Step 1 — Create Brief
 Fill in:
-- **Client name** — e.g. "Mercury Lagos"
+- **Client name** — e.g. "Altitude Lagos"
 - **Vertical** — which industry they're in
 - **Channel** — WhatsApp or Email
 - **Plan** — Starter / Growth / Agency
 - **Brief** — the most important field. Write who they are, what they sell, their tone, and their target customer.
 
 **Good brief example:**
-> Mercury Lagos is a luxury property agency on Victoria Island, Lagos. We sell high-end apartments and duplexes from ₦50M upwards. Our tone is professional, warm, and confident. Target clients: high-net-worth individuals, diaspora buyers, and property investors. We do not target first-time buyers or budgets below ₦30M.
+> Altitude Lagos is a luxury property agency on Victoria Island, Lagos. We sell high-end apartments and duplexes from ₦50M upwards. Our tone is professional, warm, and confident. Target clients: high-net-worth individuals, diaspora buyers, and property investors. We do not target first-time buyers or budgets below ₦30M.
 
 Click **Save Client**. The brief is saved and Steps 2 & 3 are auto-filled.
 
@@ -156,7 +156,7 @@ POST /api/v1/campaigns/run
   "vertical": "real_estate",
   "max_contacts": 30,
   "dry_run": false,
-  "client_name": "Mercury Lagos"   ← optional, for agency mode
+  "client_name": "Altitude Lagos"   ← optional, for agency mode
 }
 ```
 
@@ -275,7 +275,7 @@ Each client gets a private read-only dashboard.
 
 ### Generate the link
 ```http
-POST /api/v1/portal/generate/Mercury Lagos
+POST /api/v1/portal/generate/Altitude Lagos
 → { "portal_url": "/portal/abc123xyz" }
 ```
 
@@ -318,9 +318,9 @@ When a contact says "speak to my colleague" or refers someone, log it:
 ```http
 POST /api/v1/referrals/
 {
-  "referrer_client_name": "Mercury Lagos",
+  "referrer_client_name": "Altitude Lagos",
   "referred_client_name": "Apex Properties",
-  "notes": "Mercury referred via WhatsApp reply"
+  "notes": "Altitude referred via WhatsApp reply"
 }
 ```
 

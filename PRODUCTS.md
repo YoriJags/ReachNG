@@ -102,7 +102,7 @@ Google Maps + DuckDuckGo + Instagram bio scraper + Unipile → cold email/WhatsA
 - `small_business` → pitches ReachNG Closer via Instagram bio scraper + DDG
 - `events`, `hospitality`, `logistics`, `legal`, `fintech`, `agency_sales` → all pitch ReachNG Closer
 
-**Warm/referral path:** Dashboard → Clients tab → "Add Pilot Client" — skips brief gate, generates portal link instantly. For people you know personally (Mercury Lagos etc.).
+**Warm/referral path:** Dashboard → Clients tab → "Add Pilot Client" — skips brief gate, generates portal link instantly. For people you know personally (Altitude Lagos etc.).
 
 This funnel never stops. It's our only top-of-funnel until referrals kick in.
 
