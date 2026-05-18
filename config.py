@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     unipile_email_account_id: str | None = Field(default=None, env="UNIPILE_EMAIL_ACCOUNT_ID")
     unipile_instagram_account_id: str | None = Field(default=None, env="UNIPILE_INSTAGRAM_ACCOUNT_ID")
     unipile_linkedin_account_id: str | None = Field(default=None, env="UNIPILE_LINKEDIN_ACCOUNT_ID")
+    # Shared secret Unipile sends back as X-Notify-Token on hosted-auth completion.
+    # Optional but recommended in production — if unset, webhook routes by name field only.
+    unipile_hosted_notify_token: str | None = Field(default=None, env="UNIPILE_HOSTED_NOTIFY_TOKEN")
 
     # MongoDB
     mongodb_uri: str = Field(..., env="MONGODB_URI")

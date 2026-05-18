@@ -525,6 +525,14 @@
   </div>
 </nav>
 
+{% if not whatsapp_connected %}
+<a href="/portal/{{ token }}/connect-whatsapp" style="display:block;background:linear-gradient(90deg,#1f160a 0%,#2a1a0e 100%);border-bottom:1px solid #ff5c00;color:#ffd2a8;text-decoration:none;padding:14px 24px;text-align:center;font-size:13px;letter-spacing:0.3px;">
+  <strong style="color:#ff7e30;">●&nbsp;&nbsp;Setup needed:</strong>
+  Connect your WhatsApp so EYO can start replying to customers on your behalf.
+  <span style="background:#ff5c00;color:#fff;padding:4px 12px;border-radius:100px;margin-left:10px;font-weight:700;font-size:11px;letter-spacing:0.3px;">Connect now →</span>
+</a>
+{% endif %}
+
 <div class="hero">
   <div class="hero-eyebrow">Client Dashboard</div>
   <h1>{{ client_name }}</h1>

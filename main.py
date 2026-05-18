@@ -287,6 +287,7 @@ from api.waitlist_admin import router as waitlist_admin_router
 from api.copilot import router as copilot_router
 from api.billing import router as billing_router
 from api.pipeline import router as pipeline_router
+from api.whatsapp_connect import router as whatsapp_connect_router
 app.include_router(kb_router)
 app.include_router(client_rules_router)
 app.include_router(scorecard_router)
@@ -296,6 +297,7 @@ app.include_router(waitlist_admin_router)
 app.include_router(copilot_router)
 app.include_router(billing_router)
 app.include_router(pipeline_router)
+app.include_router(whatsapp_connect_router)
 
 app.include_router(dashboard_router, **_auth)
 

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Connect your WhatsApp · ReachNG</title>
+<style>
+  :root {
+    --bg:#FAF6EE; --paper:#fff; --paper-soft:#FBF8F1;
+    --ink:#1a1a1a; --ink2:#3d3a33; --muted:#7a6a3f; --muted2:#9a8e6e;
+    --accent:#B85C38; --accent2:#ff5c00;
+    --line:#E8DEC8; --line-soft:#F1E8D4;
+    --green:#2e7d32; --wa-green:#25D366; --red:#c62828;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+  .topbar {
+    padding: 14px 24px; border-bottom: 1px solid var(--line);
+    background: rgba(250,246,238,0.92); backdrop-filter: blur(10px);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .brand {
+    font-family: Georgia, serif; font-size: 17px; font-weight: 600;
+    color: var(--ink); letter-spacing: -0.3px;
+  }
+  .brand .ng { color: var(--accent); }
+  .back {
+    font-size: 12px; color: var(--muted); font-weight: 600;
+    text-decoration: none; letter-spacing: 0.3px;
+  }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px 24px; }
+
+  .eyebrow {
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    font-weight: 700; color: var(--accent); margin-bottom: 12px;
+  }
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(32px, 5vw, 44px); line-height: 1.1;
+    letter-spacing: -1px; font-weight: 600; color: var(--ink);
+    margin-bottom: 14px;
+  }
+  h1 em { color: var(--accent); font-style: italic; }
+  .lede {
+    font-size: 17px; color: var(--ink2); line-height: 1.65;
+    margin-bottom: 36px; max-width: 560px;
+  }
+
+  .card {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 14px; padding: 32px;
+    margin-bottom: 24px;
+  }
+  .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .card-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--ink); color: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; font-family: Georgia, serif;
+  }
+  .card.done .card-num { background: var(--green); }
+  .card-title {
+    font-family: Georgia, serif; font-size: 19px; font-weight: 600;
+    color: var(--ink); letter-spacing: -0.3px;
+  }
+  .card-body { color: var(--ink2); font-size: 14.5px; line-height: 1.7; }
+  .card-body ol { margin: 14px 0 0 0; padding-left: 22px; }
+  .card-body ol li { margin-bottom: 6px; }
+  .card-body strong { color: var(--ink); }
+
+  .cta-row { margin-top: 22px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--ink); color: var(--bg);
+    border: 0; padding: 13px 24px; border-radius: 100px;
+    font-size: 14px; font-weight: 700; letter-spacing: 0.3px;
+    cursor: pointer; text-decoration: none; display: inline-block;
+  }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-ghost {
+    background: transparent; color: var(--ink2);
+    border: 1px solid var(--line); padding: 12px 20px; border-radius: 100px;
+    font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none;
+  }
+  .meta { font-size: 12px; color: var(--muted); letter-spacing: 0.3px; }
+
+  /* Connected state */
+  .connected-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(46,125,50,0.10); border: 1px solid rgba(46,125,50,0.30);
+    color: var(--green); padding: 6px 14px; border-radius: 100px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .connected-pill::before {
+    content:''; width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+  }
+
+  /* Pending state */
+  .pending-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(184,92,56,0.10); border: 1px solid rgba(184,92,56,0.25);
+    color: var(--accent); padding: 6px 14px; border-radius: 100px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .pending-pill::before {
+    content:''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  .privacy {
+    margin-top: 20px; padding: 16px 18px;
+    background: var(--paper-soft); border-left: 3px solid var(--accent);
+    border-radius: 8px; font-size: 13px; color: var(--ink2); line-height: 1.65;
+  }
+  .privacy strong { color: var(--ink); }
+
+  .error-banner {
+    margin-top: 18px; padding: 12px 16px;
+    background: rgba(198,40,40,0.06); border: 1px solid rgba(198,40,40,0.30);
+    color: var(--red); border-radius: 8px;
+    font-size: 13px; display: none;
+  }
+  .error-banner.show { display: block; }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a href="/portal/{{ token }}" class="brand">Reach<span class="ng">NG</span></a>
+  <a href="/portal/{{ token }}" class="back">← Back to portal</a>
+</nav>
+
+<div class="wrap">
+
+  <div class="eyebrow">{{ client_name }} · Setup step</div>
+  <h1>Connect your <em>WhatsApp</em>.</h1>
+  <p class="lede">EYO replies to customers from <strong>your own WhatsApp number</strong> — never from a ReachNG number. This takes 30 seconds. Same scan flow as WhatsApp Web.</p>
+
+  <!-- Card 1 — Status -->
+  <div class="card" id="status-card">
+    <div class="card-head">
+      <div class="card-num" id="status-num">●</div>
+      <div class="card-title" id="status-title">Checking connection…</div>
+    </div>
+    <div class="card-body" id="status-body">
+      <p style="color:var(--muted);">One moment.</p>
+    </div>
+  </div>
+
+  <!-- Card 2 — How it works -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-num">i</div>
+      <div class="card-title">How the scan works</div>
+    </div>
+    <div class="card-body">
+      <ol>
+        <li>Tap <strong>Generate pairing link</strong> below — we'll open Unipile's secure pairing page in a new tab.</li>
+        <li>On your phone, open WhatsApp → tap <strong>Settings → Linked Devices → Link a Device</strong>.</li>
+        <li>Scan the QR shown on the pairing page. EYO is connected immediately.</li>
+        <li>This page will flip to "Connected ✓" — usually within 5 seconds of the scan.</li>
+      </ol>
+      <p style="margin-top:14px;color:var(--muted);font-size:13px;">QR codes expire after 30 minutes. If yours times out, just tap Generate again.</p>
+    </div>
+  </div>
+
+  <!-- Card 3 — Privacy -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-num">🔒</div>
+      <div class="card-title">What this gives EYO access to</div>
+    </div>
+    <div class="card-body">
+      <div class="privacy">
+        <strong>EYO can read inbound WhatsApp messages and send drafted replies you approve.</strong> That's it. We don't read your group chats, archive your existing messages, or send anything without your tap (unless you explicitly enable Autopilot).
+        <br><br>
+        <strong>To disconnect:</strong> WhatsApp → Settings → Linked Devices → tap "ReachNG" → Log out. Instant cutoff on our end.
+      </div>
+    </div>
+  </div>
+
+  <div class="error-banner" id="error-banner"></div>
+
+</div>
+
+<script>
+const TOKEN = "{{ token }}";
+const STATUS_URL = `/api/v1/portal/${TOKEN}/whatsapp/connect/status`;
+const START_URL  = `/api/v1/portal/${TOKEN}/whatsapp/connect/start`;
+
+const statusNum   = document.getElementById('status-num');
+const statusTitle = document.getElementById('status-title');
+const statusBody  = document.getElementById('status-body');
+const statusCard  = document.getElementById('status-card');
+const errBanner   = document.getElementById('error-banner');
+
+let pollTimer = null;
+let lastStatus = null;
+
+function showError(msg) {
+  errBanner.textContent = msg;
+  errBanner.classList.add('show');
+}
+function clearError() {
+  errBanner.classList.remove('show');
+}
+
+function renderConnected(data) {
+  statusCard.classList.add('done');
+  statusNum.textContent = '✓';
+  statusTitle.textContent = 'WhatsApp connected';
+  statusBody.innerHTML = `
+    <span class="connected-pill">Live</span>
+    <p style="margin-top:12px;color:var(--ink2);">EYO is now drafting replies for inbound customer messages on your WhatsApp number. Every draft routes through your approval queue before sending.</p>
+    <div class="cta-row">
+      <a href="/portal/${TOKEN}" class="btn-primary">Open your portal →</a>
+    </div>`;
+}
+
+function renderPending() {
+  statusNum.textContent = '⏳';
+  statusTitle.textContent = 'Waiting for your scan';
+  statusBody.innerHTML = `
+    <span class="pending-pill">Awaiting scan</span>
+    <p style="margin-top:12px;">A pairing link was generated. Scan the QR in the new tab. This page will flip to <strong>Connected</strong> within 5 seconds of completion.</p>
+    <div class="cta-row">
+      <button class="btn-ghost" onclick="startPairing()">Re-open pairing tab</button>
+      <span class="meta">Polling every 4s</span>
+    </div>`;
+}
+
+function renderNone() {
+  statusNum.textContent = '1';
+  statusTitle.textContent = "Let's connect your number";
+  statusBody.innerHTML = `
+    <p>EYO needs to be paired with your WhatsApp account before it can reply to customer messages. Tap below and we'll generate a one-time pairing link.</p>
+    <div class="cta-row">
+      <button class="btn-primary" id="start-btn" onclick="startPairing()">Generate pairing link →</button>
+      <span class="meta">Opens in a new tab · 30 sec scan</span>
+    </div>`;
+}
+
+async function startPairing() {
+  clearError();
+  const btn = document.getElementById('start-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
+  try {
+    const r = await fetch(START_URL, { method: 'POST' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    if (!data.url) throw new Error('No pairing URL returned');
+    window.open(data.url, '_blank', 'noopener');
+    renderPending();
+    pollStatus();
+  } catch (e) {
+    showError('Could not start pairing: ' + e.message + '. Try again in a moment.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Generate pairing link →'; }
+  }
+}
+
+async function pollStatus() {
+  try {
+    const r = await fetch(STATUS_URL);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    if (data.status !== lastStatus) {
+      lastStatus = data.status;
+      if (data.status === 'connected') {
+        renderConnected(data);
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        return;
+      } else if (data.status === 'pending') {
+        renderPending();
+      } else {
+        renderNone();
+      }
+    }
+  } catch (e) {
+    // Quiet poll — don't spam errors on transient blips
+    console.warn('status poll failed:', e);
+  }
+  // Re-arm the poll loop
+  if (!pollTimer && lastStatus !== 'connected') {
+    pollTimer = setInterval(pollStatus, 4000);
+  }
+}
+
+pollStatus();
+</script>
+
+</body>
+</html>

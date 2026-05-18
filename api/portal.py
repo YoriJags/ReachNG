@@ -388,7 +388,12 @@ async def client_portal(token: str, request: Request):
 
     vertical = vertical_raw.replace("_", " ").title()
     templates = request.app.state.templates
-    return templates.TemplateResponse(request, "portal.html", {"token": token, "client_name": client_name, "vertical": vertical})
+    return templates.TemplateResponse(request, "portal.html", {
+        "token":              token,
+        "client_name":        client_name,
+        "vertical":           vertical,
+        "whatsapp_connected": bool(client.get("whatsapp_account_id")),
+    })
 
 
 @router.get("/{token}/configure", response_class=HTMLResponse)
