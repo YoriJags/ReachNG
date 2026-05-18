@@ -101,6 +101,88 @@ def _agent_identity_block(client_name: Optional[str]) -> str:
     )
 
 
+def _availability_safety_block(client_name: Optional[str]) -> str:
+    """Universal availability safety rail.
+
+    When a customer asks if X is available, the drafter NEVER auto-confirms
+    unless explicit data is in context. Default behavior: 'let me check and
+    revert'. Owner verifies the real availability and edits the draft
+    upward before tapping approve.
+
+    If client.business_brief.availability_notes is set, those notes are
+    injected as facts EYO can cite. Same principle as the receipt-screenshot
+    safety rail: confident claims need verified data, not assumptions.
+
+    For per-item structured availability (planned), reads from
+    client_inventory collection.
+    """
+    safety_rail = (
+        "AVAILABILITY SAFETY RAIL:\n"
+        "When a customer asks if something is available (a table, a property, a slot, "
+        "a date, an appointment, an item), DO NOT auto-confirm availability unless "
+        "explicit availability data appears in this prompt. The default reply is "
+        "conservative: 'Let me check our calendar and confirm in the next few minutes — "
+        "I'll come back with options.' The owner verifies real availability in their "
+        "system and edits the draft upward to 'yes confirmed' BEFORE tapping approve. "
+        "Never invent calendar facts. Never promise a specific slot is open unless the "
+        "facts below explicitly say so."
+    )
+
+    if not client_name:
+        return safety_rail
+
+    notes_block = ""
+    inventory_block = ""
+    try:
+        import re as _re
+        from database import get_db
+        doc = get_db()["clients"].find_one(
+            {"name": {"$regex": f"^{_re.escape(client_name)}$", "$options": "i"}},
+            {"_id": 1, "business_brief.availability_notes": 1},
+        )
+        if doc:
+            cid = str(doc["_id"])
+            bb = doc.get("business_brief") or {}
+            notes = (bb.get("availability_notes") or "").strip()
+            if notes:
+                notes_block = (
+                    "\n\nAVAILABILITY NOTES FROM OWNER (treat as ground truth):\n"
+                    f"{notes}"
+                )
+            # Pull structured inventory if any items exist for this client
+            try:
+                items = list(get_db()["client_inventory"].find(
+                    {"client_id": cid},
+                    {"name": 1, "status": 1, "notes": 1, "category": 1, "valid_until": 1},
+                ).limit(50))
+                if items:
+                    lines = []
+                    for it in items:
+                        status = (it.get("status") or "unknown").upper()
+                        name   = it.get("name") or "(item)"
+                        cat    = it.get("category") or ""
+                        note   = it.get("notes") or ""
+                        until  = it.get("valid_until")
+                        chunks = [f"- {name}"]
+                        if cat:    chunks.append(f"[{cat}]")
+                        chunks.append(f"= {status}")
+                        if note:   chunks.append(f"({note})")
+                        if until:  chunks.append(f"until {str(until)[:10]}")
+                        lines.append(" ".join(chunks))
+                    inventory_block = (
+                        "\n\nSTRUCTURED INVENTORY (per-item status, owner-maintained):\n"
+                        + "\n".join(lines)
+                        + "\n\nRefer to this list when asked about a specific item. "
+                        "If an item isn't listed, do NOT assume — apply the safety rail."
+                    )
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    return safety_rail + notes_block + inventory_block
+
+
 def _resolve_client_id(client_name: Optional[str]) -> Optional[str]:
     """Look up client_id from client_name. Returns None if no match. Cheap lookup."""
     if not client_name:
@@ -371,6 +453,10 @@ def generate_b2c_message(
     payment = _payment_details_block(client_name)
     if payment:
         system = payment + "\n\n" + system
+    # ── Availability safety rail (never auto-confirm without data) ────────
+    availability = _availability_safety_block(client_name)
+    if availability:
+        system = availability + "\n\n" + system
 
     # ── Resolve client_id once for KB / Rules / Memory injection ────────────
     resolved_client_id: Optional[str] = None
@@ -719,7 +805,8 @@ No explanations. No preamble. Just the message.
     client_api = _get_client()
     identity = _agent_identity_block(client_name)
     payment = _payment_details_block(client_name)
-    prefix = "\n\n".join(p for p in [payment, identity] if p)
+    availability = _availability_safety_block(client_name)
+    prefix = "\n\n".join(p for p in [payment, identity, availability] if p)
     layered_system = f"{prefix}\n\n{system}\n\n{_nigerian_context()}" if prefix else f"{system}\n\n{_nigerian_context()}"
     response = client_api.messages.create(
         model="claude-sonnet-4-6",

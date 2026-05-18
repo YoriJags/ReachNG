@@ -110,13 +110,16 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
     # ── Agent identity (T0.2.6) — sign-off name, customer perceives them
     #    as the business's in-house employee, never as "ReachNG".
     try:
-        from agent.brain import _agent_identity_block, _payment_details_block
+        from agent.brain import _agent_identity_block, _payment_details_block, _availability_safety_block
         identity = _agent_identity_block(client_name)
         if identity:
             system_prompt = identity + "\n\n" + system_prompt
         payment = _payment_details_block(client_name)
         if payment:
             system_prompt = payment + "\n\n" + system_prompt
+        availability = _availability_safety_block(client_name)
+        if availability:
+            system_prompt = availability + "\n\n" + system_prompt
     except Exception as _e:
         log.warning("identity_inject_closer_failed", error=str(_e))
     contact_phone = lead.get("contact_phone")

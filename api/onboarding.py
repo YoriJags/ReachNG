@@ -73,7 +73,7 @@ class StepPayload(BaseModel):
 _STEP_FIELDS = {
     1: {"trading_name", "one_liner", "geography", "icp"},
     2: {"tone_overrides", "signature", "never_say", "always_say", "language_mix"},
-    3: {"products", "pricing_rules", "payment_terms"},
+    3: {"products", "pricing_rules", "payment_terms", "availability_notes"},
     4: {"qualifying_questions", "not_a_fit", "red_flags", "closing_action"},
     # Steps 5, 6, 7 don't merge into the brief directly.
 }

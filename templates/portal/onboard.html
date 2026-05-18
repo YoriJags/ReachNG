@@ -291,6 +291,16 @@
       <textarea id="f-payment-terms" rows="3" placeholder="e.g. GTBank · 0123456789 · Altitude Lagos Ltd · Reference: your booking date"></textarea>
       <div class="field-hint">This goes inside drafts. ReachNG never holds your money; payments land directly in your account.</div>
     </div>
+
+    <div class="field">
+      <label>Real-time availability notes <span style="color:var(--orange);font-size:10px;letter-spacing:0.5px;">· EYO checks this before saying "yes available"</span></label>
+      <textarea id="f-availability-notes" rows="5" placeholder="Plain language. Anything you'd tell a new receptionist who answered the phone.&#10;&#10;e.g. Saturdays through May: rooftop fully booked, only patio tables open.&#10;Sunday nights and weeknights: plenty of availability.&#10;VIP private section: booked Sat 18th and 25th. Open all other Saturdays.&#10;Bottle service: always available.&#10;Corporate full-buyout: requires 7 days notice."></textarea>
+      <div class="field-hint">If a customer asks "is X available?" EYO checks this first. If your notes don't cover the question, EYO defaults to "let me confirm and revert" rather than guessing. <strong style="color:var(--ink);">Update this whenever your calendar changes.</strong></div>
+    </div>
+
+    <div class="privacy-note">
+      <strong style="color:var(--ink);">Why this matters:</strong> EYO is conservative by design. Without availability data, it never auto-confirms a slot, table, or unit is open. It says "let me check and revert." Your tap is the verification gate.
+    </div>
   </section>
 
   <!-- ───── Step 4 · Lead Qualification ───── -->
@@ -428,6 +438,7 @@ async function loadStatus() {
     setVal('f-never-say', Array.isArray(brief.never_say) ? brief.never_say.join('\n') : '');
     setVal('f-pricing-rules', brief.pricing_rules);
     setVal('f-payment-terms', brief.payment_terms);
+    setVal('f-availability-notes', brief.availability_notes);
     setVal('f-qualifying', Array.isArray(brief.qualifying_questions) ? brief.qualifying_questions.join('\n') : '');
     setVal('f-closing-action', brief.closing_action);
     setVal('f-not-a-fit', brief.not_a_fit);
@@ -514,6 +525,7 @@ function collectStepData() {
       products: collectProducts(),
       pricing_rules: val('f-pricing-rules'),
       payment_terms: val('f-payment-terms'),
+      availability_notes: val('f-availability-notes'),
     };
   }
   if (currentStep === 4) {

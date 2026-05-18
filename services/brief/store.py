@@ -81,6 +81,12 @@ class BusinessBrief(BaseModel):
     calendar_link: str = ""
     payment_terms: str = ""
 
+    # Real-time availability (free-text, owner-edited)
+    # EYO reads this before claiming anything is "available" — if blank, EYO
+    # defaults to "let me confirm and revert" rather than auto-confirming.
+    # For structured inventory (per-item status), see client_inventory collection.
+    availability_notes: str = ""
+
     # Meta
     updated_at: Optional[datetime] = None
     intake_source: str = "manual"                # "manual" | "ai_assisted" | "imported"
