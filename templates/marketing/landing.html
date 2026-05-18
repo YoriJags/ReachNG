@@ -143,17 +143,17 @@
         </div>
 
         <p style="margin-top:24px;font-size:11px;color:var(--muted);line-height:1.7;letter-spacing:0.2px;">
-          <strong style="color:var(--muted-strong);">Estimate, not a measurement.</strong> Formula: enquiries × deal value × 30%, a conservative working assumption based on the HBR 5-min / 9× finding above. Your actual leakage depends on how fast your team replies today.
+          <strong style="color:var(--muted-strong);">Estimate, not a measurement.</strong> Formula: enquiries × deal value × 10%. The 10% is a working assumption for the share of total enquiries that would have closed faster with sub-5-minute replies, anchored on the HBR 5-min / 9× finding above. Your real figure depends on your current reply time, close rate, and vertical.
         </p>
       </div>
 
       <div style="text-align:center;padding:24px;background:linear-gradient(180deg, rgba(255,85,0,0.04), rgba(255,85,0,0.10));border:1px solid rgba(255,85,0,0.25);border-radius:14px;">
         <div style="font-size:11px;color:var(--orange);letter-spacing:0.15em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">Estimated monthly leak</div>
-        <div id="calc-monthly" style="font-family:Georgia,serif;font-size:clamp(40px, 7vw, 64px);font-weight:600;line-height:1;letter-spacing:-2px;color:var(--text-strong);">₦1.5M</div>
+        <div id="calc-monthly" style="font-family:Georgia,serif;font-size:clamp(40px, 7vw, 64px);font-weight:600;line-height:1;letter-spacing:-2px;color:var(--text-strong);">₦5M</div>
         <div style="margin-top:14px;display:flex;justify-content:center;gap:16px;font-size:12px;color:var(--muted-strong);">
-          <span>Weekly: <strong id="calc-weekly" style="color:var(--text-strong);">₦375k</strong></span>
+          <span>Weekly: <strong id="calc-weekly" style="color:var(--text-strong);">₦1.3M</strong></span>
           <span>·</span>
-          <span>Yearly: <strong id="calc-yearly" style="color:var(--text-strong);">₦18M</strong></span>
+          <span>Yearly: <strong id="calc-yearly" style="color:var(--text-strong);">₦65M</strong></span>
         </div>
 
         <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border);">
@@ -182,7 +182,7 @@
     const monthly = document.getElementById('calc-monthly');
     const weekly = document.getElementById('calc-weekly');
     const yearly = document.getElementById('calc-yearly');
-    const LEAK = 0.30;
+    const LEAK = 0.10;
 
     function fmtN(n) {
       if (n >= 1_000_000_000) return '₦' + (n / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';

@@ -118,10 +118,16 @@ class LeakageCalc(BaseModel):
 async def calculator_leakage(payload: LeakageCalc, request: Request):
     """Compute weekly + monthly revenue leakage and (optionally) email the
     result. Anchor: HBR's "5-minute rule" — leads that wait >5 min are 9x
-    less likely to close. We use 30% as the leakage rate (conservative)
-    for prospects who aren't replying within 5 minutes.
+    less likely to close. We use 10% as the leakage rate. That's a
+    working assumption for the share of total enquiries that would have
+    closed faster with sub-5-min replies (discounted from HBR because
+    not every "would-have-converted" deal goes to a competitor).
     """
-    LEAKAGE_RATE = 0.30  # conservative; the HBR 9x gap implies more
+    # 10% = working assumption for share of total enquiries that would have
+    # closed faster with sub-5-min replies. Anchored on HBR 5-min/9× finding
+    # but discounted because not every "would-have-converted" deal goes to a
+    # competitor (some postpone, some come back). Conservative on purpose.
+    LEAKAGE_RATE = 0.10
     weekly_loss  = int(payload.enquiries_per_week * payload.avg_deal_value_naira * LEAKAGE_RATE)
     monthly_loss = weekly_loss * 4
 
@@ -144,11 +150,11 @@ async def calculator_leakage(payload: LeakageCalc, request: Request):
                 f"EYO here from ReachNG. You ran the WhatsApp leakage calculator for {biz}.\n\n"
                 f"This is an estimate, not a measurement. The maths:\n\n"
                 f"  {payload.enquiries_per_week} enquiries/week × ₦{payload.avg_deal_value_naira:,} avg deal\n"
-                f"  × 30% working assumption for slow-reply leakage\n\n"
+                f"  × 10% working assumption for slow-reply leakage\n\n"
                 f"= roughly:\n\n"
                 f"  • ₦{weekly_loss:,} per week\n"
                 f"  • ₦{monthly_loss:,} per month\n\n"
-                f"Why 30%? HBR found that leads not replied to within 5 minutes are\n"
+                f"Why 10%? HBR found that leads not replied to within 5 minutes are\n"
                 f"9× less likely to close. WhatsApp Business penetration in Nigeria is\n"
                 f"95%+, so customers expect minute-level replies. Most Lagos owners\n"
                 f"can't physically maintain that — and lose the deal to whoever can.\n\n"
@@ -178,11 +184,11 @@ async def calculator_leakage(payload: LeakageCalc, request: Request):
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#FBF8F1;border:1px solid #F1E8D4;border-radius:10px;padding:14px 16px;margin-bottom:18px;">
       <tr><td style="font-size:13px;padding:4px 0;color:#7a6a3f;">Enquiries / week</td><td align="right" style="font-weight:700;">{payload.enquiries_per_week}</td></tr>
       <tr><td style="font-size:13px;padding:4px 0;color:#7a6a3f;">Avg deal value</td><td align="right" style="font-weight:700;">₦{payload.avg_deal_value_naira:,}</td></tr>
-      <tr><td style="font-size:13px;padding:4px 0;color:#7a6a3f;">Conservative leakage</td><td align="right" style="font-weight:700;">30%</td></tr>
+      <tr><td style="font-size:13px;padding:4px 0;color:#7a6a3f;">Working-assumption leakage</td><td align="right" style="font-weight:700;">10%</td></tr>
       <tr><td style="font-size:13px;padding:4px 0;color:#7a6a3f;border-top:1px solid #E8DEC8;padding-top:10px;">Weekly loss</td><td align="right" style="border-top:1px solid #E8DEC8;padding-top:10px;font-weight:700;color:#c62828;">₦{weekly_loss:,}</td></tr>
       <tr><td style="font-size:13px;padding:4px 0;color:#7a6a3f;">Monthly loss</td><td align="right" style="font-weight:700;color:#c62828;">₦{monthly_loss:,}</td></tr>
     </table>
-    <p style="margin:0 0 12px 0;font-weight:600;">Why 30%?</p>
+    <p style="margin:0 0 12px 0;font-weight:600;">Why 10%?</p>
     <p style="margin:0 0 16px 0;">HBR found that leads not replied to within 5 minutes are <strong>9× less likely</strong> to close. Nigeria has 95%+ WhatsApp Business penetration, so customers expect minute-level replies. Most Lagos owners physically can't — and lose the deal to whoever can.</p>
     <p style="margin:24px 0 12px 0;font-weight:600;">What EYO does about it</p>
     <ol style="margin:0 0 18px 0;padding-left:20px;">
