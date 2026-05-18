@@ -50,6 +50,8 @@ class BaseCampaign:
         Returns summary stats.
         """
         settings = get_settings()
+        # Store on instance so _pick_channel can detect mode (self-promotion vs client campaign)
+        self.client_name = client_name
         log.info("campaign_start", vertical=self.vertical, dry_run=dry_run, hitl_mode=hitl_mode, client=client_name)
 
         # Agency mode: pull client config to personalise messages + route via their accounts
@@ -423,6 +425,30 @@ class BaseCampaign:
                     elif channel == "email" and biz.get("phone"):
                         channels_to_queue.insert(0, "whatsapp")
 
+                # Cadence: drop email channel if this address was queued/sent
+                # to within the cooldown window. WhatsApp has its own dedup
+                # via the existing contact 14-day rule.
+                if "email" in channels_to_queue and biz.get("email"):
+                    try:
+                        from services.email_cadence import should_skip_email
+                        verdict = should_skip_email(biz["email"])
+                        if verdict.get("skip"):
+                            channels_to_queue = [c for c in channels_to_queue if c != "email"]
+                            log.info(
+                                "email_cadence_skip",
+                                business=biz.get("name"),
+                                email=biz["email"],
+                                last_at=str(verdict.get("last_at") or ""),
+                                cooldown_days=verdict.get("cooldown_days"),
+                            )
+                    except Exception as _e:
+                        log.warning("email_cadence_check_failed", error=str(_e))
+
+                # If cadence stripped email AND that was the only channel, skip the lead
+                if not channels_to_queue:
+                    skipped_no_channel += 1
+                    continue
+
                 for ch in channels_to_queue:
                     queue_draft(
                         contact_id=contact_id,
@@ -590,7 +616,20 @@ class BaseCampaign:
         return {"vertical": self.vertical, "followups_sent": sent, "errors": errors}
 
     def _pick_channel(self, biz: dict) -> Optional[str]:
-        """Return best available channel for this contact."""
+        """Return best available channel for this contact.
+
+        Two-mode split (per Prospect OS / ReachNG architecture):
+          - Self-promotion mode (no client_name): Yori is prospecting Lagos
+            businesses to pitch ReachNG. Email-only via hello@reachng.ng.
+            WhatsApp deliberately skipped — Unipile isn't paid for yet
+            and won't be until first paid clients. Skip leads with no email.
+          - Client campaign mode (client_name set): the client's own
+            preferred channel logic applies. Both phone and email considered.
+        """
+        if not self.client_name:
+            # Self-promotion / Prospect OS mode — email only
+            return "email" if biz.get("email") else None
+
         if self.preferred_channel == "whatsapp" and biz.get("phone"):
             return "whatsapp"
         if biz.get("email"):

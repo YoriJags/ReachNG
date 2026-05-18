@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     imap_host: str = Field(default="imap.gmail.com", env="IMAP_HOST")
     imap_port: int = Field(default=993, env="IMAP_PORT")
 
+    # SDR email cadence: don't email the same business twice within N days,
+    # even if it appears in overlapping campaigns. Protects sender reputation
+    # and recipient inboxes. Override via env if you need a different window.
+    email_cooldown_days: int = Field(default=14, env="EMAIL_COOLDOWN_DAYS")
+
     # Unipile — kept optional for clients still using it in agency mode
     unipile_api_key: str | None = Field(default=None, env="UNIPILE_API_KEY")
     unipile_dsn: str | None = Field(default=None, env="UNIPILE_DSN")
