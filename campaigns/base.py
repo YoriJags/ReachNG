@@ -307,11 +307,30 @@ class BaseCampaign:
                 # Backfill email from website crawl if Maps didn't return one
                 if enrichment.get("email") and not biz.get("email"):
                     biz["email"] = enrichment["email"]
-                    # Re-evaluate channel now that email is available
-                    channel = self._pick_channel(biz) or channel
                 # Backfill decision-maker from website team page if discovery didn't catch one
                 if not biz.get("contact_name") and enrichment.get("team_names"):
                     biz["contact_name"] = enrichment["team_names"][0]
+
+            # Step 5.6: Email finder fallback — when basic enrichment regex
+            # missed an email (obfuscated "hello [at] domain"), LeanScrape +
+            # Haiku semantic extract. Cached per domain for 30 days to keep
+            # repeat campaigns cheap.
+            if biz.get("website") and not biz.get("email") and not biz.get("source") == "social":
+                try:
+                    from services.email_finder import find_email_for_business
+                    found = await find_email_for_business(biz["website"])
+                    if found and found.get("email"):
+                        biz["email"] = found["email"]
+                        log.info(
+                            "email_finder_backfill",
+                            business=biz["name"], source=found.get("source"),
+                        )
+                except Exception as _e:
+                    log.warning("email_finder_backfill_failed", business=biz.get("name"), error=str(_e))
+
+            # Re-evaluate channel now that email may be available
+            if biz.get("email"):
+                channel = self._pick_channel(biz) or channel
 
             # Step 6: Generate message — social leads get post-aware opener
             try:

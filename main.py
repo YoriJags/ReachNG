@@ -161,6 +161,8 @@ async def lifespan(app: FastAPI):
     _safe("waitlist",    ensure_waitlist_indexes)
     from services.inventory import ensure_inventory_indexes
     _safe("inventory",   ensure_inventory_indexes)
+    from services.email_finder import ensure_email_finder_indexes
+    _safe("email_finder", ensure_email_finder_indexes)
     from services.usage_meter import ensure_usage_indexes
     _safe("usage",       ensure_usage_indexes)
     from api.legal import ensure_legal_indexes as ensure_legal_api_indexes
