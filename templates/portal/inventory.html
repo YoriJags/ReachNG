@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inventory · {{ client_name }} · ReachNG</title>
+<style>
+  :root {
+    --bg:#FAF6EE; --paper:#fff; --paper-soft:#FBF8F1;
+    --ink:#1a1a1a; --ink2:#3d3a33; --muted:#7a6a3f; --muted2:#9a8e6e;
+    --accent:#B85C38; --accent2:#ff5c00;
+    --line:#E8DEC8; --line-soft:#F1E8D4;
+    --green:#2e7d32; --gold:#d3a52e; --red:#c62828;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+  a { color: var(--accent); text-decoration: none; }
+
+  .topbar {
+    padding: 14px 24px; border-bottom: 1px solid var(--line);
+    background: rgba(250,246,238,0.92); backdrop-filter: blur(10px);
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .brand { font-family: Georgia, serif; font-size: 17px; font-weight: 600; color: var(--ink); letter-spacing: -0.3px; }
+  .brand .ng { color: var(--accent); }
+
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 28px 20px 80px 20px; }
+
+  .head { margin-bottom: 24px; }
+  .head .eyebrow { font-size: 11px; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(26px, 4vw, 36px); line-height: 1.15;
+    letter-spacing: -1px; font-weight: 600; color: var(--ink);
+    margin-bottom: 6px;
+  }
+  h1 em { color: var(--accent); font-style: italic; }
+  .head .sub { font-size: 14px; color: var(--ink2); line-height: 1.65; max-width: 720px; }
+
+  .counts { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 24px 0; }
+  .count-pill {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 100px; padding: 6px 14px;
+    font-size: 12px; color: var(--ink2);
+  }
+  .count-pill strong { color: var(--ink); margin-left: 4px; }
+  .count-pill.avail { border-color: rgba(46,125,50,0.3); color: var(--green); }
+  .count-pill.avail strong { color: var(--green); }
+  .count-pill.lim { border-color: rgba(211,165,46,0.4); color: #7a5a10; }
+  .count-pill.lim strong { color: #7a5a10; }
+  .count-pill.no { border-color: rgba(198,40,40,0.3); color: var(--red); }
+  .count-pill.no strong { color: var(--red); }
+
+  .action-row { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .btn {
+    padding: 10px 18px; border-radius: 100px; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.3px; cursor: pointer; border: 0; font-family: inherit;
+  }
+  .btn-primary { background: var(--ink); color: var(--bg); }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-ghost { background: transparent; color: var(--ink2); border: 1px solid var(--line); }
+
+  /* Table */
+  .table-wrap {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 12px 14px; text-align: left; font-size: 13px; vertical-align: middle; }
+  th { background: var(--paper-soft); color: var(--muted); font-weight: 700; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid var(--line); }
+  tr + tr td { border-top: 1px solid var(--line-soft); }
+  .name-input, .cat-input, .notes-input, .until-input {
+    width: 100%; background: transparent; border: 1px solid transparent;
+    padding: 8px 10px; border-radius: 6px; font-family: inherit; font-size: 13px; color: var(--ink);
+  }
+  .name-input:hover, .cat-input:hover, .notes-input:hover, .until-input:hover { background: var(--paper-soft); }
+  .name-input:focus, .cat-input:focus, .notes-input:focus, .until-input:focus { background: var(--paper-soft); border-color: var(--accent); outline: none; }
+  .status-select {
+    padding: 4px 10px; border-radius: 100px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.4px;
+    border: 1px solid var(--line); background: var(--paper);
+    cursor: pointer; font-family: inherit;
+  }
+  .status-select.avail { background: rgba(46,125,50,0.10); color: var(--green); border-color: rgba(46,125,50,0.3); }
+  .status-select.lim { background: rgba(211,165,46,0.10); color: #7a5a10; border-color: rgba(211,165,46,0.4); }
+  .status-select.no { background: rgba(198,40,40,0.08); color: var(--red); border-color: rgba(198,40,40,0.3); }
+  .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+  .icon-btn {
+    background: transparent; color: var(--muted2); border: 1px solid var(--line);
+    width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 13px;
+  }
+  .icon-btn:hover { color: var(--red); border-color: var(--red); }
+  .icon-btn.save { color: var(--green); border-color: rgba(46,125,50,0.3); }
+  .icon-btn.save:hover { background: rgba(46,125,50,0.10); }
+
+  .empty {
+    padding: 60px 24px; text-align: center; color: var(--muted2);
+  }
+  .empty .big { font-family: Georgia, serif; font-size: 22px; color: var(--ink); margin-bottom: 8px; font-style: italic; }
+
+  .save-pill { font-size: 11px; color: var(--green); display: none; align-items: center; gap: 6px; }
+  .save-pill.show { display: inline-flex; }
+  .save-pill::before { content:''; width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+
+  .privacy-note {
+    margin-top: 24px; padding: 16px 20px;
+    background: var(--paper-soft); border-left: 3px solid var(--accent);
+    border-radius: 8px; font-size: 13px; color: var(--ink2); line-height: 1.65;
+  }
+
+  @media (max-width: 720px) {
+    th:nth-child(4), td:nth-child(4),
+    th:nth-child(5), td:nth-child(5) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a href="/portal/{{ token }}" class="brand">Reach<span class="ng">NG</span></a>
+  <span class="save-pill" id="save-pill">✓ Saved</span>
+  <a href="/portal/{{ token }}" style="font-size: 12px; color: var(--muted); font-weight: 600;">← Portal home</a>
+</nav>
+
+<div class="wrap">
+  <div class="head">
+    <div class="eyebrow">{{ client_name }} · Real-time inventory</div>
+    <h1>Tell EYO what's <em>available</em> right now.</h1>
+    <p class="sub">When a customer asks "is this available?", EYO checks this list before answering. Anything you mark <strong style="color:var(--green);">available</strong> can be quoted with confidence. Anything <strong style="color:#7a5a10;">limited</strong> EYO will mention with a caveat. Anything <strong style="color:var(--red);">unavailable</strong> EYO will route to an alternative.</p>
+  </div>
+
+  <div class="counts" id="counts"></div>
+
+  <div class="action-row">
+    <button class="btn btn-primary" onclick="addRow()">+ Add item</button>
+    <button class="btn btn-ghost" onclick="reload()">↻ Refresh</button>
+  </div>
+
+  <div class="table-wrap">
+    <table id="inventory-table">
+      <thead>
+        <tr>
+          <th style="width: 28%;">Item / service</th>
+          <th style="width: 16%;">Category</th>
+          <th style="width: 14%;">Status</th>
+          <th style="width: 28%;">Notes (EYO can quote)</th>
+          <th style="width: 110px;">Valid until</th>
+          <th style="width: 80px; text-align: right;"></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <div class="privacy-note">
+    <strong style="color:var(--ink);">Why this exists:</strong> EYO is conservative by design. Without inventory data, it never auto-confirms a slot, table, or unit is open. By keeping this list current, you let EYO answer with certainty in the moments customers expect a fast yes. Anything not in the list defaults to <em>"let me check and revert"</em> + a ping to you.
+  </div>
+
+</div>
+
+<script>
+const TOKEN  = "{{ token }}";
+const LIST_URL    = `/api/v1/portal/${TOKEN}/inventory`;
+const CREATE_URL  = `/api/v1/portal/${TOKEN}/inventory`;
+const UPDATE_URL  = id => `/api/v1/portal/${TOKEN}/inventory/${id}`;
+const DELETE_URL  = id => `/api/v1/portal/${TOKEN}/inventory/${id}`;
+const STATUSES = [
+  ["available", "Available"],
+  ["limited", "Limited"],
+  ["unavailable", "Unavailable"],
+];
+function statusClass(s) { return s === "available" ? "avail" : s === "limited" ? "lim" : "no"; }
+
+function escapeAttr(s) { return (s || "").toString().replace(/"/g,"&quot;"); }
+function escapeHtml(s) { return (s || "").toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+async function reload() {
+  try {
+    const r = await fetch(LIST_URL);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const d = await r.json();
+    renderCounts(d.counts || {});
+    renderRows(d.items || []);
+  } catch (e) {
+    alert("Could not load inventory: " + e.message);
+  }
+}
+
+function renderCounts(c) {
+  document.getElementById("counts").innerHTML = `
+    <span class="count-pill">Total <strong>${c.total||0}</strong></span>
+    <span class="count-pill avail">Available <strong>${c.available||0}</strong></span>
+    <span class="count-pill lim">Limited <strong>${c.limited||0}</strong></span>
+    <span class="count-pill no">Unavailable <strong>${c.unavailable||0}</strong></span>`;
+}
+
+function renderRows(items) {
+  const tbody = document.getElementById("rows");
+  if (!items.length) {
+    tbody.innerHTML = `
+      <tr><td colspan="6">
+        <div class="empty">
+          <div class="big">Nothing here yet.</div>
+          <div>Add a few items so EYO knows what's currently available. Try "Saturday 9pm DJ booth", "VIP table for 6", "3-bed Victoria Island unit", whatever applies.</div>
+        </div>
+      </td></tr>`;
+    return;
+  }
+  tbody.innerHTML = items.map(rowHtml).join("");
+}
+
+function rowHtml(r) {
+  const isNew = !r._id;
+  const dataId = isNew ? "" : `data-id="${r._id}"`;
+  const status = r.status || "available";
+  const validUntil = (r.valid_until || "").slice(0, 10);
+  return `
+    <tr ${dataId}>
+      <td><input class="name-input" placeholder="e.g. Sat 9pm DJ-booth table" value="${escapeAttr(r.name)}" data-key="name"></td>
+      <td><input class="cat-input" placeholder="Table / Property / Slot" value="${escapeAttr(r.category)}" data-key="category"></td>
+      <td>
+        <select class="status-select ${statusClass(status)}" data-key="status" onchange="onStatusChange(this)">
+          ${STATUSES.map(([v, l]) => `<option value="${v}" ${v===status?"selected":""}>${l}</option>`).join("")}
+        </select>
+      </td>
+      <td><input class="notes-input" placeholder="e.g. Booked Apr-May. Patio table free." value="${escapeAttr(r.notes)}" data-key="notes"></td>
+      <td><input class="until-input" type="date" value="${validUntil}" data-key="valid_until" title="Optional. Status auto-expires after this date."></td>
+      <td class="row-actions">
+        <button class="icon-btn save" title="Save" onclick="saveRow(this)">✓</button>
+        <button class="icon-btn" title="Delete" onclick="deleteRow(this)">×</button>
+      </td>
+    </tr>`;
+}
+
+function addRow() {
+  const tbody = document.getElementById("rows");
+  // Strip the empty state if there
+  if (tbody.querySelector(".empty")) tbody.innerHTML = "";
+  tbody.insertAdjacentHTML("beforeend", rowHtml({
+    name: "", category: "", status: "available", notes: "", valid_until: "",
+  }));
+  // Focus the new name input
+  const last = tbody.lastElementChild.querySelector(".name-input");
+  if (last) last.focus();
+}
+
+function onStatusChange(sel) {
+  sel.className = "status-select " + statusClass(sel.value);
+}
+
+function readRow(tr) {
+  const obj = {};
+  tr.querySelectorAll("[data-key]").forEach(el => {
+    const k = el.dataset.key;
+    let v = el.value;
+    if (k === "valid_until" && v) {
+      // Send as ISO with midnight
+      v = v + "T00:00:00.000Z";
+    }
+    obj[k] = v;
+  });
+  return obj;
+}
+
+async function saveRow(btn) {
+  const tr = btn.closest("tr");
+  const payload = readRow(tr);
+  if (!payload.name || payload.name.trim().length < 1) {
+    alert("Item name is required.");
+    return;
+  }
+  if (!payload.valid_until) delete payload.valid_until;
+  const id = tr.dataset.id;
+  btn.textContent = "…";
+  try {
+    let r;
+    if (id) {
+      r = await fetch(UPDATE_URL(id), {
+        method: "PUT", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload),
+      });
+    } else {
+      r = await fetch(CREATE_URL, {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload),
+      });
+      if (r.ok) {
+        const d = await r.json();
+        if (d.item_id) tr.setAttribute("data-id", d.item_id);
+      }
+    }
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    btn.textContent = "✓";
+    showSaved();
+    reload();
+  } catch (e) {
+    alert("Save failed: " + e.message);
+    btn.textContent = "✓";
+  }
+}
+
+async function deleteRow(btn) {
+  const tr = btn.closest("tr");
+  const id = tr.dataset.id;
+  if (!id) { tr.remove(); return; }
+  if (!confirm("Remove this item from EYO's inventory?")) return;
+  try {
+    const r = await fetch(DELETE_URL(id), { method: "DELETE" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    tr.remove();
+    showSaved();
+    reload();
+  } catch (e) {
+    alert("Delete failed: " + e.message);
+  }
+}
+
+function showSaved() {
+  const p = document.getElementById("save-pill");
+  p.classList.add("show");
+  setTimeout(() => p.classList.remove("show"), 1500);
+}
+
+reload();
+</script>
+
+</body>
+</html>

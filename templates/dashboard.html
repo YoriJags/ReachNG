@@ -5567,6 +5567,7 @@ async function refreshRoster() {
           ${portalToken ? `<button class="btn" style="font-size:11px;padding:4px 10px;background:#0e1a14;color:#00e5a0;border:1px solid #00e5a044;" onclick="openPortalEmbed('${portalToken}','${encodeURIComponent(c.name)}')">View Portal</button>` : ''}
           ${portalToken ? `<button class="btn" style="font-size:11px;padding:4px 10px;background:${c.onboarded_at ? '#1e2530' : '#2a1a0e'};color:${c.onboarded_at ? '#aaa' : '#ff7e30'};border:1px solid ${c.onboarded_at ? '#2a3340' : '#ff5c0044'};" onclick="window.open('/portal/${portalToken}/onboard','_blank','noopener')" title="${c.onboarded_at ? 'Onboarded — open the wizard to edit' : 'Not onboarded — launch the setup wizard'}">${c.onboarded_at ? '🧰 Setup' : '🧰 Onboard'}</button>` : ''}
           ${portalToken ? `<button class="btn" style="font-size:11px;padding:4px 10px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="window.open('/portal/${portalToken}/configure','_blank','noopener')" title="Open Configure panel (KB / Rules / Scenarios)">⚙ Configure</button>` : ''}
+          ${portalToken ? `<button class="btn" style="font-size:11px;padding:4px 10px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="window.open('/portal/${portalToken}/inventory','_blank','noopener')" title="Update availability (EYO checks this before answering)">📋 Inventory</button>` : ''}
         </td>
       </tr>`;
     }).join("");
@@ -6094,6 +6095,7 @@ async function loadControlTower() {
             <button class="ct-btn ${c.onboarded_at ? '' : 'primary'}" onclick="adminLaunchClientUrl('${c.name.replace(/'/g,"\\'")}', '/onboard')" title="${c.onboarded_at ? 'Onboarded — open setup wizard to edit brief' : 'Not onboarded yet — launch the setup wizard'}">${c.onboarded_at ? '🧰' : '🧰 Onboard'}</button>
             <button class="ct-btn" onclick="adminLaunchClientUrl('${c.name.replace(/'/g,"\\'")}', '')" title="Open this client's portal home">🏠</button>
             <button class="ct-btn" onclick="adminLaunchClientUrl('${c.name.replace(/'/g,"\\'")}', '/configure')" title="Open the operator's Configure panel (KB / Rules / Scenarios)">⚙</button>
+            <button class="ct-btn" onclick="adminLaunchClientUrl('${c.name.replace(/'/g,"\\'")}', '/inventory')" title="Update what's currently available (EYO reads this before claiming yes)">📋</button>
           </div>
         </div>`;
       }).join("");

@@ -159,6 +159,8 @@ async def lifespan(app: FastAPI):
     _safe("sales_alert", ensure_sales_alert_indexes)
     from services.waitlist import ensure_waitlist_indexes
     _safe("waitlist",    ensure_waitlist_indexes)
+    from services.inventory import ensure_inventory_indexes
+    _safe("inventory",   ensure_inventory_indexes)
     from services.usage_meter import ensure_usage_indexes
     _safe("usage",       ensure_usage_indexes)
     from api.legal import ensure_legal_indexes as ensure_legal_api_indexes
@@ -289,6 +291,7 @@ from api.billing import router as billing_router
 from api.pipeline import router as pipeline_router
 from api.whatsapp_connect import router as whatsapp_connect_router
 from api.onboarding import router as onboarding_router
+from api.inventory import router as inventory_router
 app.include_router(kb_router)
 app.include_router(client_rules_router)
 app.include_router(scorecard_router)
@@ -300,6 +303,7 @@ app.include_router(billing_router)
 app.include_router(pipeline_router)
 app.include_router(whatsapp_connect_router)
 app.include_router(onboarding_router)
+app.include_router(inventory_router)
 
 app.include_router(dashboard_router, **_auth)
 
