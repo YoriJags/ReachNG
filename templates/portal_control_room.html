@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EYO Control Room — {{ data.brand }} · ReachNG</title>
-<meta name="description" content="Sample EYO Control Room — overnight signals, awaiting taps, money matched, leaks. Sample Lagos data.">
+<title>EYO Control Room · {{ data.brand }} · ReachNG</title>
+<meta name="description" content="Sample EYO Control Room. Overnight signals, awaiting taps, money matched, leaks. Sample Lagos data.">
 <style>
   :root {
     --bg: #FAF6EE; --bg2: #F5EFE0;
@@ -301,7 +301,7 @@
   .chip-reply { background: rgba(184,92,56,0.10); color: var(--accent); border: 1px solid rgba(184,92,56,0.25); }
   .chip-event { background: rgba(0,0,0,0.05); color: #555; border: 1px solid rgba(0,0,0,0.08); }
 
-  /* Money panel — receipt extraction visualised */
+  /* Money panel: receipt extraction visualised */
   .panel-count.good { color: var(--green); background: var(--green-soft); border-color: rgba(46,125,50,0.30); }
   .mini-receipt {
     background: linear-gradient(135deg, #fff8e1, #fff3c4);
@@ -796,7 +796,7 @@ const countIo = new IntersectionObserver((entries) => {
 }, { threshold: 0.5 });
 document.querySelectorAll('.tile-value[data-count]').forEach(el => countIo.observe(el));
 
-// Approve / skip handler — flips card into "Sent from your WhatsApp" state
+// Approve / skip handler. Flips card into "Sent from your WhatsApp" state.
 function approveDraft(btn) {
   const card = btn.closest('.draft-card');
   if (!card) return;
