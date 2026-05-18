@@ -1,17 +1,17 @@
 {% extends "marketing/_base.html" %}
 
 {% block title %}Join the early access list · ReachNG{% endblock %}
-{% block description %}We're onboarding Lagos businesses in small batches. Tell us a little about your WhatsApp workflow so we can prioritise the businesses EYO can help fastest.{% endblock %}
+{% block description %}We're onboarding Lagos and Abuja businesses in small batches. Tell us a little about your WhatsApp workflow so we can prioritise the businesses EYO can help fastest.{% endblock %}
 
 {% block content %}
 
 <section class="hero" style="padding: 80px 24px 40px;">
-  <div class="eyebrow">Early access · Small batches · Hand-onboarded · Lagos</div>
+  <div class="eyebrow">Early access · Small batches · Hand-onboarded · Lagos &amp; Abuja</div>
   <h1 style="max-width: 820px;">Join the <em>early access</em> list.</h1>
-  <p class="sub" style="max-width: 660px;">We're onboarding Lagos businesses in small batches. Tell us a little about your WhatsApp workflow so we can prioritise the businesses EYO can help fastest.</p>
+  <p class="sub" style="max-width: 660px;">We're onboarding Lagos and Abuja businesses in small batches. Tell us a little about your WhatsApp workflow so we can prioritise the businesses EYO can help fastest.</p>
   {% if total and total > 0 %}
   <p style="margin-top: 20px; font-size: 13px; color: var(--muted); letter-spacing: 0.04em;">
-    <strong style="color: var(--text-strong);">{{ total }}</strong> Lagos businesses already on the list.
+    <strong style="color: var(--text-strong);">{{ total }}</strong> Lagos &amp; Abuja businesses already on the list.
   </p>
   {% endif %}
 </section>
@@ -23,7 +23,7 @@
       <div style="font-size:11px; color:#5dd28a; text-transform:uppercase; letter-spacing:0.18em; font-weight:700; margin-bottom:8px;">You're in</div>
       <h2 style="margin:0 0 12px; font-size:26px; color:var(--text-strong); letter-spacing:-0.5px;">You're on the early access list.</h2>
       <p style="margin:0 0 12px; color:var(--muted-strong); line-height:1.7;">Based on your answers, we may invite you into the first pilot batch. Priority applicants get a tailored WhatsApp demo within 48 hours, showing how the operator would carry your actual conversations.</p>
-      <p style="margin:0; color:var(--muted); font-size:13px;">In the meantime, see the operator on the <a href="/portal/demo" target="_blank" style="color:var(--orange);">live Lagos demo</a>. Same engine, sample data.</p>
+      <p style="margin:0; color:var(--muted); font-size:13px;">In the meantime, see the operator on the <a href="/portal/demo" target="_blank" style="color:var(--orange);">live demo</a>. Same engine, sample data.</p>
     </div>
 
     <form id="waitlist-form" style="display:grid; gap:18px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px;">
@@ -70,7 +70,7 @@
         </div>
         <div>
           <label style="font-size:11px; color:var(--muted); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">City</label>
-          <input type="text" name="city" placeholder="Lagos" maxlength="60" style="width:100%; padding:11px 13px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; font-family:inherit;">
+          <input type="text" name="city" placeholder="Lagos or Abuja" maxlength="60" style="width:100%; padding:11px 13px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; font-family:inherit;">
         </div>
       </div>
 
