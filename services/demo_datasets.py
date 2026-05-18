@@ -350,7 +350,7 @@ CONTROL_ROOM_HOSPITALITY = {
         "bank":          "GTBank",
         "amount_text":   "₦450,000.00",
         "from":          "BOLA O. OLAJIDE",
-        "to":            "MERCURY LAGOS LTD",
+        "to":            "ALTITUDE LAGOS LTD",
         "ref":           "TABLE BOOKING SAT",
         "match_ref":     "#MER-2614",
         "match_detail":  "Sat 9pm · DJ booth · ₦450k deposit",
