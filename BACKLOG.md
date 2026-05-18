@@ -60,6 +60,8 @@ Things that aren't features but block actual paid clients. These matter when the
 
 - [ ] **WhatsApp pairing flow** (~1-2 days) — Critical. Without this, no pilot can go live. Choose: Unipile QR-pair (one mobile scan → number connected) OR Meta Cloud API (more involved, requires business verification). Need a self-serve `/portal/{token}/connect-whatsapp` page that walks the founder through. Today this is manual.
 
+- [ ] **SPIKE: deliver Owner Brief via the client's own "Message Yourself" chat** (~30 min experiment) — Raised 2026-05-18. WhatsApp's 2022+ "Me" chat is a thread every user has with their own number for personal notes. Idea: instead of sending the morning brief from ReachNG's dedicated WA number (current plan, second contact in their phone), inject it into the client's own "Me" chat via the paired Unipile session. Pros: zero second-contact friction, brief appears in the surface they already open daily. Risks: (a) WhatsApp may filter or no-op self-sends from third-party APIs; (b) message would appear as sent BY the user themselves, possibly confusing; (c) anti-spam flags could disconnect EYO. Spike scope: paired test account, send one message to self via Unipile, observe delivery + UI rendering + account health over 24h. Decide path after data. Until then, current "ReachNG dedicated WA business line" plan stands.
+
 ---
 
 ## P0 Principle — Receipt acknowledgments are conditional, not confirmatory (raised 2026-05-18)

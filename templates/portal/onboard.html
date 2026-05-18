@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Set up EYO · {{ client_name }} · ReachNG</title>
+<style>
+  :root {
+    --bg:#FAF6EE; --paper:#fff; --paper-soft:#FBF8F1;
+    --ink:#1a1a1a; --ink2:#3d3a33; --muted:#7a6a3f; --muted2:#9a8e6e;
+    --accent:#B85C38; --accent2:#ff5c00;
+    --line:#E8DEC8; --line-soft:#F1E8D4;
+    --green:#2e7d32; --gold:#d3a52e; --red:#c62828;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; line-height: 1.55;
+  }
+  a { color: var(--accent); text-decoration: none; }
+
+  .topbar {
+    padding: 14px 24px; border-bottom: 1px solid var(--line);
+    background: rgba(250,246,238,0.92); backdrop-filter: blur(10px);
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .brand { font-family: Georgia, serif; font-size: 17px; font-weight: 600; color: var(--ink); letter-spacing: -0.3px; }
+  .brand .ng { color: var(--accent); }
+  .save-pill { font-size: 11px; color: var(--green); display: none; align-items: center; gap: 6px; }
+  .save-pill.show { display: inline-flex; }
+  .save-pill::before { content:''; width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px 20px; }
+
+  /* Progress rail */
+  .rail {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+    margin-bottom: 36px;
+  }
+  .rail-step {
+    height: 4px; background: var(--line); border-radius: 2px;
+    transition: background 0.3s ease;
+  }
+  .rail-step.done { background: var(--green); }
+  .rail-step.current { background: var(--accent); }
+  .rail-meta { margin-bottom: 8px; font-size: 11px; color: var(--muted); letter-spacing: 1.2px; text-transform: uppercase; font-weight: 600; }
+
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(26px, 4vw, 36px); line-height: 1.15;
+    letter-spacing: -1px; font-weight: 600; color: var(--ink);
+    margin-bottom: 8px;
+  }
+  h1 em { color: var(--accent); font-style: italic; }
+  .step-sub { font-size: 15px; color: var(--ink2); line-height: 1.65; margin-bottom: 28px; }
+
+  /* Form fields */
+  .field { margin-bottom: 20px; }
+  .field label {
+    display: block; font-size: 12px; color: var(--muted); letter-spacing: 0.08em;
+    text-transform: uppercase; font-weight: 600; margin-bottom: 8px;
+  }
+  .field-hint { font-size: 12px; color: var(--muted2); margin-top: 6px; line-height: 1.55; }
+  .field input[type="text"], .field input[type="email"], .field input[type="tel"],
+  .field textarea, .field select {
+    width: 100%; background: var(--paper); border: 1px solid var(--line);
+    border-radius: 8px; padding: 11px 13px; color: var(--ink); font-size: 14px;
+    font-family: inherit; transition: border-color 0.15s ease;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .field textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
+
+  /* Tone picker */
+  .tone-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+  .tone-opt {
+    padding: 12px 14px; background: var(--paper); border: 1px solid var(--line);
+    border-radius: 8px; cursor: pointer; transition: all 0.15s ease;
+    font-size: 13px; color: var(--ink2);
+  }
+  .tone-opt:hover { border-color: var(--accent); }
+  .tone-opt.selected { border-color: var(--accent); background: rgba(184,92,56,0.06); color: var(--ink); font-weight: 600; }
+
+  /* Product row */
+  .product-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: start; }
+  .product-row input { padding: 9px 11px !important; font-size: 13px !important; }
+  .product-row .x { background: transparent; border: 1px solid var(--line); color: var(--muted); width: 36px; height: 36px; border-radius: 8px; cursor: pointer; }
+  .add-row-btn {
+    background: transparent; border: 1px dashed var(--line); color: var(--muted);
+    padding: 9px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600;
+  }
+  .add-row-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Buttons */
+  .nav-row {
+    display: flex; justify-content: space-between; gap: 12px;
+    margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--line);
+  }
+  .btn {
+    padding: 12px 22px; border-radius: 100px; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.3px; cursor: pointer; border: 0; font-family: inherit;
+  }
+  .btn-primary { background: var(--ink); color: var(--bg); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--ink2); border: 1px solid var(--line); }
+  .btn-ghost:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Test EYO box */
+  .test-box {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 12px;
+    padding: 20px; margin-top: 16px;
+  }
+  .test-section { margin-bottom: 16px; }
+  .test-section:last-child { margin-bottom: 0; }
+  .test-section .h {
+    font-size: 11px; color: var(--accent); letter-spacing: 0.1em;
+    text-transform: uppercase; font-weight: 700; margin-bottom: 8px;
+  }
+  .test-bubble {
+    background: var(--paper-soft); border: 1px solid var(--line-soft);
+    border-radius: 10px 10px 10px 4px;
+    padding: 12px 14px; font-size: 14px; line-height: 1.6; color: var(--ink);
+  }
+  .test-bubble.eyo {
+    background: linear-gradient(180deg, rgba(184,92,56,0.04), rgba(184,92,56,0.02));
+    border: 1px solid rgba(184,92,56,0.30);
+    border-radius: 10px 10px 4px 10px;
+  }
+  .test-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+  /* Checklist (Step 7) */
+  .check-list { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+  .check-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; background: var(--paper); border: 1px solid var(--line);
+    border-radius: 10px; font-size: 14px;
+  }
+  .check-item.done { border-left: 3px solid var(--green); }
+  .check-item.todo { border-left: 3px solid var(--gold); }
+  .check-mark {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 12px; flex-shrink: 0;
+  }
+  .check-mark.done { background: var(--green); color: #fff; }
+  .check-mark.todo { background: var(--paper-soft); color: var(--gold); border: 1px solid var(--gold); }
+
+  /* Steps visibility */
+  .step { display: none; }
+  .step.active { display: block; animation: fade-in 0.25s ease; }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .error-banner {
+    margin-top: 14px; padding: 12px 14px;
+    background: rgba(198,40,40,0.06); border: 1px solid rgba(198,40,40,0.30);
+    color: var(--red); border-radius: 8px; font-size: 13px; display: none;
+  }
+  .error-banner.show { display: block; }
+
+  .privacy-note {
+    margin-top: 20px; padding: 14px 18px;
+    background: var(--paper-soft); border-left: 3px solid var(--accent);
+    border-radius: 8px; font-size: 12px; color: var(--ink2); line-height: 1.65;
+  }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a href="/portal/{{ token }}" class="brand">Reach<span class="ng">NG</span></a>
+  <span class="save-pill" id="save-pill">✓ Saved</span>
+  <a href="/portal/{{ token }}" style="font-size: 12px; color: var(--muted); font-weight: 600;">Exit setup →</a>
+</nav>
+
+<div class="wrap">
+
+  <!-- Progress rail -->
+  <div class="rail-meta"><span id="rail-current">Step 1</span> of 7 · {{ client_name }}</div>
+  <div class="rail">
+    <div class="rail-step" data-step="1"></div>
+    <div class="rail-step" data-step="2"></div>
+    <div class="rail-step" data-step="3"></div>
+    <div class="rail-step" data-step="4"></div>
+    <div class="rail-step" data-step="5"></div>
+    <div class="rail-step" data-step="6"></div>
+    <div class="rail-step" data-step="7"></div>
+  </div>
+
+  <!-- ───── Step 1 · Business Basics ───── -->
+  <section class="step" data-step="1">
+    <h1>Tell us about <em>{{ client_name }}</em>.</h1>
+    <p class="step-sub">The five-line snapshot. Used in every draft EYO writes for you.</p>
+
+    <div class="field">
+      <label>Business name (as customers know it)</label>
+      <input type="text" id="f-trading-name" maxlength="120" placeholder="e.g. Altitude Lagos">
+    </div>
+
+    <div class="field">
+      <label>One-line description of what you sell</label>
+      <input type="text" id="f-one-liner" maxlength="200" placeholder="e.g. Rooftop bar &amp; private events venue in Victoria Island">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>City / areas you serve</label>
+        <input type="text" id="f-geography" maxlength="120" placeholder="Lagos · Victoria Island, Ikoyi">
+        <div class="field-hint">Comma-separated.</div>
+      </div>
+      <div class="field">
+        <label>Vertical</label>
+        <input type="text" value="{{ vertical }}" disabled style="opacity:0.6;">
+        <div class="field-hint">Locked from signup.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Your ideal customer</label>
+      <textarea id="f-icp" rows="3" maxlength="600" placeholder="e.g. 28–45 year-old Lagos professionals, corporate event organisers, diaspora visitors looking for a premium night out. ₦80–300k/visit."></textarea>
+      <div class="field-hint">EYO uses this to recognise high-intent enquiries vs casual ones.</div>
+    </div>
+  </section>
+
+  <!-- ───── Step 2 · Voice & Tone ───── -->
+  <section class="step" data-step="2">
+    <h1>Teach EYO your <em>voice</em>.</h1>
+    <p class="step-sub">The single biggest lever for "this sounds like me." Pick a starting tone, paste 3-5 replies you've actually sent that you're proud of, and the phrases you'd never want a customer to see.</p>
+
+    <div class="field">
+      <label>Starting tone</label>
+      <div class="tone-grid" id="tone-grid">
+        <div class="tone-opt" data-tone="warm-professional">🤝 Warm-professional</div>
+        <div class="tone-opt" data-tone="luxury">✨ Luxury</div>
+        <div class="tone-opt" data-tone="friendly">😊 Friendly &amp; casual</div>
+        <div class="tone-opt" data-tone="direct">⚡ Direct &amp; brief</div>
+        <div class="tone-opt" data-tone="playful">🎉 Playful</div>
+      </div>
+      <input type="hidden" id="f-tone">
+    </div>
+
+    <div class="field">
+      <label>3-5 replies you've sent that you're proud of</label>
+      <textarea id="f-sample-replies" rows="8" placeholder="Paste each reply separated by a blank line. Example:&#10;&#10;Hey Funke! Yes the 9pm DJ booth is still open for Saturday. Deposit is ₦90k, send to GTBank 0123456789 Altitude Lagos Ltd. I'll lock it the moment you confirm.&#10;&#10;Good evening Mr Adebanjo — yes we host corporate dinners up to 60 guests. Minimum is ₦1.2M for a weeknight buyout including bar + canapés. Would Thursday or Friday next week work?"></textarea>
+      <div class="field-hint">These become tone signals. EYO retrieves the most relevant one when drafting.</div>
+    </div>
+
+    <div class="field">
+      <label>Sign-off you use</label>
+      <input type="text" id="f-signature" maxlength="120" placeholder="e.g. — Adunni · Altitude Lagos">
+    </div>
+
+    <div class="field">
+      <label>Phrases or words you'd never want EYO to say</label>
+      <textarea id="f-never-say" rows="3" placeholder="One per line.&#10;e.g. cheap&#10;basic&#10;Sorry for the inconvenience&#10;Please bear with us"></textarea>
+      <div class="field-hint">Hard rule. EYO will rewrite around these every time.</div>
+    </div>
+
+    <div class="privacy-note">
+      <strong style="color:var(--ink);">Your voice stays yours.</strong> Everything you paste here lives only on your client doc. We don't train shared models on your replies, and we don't show them to other ReachNG clients.
+    </div>
+  </section>
+
+  <!-- ───── Step 3 · Offer & Pricing ───── -->
+  <section class="step" data-step="3">
+    <h1>What do you <em>sell</em>, and at what price?</h1>
+    <p class="step-sub">Specifics matter. EYO quotes from these, so the customer never gets a wrong number.</p>
+
+    <div class="field">
+      <label>Products / services</label>
+      <div id="products-list"></div>
+      <button type="button" class="add-row-btn" onclick="addProductRow()">+ Add product</button>
+      <div class="field-hint">Add the top 5-10 things you sell most often.</div>
+    </div>
+
+    <div class="field">
+      <label>Deposit / payment rules</label>
+      <textarea id="f-pricing-rules" rows="4" placeholder="e.g. Bookings under ₦500k require a 30% deposit to lock. Corporate events ≥ ₦1M require 50% deposit + signed terms. Diaspora bookings: full payment 7 days before arrival."></textarea>
+      <div class="field-hint">EYO reads this to know when to ask for a deposit vs. when to send the bill later.</div>
+    </div>
+
+    <div class="field">
+      <label>Bank details EYO can quote in replies</label>
+      <textarea id="f-payment-terms" rows="3" placeholder="e.g. GTBank · 0123456789 · Altitude Lagos Ltd · Reference: your booking date"></textarea>
+      <div class="field-hint">This goes inside drafts. ReachNG never holds your money; payments land directly in your account.</div>
+    </div>
+  </section>
+
+  <!-- ───── Step 4 · Lead Qualification ───── -->
+  <section class="step" data-step="4">
+    <h1>How does EYO <em>qualify</em> a lead?</h1>
+    <p class="step-sub">What does EYO ask, what makes a lead hot, and who isn't a fit for you.</p>
+
+    <div class="field">
+      <label>Questions EYO should ask before flagging a lead as hot</label>
+      <textarea id="f-qualifying" rows="4" placeholder="One per line.&#10;e.g. What date / how many people?&#10;Indoor or rooftop preference?&#10;Budget range?&#10;Is this a private event or a casual visit?"></textarea>
+      <div class="field-hint">EYO blends these into the conversation naturally rather than firing them as a survey.</div>
+    </div>
+
+    <div class="field">
+      <label>What makes a lead "hot" (ready for your attention)?</label>
+      <textarea id="f-closing-action" rows="3" placeholder="e.g. Date confirmed + headcount given + deposit committed. Or: corporate group of 20+. Or: any enquiry mentioning a specific date this week."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Who isn't a fit for you?</label>
+      <textarea id="f-not-a-fit" rows="3" placeholder="e.g. Groups under 4 on Saturdays (capacity priority). Walk-in price-shopping. Anyone asking about underage events. Birthdays under 21."></textarea>
+      <div class="field-hint">EYO will politely route these elsewhere or decline using your tone.</div>
+    </div>
+
+    <div class="field">
+      <label>Red flags EYO should escalate immediately</label>
+      <textarea id="f-red-flags" rows="3" placeholder="One per line.&#10;e.g. Refund request&#10;Complaint about staff&#10;Press / media enquiry&#10;Legal / payment dispute"></textarea>
+      <div class="field-hint">These never go through EYO's drafter. Owner is pinged directly.</div>
+    </div>
+  </section>
+
+  <!-- ───── Step 5 · Approval Rules ───── -->
+  <section class="step" data-step="5">
+    <h1>Set the <em>safety rails</em>.</h1>
+    <p class="step-sub">How carefully should EYO move? The default is the safest setting (every draft waits for you). You can loosen it later.</p>
+
+    <div class="field">
+      <label>Default sending mode</label>
+      <div class="tone-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="tone-opt selected" data-mode="hitl" onclick="selectMode(this, 'hitl')">🛡 Every draft waits for my tap <strong style="display:block;font-size:11px;color:var(--muted);font-weight:600;margin-top:4px;">Safest. Default.</strong></div>
+        <div class="tone-opt" data-mode="autopilot" onclick="selectMode(this, 'autopilot')">⚡ Autopilot for safe replies <strong style="display:block;font-size:11px;color:var(--muted);font-weight:600;margin-top:4px;">Holding replies and FAQs send instantly. Money / refunds / complaints still wait.</strong></div>
+      </div>
+      <input type="hidden" id="f-autopilot" value="false">
+    </div>
+
+    <div class="field">
+      <label>Instant "holding" reply for new inbound (optional)</label>
+      <textarea id="f-holding-message" rows="3" placeholder="e.g. Hi! 🌹 Thanks for reaching out to Altitude. Give me a few minutes and I'll be back with availability and pricing."></textarea>
+      <div class="field-hint">Fires once per contact per day, only when a new customer messages you. Keeps them warm while you draft the real reply. Leave blank to disable.</div>
+    </div>
+
+    <div class="privacy-note">
+      <strong style="color:var(--ink);">Always-require-approval categories.</strong> Regardless of mode, these never auto-send: money confirmations, refund discussions, complaints, legal matters, anything containing your red-flags list. Your tap is mandatory.
+    </div>
+  </section>
+
+  <!-- ───── Step 6 · Test EYO ───── -->
+  <section class="step" data-step="6">
+    <h1>Try EYO <em>right now</em>.</h1>
+    <p class="step-sub">Paste a real customer message you've actually received. EYO will draft a reply using everything you just told it. Edit if needed — your edit is the first tone signal.</p>
+
+    <div class="field">
+      <label>Paste a real customer message</label>
+      <textarea id="f-test-msg" rows="4" placeholder="e.g. Hi, do you have a table for 6 this Saturday around 9pm? And how much is the deposit?"></textarea>
+    </div>
+
+    <button type="button" class="btn btn-primary" onclick="runTestDraft()" id="test-draft-btn" style="margin-top: 4px;">Draft reply →</button>
+
+    <div class="test-box" id="test-result" style="display: none; margin-top: 24px;">
+      <div class="test-section">
+        <div class="h">Customer says</div>
+        <div class="test-bubble" id="test-inbound"></div>
+      </div>
+      <div class="test-section">
+        <div class="h">EYO drafts</div>
+        <div class="test-bubble eyo" id="test-eyo-draft" contenteditable="true" style="cursor: text;"></div>
+        <div class="field-hint" style="margin-top: 8px;">This bubble is editable. Any change you make becomes a tone signal for future drafts.</div>
+      </div>
+      <div class="test-actions">
+        <button type="button" class="btn btn-primary" onclick="acceptDraft()">Looks good →</button>
+        <button type="button" class="btn btn-ghost" onclick="runTestDraft()">Regenerate</button>
+      </div>
+    </div>
+
+    <div class="error-banner" id="test-error"></div>
+  </section>
+
+  <!-- ───── Step 7 · Go Live ───── -->
+  <section class="step" data-step="7">
+    <h1>Almost there. <em>Go live.</em></h1>
+    <p class="step-sub">Final checklist. Tick anything outstanding before activating.</p>
+
+    <div class="check-list" id="checklist"></div>
+
+    <div class="error-banner" id="complete-error"></div>
+  </section>
+
+  <!-- Nav -->
+  <div class="nav-row">
+    <button type="button" class="btn btn-ghost" id="btn-back" onclick="prevStep()" disabled>← Back</button>
+    <button type="button" class="btn btn-primary" id="btn-next" onclick="nextStep()">Save &amp; continue →</button>
+  </div>
+
+</div>
+
+<script>
+const TOKEN = "{{ token }}";
+let currentStep = 1;
+const TOTAL_STEPS = 7;
+let acceptedTestDraft = false;
+let healthState = null;
+let waConnected = false;
+
+// ─── Init: load saved state ──────────────────────────────────────────────
+async function loadStatus() {
+  try {
+    const r = await fetch(`/api/v1/portal/${TOKEN}/onboard/status`);
+    if (!r.ok) return;
+    const d = await r.json();
+    currentStep = Math.min(d.current_step || 1, TOTAL_STEPS);
+    healthState = d.health;
+    waConnected = d.wa_connected;
+    const brief = d.brief || {};
+    // Pre-fill fields from saved brief
+    setVal('f-trading-name', brief.trading_name);
+    setVal('f-one-liner', brief.one_liner);
+    setVal('f-geography', Array.isArray(brief.geography) ? brief.geography.join(', ') : '');
+    setVal('f-icp', brief.icp);
+    setVal('f-tone', brief.tone_overrides);
+    if (brief.tone_overrides) {
+      const opt = document.querySelector(`.tone-opt[data-tone="${brief.tone_overrides}"]`);
+      if (opt) opt.classList.add('selected');
+    }
+    setVal('f-signature', brief.signature);
+    setVal('f-never-say', Array.isArray(brief.never_say) ? brief.never_say.join('\n') : '');
+    setVal('f-pricing-rules', brief.pricing_rules);
+    setVal('f-payment-terms', brief.payment_terms);
+    setVal('f-qualifying', Array.isArray(brief.qualifying_questions) ? brief.qualifying_questions.join('\n') : '');
+    setVal('f-closing-action', brief.closing_action);
+    setVal('f-not-a-fit', brief.not_a_fit);
+    setVal('f-red-flags', Array.isArray(brief.red_flags) ? brief.red_flags.join('\n') : '');
+    setVal('f-holding-message', d.holding_message);
+    if (Array.isArray(brief.products)) renderProducts(brief.products);
+    document.getElementById('f-autopilot').value = d.autopilot ? 'true' : 'false';
+    if (d.autopilot) {
+      document.querySelectorAll('[data-mode]').forEach(el => el.classList.remove('selected'));
+      const m = document.querySelector('[data-mode="autopilot"]');
+      if (m) m.classList.add('selected');
+    }
+    renderStep();
+  } catch (e) { console.warn('status load failed:', e); }
+}
+function setVal(id, v) {
+  const el = document.getElementById(id);
+  if (el && v != null) el.value = v;
+}
+
+// ─── Step navigation ────────────────────────────────────────────────────
+function renderStep() {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  const el = document.querySelector(`.step[data-step="${currentStep}"]`);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.rail-step').forEach(r => {
+    const n = parseInt(r.dataset.step);
+    r.classList.toggle('done', n < currentStep);
+    r.classList.toggle('current', n === currentStep);
+  });
+  document.getElementById('rail-current').textContent = `Step ${currentStep}`;
+  document.getElementById('btn-back').disabled = currentStep === 1;
+  document.getElementById('btn-next').textContent = currentStep === TOTAL_STEPS ? 'Activate EYO →' : 'Save & continue →';
+  if (currentStep === 7) renderChecklist();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function prevStep() {
+  if (currentStep > 1) { currentStep--; renderStep(); }
+}
+async function nextStep() {
+  const btn = document.getElementById('btn-next');
+  btn.disabled = true;
+  try {
+    if (currentStep === 7) {
+      await completeOnboarding();
+    } else {
+      await saveCurrentStep();
+      currentStep++;
+      renderStep();
+      showSaved();
+    }
+  } catch (e) {
+    alert(e.message || 'Save failed. Try again.');
+  } finally {
+    btn.disabled = false;
+  }
+}
+function showSaved() {
+  const p = document.getElementById('save-pill');
+  p.classList.add('show');
+  setTimeout(() => p.classList.remove('show'), 1800);
+}
+
+// ─── Step → payload extractors ──────────────────────────────────────────
+function collectStepData() {
+  if (currentStep === 1) {
+    return {
+      trading_name: val('f-trading-name'),
+      one_liner: val('f-one-liner'),
+      geography: val('f-geography').split(',').map(s => s.trim()).filter(Boolean),
+      icp: val('f-icp'),
+    };
+  }
+  if (currentStep === 2) {
+    return {
+      tone_overrides: val('f-tone'),
+      signature: val('f-signature'),
+      never_say: val('f-never-say').split('\n').map(s => s.trim()).filter(Boolean),
+      sample_replies: val('f-sample-replies'),
+    };
+  }
+  if (currentStep === 3) {
+    return {
+      products: collectProducts(),
+      pricing_rules: val('f-pricing-rules'),
+      payment_terms: val('f-payment-terms'),
+    };
+  }
+  if (currentStep === 4) {
+    return {
+      qualifying_questions: val('f-qualifying').split('\n').map(s => s.trim()).filter(Boolean),
+      closing_action: val('f-closing-action'),
+      not_a_fit: val('f-not-a-fit'),
+      red_flags: val('f-red-flags').split('\n').map(s => s.trim()).filter(Boolean),
+    };
+  }
+  if (currentStep === 5) {
+    return {
+      autopilot: val('f-autopilot') === 'true',
+      holding_message: val('f-holding-message'),
+    };
+  }
+  return {};
+}
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? (el.value || '').trim() : '';
+}
+async function saveCurrentStep() {
+  const data = collectStepData();
+  if (Object.keys(data).length === 0) return;
+  const r = await fetch(`/api/v1/portal/${TOKEN}/onboard/step`, {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ step: currentStep, data }),
+  });
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}));
+    throw new Error(err.detail || 'Save failed at step ' + currentStep);
+  }
+  const result = await r.json();
+  if (result.health) healthState = result.health;
+}
+
+// ─── Products list ──────────────────────────────────────────────────────
+function renderProducts(items) {
+  const list = document.getElementById('products-list');
+  list.innerHTML = '';
+  items.forEach(p => addProductRow(p));
+  if (items.length === 0) { addProductRow(); addProductRow(); }
+}
+function addProductRow(p = {}) {
+  const list = document.getElementById('products-list');
+  const row = document.createElement('div');
+  row.className = 'product-row';
+  row.innerHTML = `
+    <input type="text" placeholder="Name (e.g. VIP table for 6)" value="${(p.name || '').replace(/"/g,'&quot;')}" data-key="name">
+    <input type="text" placeholder="From ₦" value="${p.price_ngn_min || ''}" data-key="price_ngn_min">
+    <input type="text" placeholder="To ₦" value="${p.price_ngn_max || ''}" data-key="price_ngn_max">
+    <button type="button" class="x" onclick="this.parentNode.remove()">×</button>`;
+  list.appendChild(row);
+}
+function collectProducts() {
+  return Array.from(document.querySelectorAll('.product-row')).map(row => {
+    const obj = {};
+    row.querySelectorAll('input').forEach(i => {
+      const k = i.dataset.key;
+      let v = i.value.trim();
+      if ((k === 'price_ngn_min' || k === 'price_ngn_max') && v) v = parseInt(v.replace(/[^0-9]/g, ''), 10) || null;
+      if (v !== '' && v != null) obj[k] = v;
+    });
+    return obj;
+  }).filter(p => p.name);
+}
+
+// ─── Tone picker ────────────────────────────────────────────────────────
+document.querySelectorAll('.tone-opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    if (opt.dataset.mode) return; // mode picker handles itself
+    document.querySelectorAll('.tone-opt[data-tone]').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    document.getElementById('f-tone').value = opt.dataset.tone;
+  });
+});
+function selectMode(el, mode) {
+  document.querySelectorAll('[data-mode]').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('f-autopilot').value = mode === 'autopilot' ? 'true' : 'false';
+}
+
+// ─── Test EYO ───────────────────────────────────────────────────────────
+async function runTestDraft() {
+  const msg = val('f-test-msg');
+  const errEl = document.getElementById('test-error');
+  errEl.classList.remove('show');
+  if (msg.length < 3) { errEl.textContent = 'Paste a real message first.'; errEl.classList.add('show'); return; }
+  const btn = document.getElementById('test-draft-btn');
+  btn.disabled = true;
+  btn.textContent = 'EYO drafting…';
+  // Save any pending fields first so EYO uses fresh data
+  try { await saveCurrentStep(); } catch (_) {}
+  try {
+    const r = await fetch(`/api/v1/portal/${TOKEN}/onboard/test-draft`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ customer_message: msg }),
+    });
+    const d = await r.json();
+    if (!d.ok || !d.draft) {
+      errEl.textContent = d.error || 'EYO could not draft this time. Try a different message or come back after completing more steps.';
+      errEl.classList.add('show');
+      return;
+    }
+    document.getElementById('test-inbound').textContent = msg;
+    document.getElementById('test-eyo-draft').textContent = d.draft;
+    document.getElementById('test-result').style.display = 'block';
+  } catch (e) {
+    errEl.textContent = 'Network error. Try again.';
+    errEl.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Draft another reply →';
+  }
+}
+function acceptDraft() {
+  acceptedTestDraft = true;
+  alert("Marked as approved. The drafted reply (with any edits you made) will be referenced as a tone signal. Tap 'Save & continue →' below to head to the final step.");
+}
+
+// ─── Step 7 checklist ───────────────────────────────────────────────────
+function renderChecklist() {
+  const items = [];
+  const h = healthState || {};
+  const missing = (h.missing || []);
+  items.push({ done: !missing.includes('icp'), label: 'Business basics complete' });
+  items.push({ done: !missing.includes('closing_action'), label: 'Hot-lead definition set' });
+  items.push({ done: !missing.includes('never_say'), label: 'Never-say list provided' });
+  items.push({ done: acceptedTestDraft, label: 'Test draft tried' });
+  items.push({ done: waConnected, label: 'WhatsApp number connected', cta: !waConnected ? `/portal/${TOKEN}/connect-whatsapp` : null });
+
+  const list = document.getElementById('checklist');
+  list.innerHTML = items.map(it => `
+    <div class="check-item ${it.done ? 'done' : 'todo'}">
+      <div class="check-mark ${it.done ? 'done' : 'todo'}">${it.done ? '✓' : '!'}</div>
+      <div style="flex:1;">${it.label}</div>
+      ${it.cta ? `<a href="${it.cta}" target="_blank" style="font-size:12px;font-weight:600;">Open →</a>` : ''}
+    </div>`).join('');
+}
+
+async function completeOnboarding() {
+  const errEl = document.getElementById('complete-error');
+  errEl.classList.remove('show');
+  const r = await fetch(`/api/v1/portal/${TOKEN}/onboard/complete`, { method: 'POST' });
+  const d = await r.json();
+  if (!d.ok) {
+    errEl.textContent = d.message || 'Some steps are missing. Go back and finish them.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (d.next === 'connect_whatsapp') {
+    window.location.href = `/portal/${TOKEN}/connect-whatsapp`;
+  } else {
+    window.location.href = `/portal/${TOKEN}`;
+  }
+}
+
+// ─── Boot ───────────────────────────────────────────────────────────────
+renderProducts([]);
+loadStatus();
+</script>
+
+</body>
+</html>
