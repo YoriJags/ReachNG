@@ -234,8 +234,25 @@ def _find_client_by_id(db, client_id: Optional[str]) -> Optional[dict]:
 
 def draft_acknowledgement(receipt: ReceiptData, match: MatchResult) -> str:
     """
-    Compose the WhatsApp acknowledgement the customer will see (after HITL approval).
-    Tone: warm, specific, Nigerian-business-natural. No emojis except a single ✓.
+    Compose the WhatsApp acknowledgement the customer will see (AFTER HITL approval).
+
+    SAFETY PRINCIPLE (raised 2026-05-18):
+    A bank-transfer SCREENSHOT is a workflow trigger, NOT proof of money received.
+    Nigerian transfers can fail silently: network issues, reversal, pending
+    status, faked screenshots. If we pre-confirm receipt on the screenshot
+    alone and the money never lands, the business has acknowledged payment
+    for service they never received. Costly. Embarrassing. Fraud-vector.
+
+    Therefore every default draft below uses CONDITIONAL language:
+      "I'll confirm receipt once it reflects on our end"
+    NOT confirmatory:
+      "Your payment is confirmed" ← removed
+
+    The owner can EDIT upward to "confirmed" after they verify funds in
+    their bank app, then tap approve. HITL is the verification gate, not
+    the screenshot.
+
+    Tone: warm, specific, Nigerian-business-natural.
     """
     name = (match.debtor_name or "").split()[0] if match.debtor_name else None
     salute = f"Hi {name}" if name else "Hi"
@@ -244,52 +261,54 @@ def draft_acknowledgement(receipt: ReceiptData, match: MatchResult) -> str:
     bank = receipt.bank or "your bank"
     ref = receipt.reference
 
-    # Build the verb-phrase
     amt_phrase = f"₦{amt:,.0f}" if amt else "your transfer"
     ref_phrase = f" (ref {ref})" if ref else ""
 
     if match.match_type == "unmatched":
         return (
-            f"{salute}, thanks — we've received {amt_phrase} from {bank}{ref_phrase}. "
-            "Could you let us know what this payment is for so I can credit it correctly? "
-            "If it was sent to us by mistake, please confirm so we can refund."
+            f"{salute}, thanks for the screenshot showing {amt_phrase} from {bank}{ref_phrase}. "
+            "I'll confirm receipt once it reflects on our end (usually within 10 minutes). "
+            "Could you tell me what this payment is for so I can credit it correctly when it lands? "
+            "If it was sent to us by mistake, please flag so we can refund."
         )
 
     if match.verdict == "exact":
         return (
-            f"{salute}, thank you ✓ Your {amt_phrase} payment for {match.record_label} "
-            f"is confirmed{ref_phrase}. Your receipt will follow shortly. We appreciate you."
+            f"{salute}, thanks for the screenshot showing {amt_phrase} for {match.record_label}{ref_phrase}. "
+            "I'll lock it in the moment it reflects on our end (usually within 10 minutes). "
+            "I'll ping you the second it lands."
         )
 
     if match.verdict == "underpaid":
         short = abs(match.delta_ngn or 0)
         return (
-            f"{salute}, thank you — we've received {amt_phrase}{ref_phrase} towards "
-            f"{match.record_label}. There's a balance of ₦{short:,.0f} still outstanding. "
-            "Were you planning to send the balance separately, or shall we set up an instalment? "
-            "Either works — let me know."
+            f"{salute}, thanks for the screenshot showing {amt_phrase}{ref_phrase} towards "
+            f"{match.record_label}. Once it reflects on our end, there'll still be "
+            f"₦{short:,.0f} outstanding. Were you planning to send the balance separately, "
+            "or shall we set up an instalment? Either works — let me know."
         )
 
     if match.verdict == "overpaid":
         excess = match.delta_ngn or 0
         return (
-            f"{salute}, thank you ✓ Your {amt_phrase} payment{ref_phrase} is confirmed for "
-            f"{match.record_label}. You've actually sent ₦{excess:,.0f} more than the balance — "
-            "would you like the excess refunded, held as credit for next month, or applied to "
-            "another invoice? Let me know what works."
+            f"{salute}, thanks for the screenshot showing {amt_phrase}{ref_phrase} for "
+            f"{match.record_label}. Once it reflects, that's ₦{excess:,.0f} more than the "
+            "balance. Would you like the excess refunded, held as credit for next month, "
+            "or applied to another invoice? Let me know what works."
         )
 
     if match.verdict == "no_open_balance":
         return (
-            f"{salute}, thanks — we've received {amt_phrase}{ref_phrase}. Just confirming, "
-            "we don't have an outstanding balance for you on file — would you like this held "
-            "as credit, or refunded? Happy to do either."
+            f"{salute}, thanks for the screenshot showing {amt_phrase}{ref_phrase}. "
+            "Once it reflects on our end, I'll note that we don't have an outstanding "
+            "balance for you on file — would you like this held as credit, or refunded? "
+            "Happy to do either."
         )
 
     # Fallback
     return (
-        f"{salute}, thank you — we've received {amt_phrase} from {bank}{ref_phrase}. "
-        "I'll review and confirm shortly."
+        f"{salute}, thanks for the screenshot showing {amt_phrase} from {bank}{ref_phrase}. "
+        "I'll confirm receipt once it reflects on our end."
     )
 
 

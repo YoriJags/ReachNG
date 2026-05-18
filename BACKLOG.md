@@ -59,6 +59,24 @@ Locked sequence — build in this order. Total ~17 days.
 Things that aren't features but block actual paid clients. These matter when the first 5 pilots want to go live.
 
 - [ ] **WhatsApp pairing flow** (~1-2 days) — Critical. Without this, no pilot can go live. Choose: Unipile QR-pair (one mobile scan → number connected) OR Meta Cloud API (more involved, requires business verification). Need a self-serve `/portal/{token}/connect-whatsapp` page that walks the founder through. Today this is manual.
+
+---
+
+## P0 Principle — Receipt acknowledgments are conditional, not confirmatory (raised 2026-05-18)
+
+**The rule:** A bank-transfer screenshot is a *workflow trigger*, NOT proof of money received. Nigerian transfers can fail silently (network issues, reversals, pending status, faked screenshots). If ReachNG pre-confirms receipt on a screenshot alone and the money never lands, the business has acknowledged payment for service they never received. Costly, embarrassing, fraud-vector.
+
+**The principle (now enforced in code as of `services/receipt_match.py::draft_acknowledgement`):**
+- EYO reads + extracts + matches the screenshot
+- EYO drafts a **conditional** acknowledgment: *"I'll confirm receipt once it reflects on our end"*
+- EYO **does NOT** draft confirmatory language like *"₦X confirmed"* in the default template
+- HITL is the verification gate. Owner verifies funds in their bank app, edits draft upward to "confirmed" if appropriate, taps approve
+- Match-row in dashboard says *"Likely match"* + *"awaiting your bank confirmation"*, never bare *"Matched"*
+- Timeline events read *"received"* / *"drafted"* / *"awaiting"*, never *"confirmed"* / *"auto-acknowledged"*
+
+**Surfaces this principle is enforced on:** receipt_match.py draft templates · landing page Scene 2 (Receipt Catcher) · guided demo Scene 3 · Control Room Money Matched panel · all three CONTROL_ROOM_OVERLAYS money_panel.draft fields · timeline entries.
+
+**Owner override:** owners can edit any conditional draft upward to "confirmed" once they verify funds. The default is conservative; the override is conscious.
 - [ ] **Onboarding wizard** (~2-3 days) — DEFERRED until 5 pilots inform what to ask. Codex-spec'd: Business Basics → Voice & Tone → Offer & Pricing → Lead Qualification → Approval Rules → Test EYO → Go-Live Checklist. Lives at `/portal/{token}/onboard`. Build this AFTER manual onboarding the first 5.
 - [ ] **Pass-2 guided demo: per-vertical** (~3 hrs) — Today's guided tour at `/portal/demo` is hospitality-only. Build vertical variants for `/portal/demo/real_estate` and `/portal/demo/professional_services` (Victoria Island PoF storyline + Greenview Fri-6pm storyline). Education + clinics + small_business deferred until demand signal.
 - [ ] **Education + small_business Control Room overlays** (~2 hrs) — Currently fall back to hospitality overlay. Add overlay entries OR keep hidden from public pills (already done in `744776e`). Build when first signup applies in either vertical.

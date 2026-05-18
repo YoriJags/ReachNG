@@ -322,9 +322,9 @@
     <div style="margin-top: 72px;">
       <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; flex-wrap: wrap;">
         <span style="font-family: Georgia, serif; font-size: 32px; font-weight: 600; color: var(--orange); letter-spacing: -1px;">02</span>
-        <h3 style="font-size: clamp(22px, 3.2vw, 28px); font-weight: 700; color: var(--text-strong); letter-spacing: -0.4px; margin: 0;">Catches money from bank-transfer screenshots.</h3>
+        <h3 style="font-size: clamp(22px, 3.2vw, 28px); font-weight: 700; color: var(--text-strong); letter-spacing: -0.4px; margin: 0;">Reads bank-transfer screenshots and queues the right receipt for your tap.</h3>
       </div>
-      <p style="margin-bottom: 32px; color: var(--muted-strong); font-size: 15px; line-height: 1.7; max-width: 720px;">Lagos runs on bank transfers. GTB, OPay, Kuda, UBA, PalmPay. Screenshots, slips, share-photos. ReachNG reads them in 3 seconds, matches them to the right invoice, drafts the receipt.</p>
+      <p style="margin-bottom: 32px; color: var(--muted-strong); font-size: 15px; line-height: 1.7; max-width: 720px;">Lagos runs on bank transfers. GTB, OPay, Kuda, UBA, PalmPay. Screenshots, slips, share-photos. ReachNG reads them in 3 seconds, matches them to the right invoice, drafts a <strong style="color:var(--text-strong)">conditional acknowledgment</strong> — and waits for your bank verification before sending.</p>
 
       <div style="display: grid; grid-template-columns: 1fr 1.05fr; gap: 22px; align-items: start;" class="mock-grid">
 
@@ -380,15 +380,15 @@
             </div>
           </div>
 
-          <div style="background: rgba(46,125,50,0.08); border: 1px solid rgba(46,125,50,0.3); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
-            <div style="width: 18px; height: 18px; border-radius: 50%; background: #2e7d32; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">✓</div>
+          <div style="background: rgba(211,165,46,0.08); border: 1px solid rgba(211,165,46,0.35); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
+            <div style="width: 18px; height: 18px; border-radius: 50%; background: #b8862a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">⏳</div>
             <div style="font-size: 12px; color: var(--text-strong);">
-              <strong>Matched</strong> to open booking <span style="color: var(--muted);">#ALT-2614 · Funke + 5 · Saturday 9pm DJ booth · ₦450k deposit</span>
+              <strong>Likely match:</strong> booking <span style="color: var(--muted);">#ALT-2614 · Funke + 5 · Saturday 9pm DJ booth · ₦450k deposit</span> · waiting for your bank confirmation
             </div>
           </div>
 
           <div style="background: linear-gradient(180deg, rgba(255,85,0,0.04), rgba(255,85,0,0.02)); border: 1px solid rgba(255,85,0,0.3); color: var(--text-strong); padding: 12px 14px; border-radius: 12px 12px 4px 12px; font-size: 13px; line-height: 1.6;">
-            Got it Bola 🙏 ₦450k deposit confirmed against your Saturday 9pm booking (booth near the DJ, table of 6). Receipt #ALT-2614. Doors open 8:30pm. See you Saturday.
+            Hey Bola, thanks for the screenshot 🙏 I'll lock in your Saturday 9pm booking (booth near the DJ, table of 6) the moment ₦450k reflects on our end (usually under 10 mins). I'll ping you the second it lands.
           </div>
 
           <div style="margin-top: 16px; display: flex; gap: 8px;">
@@ -410,10 +410,18 @@
           <div>
             <div style="font-size: 10px; color: #c62828; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 6px;">ReachNG drafts a balance follow-up</div>
             <div style="font-size: 13px; color: var(--muted-strong); line-height: 1.6; font-style: italic;">
-              "Thanks Bola, we've received ₦400k against your booking #ALT-2614. Balance of ₦50k still due, same account. Want me to send the link again?"
+              "Thanks Bola, your screenshot shows ₦400k. Once it reflects on our end, there'll still be ₦50k outstanding on booking #ALT-2614. Want me to send the link again for the balance?"
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Safety principle: screenshots are workflow triggers, not confirmations -->
+      <div style="margin-top: 28px; max-width: 760px; margin-left: auto; margin-right: auto; padding: 18px 22px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--orange); border-radius: 10px;">
+        <div style="font-size: 11px; color: var(--orange); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">⚠ The safety rail</div>
+        <p style="margin: 0; font-size: 14px; line-height: 1.7; color: var(--muted-strong);">
+          A bank-transfer screenshot is a <strong style="color:var(--text-strong);">workflow trigger, not a confirmation</strong>. Network issues, reversals, pending status, and outright fake screenshots all happen. ReachNG never sends a "confirmed" acknowledgment until you verify the funds in your account and tap approve. The default draft says <em>"will confirm once it reflects"</em>. You can edit it upward to "confirmed" the moment you see the money. Your money, your verification, your tap.
+        </p>
       </div>
     </div>
 
@@ -433,9 +441,9 @@
           <div style="background: var(--surface); border-radius: 28px; overflow: hidden;">
             <div style="background: #075E54; color: #fff; padding: 14px 20px 12px 20px; display: flex; justify-content: space-between; align-items: center;">
               <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--orange), #ff7e30); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px;">E</div>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--orange), #ff7e30); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px;">RNG</div>
                 <div>
-                  <div style="font-size: 13px; font-weight: 600;">EYO</div>
+                  <div style="font-size: 13px; font-weight: 600;">ReachNG</div>
                   <div style="font-size: 10px; opacity: 0.8;">online · 7:02 AM</div>
                 </div>
               </div>
@@ -492,6 +500,10 @@
 
       <p style="margin-top: 32px; text-align: center; font-size: 15px; color: var(--muted-strong); max-width: 720px; margin-left: auto; margin-right: auto; line-height: 1.7;">
         <strong style="color: var(--text-strong);">Five minutes a morning.</strong> You know your money, your hottest leads, where revenue almost slipped. Then you go run your day.
+      </p>
+
+      <p style="margin-top: 14px; text-align: center; font-size: 12px; color: var(--muted); max-width: 680px; margin-left: auto; margin-right: auto; line-height: 1.6; letter-spacing: 0.2px;">
+        The brief arrives from <strong style="color:var(--muted-strong);">ReachNG's own WhatsApp line</strong> (saved as a contact in your phone). Customer-facing replies still go from <strong style="color:var(--muted-strong);">your</strong> number. Two distinct lines so the system notifications never get tangled with your customer threads.
       </p>
     </div>
 
