@@ -378,9 +378,14 @@
 <script>
   // Track tagged CTA clicks. Add data-ph="event_name" to any link/button.
   (function() {
+    // De-dupe between pointerdown (preferred, fires before navigation)
+    // and click (fallback for keyboard-activated buttons / touch quirks).
+    var fired = new WeakSet();
     function track(el) {
       var ev = el.getAttribute('data-ph');
       if (!ev || !window.posthog) return;
+      if (fired.has(el)) return;
+      fired.add(el);
       try {
         posthog.capture(ev, {
           href:   el.getAttribute('href') || null,
@@ -388,7 +393,16 @@
           path:   window.location.pathname,
         });
       } catch (e) {}
+      // Belt-and-braces: clear the dedupe lock after a tick so a real
+      // second click on the same element (rare) still counts.
+      setTimeout(function() { fired.delete(el); }, 1000);
     }
+    // Primary binding — fires before the browser starts the navigation.
+    document.addEventListener('pointerdown', function(e) {
+      var t = e.target.closest('[data-ph]');
+      if (t) track(t);
+    }, true);
+    // Fallback for keyboard activation (Enter/Space on a focused link).
     document.addEventListener('click', function(e) {
       var t = e.target.closest('[data-ph]');
       if (t) track(t);
