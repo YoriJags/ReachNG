@@ -407,6 +407,18 @@ async def _outcome_silence_sweep():
         log.error("outcome_silence_sweep_crashed", error=str(e))
 
 
+async def _wa_health_check():
+    """Refresh WhatsApp linked-device health for every paired client.
+    Detects silent QR-session expiry and alerts on OK → NOT_OK transitions."""
+    log.info("wa_health_check_start")
+    try:
+        from services.wa_health import check_all_clients_wa_health
+        result = await check_all_clients_wa_health()
+        log.info("wa_health_check_complete", **result)
+    except Exception as e:
+        log.error("wa_health_check_crashed", error=str(e))
+
+
 async def _outcome_weekly_distil():
     """Sunday 23:00 Lagos — distil last 7d wins/misses into per-client
     prompt_addendum across all active paying clients."""
@@ -495,6 +507,15 @@ def setup_scheduler():
         _reply_poll,
         CronTrigger(hour="8-23", minute="*/30", timezone="Africa/Lagos"),
         id="reply_poll", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=120,
+    )
+
+    # WhatsApp linked-device health check — every 6h. Silent QR expiry is the
+    # one production failure mode that goes unnoticed by the client; this loop
+    # detects it and alerts both owner (us) and client the moment it happens.
+    scheduler.add_job(
+        _wa_health_check,
+        CronTrigger(hour="0,6,12,18", minute=10, timezone="Africa/Lagos"),
+        id="wa_health_check", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=600,
     )
 
     # Sequence tick — multi-touch follow-ups for BYO Leads. Runs hourly during

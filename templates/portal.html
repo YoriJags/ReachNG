@@ -538,6 +538,12 @@
   Connect your WhatsApp so EYO can start replying to customers on your behalf.
   <span style="background:#ff5c00;color:#fff;padding:4px 12px;border-radius:100px;margin-left:10px;font-weight:700;font-size:11px;letter-spacing:0.3px;">Connect →</span>
 </a>
+{% elif whatsapp_health and whatsapp_health != "OK" %}
+<a href="/portal/{{ token }}/connect-whatsapp" style="display:block;background:linear-gradient(90deg,#2a0e0e 0%,#3a1414 100%);border-bottom:1px solid #c62828;color:#ffd4d4;text-decoration:none;padding:14px 24px;text-align:center;font-size:13px;letter-spacing:0.3px;">
+  <strong style="color:#ff6b6b;">●&nbsp;&nbsp;WhatsApp disconnected:</strong>
+  Your linked-device session expired. EYO can't read inbound or send drafts until you reconnect.
+  <span style="background:#c62828;color:#fff;padding:4px 12px;border-radius:100px;margin-left:10px;font-weight:700;font-size:11px;letter-spacing:0.3px;">Reconnect now →</span>
+</a>
 {% endif %}
 
 <div class="hero">

@@ -393,6 +393,7 @@ async def client_portal(token: str, request: Request):
         "client_name":        client_name,
         "vertical":           vertical,
         "whatsapp_connected": bool(client.get("whatsapp_account_id")),
+        "whatsapp_health":    client.get("whatsapp_health"),
         "onboarded":          bool(client.get("onboarded_at")),
     })
 
