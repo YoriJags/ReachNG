@@ -4,7 +4,7 @@
 
 Queued work waiting to be promoted into a phase: see [BACKLOG.md](./BACKLOG.md).
 
-Last updated: 2026-05-15
+Last updated: 2026-05-19
 
 ---
 
@@ -75,6 +75,39 @@ Source of truth: BACKLOG.md → "P0 — Tier-0 Engine sprint" → T0.4. Every ap
 ## Next — Tier-0 Engine: T0.5 Proactive Intelligence *(~4 days)*
 
 5 starter behaviours per BACKLOG.md (stale revival, festival timing, birthday nudges, capacity nudges, booking reminders). Each = scheduler job → HITL drafts.
+
+## Next — Phase 1.6: Client Book Onboarding *(~6 working days)*
+
+Bring a new client's existing customer base into ReachNG so EYO can work it from day one — and clearly distinguish a contact that pre-dates EYO from a lead EYO actually drove. Renewal proof depends on this split.
+
+**Ingestion paths (in priority order):**
+- [ ] **CSV upload** — already partly built via BYO Leads. Extend portal upload UI: column mapping, dedupe by phone/email, NDPR consent gate, audit row in `lead_imports`. *(0.5 day on top of existing BYO)*
+- [ ] **vCard (.vcf) upload** — accept .vcf alongside CSV on the same uploader. Server-side parser (vobject or manual) → name, phone, email per card. Covers WhatsApp-resident contacts since WhatsApp reads the phone's address book. *(0.5 day)*
+- [ ] **Paste-in batch textarea** — "Paste one contact per line" on the same page. Regex first (`name, phone[, email]`), Haiku fallback for messy lines like `Funke Adebayo · 0816 ...`. Same dedupe + audit path. *(0.5 day)*
+- [ ] (Backlog, not in this phase) — Photo OCR of phone Contacts screen via Haiku vision. Build only after first 3 clients ask for it.
+
+**Triage on import:**
+- [ ] After upload, client sees 3 buckets and approves cadence per bucket:
+  - **Past customers** — relationship tone, "checking in", low pressure
+  - **Dormant leads** — gentle re-engagement, "still interested?"
+  - **Hot leads** — recent enquiries, chase now
+- [ ] Default tone profiles preloaded by vertical; client can override before approval.
+
+**Pre-EYO vs Post-EYO split:**
+- [ ] Add `clients.client_onboarded_at` (snapshot the moment first portal access happens, immutable thereafter).
+- [ ] Add `leads.imported_at` field (set on every csv/vcf/paste row).
+- [ ] Derive in portal: a lead is **Pre-EYO** if `first_seen_at < client_onboarded_at`, else **Post-EYO**.
+- [ ] Client portal — 2 tabs side-by-side: **Your existing book** (pre-EYO) vs **Since EYO went live** (post-EYO). Latter is the ROI proof number for renewals: "EYO drove N new replies, M bookings, ₦X deposits since you onboarded on $date."
+- [ ] Admin per-client view mirrors the split. *(1 day)*
+
+**Tone routing:**
+- [ ] Drafter reads each lead's `source` + `bucket` and selects a tone profile (past_customer vs dormant_lead vs hot_lead vs new_inbound). *(1 day)*
+
+**Acceptance:**
+- [ ] Client uploads a .vcf with 50 contacts → portal shows 3 buckets → client approves "send re-engagement to dormant" → 50 drafts in HITL with correct tone, all NDPR-consented.
+- [ ] On client onboarding day +7, portal Pre/Post split correctly attributes new inbound to Post-EYO.
+
+Total ~6 working days. Slots in after T0.5 unless a pilot client signs first and forces it earlier.
 
 ## Later — Phase 2: Closer Brain *(2–3 days)*
 
