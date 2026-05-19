@@ -78,11 +78,13 @@ async def lifespan(app: FastAPI):
     _validate_env(settings)
     log.info("reachng_starting", env=settings.app_env)
     if settings.posthog_api_key:
+        # posthog-python uses positional project_api_key + host kwarg.
+        # The older `api_key=` kwarg was removed; passing it raises TypeError.
         _posthog = Posthog(
-            api_key=settings.posthog_api_key,
+            settings.posthog_api_key,
             host=settings.posthog_host,
         )
-        _posthog.capture("reachng", event="server_started", properties={"env": settings.app_env})
+        _posthog.capture("server_started", distinct_id="reachng", properties={"env": settings.app_env})
         log.info("posthog_initialized", host=settings.posthog_host)
     try:
         ensure_indexes()
@@ -220,8 +222,8 @@ async def posthog_request_middleware(request: Request, call_next):
     ph = get_posthog()
     if ph and request.url.path.startswith("/api/"):
         ph.capture(
-            "reachng",
-            event="api_request",
+            "api_request",
+            distinct_id="reachng",
             properties={
                 "path": request.url.path,
                 "method": request.method,
