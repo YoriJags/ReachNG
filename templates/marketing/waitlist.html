@@ -180,7 +180,7 @@
           try {
             // Bind this browser to the email so prior anonymous events
             // (pageview, hero_cta_join) join up under one person profile.
-            // Phone-only signups stay anonymous — that's fine.
+            // Phone-only signups stay anonymous, that's fine.
             var ident = (payload.email || '').toLowerCase().trim();
             if (ident) {
               posthog.identify(ident, {

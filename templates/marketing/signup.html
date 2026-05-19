@@ -1,6 +1,6 @@
 {% extends "marketing/_base.html" %}
 
-{% block title %}Get started — ReachNG{% endblock %}
+{% block title %}Get started, ReachNG{% endblock %}
 {% block description %}Sign up for ReachNG. Pay via Paystack, get your portal in 60 seconds.{% endblock %}
 
 {% block content %}
@@ -32,7 +32,7 @@
         </div>
         <label style="display: flex; align-items: center; gap: 10px; margin-top: 16px; cursor: pointer; font-size: 13px; color: var(--muted-strong);">
           <input type="checkbox" name="annual" id="annual-toggle" style="cursor: pointer;">
-          <span>Pay annually — <strong style="color: var(--orange);">save 15%</strong> (12 months × selected plan, billed once)</span>
+          <span>Pay annually, <strong style="color: var(--orange);">save 15%</strong> (12 months × selected plan, billed once)</span>
         </label>
       </div>
 
@@ -45,7 +45,7 @@
         <div>
           <label class="signup-label">Vertical</label>
           <select name="vertical" required class="signup-input">
-            <option value="">— Select —</option>
+            <option value="">  Select  </option>
             <option value="hospitality">Restaurants / Bars / Hotels</option>
             <option value="real_estate">Real estate</option>
             <option value="education">Schools / Education</option>
@@ -85,7 +85,7 @@
           <span style="color: var(--muted);">You'll pay today</span>
           <strong id="summary-amount" style="font-size: 20px; color: var(--text-strong); font-weight: 700; letter-spacing: -0.3px;">₦150,000</strong>
         </div>
-        <div style="font-size: 12px; color: var(--muted); margin-top: 4px;" id="summary-note">Growth plan — 1 month. Renews automatically. Cancel anytime.</div>
+        <div style="font-size: 12px; color: var(--muted); margin-top: 4px;" id="summary-note">Growth plan, 1 month. Renews automatically. Cancel anytime.</div>
       </div>
 
       <button type="submit" id="signup-submit" class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 16px;">Continue to Paystack →</button>
@@ -134,8 +134,8 @@
     const monthly = annual ? Math.round(amount / 12) : p.ngn;
     document.getElementById("summary-amount").textContent = "₦" + amount.toLocaleString();
     document.getElementById("summary-note").textContent = annual
-      ? `${p.label} plan — 12 months prepaid (effective ₦${monthly.toLocaleString()}/mo, save 15%). Renews after 12 months.`
-      : `${p.label} plan — 1 month. Renews automatically. Cancel anytime.`;
+      ? `${p.label} plan, 12 months prepaid (effective ₦${monthly.toLocaleString()}/mo, save 15%). Renews after 12 months.`
+      : `${p.label} plan, 1 month. Renews automatically. Cancel anytime.`;
   }
 
   document.querySelectorAll('input[name="plan"], #annual-toggle').forEach(el => {
