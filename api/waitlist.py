@@ -1,33 +1,31 @@
-"""
+﻿"""
 Waitlist API.
 
 Public:
-  POST /api/v1/waitlist           — join the waitlist
-  GET  /api/v1/waitlist/counter   — public total + top verticals (for landing tile)
-  GET  /waitlist                  — the form page
+  POST /api/v1/waitlist
+  GET  /api/v1/waitlist/counter
+  GET  /waitlist
 
 Admin (Basic Auth):
-  GET  /api/v1/admin/waitlist                  — full list
-  POST /api/v1/admin/waitlist/{position}/invite — mark a person as invited
+  GET  /api/v1/admin/waitlist
+  POST /api/v1/admin/waitlist/{position}/invite
 """
 from __future__ import annotations
-
 from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
-
 from auth import require_auth as _admin_auth
 from services.waitlist import (
     add_to_waitlist, waitlist_total, waitlist_public_counter,
     list_waitlist, mark_invited,
 )
+from services.analytics import (
+    track_page_viewed, track_waitlist_joined, track_waitlist_invite_sent,
+)
 
 router = APIRouter(tags=["Waitlist"])
 
-
-# ─── Public ──────────────────────────────────────────────────────────────────
 
 class WaitlistJoin(BaseModel):
     name:          str = Field(..., min_length=1, max_length=80)
@@ -38,12 +36,11 @@ class WaitlistJoin(BaseModel):
     city:          Optional[str] = Field(None, max_length=60)
     brief_pain:    Optional[str] = Field(None, max_length=600)
     source:        Optional[str] = Field(None, max_length=32)
-    # Pilot-application qualifying fields (2026-05-17)
-    enquiry_volume:           Optional[str]       = Field(None, max_length=12)
-    avg_deal_value:           Optional[str]       = Field(None, max_length=12)
-    top_pains:                Optional[list[str]] = Field(None, max_length=8)
-    trust_ai_draft:           Optional[str]       = Field(None, max_length=12)
-    sample_customer_message:  Optional[str]       = Field(None, max_length=1200)
+    enquiry_volume:          Optional[str]       = Field(None, max_length=12)
+    avg_deal_value:          Optional[str]       = Field(None, max_length=12)
+    top_pains:               Optional[list[str]] = Field(None, max_length=8)
+    trust_ai_draft:          Optional[str]       = Field(None, max_length=12)
+    sample_customer_message: Optional[str]       = Field(None, max_length=1200)
 
 
 @router.post("/api/v1/waitlist")
@@ -66,11 +63,25 @@ async def public_join(payload: WaitlistJoin):
         )
     except ValueError as e:
         raise HTTPException(400, str(e))
+
+    total = waitlist_total()
+    track_waitlist_joined(
+        email=payload.email, phone=payload.phone,
+        position=doc["position"], vertical=payload.vertical,
+        city=payload.city, source=payload.source,
+        enquiry_volume=payload.enquiry_volume,
+        avg_deal_value=payload.avg_deal_value,
+        trust_ai_draft=payload.trust_ai_draft,
+        top_pains=payload.top_pains,
+        has_pain=bool(payload.brief_pain),
+        has_sample_message=bool(payload.sample_customer_message),
+        total_on_list=total,
+    )
     return {
         "position":      doc["position"],
         "business_name": doc["business_name"],
-        "total_on_list": waitlist_total(),
-        "message":       f"You're on the early access list. Based on your answers, we may invite you into the first pilot batch.",
+        "total_on_list": total,
+        "message":       "You're on the early access list. Based on your answers, we may invite you into the first pilot batch.",
     }
 
 
@@ -81,19 +92,23 @@ async def public_counter():
 
 @router.get("/waitlist", response_class=HTMLResponse)
 async def waitlist_page(request: Request, vertical: Optional[str] = None):
-    """Render the public waitlist form. `vertical` query param pre-selects."""
     templates = request.app.state.templates
+    track_page_viewed(
+        page="waitlist", path="/waitlist",
+        referrer=request.headers.get("referer", ""),
+        utm_source=request.query_params.get("utm_source"),
+        utm_campaign=request.query_params.get("utm_campaign"),
+        preselected_vertical=(vertical or "").lower(),
+    )
     return templates.TemplateResponse(request, "marketing/waitlist.html", {
         "preselected_vertical": (vertical or "").lower(),
         "total":                waitlist_total(),
     })
 
 
-# ─── Admin ───────────────────────────────────────────────────────────────────
-
 @router.get("/api/v1/admin/waitlist")
 async def admin_list(only_uninvited: bool = False, vertical: Optional[str] = None,
-                      limit: int = 200, _: str = Depends(_admin_auth)):
+                     limit: int = 200, _: str = Depends(_admin_auth)):
     return {"entries": list_waitlist(limit=limit, vertical=vertical, only_uninvited=only_uninvited),
             "total":   waitlist_total()}
 
@@ -103,4 +118,5 @@ async def admin_invite(position: int, _: str = Depends(_admin_auth)):
     ok = mark_invited(position)
     if not ok:
         raise HTTPException(404, "position not found")
+    track_waitlist_invite_sent(position=position, total_on_list=waitlist_total())
     return {"position": position, "invited": True}
