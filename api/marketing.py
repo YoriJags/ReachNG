@@ -21,6 +21,7 @@ from services.analytics import (
     track_page_viewed, track_vertical_lander, track_contact_submitted,
     track_signup_page, track_signup_initiated,
     track_payment_verified, track_client_provisioned,
+    track_signup_failed, track_paystack_webhook_ignored,
 )
 
 log = structlog.get_logger()
@@ -152,6 +153,9 @@ async def signup_page(request: Request, plan: Optional[str] = None):
 
 @router.get("/signup/success", response_class=HTMLResponse, include_in_schema=False)
 async def signup_success(request: Request, reference: Optional[str] = None):
+    track_page_viewed(page="signup_success", path="/signup/success",
+                      referrer=request.headers.get("referer", ""),
+                      has_reference=bool(reference))
     portal_path = None
     business = None
     error = None
@@ -220,9 +224,15 @@ class SignupPayload(BaseModel):
 async def signup_initialize(payload: SignupPayload, request: Request):
     settings = get_settings()
     if not settings.paystack_secret_key:
+        track_signup_failed(stage="config", reason="paystack_not_configured",
+                            email=payload.owner_email, plan=payload.plan,
+                            vertical=payload.vertical.strip().lower(), status_code=503)
         raise HTTPException(503, "Payments not configured. Email hello@reachng.ng to sign up directly.")
     vertical = payload.vertical.strip().lower()
     if vertical not in SUPPORTED_SIGNUP_VERTICALS:
+        track_signup_failed(stage="validation", reason="unsupported_vertical",
+                            email=payload.owner_email, plan=payload.plan,
+                            vertical=vertical, status_code=400)
         raise HTTPException(400, f"Vertical '{payload.vertical}' not supported.")
     plan_info = _live_pricing()[payload.plan]
     base_ngn = plan_info["ngn"]
@@ -254,6 +264,9 @@ async def signup_initialize(payload: SignupPayload, request: Request):
         )
     if r.status_code != 200 or not r.json().get("status"):
         log.error("paystack_init_failed", status=r.status_code, body=r.text[:500])
+        track_signup_failed(stage="paystack_init", reason="paystack_rejected",
+                            email=payload.owner_email, plan=payload.plan,
+                            vertical=vertical, reference=reference, status_code=r.status_code)
         raise HTTPException(502, "Could not initialise payment. Try again or email hello@reachng.ng.")
     data = r.json()["data"]
     get_db()["signups"].insert_one({
@@ -284,22 +297,31 @@ async def paystack_webhook(request: Request):
     expected = hmac.new(secret.encode("utf-8"), body_bytes, hashlib.sha512).hexdigest()
     if not hmac.compare_digest(sig_header, expected):
         log.warning("paystack_webhook_bad_signature")
+        track_paystack_webhook_ignored(reason="bad_signature")
         raise HTTPException(401, "Invalid signature")
     payload = (await request.json()) if body_bytes else {}
     event = payload.get("event")
     data = payload.get("data", {})
     if event != "charge.success":
+        track_paystack_webhook_ignored(reason="non_charge_success", event=event,
+                                         reference=data.get("reference"))
         return {"ok": True, "ignored": event}
     metadata = data.get("metadata") or {}
     if metadata.get("kind") != "signup":
+        track_paystack_webhook_ignored(reason="non_signup", event=event,
+                                         reference=data.get("reference"))
         return {"ok": True, "ignored": "non-signup"}
     reference = data.get("reference")
     db = get_db()
     signup = db["signups"].find_one({"paystack_reference": reference})
     if not signup:
         log.warning("paystack_signup_not_found", reference=reference)
+        track_paystack_webhook_ignored(reason="no_pending_signup", event=event,
+                                         reference=reference)
         return {"ok": True, "ignored": "no-pending-signup"}
     if signup.get("status") == "provisioned":
+        track_paystack_webhook_ignored(reason="already_provisioned", event=event,
+                                         reference=reference)
         return {"ok": True, "ignored": "already-provisioned"}
     portal_token = pysecrets.token_urlsafe(24)
     now = datetime.now(timezone.utc)
@@ -338,19 +360,68 @@ async def paystack_webhook(request: Request):
         business_name=signup["business_name"],
         amount_ngn=signup.get("amount_ngn"), annual=signup.get("annual"),
     )
+    # Portal URL — prefer configured app_base_url over request.base_url so
+    # links work even when the webhook arrives via the Railway internal host.
+    base = (settings.app_base_url or str(request.base_url)).rstrip("/")
+    portal_url = f"{base}/portal/{portal_token}"
+    owner_name = signup.get("owner_name", "there")
+    plan_label = signup.get("plan_label", "subscription")
+    paid_until_str = paid_until.strftime("%d %b %Y")
+
+    # 1) WhatsApp welcome — best-effort. Only fires if a WhatsApp connector
+    #    (Meta Cloud API or Unipile) is configured; otherwise silently skipped.
     try:
         from tools.outreach import send_whatsapp_for_client
-        portal_url = f"{request.base_url}portal/{portal_token}".replace("//portal", "/portal")
-        welcome = (
-            f"Welcome to ReachNG, {signup.get('owner_name', 'there')}!\n\n"
-            f"Your {signup.get('plan_label', 'subscription')} is active until {paid_until.strftime('%d %b %Y')}.\n\n"
+        wa_msg = (
+            f"Welcome to ReachNG, {owner_name}!\n\n"
+            f"Your {plan_label} is active until {paid_until_str}.\n\n"
             f"Your portal: {portal_url}\n\nNext step: open the portal, fill your Business Brief (5 mins), "
             f"and we'll set up your WhatsApp pairing on a quick call. "
             f"Reply here when you're ready and we'll send the pairing link."
         )
-        await send_whatsapp_for_client(phone=signup["owner_phone"], message=welcome)
+        await send_whatsapp_for_client(phone=signup["owner_phone"], message=wa_msg)
     except Exception as exc:
-        log.warning("signup_welcome_failed", error=str(exc), business=signup["business_name"])
+        log.warning("signup_welcome_whatsapp_failed", error=str(exc), business=signup["business_name"])
+
+    # 2) Email welcome via Resend (hello@reachng.ng) — independent of WhatsApp
+    #    so the customer always gets the portal link even before pairing.
+    try:
+        from tools.outreach import send_email
+        owner_email = signup.get("owner_email")
+        if owner_email:
+            subject = f"Welcome to ReachNG — your portal is ready, {owner_name}"
+            text = (
+                f"Hi {owner_name},\n\n"
+                f"Your ReachNG {plan_label} is now active until {paid_until_str}.\n\n"
+                f"Open your portal: {portal_url}\n\n"
+                f"Next step: log into the portal and fill your Business Brief (5 minutes). "
+                f"Once that's in, we'll send a WhatsApp pairing link so EYO can start drafting "
+                f"replies in your voice.\n\n"
+                f"Anything urgent — reply to this email or WhatsApp +234 816 458 3657.\n\n"
+                f"— EYO from ReachNG\nhello@reachng.ng\n"
+            )
+            html = f"""<!doctype html>
+<html><body style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;background:#f8f4ec;color:#14110d;margin:0;padding:32px 16px;">
+  <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e8ddc8;border-radius:14px;padding:32px;">
+    <div style="font-size:11px;letter-spacing:0.18em;color:#ff5500;text-transform:uppercase;font-weight:700;margin-bottom:18px;">Welcome to ReachNG</div>
+    <h1 style="font-family:Georgia,serif;font-size:26px;font-weight:600;letter-spacing:-0.5px;margin:0 0 18px;">Your portal is ready, {owner_name}.</h1>
+    <p style="font-size:15px;line-height:1.65;color:#3a342b;margin:0 0 22px;">Your <strong>{plan_label}</strong> is active until <strong>{paid_until_str}</strong>.</p>
+    <p style="margin:0 0 28px;">
+      <a href="{portal_url}" style="display:inline-block;background:#14110d;color:#fff;text-decoration:none;padding:14px 22px;border-radius:8px;font-size:14px;font-weight:600;">Open your portal →</a>
+    </p>
+    <p style="font-size:14px;line-height:1.7;color:#3a342b;margin:0 0 18px;"><strong>Next step:</strong> log into the portal and fill your Business Brief (5 minutes). Once that's in, we'll send a WhatsApp pairing link so EYO can start drafting replies in your voice.</p>
+    <p style="font-size:13px;line-height:1.7;color:#6b6356;margin:24px 0 0;border-top:1px solid #eee3cf;padding-top:18px;">Anything urgent — reply to this email or WhatsApp <a href="https://wa.me/2348164583657" style="color:#ff5500;text-decoration:none;">+234 816 458 3657</a>.</p>
+    <p style="font-size:12px;color:#9b917f;margin:18px 0 0;">— EYO from ReachNG · hello@reachng.ng</p>
+  </div>
+</body></html>"""
+            await send_email(
+                to_email=owner_email, subject=subject, body=text, html=html,
+                force_smtp=True,  # routes via Resend from hello@reachng.ng
+            )
+            log.info("signup_welcome_email_sent", business=signup["business_name"], email=owner_email)
+    except Exception as exc:
+        log.warning("signup_welcome_email_failed", error=str(exc), business=signup["business_name"])
+
     return {"ok": True, "provisioned": True, "portal_token": portal_token}
 
 
