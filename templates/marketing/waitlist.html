@@ -176,6 +176,15 @@
         });
         const data = await r.json();
         if (!r.ok) throw new Error(data.detail || 'Could not submit. Try again.');
+        if (window.posthog) {
+          try {
+            posthog.capture('waitlist_submitted', {
+              vertical: payload.vertical || null,
+              city:     payload.city || null,
+              source:   payload.source || null,
+            });
+          } catch (e) {}
+        }
         form.style.display = 'none';
         success.style.display = 'block';
         success.scrollIntoView({behavior: 'smooth', block: 'start'});

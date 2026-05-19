@@ -195,6 +195,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 app.state.templates = Jinja2Templates(directory="templates")
+# Expose PostHog public config to all templates so the JS snippet can fire
+# client-side. Only the API key + host are public; gate snippet on key presence.
+_ph_settings = get_settings()
+app.state.templates.env.globals["posthog_key"] = _ph_settings.posthog_api_key or ""
+app.state.templates.env.globals["posthog_host"] = _ph_settings.posthog_host
 
 # CORS: restrict to configured origins in production.
 # Set ALLOWED_ORIGINS=https://yourdomain.com in Railway env vars.

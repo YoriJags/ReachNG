@@ -45,6 +45,14 @@
 
 {% block schema %}{% endblock %}
 
+{# PostHog product analytics — page views, hero CTA, scroll, pilot submit. Gated on env. #}
+{% if posthog_key %}
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('{{ posthog_key }}', { api_host: '{{ posthog_host }}', person_profiles: 'identified_only', capture_pageview: true, capture_pageleave: true });
+</script>
+{% endif %}
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -365,6 +373,45 @@
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 </script>
+
+{% if posthog_key %}
+<script>
+  // Track tagged CTA clicks. Add data-ph="event_name" to any link/button.
+  (function() {
+    function track(el) {
+      var ev = el.getAttribute('data-ph');
+      if (!ev || !window.posthog) return;
+      try {
+        posthog.capture(ev, {
+          href:   el.getAttribute('href') || null,
+          text:   (el.textContent || '').trim().slice(0, 80),
+          path:   window.location.pathname,
+        });
+      } catch (e) {}
+    }
+    document.addEventListener('click', function(e) {
+      var t = e.target.closest('[data-ph]');
+      if (t) track(t);
+    }, true);
+
+    // Scroll-depth milestones: 25/50/75/100. Fire each only once per page.
+    var hit = {};
+    function onScroll() {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      if (max <= 0) return;
+      var pct = Math.round((h.scrollTop / max) * 100);
+      [25, 50, 75, 100].forEach(function(m) {
+        if (pct >= m && !hit[m]) {
+          hit[m] = true;
+          try { posthog.capture('scroll_depth', { depth: m, path: window.location.pathname }); } catch (e) {}
+        }
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+  })();
+</script>
+{% endif %}
 
 {% block scripts %}{% endblock %}
 </body>
