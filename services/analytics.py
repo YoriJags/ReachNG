@@ -75,6 +75,26 @@ def track_client_provisioned(email: str | None, reference: str,
           reference=reference, source="paystack_webhook")
 
 
+def track_signup_failed(stage: str, reason: str,
+                         email: str | None = None,
+                         plan: str | None = None,
+                         vertical: str | None = None,
+                         reference: str | None = None,
+                         status_code: int | None = None) -> None:
+    track("signup_failed",
+          distinct_id=email or reference or "reachng-server",
+          stage=stage, reason=reason, plan=plan, vertical=vertical,
+          reference=reference, status_code=status_code)
+
+
+def track_paystack_webhook_ignored(reason: str,
+                                     event: str | None = None,
+                                     reference: str | None = None) -> None:
+    track("paystack_webhook_ignored",
+          distinct_id=reference or "reachng-server",
+          reason=reason, event=event, reference=reference)
+
+
 def track_waitlist_joined(email: str | None, phone: str | None,
                            position: int, vertical: str,
                            city: str | None, source: str | None,
