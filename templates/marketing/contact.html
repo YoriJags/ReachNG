@@ -47,7 +47,7 @@
     <!-- Lightweight contact form -->
     <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 32px; margin-top: 48px;">
       <h2 style="font-size: 22px; font-weight: 700; color: var(--text-strong); margin: 0 0 20px; letter-spacing: -0.3px;">Or drop us a line right here</h2>
-      <form action="/api/v1/contact" method="POST" style="display: grid; gap: 16px;">
+      <form id="contact-form" action="/api/v1/contact" method="POST" style="display: grid; gap: 16px;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
           <div>
             <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em;">Your name</label>
@@ -87,5 +87,24 @@
 
   </div>
 </section>
+
+<script>
+  (function() {
+    var f = document.getElementById('contact-form');
+    if (!f) return;
+    f.addEventListener('submit', function() {
+      if (!window.posthog) return;
+      var d = new FormData(f);
+      try {
+        posthog.capture('contact_submitted', {
+          vertical: d.get('vertical') || null,
+          has_phone: !!d.get('phone'),
+        });
+        var email = d.get('email');
+        if (email) { try { posthog.identify(String(email).toLowerCase()); } catch (e) {} }
+      } catch (e) {}
+    });
+  })();
+</script>
 
 {% endblock %}
