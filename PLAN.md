@@ -80,18 +80,21 @@ Source of truth: BACKLOG.md → "P0 — Tier-0 Engine sprint" → T0.4. Every ap
 
 Bring a new client's existing customer base into ReachNG so EYO can work it from day one — and clearly distinguish a contact that pre-dates EYO from a lead EYO actually drove. Renewal proof depends on this split.
 
-**Ingestion paths (in priority order):**
-- [ ] **CSV upload** — already partly built via BYO Leads. Extend portal upload UI: column mapping, dedupe by phone/email, NDPR consent gate, audit row in `lead_imports`. *(0.5 day on top of existing BYO)*
-- [ ] **vCard (.vcf) upload** — accept .vcf alongside CSV on the same uploader. Server-side parser (vobject or manual) → name, phone, email per card. Covers WhatsApp-resident contacts since WhatsApp reads the phone's address book. *(0.5 day)*
-- [ ] **Paste-in batch textarea** — "Paste one contact per line" on the same page. Regex first (`name, phone[, email]`), Haiku fallback for messy lines like `Funke Adebayo · 0816 ...`. Same dedupe + audit path. *(0.5 day)*
-- [ ] (Backlog, not in this phase) — Photo OCR of phone Contacts screen via Haiku vision. Build only after first 3 clients ask for it.
+**Ingestion paths (in priority order, lowest-friction first):**
+- [ ] **Tier 1 — Share contacts to EYO inside WhatsApp.** Owner opens the EYO thread in their own WhatsApp on their phone, multi-selects contacts (up to ~200), shares. Each contact arrives as a vCard message body via Unipile inbound. We parse, dedupe, file under `source: whatsapp_share`. Zero new behaviour, owner never leaves WhatsApp. *(1 day — needs inbound vCard parser hook in `tools/reply_router.py`)*
+- [ ] **Tier 2 — Drag-and-drop .vcf in portal.** For laptop users. iPhone Contacts → Share → save .vcf → drag onto portal dropzone. `source: vcf_upload`. *(0.5 day)*
+- [ ] **Tier 3 — Paste-in textarea.** Big textarea: "Paste one contact per line." Regex first (`name, phone[, email]`), Haiku fallback for messy lines like `Funke Adebayo · 0816 ...`. `source: paste_import`. *(0.5 day)*
+- [ ] **Tier 4 — CSV upload.** Extends existing BYO Leads uploader. *(0.5 day)*
+- [ ] (Deferred backlog) — Photo OCR of phone Contacts screen via Haiku vision. Build only after demand surfaces.
 
-**Triage on import:**
-- [ ] After upload, client sees 3 buckets and approves cadence per bucket:
+**Triage on import — bucket-level approval (stress-free):**
+- [ ] Auto-classify every imported contact into one of 3 buckets:
   - **Past customers** — relationship tone, "checking in", low pressure
   - **Dormant leads** — gentle re-engagement, "still interested?"
   - **Hot leads** — recent enquiries, chase now
 - [ ] Default tone profiles preloaded by vertical; client can override before approval.
+- [ ] Owner sees a **bucket review screen** with counts + sample draft per bucket: "24 dormant leads, here's the draft EYO will send to them in your voice. Approve all? Edit the draft? Skip this bucket?" One tap per bucket.
+- [ ] Bucket approval generates N personalised drafts (one per contact, each name + context referenced) → lands in HITL queue. Owner can then batch-approve or step through message by message.
 
 **Pre-EYO vs Post-EYO split:**
 - [ ] Add `clients.client_onboarded_at` (snapshot the moment first portal access happens, immutable thereafter).
