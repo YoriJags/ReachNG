@@ -84,6 +84,45 @@ Assume 25 Starter, 20 Growth, 5 Scale = ₦12.75M MRR = **₦153M ARR**.
 
 ---
 
+## 3.5 · Bundle plan (Premium only)
+
+For owners running multiple businesses or multi-location operations. **Bundle is exclusive to Premium** — Starter and Growth do not offer add-on accounts. This keeps tier ladders clean and forces the right buyer into the right plan: if you have 2+ WhatsApp lines worth running on EYO, you're on Premium.
+
+### Pricing
+
+- **Premium base:** ₦250,000/mo (founder) · ₦300,000/mo (regular) — includes 1 paired WhatsApp number + 1 vertical playbook
+- **Each additional WhatsApp number:** **+₦125,000/mo** (founder) · ₦150,000/mo (regular). Half the base price, per the simple rule.
+- Each additional number can be in **any vertical** — EYO loads the matching per-vertical playbook, tone profile, and Control Room dashboard for that number. A single owner can run a restaurant + RE agency + clinic under one bundle.
+
+### Example math (founder pricing)
+
+Lagos owner with 3 businesses across verticals:
+
+| Operation | Vertical | Founder price |
+|---|---|---:|
+| Altitude Lagos (rooftop restaurant) | hospitality | ₦250,000 |
+| + Ikoyi Prime (real estate agency) | real_estate | ₦125,000 |
+| + Lekki Aesthetic Clinic | clinics | ₦125,000 |
+| **Bundle total** | | **₦500,000/mo** |
+| (3 standalone Premium subscriptions would be) | | ₦750,000/mo |
+| **Owner saves** | | ₦250,000/mo |
+
+### Margin on each add-on account
+
+Incremental cost per additional account ≈ ₦15,000 (Unipile add-on ~₦8,800 + small Resend/Mongo share + per-call delta).
+
+- Add-on price ₦125,000 − ₦15,000 cost = **₦110,000 profit per additional (88% margin)**
+
+Stronger margin than the base Premium tier itself, because the platform overhead is already paid for by the first seat.
+
+### Billing implementation (Phase 2 — manual today)
+
+Today: founder-led close. Owner signs up via standard Premium signup → Paystack charges ₦250k for first month → after onboarding call, we send a separate Paystack invoice for each additional number → manual reconciliation.
+
+Phase 2 (once 3+ bundle clients close): add a "+ Additional Line" UI in the client portal that auto-charges ₦125k via Paystack Subscriptions and provisions a second WhatsApp pairing slot.
+
+---
+
 ## 4 · Annual prepay (keep or adjust)
 
 Current PRODUCTS.md offers **15% off annual prepay**. With Ladder B:
