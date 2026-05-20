@@ -98,9 +98,9 @@ These attach to a client by the act of connecting them, even if they barely use 
 | **Unipile WhatsApp account** | ~$15 per connected account (their published "Pro per-account" tier) | ~₦24,000 |
 | **Meta Cloud API messaging fee** | First 1,000 service conversations/mo free; then ~$0.0094/conversation for Nigeria utility tier | 0 to ~₦3,000 |
 | **Resend transactional email** | Shared $20/mo plan ÷ ~20 clients = ~$1 attributable | ~₦1,600 |
-| **MongoDB Atlas share** | Shared $57/mo M10 ÷ ~20 clients = ~$2.85 | ~₦4,560 |
+| **MongoDB Atlas share** | Currently on free tier M0 (512MB). ₦0 today. Move to M10 (~$57/mo) at ~10-12 clients = ~₦9,100 then. | ~₦0 (today) |
 | **Anthropic + OpenAI floor** | API key flat fees ≈ $0 once usage-based; only fixed minimums during low usage | 0 |
-| **Estimated per-client fixed** | | **~₦30,160 – ₦33,160/mo** |
+| **Estimated per-client fixed** | | **~₦25,600 – ₦28,600/mo** (today, Mongo free) |
 
 **Critical:** the Unipile per-account fee dominates. ₦24k/client is the floor before EYO has done a single Haiku call.
 
@@ -125,13 +125,13 @@ These don't attribute per-client, but they need to be paid by *somebody's* margi
 | Line item | ₦/mo | Notes |
 |---|---:|---|
 | Railway hosting | ~₦16,000 ($10) | Single service, scales modestly |
-| Mongo Atlas M10 | ~₦91,000 ($57) | Shared across clients (counted partially above) |
+| Mongo Atlas M0 (free) | ~₦0 today | On free tier; switches to M10 (~₦91k) around 10-12 clients |
 | Resend Pro | ~₦32,000 ($20) | Shared (counted partially above) |
 | PostHog | 0 | Free tier sufficient until 1M events/mo |
 | Anthropic / OpenAI minimums | 0 | Usage-based, no floor |
 | Domain + SSL | ~₦5,000/mo amortised | reachng.ng renewal |
 | Apify (our SDR funnel, not client cost) | ~₦8,000/mo | Marketing expense, not COGS |
-| **Platform fixed total** | **~₦152,000/mo** | At 10 clients, that's ₦15,200/client of platform overhead |
+| **Platform fixed total** | **~₦61,000/mo (today)** | At 10 clients, that's ₦6,100/client of platform overhead. Jumps to ₦15,200/client when Mongo moves to M10. |
 
 Allocate platform fixed across active clients when computing true margin.
 
