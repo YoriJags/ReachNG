@@ -16,15 +16,17 @@ From [ECONOMICS.md](./ECONOMICS.md) §6, with Meta Cloud option removed, Unipile
 
 | Profile | Per-call AI | Per-client fixed (Unipile + Resend) | Platform share (÷10 clients) | **Total cost/mo** |
 |---|---:|---:|---:|---:|
-| Light  | 2,520 | 25,600 | 9,300 | **~₦37,400** |
-| Medium | 7,620 | 25,600 | 9,300 | **~₦42,500** |
-| Heavy  | 18,840 | 25,600 | 9,300 | **~₦53,700** |
+| Light  | 2,520 | 12,000 | 6,100 | **~₦20,620** |
+| Medium | 7,620 | 12,000 | 6,100 | **~₦25,720** |
+| Heavy  | 18,840 | 12,000 | 6,100 | **~₦36,940** |
 
 These are the floors. Any price below means a loss on that profile.
 
-**Platform share (₦9,300/client at 10 clients) now includes Claude Pro subscription** (₦32k/mo) used by the operator for building and operating ReachNG. Upgrades to Max 5× (~₦160k) around 15 clients, Max 20× (~₦320k) around 50 clients. Still negligible per-client at scale (~₦3k each at 100 clients).
+**Unipile pricing reality (corrected 2026-05-20):** First 10 connected accounts = $55/mo flat (~₦88,000 total = ₦8,800/client). Then $5.5 per additional (11-50), $5 (51-200), $4.5 (201-1k). Per-client Unipile cost stays in the ₦7,400-8,800 band across all scales.
 
-**Note on Mongo:** you're on Atlas free tier (M0, 512MB) today, so MongoDB cost is ₦0. When client volume + memory data outgrows free tier (around client 8-12 depending on usage), expect to move to M10 (~₦91,000/mo). Re-run the floor table at that point — every profile will rise by ~₦9k. Still healthy on Ladder B but worth knowing.
+**Platform share (₦6,100/client at 10 clients)** includes Railway + Resend Pro + PostHog + Claude Pro subscription + domain + Apify SDR funnel. Claude upgrades to Max 5× (~₦160k) around 15 clients, Max 20× (~₦320k) around 50 clients. Still negligible per-client at scale (~₦3k each at 100 clients).
+
+**Note on Mongo:** you're on Atlas free tier (M0, 512MB) today, so MongoDB cost is ₦0. When client volume + memory data outgrows free tier (around client 8-12 depending on usage), expect to move to M10 (~₦91,000/mo). Re-run the floor table at that point — every profile will rise by ~₦9k. Still healthy on the locked ladder.
 
 ---
 
@@ -40,7 +42,7 @@ These are the floors. Any price below means a loss on that profile.
 
 **Read:** Starter tight on heavy clients (46%). Growth and Scale clean.
 
-### Ladder B — Operator-grade (₦150 / 300 / 600) — *recommended, LOCKED*
+### Ladder B — Operator-grade (₦150 / 300 / 600) — *previously locked, superseded — see note below*
 
 | Plan | Price | Margin on Light | Margin on Medium | Margin on Heavy |
 |---|---:|---:|---:|---:|

@@ -95,12 +95,12 @@ These attach to a client by the act of connecting them, even if they barely use 
 
 | Line item | Cost basis | Per-client ₦/mo |
 |---|---|---:|
-| **Unipile WhatsApp account** | ~$15 per connected account (their published "Pro per-account" tier) | ~₦24,000 |
+| **Unipile WhatsApp account** | Real published tiered pricing: $55/mo flat for first 10 accounts, then $5.5/account (11-50), $5 (51-200), $4.5 (201-1k), $4 (1k-5k), $3.5 (5k+). Effective: ₦7,400-8,800 per client across all scales. | ~₦8,800 at 10 clients |
 | **Meta Cloud API messaging fee** | First 1,000 service conversations/mo free; then ~$0.0094/conversation for Nigeria utility tier | 0 to ~₦3,000 |
 | **Resend transactional email** | Shared $20/mo plan ÷ ~20 clients = ~$1 attributable | ~₦1,600 |
 | **MongoDB Atlas share** | Currently on free tier M0 (512MB). ₦0 today. Move to M10 (~$57/mo) at ~10-12 clients = ~₦9,100 then. | ~₦0 (today) |
 | **Anthropic + OpenAI floor** | API key flat fees ≈ $0 once usage-based; only fixed minimums during low usage | 0 |
-| **Estimated per-client fixed** | | **~₦25,600 – ₦28,600/mo** (today, Mongo free) |
+| **Estimated per-client fixed** | | **~₦12,000/mo** (today, Mongo free, 10-client scale) |
 
 **Critical:** the Unipile per-account fee dominates. ₦24k/client is the floor before EYO has done a single Haiku call.
 

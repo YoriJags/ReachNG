@@ -83,7 +83,7 @@
       <div id="signup-summary" style="background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; font-size: 14px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <span style="color: var(--muted);">You'll pay today</span>
-          <strong id="summary-amount" style="font-size: 20px; color: var(--text-strong); font-weight: 700; letter-spacing: -0.3px;">₦150,000</strong>
+          <strong id="summary-amount" style="font-size: 20px; color: var(--text-strong); font-weight: 700; letter-spacing: -0.3px;">₦120,000</strong>
         </div>
         <div style="font-size: 12px; color: var(--muted); margin-top: 4px;" id="summary-note">Growth plan, 1 month. Renews automatically. Cancel anytime.</div>
       </div>
@@ -121,9 +121,9 @@
 {% block scripts %}
 <script>
   const PLANS = {
-    starter: { label: "Starter", ngn: 80000 },
-    growth:  { label: "Growth",  ngn: 150000 },
-    scale:   { label: "Scale",   ngn: 300000 },
+    starter: { label: "Starter", ngn:  60000 },
+    growth:  { label: "Growth",  ngn: 120000 },
+    scale:   { label: "Premium", ngn: 250000 },
   };
 
   function updateSummary() {

@@ -30,9 +30,9 @@ router = APIRouter(tags=["Marketing"])
 PAYSTACK_BASE = "https://api.paystack.co"
 
 PLAN_PRICING = {
-    "starter": {"label": "Starter", "ngn": 150_000},
-    "growth":  {"label": "Growth",  "ngn": 300_000},
-    "scale":   {"label": "Scale",   "ngn": 600_000},
+    "starter": {"label": "Starter", "ngn":  60_000},
+    "growth":  {"label": "Growth",  "ngn": 120_000},
+    "scale":   {"label": "Premium", "ngn": 250_000},
 }
 
 
