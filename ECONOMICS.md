@@ -128,10 +128,17 @@ These don't attribute per-client, but they need to be paid by *somebody's* margi
 | Mongo Atlas M0 (free) | ~₦0 today | On free tier; switches to M10 (~₦91k) around 10-12 clients |
 | Resend Pro | ~₦32,000 ($20) | Shared (counted partially above) |
 | PostHog | 0 | Free tier sufficient until 1M events/mo |
-| Anthropic / OpenAI minimums | 0 | Usage-based, no floor |
+| Anthropic / OpenAI API minimums | 0 | Usage-based, no floor (separate from Claude Pro below) |
+| **Claude Pro subscription (founder tooling)** | **~₦32,000 ($20)** | The Pro subscription Yori uses to build, draft, plan, debug. Powers everything Claude Code touches. Upgrades to Max 5× (~₦160k) likely once parallel sessions matter, Max 20× (~₦320k) once team grows. |
 | Domain + SSL | ~₦5,000/mo amortised | reachng.ng renewal |
 | Apify (our SDR funnel, not client cost) | ~₦8,000/mo | Marketing expense, not COGS |
-| **Platform fixed total** | **~₦61,000/mo (today)** | At 10 clients, that's ₦6,100/client of platform overhead. Jumps to ₦15,200/client when Mongo moves to M10. |
+| **Platform fixed total (today)** | **~₦93,000/mo** | At 10 clients = ₦9,300/client. Jumps to ₦18,400/client at Mongo M10. |
+
+**Claude Pro → Max trajectory:**
+- 0-15 clients: Pro is fine (~₦32k/mo)
+- 15-50 clients: Max 5× (~₦160k/mo) — operator runs parallel Claude Code sessions, builds faster
+- 50+ clients: Max 20× (~₦320k/mo) — multiple ops team members on Claude
+- Even at Max 20× ÷ 100 clients = ₦3,200/client overhead. Negligible at scale.
 
 Allocate platform fixed across active clients when computing true margin.
 

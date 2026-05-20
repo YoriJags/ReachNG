@@ -187,15 +187,17 @@ The Unipile per-account fee is the only line that scales linearly with clients. 
 
 ### Cost at each milestone
 
-| Clients | MRR | Direct cost | Team cost | Mongo tier | Total cost | Net margin |
-|---:|---:|---:|---:|---|---:|---:|
-| 25    | ₦5.6M   | ₦780k    | Founder only | Atlas free | ₦780k    | 86% |
-| 100   | ₦22.5M  | ₦3.5M    | +1 ops/CS    | M10 ₦91k   | ₦4M      | 82% |
-| 250   | ₦56.3M  | ₦8.5M    | +SDR + accountant | M20 ₦232k | ₦11.5M | 80% |
-| 500   | ₦112.5M | ₦16.7M   | +2 engineers + CS | M20      | ₦24M     | 79% |
-| 1,000 | ₦225M   | ₦32M     | ~15-person org | M30 ₦617k | ₦48M     | 79% |
+Includes Claude Pro/Max operator-tooling cost in the founder-toolset line (Pro at start, Max 5× at ~15 clients, Max 20× at ~50 clients).
 
-**Read:** even at 1,000 clients with a 15-person Lagos team, blended net margin sits ~79%. The model is built for compounding profitability, not just compounding revenue.
+| Clients | MRR | Direct cost | Team cost | Mongo tier | Operator tools | Total cost | Net margin |
+|---:|---:|---:|---:|---|---:|---:|---:|
+| 25    | ₦5.6M   | ₦820k    | Founder only            | Atlas free | Claude Max 5× ₦160k | ₦980k    | 83% |
+| 100   | ₦22.5M  | ₦3.5M    | +1 ops/CS               | M10 ₦91k   | Max 20× ₦320k       | ₦4.4M    | 80% |
+| 250   | ₦56.3M  | ₦8.5M    | +SDR + accountant       | M20 ₦232k  | Max 20× ₦320k       | ₦11.9M   | 79% |
+| 500   | ₦112.5M | ₦16.7M   | +2 engineers + CS       | M20        | 2× Max 20× ₦640k    | ₦24.7M   | 78% |
+| 1,000 | ₦225M   | ₦32M     | ~15-person org          | M30 ₦617k  | 4× Max 20× ₦1.28M   | ₦49.3M   | 78% |
+
+**Read:** even at 1,000 clients with a 15-person Lagos team and full Claude Max for every operator, blended net margin sits at ~78%. The model is built for compounding profitability, not just compounding revenue.
 
 ### Hire plan along the curve
 

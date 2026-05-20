@@ -16,13 +16,15 @@ From [ECONOMICS.md](./ECONOMICS.md) §6, with Meta Cloud option removed, Unipile
 
 | Profile | Per-call AI | Per-client fixed (Unipile + Resend) | Platform share (÷10 clients) | **Total cost/mo** |
 |---|---:|---:|---:|---:|
-| Light  | 2,520 | 25,600 | 6,100 | **~₦34,200** |
-| Medium | 7,620 | 25,600 | 6,100 | **~₦39,300** |
-| Heavy  | 18,840 | 25,600 | 6,100 | **~₦50,500** |
+| Light  | 2,520 | 25,600 | 9,300 | **~₦37,400** |
+| Medium | 7,620 | 25,600 | 9,300 | **~₦42,500** |
+| Heavy  | 18,840 | 25,600 | 9,300 | **~₦53,700** |
 
 These are the floors. Any price below means a loss on that profile.
 
-**Note on Mongo:** you're on Atlas free tier (M0, 512MB) today, so MongoDB cost is ₦0. When client volume + memory data outgrows free tier (around client 8-12 depending on usage), expect to move to M10 (~₦91,000/mo = ~₦9,100/client at 10 clients). Re-run the floor table at that point — every profile will rise by ~₦9k. Still healthy on Ladder B but worth knowing.
+**Platform share (₦9,300/client at 10 clients) now includes Claude Pro subscription** (₦32k/mo) used by the operator for building and operating ReachNG. Upgrades to Max 5× (~₦160k) around 15 clients, Max 20× (~₦320k) around 50 clients. Still negligible per-client at scale (~₦3k each at 100 clients).
+
+**Note on Mongo:** you're on Atlas free tier (M0, 512MB) today, so MongoDB cost is ₦0. When client volume + memory data outgrows free tier (around client 8-12 depending on usage), expect to move to M10 (~₦91,000/mo). Re-run the floor table at that point — every profile will rise by ~₦9k. Still healthy on Ladder B but worth knowing.
 
 ---
 
@@ -32,29 +34,29 @@ These are the floors. Any price below means a loss on that profile.
 
 | Plan | Price | Margin on Light | Margin on Medium | Margin on Heavy |
 |---|---:|---:|---:|---:|
-| Starter | ₦100,000 | +₦65,800 (66%) | +₦60,700 (61%) | +₦49,500 (50%) |
-| Growth  | ₦200,000 | +₦165,800 (83%) | +₦160,700 (80%) | +₦149,500 (75%) |
-| Scale   | ₦400,000 | +₦365,800 (91%) | +₦360,700 (90%) | +₦349,500 (87%) |
+| Starter | ₦100,000 | +₦62,600 (63%) | +₦57,500 (58%) | +₦46,300 (46%) |
+| Growth  | ₦200,000 | +₦162,600 (81%) | +₦157,500 (79%) | +₦146,300 (73%) |
+| Scale   | ₦400,000 | +₦362,600 (91%) | +₦357,500 (89%) | +₦346,300 (87%) |
 
-**Read:** all tiers >50% margin. Starter feels comfortable. Suits a conservative launch.
+**Read:** Starter tight on heavy clients (46%). Growth and Scale clean.
 
-### Ladder B — Operator-grade (₦150 / 300 / 600) — *recommended*
+### Ladder B — Operator-grade (₦150 / 300 / 600) — *recommended, LOCKED*
 
 | Plan | Price | Margin on Light | Margin on Medium | Margin on Heavy |
 |---|---:|---:|---:|---:|
-| Starter | ₦150,000 | +₦115,800 (77%) | +₦110,700 (74%) | +₦99,500 (66%) |
-| Growth  | ₦300,000 | +₦265,800 (89%) | +₦260,700 (87%) | +₦249,500 (83%) |
-| Scale   | ₦600,000 | +₦565,800 (94%) | +₦560,700 (93%) | +₦549,500 (92%) |
+| Starter | ₦150,000 | +₦112,600 (75%) | +₦107,500 (72%) | +₦96,300 (64%) |
+| Growth  | ₦300,000 | +₦262,600 (88%) | +₦257,500 (86%) | +₦246,300 (82%) |
+| Scale   | ₦600,000 | +₦562,600 (94%) | +₦557,500 (93%) | +₦546,300 (91%) |
 
-**Read:** every tier × every profile margin >65%. Comfortable headroom for surprise heavy usage. Strong ambition without pricing-out the premium SME tier.
+**Read:** every tier × every profile margin >64%. Worst case (Heavy on Starter) is still healthy 64%. Headroom for surprise spikes and the eventual Mongo M10 + Claude Max upgrades.
 
 ### Ladder C — Premium-anchor (₦200 / 400 / 800)
 
 | Plan | Price | Margin on Light | Margin on Medium | Margin on Heavy |
 |---|---:|---:|---:|---:|
-| Starter | ₦200,000 | +₦165,800 (83%) | +₦160,700 (80%) | +₦149,500 (75%) |
-| Growth  | ₦400,000 | +₦365,800 (91%) | +₦360,700 (90%) | +₦349,500 (87%) |
-| Scale   | ₦800,000 | +₦765,800 (96%) | +₦760,700 (95%) | +₦749,500 (94%) |
+| Starter | ₦200,000 | +₦162,600 (81%) | +₦157,500 (79%) | +₦146,300 (73%) |
+| Growth  | ₦400,000 | +₦362,600 (91%) | +₦357,500 (89%) | +₦346,300 (87%) |
+| Scale   | ₦800,000 | +₦762,600 (95%) | +₦757,500 (95%) | +₦746,300 (93%) |
 
 **Read:** aggressive but defensible. "₦200k/mo is two days of a senior receptionist's salary, except this one never sleeps." Risk: prices out non-luxury verticals (beauty, small hospitality), narrows TAM.
 
