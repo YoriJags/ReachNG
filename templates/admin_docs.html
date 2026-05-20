@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap">
+  <style>
+    /* ── Screen styling ───────────────────────────────────────────────── */
+    :root {
+      --ink:       #14110d;
+      --ink-mute:  #3a342b;
+      --line:      #d9cdb1;
+      --bg:        #faf7ef;
+      --orange:    #c44a00;
+      --table-h:   #efe7d3;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, Segoe UI, system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .toolbar {
+      position: sticky; top: 0; z-index: 10;
+      background: #14110d; color: #fff;
+      padding: 10px 20px;
+      display: flex; align-items: center; gap: 16px;
+      font-size: 13px;
+    }
+    .toolbar a { color: #fff; text-decoration: none; opacity: 0.85; }
+    .toolbar a:hover { opacity: 1; }
+    .toolbar .print-btn {
+      margin-left: auto;
+      background: var(--orange); color: #fff;
+      padding: 6px 14px; border-radius: 6px; font-weight: 700;
+      letter-spacing: 0.04em; cursor: pointer; border: 0;
+      font-family: inherit; font-size: 12px;
+    }
+    .page {
+      max-width: 780px;
+      margin: 24px auto 80px;
+      background: #fff;
+      padding: 56px 60px;
+      box-shadow: 0 10px 36px rgba(0,0,0,0.08);
+      border: 1px solid var(--line);
+    }
+
+    /* Document header */
+    .doc-header { border-bottom: 2px solid var(--ink); padding-bottom: 18px; margin-bottom: 28px; }
+    .doc-header .eyebrow {
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--orange); font-weight: 700; margin-bottom: 8px;
+    }
+    .doc-header h1 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 36px; font-weight: 500; letter-spacing: -0.8px;
+      margin: 0 0 6px; color: var(--ink);
+    }
+    .doc-header .subtitle { color: var(--ink-mute); font-size: 14px; margin: 0; }
+
+    /* Body typography */
+    .doc h1, .doc h2, .doc h3, .doc h4 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      color: var(--ink); letter-spacing: -0.3px; line-height: 1.25;
+      margin-top: 1.4em; margin-bottom: 0.45em;
+    }
+    .doc h1 { font-size: 28px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+    .doc h2 { font-size: 22px; }
+    .doc h3 { font-size: 17px; }
+    .doc h4 { font-size: 15px; }
+    .doc p  { margin: 0.6em 0 0.9em; }
+    .doc strong { color: var(--ink); }
+    .doc em { color: var(--ink-mute); }
+    .doc a { color: var(--orange); text-decoration: none; border-bottom: 1px dotted var(--orange); }
+    .doc ul, .doc ol { margin: 0.4em 0 1em; padding-left: 24px; }
+    .doc li { margin-bottom: 0.3em; }
+    .doc hr {
+      border: 0; border-top: 1px solid var(--line);
+      margin: 28px 0;
+    }
+    .doc blockquote {
+      margin: 14px 0; padding: 12px 18px;
+      border-left: 3px solid var(--orange);
+      background: #fcf6e6;
+      font-style: italic;
+      color: var(--ink-mute);
+    }
+    .doc code {
+      font-family: 'JetBrains Mono', Consolas, ui-monospace, monospace;
+      font-size: 12px;
+      background: #f3eddb;
+      padding: 1px 6px; border-radius: 4px;
+      color: var(--ink);
+    }
+    .doc pre {
+      background: #2a241b; color: #f0e9dc;
+      padding: 14px 18px; border-radius: 8px; overflow-x: auto;
+    }
+    .doc pre code { background: transparent; color: inherit; }
+
+    /* Tables — the workhorse of these docs */
+    .doc table {
+      width: 100%; border-collapse: collapse;
+      margin: 14px 0 22px;
+      font-size: 13px;
+      border: 1px solid var(--line);
+    }
+    .doc thead { background: var(--table-h); }
+    .doc th {
+      text-align: left; padding: 9px 12px;
+      font-weight: 700; color: var(--ink);
+      border-bottom: 1px solid var(--line);
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .doc td {
+      padding: 8px 12px; border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    .doc tr:last-child td { border-bottom: 0; }
+    /* Right-align cells that are mostly numeric — Markdown :---: is rendered as text-align center, :--- as left, ---: as right.
+       Markdown's `markdown` library writes <th style="text-align:right;"> when you use ---:. We respect that already. */
+
+    /* Footer with page numbers (print only) */
+    @page {
+      size: A4;
+      margin: 16mm 14mm 18mm 14mm;
+      @bottom-center {
+        content: "ReachNG · Confidential · page " counter(page) " of " counter(pages);
+        font-family: 'Inter', sans-serif; font-size: 9pt; color: #6b6356;
+      }
+    }
+
+    /* ── Print overrides ───────────────────────────────────────────────── */
+    @media print {
+      body { background: #fff; font-size: 11pt; line-height: 1.55; }
+      .toolbar { display: none; }
+      .page {
+        box-shadow: none; border: 0;
+        max-width: none; padding: 0; margin: 0;
+      }
+      .doc h1, .doc h2, .doc h3, .doc h4 { page-break-after: avoid; }
+      .doc table, .doc pre, .doc blockquote { page-break-inside: avoid; }
+      .doc h2 { margin-top: 26pt; }
+      .doc a { color: var(--ink); border-bottom: 0; }
+      .doc table { font-size: 10pt; }
+      .doc-header h1 { font-size: 26pt; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="/admin/docs">← All docs</a>
+    <span style="opacity:0.5">·</span>
+    <span>{{ title }}</span>
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+
+  <div class="page">
+    <div class="doc-header">
+      <div class="eyebrow">ReachNG · Confidential</div>
+      <h1>{{ title.replace('ReachNG · ', '') }}</h1>
+      <p class="subtitle">{{ subtitle }}</p>
+    </div>
+
+    <div class="doc">
+      {{ body_html | safe }}
+    </div>
+  </div>
+</body>
+</html>

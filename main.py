@@ -303,6 +303,7 @@ from api.pipeline import router as pipeline_router
 from api.whatsapp_connect import router as whatsapp_connect_router
 from api.onboarding import router as onboarding_router
 from api.inventory import router as inventory_router
+from api.admin_docs import router as admin_docs_router
 app.include_router(kb_router)
 app.include_router(client_rules_router)
 app.include_router(scorecard_router)
@@ -315,6 +316,7 @@ app.include_router(pipeline_router)
 app.include_router(whatsapp_connect_router)
 app.include_router(onboarding_router)
 app.include_router(inventory_router)
+app.include_router(admin_docs_router)
 
 app.include_router(dashboard_router, **_auth)
 

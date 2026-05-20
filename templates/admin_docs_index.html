@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ReachNG · Admin Docs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap">
+  <style>
+    :root {
+      --bg:           #f8f4ec;
+      --bg-2:         #f0e9dc;
+      --surface:      #ffffff;
+      --border:       #e3d8c0;
+      --text:         #14110d;
+      --text-strong:  #14110d;
+      --muted:        #6b6356;
+      --muted-strong: #3a342b;
+      --orange:       #ff5500;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Inter', -apple-system, Segoe UI, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 80px 24px 60px; }
+    h1 { font-family: 'Instrument Serif', Georgia, serif; font-size: 44px; font-weight: 400; letter-spacing: -1px; margin: 0 0 10px; }
+    .sub { color: var(--muted); margin: 0 0 36px; font-size: 15px; }
+    .doc-card {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .doc-card:hover { border-color: var(--orange); transform: translateY(-1px); }
+    .doc-card h2 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 24px; font-weight: 400; margin: 0 0 6px; letter-spacing: -0.3px;
+      color: var(--text-strong);
+    }
+    .doc-card p { margin: 0; font-size: 14px; color: var(--muted-strong); }
+    .doc-card .meta { margin-top: 12px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--orange); font-weight: 700; }
+    .tip {
+      margin-top: 36px;
+      padding: 16px 20px;
+      background: var(--bg-2);
+      border-left: 3px solid var(--orange);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--muted-strong);
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Admin Docs</h1>
+    <p class="sub">Printable internal docs. Open one, then use your browser's Print → Save as PDF.</p>
+
+    {% for slug, meta in docs.items() %}
+    <a class="doc-card" href="/admin/docs/{{ slug }}">
+      <h2>{{ meta.title }}</h2>
+      <p>{{ meta.subtitle }}</p>
+      <div class="meta">Read · Print · Share</div>
+    </a>
+    {% endfor %}
+
+    <div class="tip">
+      <strong>How to share with an investor:</strong> open the doc → Ctrl/Cmd+P → Destination: Save as PDF → attach to email. Each page is sized for letter / A4 with margins built in.
+    </div>
+  </div>
+</body>
+</html>
