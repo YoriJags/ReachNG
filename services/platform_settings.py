@@ -40,9 +40,9 @@ log = structlog.get_logger()
 # ─── Defaults (fallback when no doc exists) ───────────────────────────────────
 
 DEFAULT_PRICING = {
-    "starter": {"label": "Starter", "ngn": 80_000},
-    "growth":  {"label": "Growth",  "ngn": 150_000},
-    "scale":   {"label": "Scale",   "ngn": 300_000},
+    "starter": {"label": "Starter", "ngn": 150_000},
+    "growth":  {"label": "Growth",  "ngn": 300_000},
+    "scale":   {"label": "Scale",   "ngn": 600_000},
 }
 
 
