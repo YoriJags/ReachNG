@@ -44,6 +44,11 @@ DOCS = {
         "path":  _ROOT / "INVESTOR.md",
         "subtitle": "Road to 1,000 clients · Lagos + Abuja premium SME tier",
     },
+    "acquisition": {
+        "title": "ReachNG · Year-1 Acquisition Plan",
+        "path":  _ROOT / "ACQUISITION.md",
+        "subtitle": "How we get from 2 visitors/week to 700/week (100 paid clients Y1)",
+    },
 }
 
 
