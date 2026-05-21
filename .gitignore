@@ -28,6 +28,9 @@ logs/
 .DS_Store
 Thumbs.db
 
+# Local Claude config
+.claude/
+
 # Data exports
 exports/
 *.csv
