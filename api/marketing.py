@@ -437,6 +437,35 @@ async def paystack_webhook(request: Request):
     return {"ok": True, "provisioned": True, "portal_token": portal_token}
 
 
+# Public founder-slots counter — drives the live scarcity strip on /pricing.
+# Visible-scarcity converts better than abstract "first 50" phrasing.
+FOUNDER_CAP = 50
+_SLOTS_CACHE: dict = {"taken": None, "expires_at": None}
+
+@router.get("/api/v1/founder-slots", include_in_schema=False)
+async def founder_slots():
+    """Returns {cap, taken, remaining} based on count of active paying clients.
+    Cached 5 minutes so a viral spike doesn't hammer Mongo."""
+    from datetime import datetime, timezone, timedelta
+    now = datetime.now(timezone.utc)
+    cached_until = _SLOTS_CACHE.get("expires_at")
+    if cached_until and now < cached_until and _SLOTS_CACHE.get("taken") is not None:
+        taken = _SLOTS_CACHE["taken"]
+    else:
+        try:
+            taken = get_db()["clients"].count_documents({"active": True, "payment_status": "paid"})
+        except Exception:
+            taken = 0
+        _SLOTS_CACHE["taken"] = taken
+        _SLOTS_CACHE["expires_at"] = now + timedelta(minutes=5)
+    return {
+        "cap":       FOUNDER_CAP,
+        "taken":     taken,
+        "remaining": max(0, FOUNDER_CAP - taken),
+        "sold_out":  taken >= FOUNDER_CAP,
+    }
+
+
 @router.get("/robots.txt", response_class=PlainTextResponse, include_in_schema=False)
 async def robots_txt(request: Request):
     base = str(request.base_url).rstrip("/")

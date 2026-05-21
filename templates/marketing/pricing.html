@@ -24,6 +24,33 @@
   <div class="eyebrow">Concrete naira pricing · No surprises</div>
   <h1>Cash Desk pricing. Pay for outcomes.</h1>
   <p class="sub">Three tiers built around the four cash workflows, Activate, Recover, Close, Retain. Pick the one that matches your volume. Pay monthly, or save 15% on annual prepay.</p>
+
+  <!-- Live founder-slots counter — visible scarcity vs abstract "first 50" phrasing -->
+  <div id="founder-slots-strip" style="display:none; max-width: 480px; margin: 26px auto 0; padding: 14px 22px; background: linear-gradient(135deg, rgba(255,85,0,0.10), rgba(255,85,0,0.04)); border: 1px solid rgba(255,85,0,0.30); border-radius: 100px; font-size: 13px; color: var(--text-strong); font-weight: 600; letter-spacing: 0.02em;">
+    <span style="display:inline-flex; align-items:center; gap:10px;">
+      <span style="width:8px; height:8px; border-radius:50%; background:#ff5500; box-shadow:0 0 10px #ff5500; display:inline-block;"></span>
+      <span><strong id="fs-taken" style="color:var(--orange);">·</strong> of <strong>50</strong> founder slots taken · <strong id="fs-remaining" style="color:var(--text-strong);">·</strong> remaining at this price</span>
+    </span>
+  </div>
+  <div id="founder-slots-soldout" style="display:none; max-width: 480px; margin: 26px auto 0; padding: 14px 22px; background: #14110d; color:#fff; border-radius: 100px; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; text-align: center;">
+    Founder pricing closed · standard prices in effect
+  </div>
+  <script>
+    (async function () {
+      try {
+        const r = await fetch('/api/v1/founder-slots');
+        if (!r.ok) return;
+        const d = await r.json();
+        if (d.sold_out) {
+          document.getElementById('founder-slots-soldout').style.display = 'block';
+        } else {
+          document.getElementById('fs-taken').textContent = (d.taken || 0).toLocaleString();
+          document.getElementById('fs-remaining').textContent = (d.remaining || 0).toLocaleString();
+          document.getElementById('founder-slots-strip').style.display = 'block';
+        }
+      } catch (e) { /* silent — strip stays hidden */ }
+    })();
+  </script>
 </section>
 
 <section style="padding-top: 0;">
