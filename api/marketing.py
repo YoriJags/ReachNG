@@ -422,6 +422,18 @@ async def paystack_webhook(request: Request):
     except Exception as exc:
         log.warning("signup_welcome_email_failed", error=str(exc), business=signup["business_name"])
 
+    # 3) Branded subscription receipt via Resend (separate from the Paystack auto-receipt).
+    #    Built into services/subscription_invoice.py; this is the wire-up so it actually fires.
+    try:
+        from services.subscription_invoice import generate_receipt, email_receipt
+        receipt = generate_receipt(signup=signup, client_id=str(existing["_id"]) if existing else None, paid_at=now)
+        await email_receipt(receipt)
+        log.info("subscription_receipt_dispatched",
+                 receipt_no=receipt.get("receipt_number"),
+                 business=signup["business_name"])
+    except Exception as exc:
+        log.warning("subscription_receipt_failed", error=str(exc), business=signup["business_name"])
+
     return {"ok": True, "provisioned": True, "portal_token": portal_token}
 
 
