@@ -45,6 +45,16 @@ The two gaps that block first paying client: (1) nobody visits the landing, (2) 
   - Remove "2 Lagos & Abuja businesses already on the list" line until 10+ signups
   - Or swap for: "Founding cohort: applications open"
 
+- [ ] **5b. Visible founder-slots counter on /pricing** *(30 min — added from Emergent strategic review 2026-05-21)*
+  - Reads `clients` count, shows "${50 - count} of 50 founder slots remaining" when count < 50
+  - Live scarcity > abstract "first 50" phrase
+  - Emergent insight: "9 of 50 founder slots taken" converts because visible scarcity > abstract scarcity
+
+- [ ] **5c. Bump onboarding tone-calibration from 10 → 20 approved drafts before live** *(half day — added from Emergent strategic review 2026-05-21)*
+  - First-hour-of-onboarding is where churn happens
+  - More approved drafts = sharper tone fit on day 1 = lower week-2 churn
+  - Edit `services/onboarding.py` calibration step + wizard copy + the live-mode gate
+
 **Sprint 1 ship gate:** all 5 ticked. After this, the landing converts, receipts auto-email, and WhatsApp expiry can't kill a paid client silently. Safe to push for first paid client.
 
 ---

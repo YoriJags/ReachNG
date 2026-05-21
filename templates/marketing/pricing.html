@@ -1,7 +1,7 @@
 {% extends "marketing/_base.html" %}
 
 {% block title %}Pricing, ReachNG{% endblock %}
-{% block description %}ReachNG pricing, Starter ₦60,000, Growth ₦120,000, Premium ₦250,000 per month. Annual = save 15%. Built for Lagos and Abuja SMEs of every size.{% endblock %}
+{% block description %}ReachNG pricing, Solo ₦60,000, Team ₦120,000, Empire ₦250,000 per month. Annual = save 15%. Built for Lagos and Abuja SMEs of every size.{% endblock %}
 
 {% block schema %}
 <script type="application/ld+json">
@@ -9,9 +9,9 @@
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
-    {"@type": "Question", "name": "How much does ReachNG cost?", "acceptedAnswer": {"@type": "Answer", "text": "Three tiers: Starter ₦60,000/month, Growth ₦120,000/month, Premium ₦250,000/month. Annual prepay saves 15%."}},
+    {"@type": "Question", "name": "How much does ReachNG cost?", "acceptedAnswer": {"@type": "Answer", "text": "Three tiers: Solo ₦60,000/month, Team ₦120,000/month, Empire ₦250,000/month. Annual prepay saves 15%."}},
     {"@type": "Question", "name": "Is there a free trial?", "acceptedAnswer": {"@type": "Answer", "text": "No free tier, but we do a 30-minute live demo on real Lagos or Abuja data before you commit. You see exactly how the agent handles your vertical before paying a naira."}},
-    {"@type": "Question", "name": "What's included?", "acceptedAnswer": {"@type": "Answer", "text": "Starter includes the agent + drafts + HITL approval + your WhatsApp number paired via Unipile. Growth adds operations (rent chase, payroll, invoice chasers, the suite matched to your vertical). Premium adds bespoke modules + multi-location coordination + priority operator support."}},
+    {"@type": "Question", "name": "What's included?", "acceptedAnswer": {"@type": "Answer", "text": "Solo includes the agent + drafts + HITL approval + your WhatsApp number paired via Unipile. Team adds operations (rent chase, payroll, invoice chasers, the suite matched to your vertical). Empire adds bespoke modules + multi-location coordination + priority operator support."}},
     {"@type": "Question", "name": "Do you take a cut of my revenue?", "acceptedAnswer": {"@type": "Answer", "text": "No. ReachNG never holds your funds. All deposits and payments go through your own Paystack account into your bank. We charge only the monthly SaaS fee."}}
   ]
 }
@@ -33,7 +33,7 @@
       <!-- Starter -->
       <div class="card" style="display:flex; flex-direction:column;">
         <div class="tag">Tier 1</div>
-        <h3 style="font-size: 24px;">🌱 Starter</h3>
+        <h3 style="font-size: 24px;">🌱 Solo</h3>
         <div style="font-size: 13px; color: var(--muted); text-decoration: line-through; margin-top: 6px;">₦80,000/month</div>
         <div style="font-size: 40px; font-weight: 700; color: var(--text-strong); margin: 2px 0 4px; letter-spacing:-1px;">
           ₦60,000<span style="font-size:14px; font-weight:400; color:var(--muted);">/month</span>
@@ -50,14 +50,14 @@
           <li>✓ Per-vertical Control Room dashboard</li>
           <li>✓ Email + WhatsApp support · 24-hr response</li>
         </ul>
-        <a href="/signup?plan=starter" data-ph="pricing_cta_starter" class="btn btn-ghost" style="margin-top:auto; text-align:center;">Start with Starter</a>
+        <a href="/signup?plan=starter" data-ph="pricing_cta_starter" class="btn btn-ghost" style="margin-top:auto; text-align:center;">Start with Solo</a>
       </div>
 
       <!-- Growth (middle tier — nudge toward this one) -->
       <div class="card" style="display:flex; flex-direction:column; border: 2px solid var(--orange); position: relative; background: linear-gradient(180deg, rgba(255,85,0,0.04) 0%, rgba(255,85,0,0.00) 60%); box-shadow: 0 18px 48px rgba(255,85,0,0.18); transform: translateY(-8px);">
         <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--orange); color: #fff; font-size: 10px; font-weight: 700; padding: 5px 14px; border-radius: 999px; letter-spacing: 0.14em; white-space: nowrap; box-shadow: 0 4px 14px rgba(255,85,0,0.30);">⭐ BEST VALUE · MOST POPULAR</div>
         <div class="tag" style="color: var(--orange);">Tier 2 · Recommended</div>
-        <h3 style="font-size: 24px;">⭐ Growth</h3>
+        <h3 style="font-size: 24px;">⭐ Team</h3>
         <div style="font-size: 13px; color: var(--muted); text-decoration: line-through; margin-top: 6px;">₦150,000/month</div>
         <div style="font-size: 40px; font-weight: 700; color: var(--text-strong); margin: 2px 0 4px; letter-spacing:-1px;">
           ₦120,000<span style="font-size:14px; font-weight:400; color:var(--muted);">/month</span>
@@ -65,7 +65,7 @@
         <div style="display: inline-block; background: rgba(255,85,0,0.10); color: var(--orange); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; border-radius: 100px; margin-bottom: 14px;">Founder pricing · first 50 clients</div>
         <p style="margin: 0 0 18px; font-size: 14px; color: var(--muted-strong);">For premium SMEs with active inbound, multiple staff, and a book of customers worth reactivating.</p>
         <ul style="list-style: none; padding: 0; margin: 0 0 24px; font-size: 13.5px; color: var(--muted-strong); line-height: 1.85;">
-          <li>✓ <strong style="color:var(--text-strong);">Everything in Starter</strong></li>
+          <li>✓ <strong style="color:var(--text-strong);">Everything in Solo</strong></li>
           <li>✓ Re-engagement: past customer, dormant, hot lead buckets</li>
           <li>✓ Bring your book: WhatsApp share-contact, vCard, paste, CSV</li>
           <li>✓ Outcome learning loop (replies sharpen each week)</li>
@@ -74,13 +74,13 @@
           <li>✓ ROI dashboard: deposits, bookings, recovered ₦</li>
           <li>✓ Priority WhatsApp support · 4-hr response</li>
         </ul>
-        <a href="/signup?plan=growth" data-ph="pricing_cta_growth" class="btn btn-primary" style="margin-top:auto; text-align:center;">Get Growth</a>
+        <a href="/signup?plan=growth" data-ph="pricing_cta_growth" class="btn btn-primary" style="margin-top:auto; text-align:center;">Get Team</a>
       </div>
 
       <!-- Premium (internal key remains 'scale' for code compat) -->
       <div class="card" style="display:flex; flex-direction:column;">
         <div class="tag">Tier 3</div>
-        <h3 style="font-size: 24px;">👑 Premium</h3>
+        <h3 style="font-size: 24px;">👑 Empire</h3>
         <div style="font-size: 13px; color: var(--muted); text-decoration: line-through; margin-top: 6px;">₦300,000/month</div>
         <div style="font-size: 40px; font-weight: 700; color: var(--text-strong); margin: 2px 0 4px; letter-spacing:-1px;">
           ₦250,000<span style="font-size:14px; font-weight:400; color:var(--muted);">/month</span>
@@ -89,7 +89,7 @@
         <p style="margin: 0 0 14px; font-size: 14px; color: var(--muted-strong);">For solo owners wanting the deepest operational tier (Proactive Intelligence, Owner Co-Pilot, Voice Operator), and for multi-location groups, luxury agencies, family offices.</p>
         <p style="margin: 0 0 18px; padding: 10px 14px; background: rgba(255,85,0,0.08); border-left: 3px solid var(--orange); border-radius: 6px; font-size: 12.5px; color: var(--muted-strong); line-height: 1.6;"><strong style="color:var(--text-strong);">Optional bundle:</strong> if you run multiple businesses, add each extra WhatsApp number at <strong style="color:var(--orange);">+₦125,000/mo</strong>. Any vertical — restaurant + agency + clinic, mixed. EYO adapts per line.</p>
         <ul style="list-style: none; padding: 0; margin: 0 0 24px; font-size: 13.5px; color: var(--muted-strong); line-height: 1.85;">
-          <li>✓ <strong style="color:var(--text-strong);">Everything in Growth</strong></li>
+          <li>✓ <strong style="color:var(--text-strong);">Everything in Team</strong></li>
           <li>✓ Multi-vertical bundle (50% off each extra line)</li>
           <li>✓ Proactive Intelligence: festival timing, birthday nudges, capacity prompts</li>
           <li>✓ Owner Co-Pilot — ask EYO questions, get answers from your data</li>
@@ -99,7 +99,7 @@
           <li>✓ Architecture tour + quarterly playbook tuning</li>
           <li>✓ Premium response · 15-min during business hours</li>
         </ul>
-        <a href="/signup?plan=scale" data-ph="pricing_cta_premium" class="btn btn-ghost" style="margin-top:auto; text-align:center;">Get Premium</a>
+        <a href="/signup?plan=scale" data-ph="pricing_cta_premium" class="btn btn-ghost" style="margin-top:auto; text-align:center;">Get Empire</a>
       </div>
 
     </div>
@@ -108,9 +108,9 @@
     <div style="margin-top: 56px; padding: 36px 40px; background: linear-gradient(135deg, #14110d 0%, #2a241b 100%); border-radius: 16px; color: #f0e9dc; box-shadow: 0 22px 56px rgba(20,17,13,0.20);" class="bundle-showcase">
       <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center;" class="bundle-grid">
         <div>
-          <div style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ff9b66; font-weight: 700; margin-bottom: 10px;">Premium · Optional bundle</div>
-          <h3 style="font-family: Georgia, serif; font-size: clamp(26px, 3.5vw, 34px); font-weight: 600; color: #fff; margin: 0 0 14px; letter-spacing: -0.5px; line-height: 1.2;">Run more than one business? Bundle them under Premium.</h3>
-          <p style="margin: 0 0 18px; font-size: 14.5px; line-height: 1.7; color: #c9bda7;">Premium stands on its own for solo owners who want the deepest tier (Co-Pilot, Voice Operator, bespoke modules, quarterly tuning). <strong style="color:#fff;">If you also happen to run multiple businesses</strong>, each extra WhatsApp number is <strong style="color:#ff9b66;">+₦125,000/mo</strong> (50% off the base). Each line gets its own vertical playbook — EYO sounds like a restaurant manager on the restaurant line and like a property agent on the RE line, all from one portal.</p>
+          <div style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ff9b66; font-weight: 700; margin-bottom: 10px;">Empire · Optional bundle</div>
+          <h3 style="font-family: Georgia, serif; font-size: clamp(26px, 3.5vw, 34px); font-weight: 600; color: #fff; margin: 0 0 14px; letter-spacing: -0.5px; line-height: 1.2;">Run more than one business? Bundle them under Empire.</h3>
+          <p style="margin: 0 0 18px; font-size: 14.5px; line-height: 1.7; color: #c9bda7;">Empire stands on its own for solo owners who want the deepest tier (Co-Pilot, Voice Operator, bespoke modules, quarterly tuning). <strong style="color:#fff;">If you also happen to run multiple businesses</strong>, each extra WhatsApp number is <strong style="color:#ff9b66;">+₦125,000/mo</strong> (50% off the base). Each line gets its own vertical playbook — EYO sounds like a restaurant manager on the restaurant line and like a property agent on the RE line, all from one portal.</p>
           <a href="https://wa.me/2348164583657?text=Hi%20ReachNG%2C%20I%27d%20like%20to%20talk%20about%20a%20Premium%20bundle" data-ph="pricing_bundle_cta" target="_blank" rel="noopener" style="display: inline-block; background: var(--orange); color: #fff; padding: 12px 22px; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; letter-spacing: 0.04em;">Talk to us about a bundle →</a>
         </div>
 
@@ -134,7 +134,7 @@
     <style>@media (max-width: 760px) { .bundle-grid { grid-template-columns: 1fr !important; gap: 28px !important; } .bundle-showcase { padding: 28px 24px !important; } }</style>
 
     <p style="text-align: center; margin-top: 32px; font-size: 14px; color: var(--muted);">
-      💡 <strong style="color:var(--text-strong);">Annual prepay saves 15%</strong>, Starter ₦612K/yr · Growth ₦1.22M/yr · Premium ₦2.55M/yr
+      💡 <strong style="color:var(--text-strong);">Annual prepay saves 15%</strong>, Solo ₦612K/yr · Team ₦1.22M/yr · Empire ₦2.55M/yr
     </p>
     <p style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--muted);">
       All prices in naira. Paid via Paystack. Cancel anytime.

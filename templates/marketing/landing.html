@@ -115,6 +115,18 @@
     @media (max-width: 720px) {
       .mock-grid { grid-template-columns: 1fr !important; }
     }
+    /* ≤380px (iPhone SE) — tighten padding + font sizes so WhatsApp scene cards don't overflow */
+    @media (max-width: 380px) {
+      .hero h1 { font-size: 30px !important; line-height: 1.18 !important; letter-spacing: -0.5px !important; }
+      .hero .sub { font-size: 14px !important; }
+      .hero-ctas { flex-direction: column !important; gap: 10px !important; }
+      .hero-ctas .btn { width: 100% !important; text-align: center !important; }
+      .mock-grid > div { padding: 16px 14px !important; }
+      .mock-grid .msg-bubble, .mock-grid div[style*="border-radius: 12px 12px 12px 4px"],
+      .mock-grid div[style*="border-radius: 12px 12px 4px 12px"] { font-size: 12.5px !important; max-width: 100% !important; }
+      .reassure-grid { gap: 12px !important; }
+      .reassure-grid p { font-size: 12px !important; }
+    }
   </style>
 
   <p id="wl-counter" style="margin-top: 14px; font-size: 13px; color: var(--muted-strong); letter-spacing: 0.02em; display: none;">
@@ -556,7 +568,7 @@
 
       <!-- Starter -->
       <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px;">
-        <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 700;">🌱 Starter</div>
+        <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 700;">🌱 Solo</div>
         <div style="margin-top: 6px;"><span style="font-size: 12px; color: var(--muted); text-decoration: line-through;">₦80,000</span> <span style="font-size: 26px; font-weight: 700; color: var(--text-strong); letter-spacing: -0.5px;">₦60,000</span><span style="font-size: 12px; color: var(--muted);">/mo</span></div>
         <ul style="list-style: none; padding: 0; margin: 14px 0 0; font-size: 13px; color: var(--muted-strong); line-height: 1.8;">
           <li>✓ EYO on your WhatsApp number</li>
@@ -569,10 +581,10 @@
       <!-- Growth (the nudge) -->
       <div style="background: linear-gradient(180deg, rgba(255,85,0,0.06) 0%, var(--surface) 60%); border: 2px solid var(--orange); border-radius: 12px; padding: 22px 24px; position: relative; box-shadow: 0 16px 40px rgba(255,85,0,0.16);">
         <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--orange); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 12px; border-radius: 999px; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap;">⭐ Best value</div>
-        <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange); font-weight: 700; margin-top: 4px;">⭐ Growth</div>
+        <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange); font-weight: 700; margin-top: 4px;">⭐ Team</div>
         <div style="margin-top: 6px;"><span style="font-size: 12px; color: var(--muted); text-decoration: line-through;">₦150,000</span> <span style="font-size: 28px; font-weight: 700; color: var(--text-strong); letter-spacing: -0.5px;">₦120,000</span><span style="font-size: 12px; color: var(--muted);">/mo</span></div>
         <ul style="list-style: none; padding: 0; margin: 14px 0 0; font-size: 13px; color: var(--muted-strong); line-height: 1.8;">
-          <li>✓ <strong style="color:var(--text-strong);">Everything in Starter</strong></li>
+          <li>✓ <strong style="color:var(--text-strong);">Everything in Solo</strong></li>
           <li>✓ Re-engage past customers + dormant leads</li>
           <li>✓ Bring your book (vCard / paste / WhatsApp share)</li>
           <li>✓ Outcome learning loop + ROI dashboard</li>
@@ -581,10 +593,10 @@
 
       <!-- Premium -->
       <div style="background: var(--bg-dark); color: #f0e9dc; border: 1px solid #2a241b; border-radius: 12px; padding: 22px 24px;">
-        <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #ff9b66; font-weight: 700;">👑 Premium</div>
+        <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #ff9b66; font-weight: 700;">👑 Empire</div>
         <div style="margin-top: 6px;"><span style="font-size: 12px; color: #8a7e6a; text-decoration: line-through;">₦300,000</span> <span style="font-size: 26px; font-weight: 700; color: #fff; letter-spacing: -0.5px;">₦250,000</span><span style="font-size: 12px; color: #8a7e6a;">/mo</span></div>
         <ul style="list-style: none; padding: 0; margin: 14px 0 0; font-size: 13px; color: #c9bda7; line-height: 1.8;">
-          <li>✓ <strong style="color:#fff;">Everything in Growth</strong></li>
+          <li>✓ <strong style="color:#fff;">Everything in Team</strong></li>
           <li>✓ Proactive Intelligence + Owner Co-Pilot</li>
           <li>✓ Voice Operator + bespoke modules</li>
           <li>✓ Multi-business bundle: +₦125k per extra line</li>
