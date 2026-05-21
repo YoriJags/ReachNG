@@ -9,6 +9,15 @@
      1. HERO  (problem-anchored, ReachNG-led, no "EYO" until visual context)
      ───────────────────────────────────────────────────────────────────── -->
 <section class="hero">
+  <!-- Vertical picker — Intercom-style 1-click ICP routing. Visitors self-select their industry and route to /for/{slug} -->
+  <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; font-size: 12px; color: var(--muted-strong);">
+    <span style="color: var(--muted); letter-spacing: 0.06em;">I run a</span>
+    <a href="/for/restaurants" data-ph="hero_vertical_hospitality" style="background: var(--surface); border: 1px solid var(--border); color: var(--text-strong); padding: 6px 12px; border-radius: 100px; text-decoration: none; font-weight: 600; transition: 0.15s;">🍽 restaurant / venue</a>
+    <a href="/for/real-estate" data-ph="hero_vertical_real_estate" style="background: var(--surface); border: 1px solid var(--border); color: var(--text-strong); padding: 6px 12px; border-radius: 100px; text-decoration: none; font-weight: 600;">🏛 real estate</a>
+    <a href="/for/legal" data-ph="hero_vertical_legal" style="background: var(--surface); border: 1px solid var(--border); color: var(--text-strong); padding: 6px 12px; border-radius: 100px; text-decoration: none; font-weight: 600;">⚖ law / advisory</a>
+    <a href="/for/schools" data-ph="hero_vertical_education" style="background: var(--surface); border: 1px solid var(--border); color: var(--text-strong); padding: 6px 12px; border-radius: 100px; text-decoration: none; font-weight: 600;">🎓 school</a>
+    <a href="/for/small-business" data-ph="hero_vertical_other" style="background: var(--surface); border: 1px solid var(--border); color: var(--muted-strong); padding: 6px 12px; border-radius: 100px; text-decoration: none; font-weight: 600;">something else →</a>
+  </div>
   <div class="eyebrow">AI WhatsApp operator for premium Lagos &amp; Abuja businesses</div>
   <h1>One WhatsApp operator. <em>Never sleeps.</em> Never takes a break. Replies in your voice.</h1>
   <p class="sub">ReachNG is your agentic employee for WhatsApp. Replies first, qualifies the lead, catches payments, briefs you every morning. Always on, always in your voice. You only tap to approve.</p>
@@ -120,13 +129,42 @@
         const r = await fetch('/api/v1/waitlist/counter');
         if (!r.ok) return;
         const d = await r.json();
-        if (d.total && d.total > 0) {
+        // Only show the social-proof line once we have meaningful volume.
+        // Showing "2 businesses on the list" actively hurts — looks pre-launch.
+        if (d.total && d.total >= 10) {
           document.getElementById('wl-count').textContent = d.total.toLocaleString();
           document.getElementById('wl-counter').style.display = 'block';
         }
       } catch (e) { /* silent */ }
     })();
   </script>
+</section>
+
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     1.6 TRUST BAND  (claims already true elsewhere in product — say them here)
+     ───────────────────────────────────────────────────────────────────── -->
+<section style="background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 22px 24px;">
+  <div class="inner" style="max-width: 1040px; padding: 0;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px 32px; align-items: center; text-align: center;" class="trust-grid">
+      <div>
+        <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange); font-weight: 700; margin-bottom: 4px;">Your number stays yours</div>
+        <p style="margin: 0; font-size: 12px; color: var(--muted-strong); line-height: 1.55;">EYO pairs to your existing WhatsApp via QR. No port. No new SIM.</p>
+      </div>
+      <div>
+        <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange); font-weight: 700; margin-bottom: 4px;">We never hold funds</div>
+        <p style="margin: 0; font-size: 12px; color: var(--muted-strong); line-height: 1.55;">Customer payments go straight into your own bank via Paystack.</p>
+      </div>
+      <div>
+        <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange); font-weight: 700; margin-bottom: 4px;">Memory isolation</div>
+        <p style="margin: 0; font-size: 12px; color: var(--muted-strong); line-height: 1.55;">Per-client data lock, audited nightly. Zero cross-client leakage.</p>
+      </div>
+      <div>
+        <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange); font-weight: 700; margin-bottom: 4px;">Lagos-built</div>
+        <p style="margin: 0; font-size: 12px; color: var(--muted-strong); line-height: 1.55;">Naira-first, Paystack-paid, Pidgin-fluent. Made for this market.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 
