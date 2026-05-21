@@ -473,6 +473,75 @@ Ranked by ship-effort × distribution impact. Pull the top one into PLAN.md once
 
 ---
 
+## P1 — Tech/AI engine batch (added 2026-05-21 from Emergent triage)
+
+Survivors of the Emergent 22-idea tech playbook triage. See `memory/project_reachng_emergent_tech_review.md` for verdict per item including the 8 dumped + 4 already-covered. Items below are ordered by ship-readiness.
+
+### Build after first paid client lives 30 days
+
+- [ ] **A1. Agentic Actions framework** *(~2 weeks, P0 once Sprint 1 closes)*
+  - Extend HITL queue to support stateful actions, not just outbound drafts
+  - V1 actions: send Paystack payment link sized to booking · hold a slot for 10 min · schedule a follow-up nudge · approve refund flow
+  - Owner approves the action with one tap (same HITL pattern as drafts)
+  - **Why:** drafts are commoditised. Stateful actions are the moat that locks switching cost.
+
+- [ ] **A2. Voice-clone owner brief** *(~4 days, Premium-only)*
+  - 90-second audio brief in the owner's cloned voice (ElevenLabs Multilingual v2)
+  - Cloned from 60-sec sample at onboarding · plays as WhatsApp voice note at 7am
+  - **Cost:** ~₦100/day/client at $0.06/brief. Pass-through to Empire tier only.
+  - **Why:** daily voice note in their own voice is a habit hook nothing competes with.
+
+- [ ] **A3. Multi-agent reply orchestration** *(~3 weeks, Empire-tier only)*
+  - Drafter writes → Critic scores tone/accuracy/risk → Fraud-checker scans receipts → Vertical-expert verifies playbook
+  - Owner sees winning draft + collapsible runners-up
+  - **Cost:** ~3.5× current draft cost; Empire-tier exclusive
+  - **Why:** justifies the ₦250k Empire tier · owners love seeing the AI "think"
+
+- [ ] **A4. Synthetic customer testing suite** *(~3 weeks, month 3-4)*
+  - Weekly synthetic Lagos personas DM every active EYO; probe for tone drift, price accuracy, fake-receipt recognition, language safe-switch breaks
+  - Results → weekly QA brief to owner
+  - **Why:** first production CI/CD for an AI sales agent in Africa · massive trust moat for legal/clinic verticals
+
+- [ ] **A5. NDPR / regulatory compliance dashboard** *(~4 weeks)*
+  - Automatic PII redaction in logs · one-click "right to be forgotten" customer-data export · NDPR breach detection · per-draft / per-approval / per-send audit trail surfaced in portal
+  - **Why:** unlocks regulated verticals (legal, clinics, fintech) that currently can't legally use cloud AI without this layer. Lagos has 6 active NDPR enforcement cases this year.
+
+### Trigger-gated (build when condition fires)
+
+- [ ] **A6. Open Banking integration (Mono / Okra)** *(~3 weeks)* — **THE BIGGEST SINGLE MOAT IN THE PLAYBOOK**
+  - Listen for inbound transfers to the owner's account in real-time
+  - Owner gets "💰 ₦450k confirmed from Bola O." push *before* the customer sends the screenshot
+  - Receipt Catcher demoted to fallback path for offline cases
+  - **Cost:** ~₦25/transaction via Mono Connect
+  - **Trigger:** first paid client lives 30 days successfully + Mono/Okra account approved
+  - **Why:** eliminates fake screenshots entirely · 2-year competitor lead time · switching cost becomes infinite
+
+- [ ] **A7. EYO Mesh — federated cross-client insights** *(~4 weeks)*
+  - Privacy-safe aggregates: "Restaurants like yours see 38% more bookings when X" · "Network caught ₦47M Saturday 8pm-midnight"
+  - Differential privacy + k-anonymity on the network layer
+  - **Trigger:** ≥20 paying clients (otherwise no statistical signal)
+  - **Why:** every new client makes every existing client smarter — real network effect
+
+- [ ] **A8. Visual generation per vertical** *(~3 weeks per vertical)*
+  - RE: stylised floor plan from property description (FLUX / Gemini Nano Banana)
+  - Hospitality: 1-page menu card from kitchen daily list
+  - Clinics: redacted before/after composite
+  - Legal: 1-page case summary PDF
+  - **Cost:** ~₦40/image · Gemini Nano Banana
+  - **Trigger:** vertical has 3+ paying clients · build only for verticals showing demand
+
+- [ ] **A9. Fraud detection model (Lagos-specific receipts)** *(~6 weeks)*
+  - Train on accumulated receipt dataset to detect Photoshopped GTB/Opay/Kuda screenshots, reversed-transaction patterns, mismatched name/amount/reference combos
+  - Productize as standalone Receipt-as-API for Lagos fintechs (₦2/check)
+  - **Trigger:** monthly receipt volume > 5,000 across the network (otherwise no training data)
+  - **Why:** second revenue line on the same data flywheel · separable defensible asset
+
+### Sprint-level (already promoted to SPRINT.md)
+
+- [x] ~~**A10. Voice-only owner control**~~ — promoted to **SPRINT.md Sprint 2 #11**. Owner sends WhatsApp voice note → Whisper transcribes → Haiku parses intent → applies command (pause, set rule, update pricing, bulk approve, status check) → confirmation reply back. 5-7 day v1. Replaces the portal for 80% of owner control tasks.
+
+---
+
 ## P4 — Infra monitoring (wire into `tools/system_sweep.py`)
 
 So the 7am WhatsApp brief flags scaling issues before they bite. From `project_reachng_scaling_reference.md`.
