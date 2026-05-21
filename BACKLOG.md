@@ -4,7 +4,7 @@
 
 PLAN.md = active. BACKLOG.md = queued. Promote items, don't duplicate them.
 
-Last updated: 2026-05-09 (after pressure test + SEO audit)
+Last updated: 2026-05-21 (strategic review batch added as P1)
 
 ---
 
@@ -436,6 +436,42 @@ From `project_reachng_feature_ideas_may26.md`. Each pressure-tested against the 
 - [ ] **Title Ledger** (EstateOS) — WhatsApp agent for land title verification (C of O, Governor's Consent, Excision). Vault-first summary. Constraint: client manually populates `property_vault`.
 - [ ] **Voice-Vibe Interviewing** (TalentOS) — async WhatsApp voice-note interviews, Whisper transcription, Claude eval. **Blocker: needs Whisper API.**
 - [ ] **WhatsApp voice-note inbound** — Whisper on inbound voice → existing pipeline. Lagos sends voice; we currently drop it. ~30% inbound uplift.
+
+## P1 — Strategic review batch (added 2026-05-21 from external playbook + own review)
+
+Ranked by ship-effort × distribution impact. Pull the top one into PLAN.md once the active phase ships. The 20% that was premature or restated existing scope was filtered out; these are the items that survived honest review.
+
+### Conversion + retention (do these before more features)
+
+- [ ] **1. Live "Try EYO" sandbox widget on landing** *(2 days, P0-grade)* — Single biggest conversion lever per ACQUISITION.md gap (9 → 700 visitors/week). Below-hero textarea: "Paste a customer message and watch EYO draft in your voice." Vertical selector (hospitality / RE / clinic) so the right playbook loads. Live Haiku call, sandboxed (no DB writes, no Unipile, no per-client memory). Typing indicator, ~2.4s response. PostHog events: `try_eyo_used`, `try_eyo_shared`. Generates shareable artifacts for the Twitter/LinkedIn cadence.
+- [ ] **2. Trust band below hero** *(30 min)* — One inline strip: "Your WhatsApp number stays yours · We never hold funds · Per-client memory isolation, audited nightly · Lagos-built." We already do all of this; the homepage just doesn't say it. Premium signal, zero risk.
+- [ ] **3. Streak counter on Owner Brief** *(half day, ships after first paid client lives a week)* — "EYO has briefed you 47 mornings in a row · ₦14.2M in deposits caught." Habit loop, retention asset. Reads from existing `brief_dispatch_log` + `paystack_events`.
+- [ ] **4. EYO Vault tab in client portal** *(1-2 days)* — Per-customer memory surfaced as a CRM view: lifetime spend, preferred table, allergies, last 3 deposits, why they last cancelled. Data already exists in `services/client_memory.py`; this is a portal surface, not a build. Turns switching cost into structural moat.
+- [ ] **5. Per-vertical landing variants ("Choose your industry")** *(1 day)* — Picker above hero routing to /for/hospitality, /for/real_estate, etc. Templates exist via `services/marketing_content.py`. Right now they live in the footer; promote them. Intercom/Pylon-style 1-click segmentation.
+
+### Infra hardening (before client 50 — not before)
+
+- [ ] **6. Redis caching layer (Upstash, ~$0-10/mo)** — Cache vertical prompts, client memory recent reads, Unipile account-status checks. Drops Haiku tokens ~20-30% and Unipile health-check cost. Highest ROI infra change *once we have meaningful traffic*. **Trigger:** monthly Haiku spend > ₦50k or 10+ paid clients.
+- [ ] **7. Background queue (Cloud Tasks or RQ + Redis)** — Move Receipt OCR, voice transcription, outbound sends off APScheduler. At 50+ clients scheduler becomes a SPOF. **Trigger:** 25 active clients or any client hitting `inbound spike` rate-limit.
+- [ ] **8. Sentry + BetterStack + Slack webhook tail** — Error tracking, uptime per integration (Unipile, Paystack, Anthropic), webhook-failure tail. Silent QR expiry was one of *many* failure modes worth catching pre-paid-client.
+- [ ] **9. Audit trail surfaced in portal (HITL log)** — Every approval already writes an immutable record. Make it queryable: who tapped, draft-vs-sent, edit diff, latency. Legal + clinic verticals will require this for compliance.
+- [ ] **10. Materialised dashboard snapshots** — Heavy aggregate reads (Scorecard, Quality Metrics, Cohort Stats) materialise nightly to `dashboard_snapshots`. Avoids the read-amplification at 50+ clients.
+
+### New product surfaces (build after first paid client validates the core)
+
+- [ ] **11. EYO Voice Operator (Premium add-on, ~3-5 days alpha)** — Already in PLAN.md Phase 5. Add as Premium-only ₦150k/mo add-on once first 3 Premium clients land. ElevenLabs voice clone + LiveKit pipeline + 5-second HITL veto window before bookings confirm. Killer differentiator.
+- [ ] **12. EYO Across (Instagram DM + Email channels, ~3 weeks)** — Same brain, IG DM via Unipile, Gmail via Google API. Premium customers get 40% of leads on IG DM. Add as +₦40k/mo per channel. Doubles ARPU on Growth.
+- [ ] **13. Receipt-as-API (productize OCR, ~5 weeks)** — Train Donut / PaddleOCR fine-tune on Nigerian bank slips, fall back to Claude Vision on low confidence. Standalone API for Lagos fintechs (₦2/receipt parsed, ₦50k Starter tier). Second business line on the same engine. **Trigger:** monthly receipt volume > 5,000.
+- [ ] **14. Diaspora outbound landing (~1 week)** — UK/US/Canada Nigerians use ReachNG to handle their Lagos comms with relatives/contractors. £50/mo on Stripe Checkout. Same backend, separate landing. USD-paying customer mix.
+- [ ] **15. EYO Concierge (B2C white-label)** *(Year 2 only)* — Two-sided market: consumers tell EYO to book a table at Altitude (which is a ReachNG client). Network effect. Defer to Year 2; don't build now.
+
+### Lower-priority polish
+
+- [ ] **16. Replace "2 Lagos & Abuja businesses on the list" social proof** — Either remove until 10+, swap for an unattributed founder quote ("— founder, Victoria Island restaurant"), or flip to "Founding cohort: applications open."
+- [ ] **17. Mobile WhatsApp scene snapshot test (≤380px)** — Playwright snapshot of hero mock at iPhone SE width. Lock visual regression before paid traffic.
+- [ ] **18. SEO: blog at `/blog/` with vertical-targeted posts** — "WhatsApp AI for [restaurant|RE|clinic] Lagos" × 6 posts. Organic compounds; SEO_AUDIT.md flagged this.
+
+---
 
 ## P4 — Infra monitoring (wire into `tools/system_sweep.py`)
 
