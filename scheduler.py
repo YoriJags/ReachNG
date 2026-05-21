@@ -578,4 +578,19 @@ def setup_scheduler():
         id="client_signal_listener", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=300,
     )
 
+    # WhatsApp session-expiry health check — every 6h. Detects silent QR expiry,
+    # alerts the operator (us) + emails the client with a reconnect link.
+    async def _whatsapp_health_run():
+        try:
+            from services.whatsapp_health import run_health_check
+            await run_health_check()
+        except Exception as e:
+            log.warning("whatsapp_health_job_failed", error=str(e))
+
+    scheduler.add_job(
+        _whatsapp_health_run,
+        CronTrigger(hour="2,8,14,20", minute=15, timezone="Africa/Lagos"),
+        id="whatsapp_health_check", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=600,
+    )
+
     return scheduler

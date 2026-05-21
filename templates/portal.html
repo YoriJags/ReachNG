@@ -514,6 +514,13 @@
 </head>
 <body>
 
+{% if whatsapp_connected and whatsapp_health and whatsapp_health != "OK" %}
+<div style="background: linear-gradient(135deg, #4a1f1f, #2d1212); color: #ffd4cc; padding: 14px 24px; text-align: center; border-bottom: 2px solid #c44a00; font-size: 14px; font-weight: 600; letter-spacing: 0.02em;">
+  ⚠ WhatsApp disconnected ({{ whatsapp_health }}) — EYO can't draft replies until you reconnect.
+  <a href="/portal/{{ token }}/connect-whatsapp" data-ph="portal_reconnect_banner" style="color: #ff9b66; margin-left: 12px; text-decoration: underline;">Reconnect now →</a>
+</div>
+{% endif %}
+
 <nav class="topbar">
   <div class="topbar-logo">Reach<span>NG</span></div>
   <div style="display:flex;align-items:center;gap:18px;">
