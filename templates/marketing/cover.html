@@ -85,16 +85,24 @@
         <div class="mag-card-go">Open this experience <span>↗</span></div>
       </a>
 
-      <a href="/set-vertical/hospitality?next=/?skip_cover=1" data-ph="cover_pick_other" class="mag-card mag-card-other" style="--tint:#f2eee5; --ink:#3b342a;">
+      <div class="mag-card mag-card-other" style="--tint:#f2eee5; --ink:#3b342a;">
         <div class="mag-card-no">06</div>
         <div class="mag-card-meta">Other</div>
         <h3 class="mag-card-title">Something else</h3>
-        <p class="mag-card-body">Run something we haven't named? Skip to the default landing — tell us your trade on the form.</p>
-        <blockquote class="mag-card-quote">
-          "If your work runs on WhatsApp, EYO already handles 80% of it. The remaining 20% is what your first onboarding call decides."
-        </blockquote>
-        <div class="mag-card-go">Continue with default <span>→</span></div>
-      </a>
+        <p class="mag-card-body" id="other-pitch">Tell us your business — we'll personalize the experience around your name and trade.</p>
+
+        <form id="other-form" method="post" action="/set-vertical-custom" style="display:flex; flex-direction:column; gap:10px; margin-top:6px;">
+          <input type="text" name="biz_name" required maxlength="80"
+                 placeholder="Your business name"
+                 class="other-input" data-ph="cover_other_name" />
+          <input type="text" name="trade" required maxlength="60"
+                 placeholder="What you do (e.g. logistics, barber, agency)"
+                 class="other-input" data-ph="cover_other_trade" />
+          <button type="submit" class="other-submit" data-ph="cover_other_submit">
+            Tailor my experience <span>→</span>
+          </button>
+        </form>
+      </div>
 
     </div>
 
@@ -286,6 +294,36 @@
   .mag-card-go span { transition: transform 0.25s; }
   .mag-card:hover .mag-card-go span { transform: translate(3px, -3px); }
   .mag-card-other { border-style: dashed; }
+
+  .other-input {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 3px;
+    padding: 10px 12px;
+    font-size: 13px; font-family: inherit;
+    color: var(--text-strong);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .other-input::placeholder { color: var(--muted); }
+  .other-input:focus {
+    outline: none;
+    border-color: var(--ink, var(--orange));
+    box-shadow: 0 0 0 3px rgba(255,85,0,0.12);
+  }
+  .other-submit {
+    margin-top: 4px;
+    background: var(--ink, var(--orange));
+    color: #fff; border: 0;
+    padding: 11px 16px; border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: space-between;
+    transition: filter 0.15s, transform 0.15s;
+  }
+  .other-submit:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .other-submit span { transition: transform 0.2s; }
+  .other-submit:hover span { transform: translateX(3px); }
 
   /* Footer */
   .mag-foot {

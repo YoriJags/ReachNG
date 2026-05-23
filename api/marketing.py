@@ -166,11 +166,81 @@ SCENE_PACKS = {
 }
 
 
+# ─── Custom-vertical trade → closest pack keyword routing ────────────────────
+# When a visitor on the cover picks 'Something else' and types their trade,
+# we route to the closest existing SCENE_PACK so they still see relevant copy.
+_TRADE_KEYWORDS = {
+    "hospitality": (
+        "restaurant", "bar", "club", "venue", "lounge", "cafe", "hotel",
+        "kitchen", "rooftop", "bistro", "eatery", "buka", "shawarma", "pub",
+        "catering",
+    ),
+    "real_estate": (
+        "real estate", "property", "properties", "estate", "agent", "agency",
+        "broker", "developer", "shortlet", "short-let", "rental", "rentals",
+        "letting", "buildings", "homes",
+    ),
+    "professional_services": (
+        "law", "legal", "lawyer", "solicitor", "advisor", "advisory",
+        "consult", "consulting", "consultancy", "audit", "accountant",
+        "accounting", "tax", "compliance", "chartered", "firm",
+    ),
+    "education": (
+        "school", "schools", "college", "academy", "tutor", "tutoring",
+        "creche", "creche", "kindergarten", "lessons", "lesson", "training",
+        "education", "educational",
+    ),
+    "small_business": (
+        "salon", "spa", "wellness", "barber", "gym", "fitness",
+        "beauty", "studio", "clinic", "boutique", "store", "shop", "atelier",
+        "mua", "stylist", "nails",
+    ),
+}
+
+
+def _map_trade_to_slug(trade: str) -> str:
+    """Closest scene-pack for a typed trade. Default = small_business (safest
+    generic SME default)."""
+    t = (trade or "").lower().strip()
+    if not t:
+        return "small_business"
+    for slug, words in _TRADE_KEYWORDS.items():
+        if any(w in t for w in words):
+            return slug
+    return "small_business"
+
+
 def _pick_scene(request: Request) -> dict:
     """Read the personalization cookie set by /set-vertical/{slug}.
-    Returns the matching scene pack, falls back to hospitality if missing/unknown."""
+    Returns the matching scene pack, falls back to hospitality if missing/unknown.
+
+    For custom (typed) verticals, overlays the typed business name + trade onto
+    the closest matching scene-pack so the landing reads as theirs."""
     v = (request.cookies.get("reachng_vertical") or "").lower().strip()
-    return SCENE_PACKS.get(v, SCENE_PACKS["hospitality"])
+    base = SCENE_PACKS.get(v, SCENE_PACKS["hospitality"])
+
+    custom_biz   = (request.cookies.get("reachng_biz_name") or "").strip()[:80]
+    custom_trade = (request.cookies.get("reachng_biz_trade") or "").strip()[:60]
+    if not (custom_biz or custom_trade):
+        return base
+
+    # Shallow copy so we don't mutate the module-level pack
+    s = dict(base)
+    if custom_biz:
+        s["biz_name"]  = custom_biz
+        # If we're substituting a real biz name, rebuild the draft text generically
+        # (avoid 'Hey Funke ... at Altitude Lagos' with a different biz name).
+        s["draft_text"] = (
+            f"Thanks for reaching out! I've got your message — let me confirm "
+            f"availability and ping you right back with options + payment details.\n\n"
+            f"— the team at {custom_biz}"
+        )
+    if custom_trade:
+        # Override the displayed label so the 'Showing for' strip says their trade
+        s["label"]       = custom_trade
+        s["label_emoji"] = f"✨ {custom_trade}"
+    s["is_custom"] = True
+    return s
 
 
 # User-Agent fragments belonging to crawlers/social previewers that must NEVER
@@ -256,12 +326,13 @@ async def cover(request: Request):
 @router.get("/set-vertical/{slug}", include_in_schema=False)
 async def set_vertical(slug: str, request: Request):
     """Persist the picked vertical as a cookie + route to landing.
-    Unknown slug falls back to hospitality (matches the landing default)."""
+    Unknown slug falls back to hospitality (matches the landing default).
+    Also clears any prior custom biz_name/trade overlays — the visitor
+    explicitly switched to a canonical vertical, so we drop the custom layer."""
     slug = (slug or "").lower().strip()
     if slug not in SCENE_PACKS:
         slug = "hospitality"
     target = request.query_params.get("next") or "/"
-    # Force the redirect target to a same-origin path to prevent open-redirect
     if not target.startswith("/"):
         target = "/"
     resp = RedirectResponse(url=target, status_code=302)
@@ -270,6 +341,39 @@ async def set_vertical(slug: str, request: Request):
         max_age=60 * 60 * 24 * 90,  # 90 days
         samesite="lax", httponly=False, path="/",
     )
+    # Clear any stale custom overlays from a prior 'Something else' pick.
+    resp.delete_cookie(key="reachng_biz_name",  path="/")
+    resp.delete_cookie(key="reachng_biz_trade", path="/")
+    return resp
+
+
+@router.post("/set-vertical-custom", include_in_schema=False)
+async def set_vertical_custom(request: Request):
+    """Cover's 'Something else' form — visitor types their business name +
+    what they do. We map the trade to the closest SCENE_PACK so the landing
+    still has relevant copy, and overlay their typed biz name + trade label."""
+    form = await request.form()
+    biz_name = (form.get("biz_name") or "").strip()[:80]
+    trade    = (form.get("trade") or "").strip()[:60]
+    if not biz_name and not trade:
+        return RedirectResponse(url="/start", status_code=302)
+
+    slug = _map_trade_to_slug(trade)
+    resp = RedirectResponse(url="/?skip_cover=1", status_code=302)
+    resp.set_cookie(
+        key="reachng_vertical", value=slug,
+        max_age=60 * 60 * 24 * 90, samesite="lax", httponly=False, path="/",
+    )
+    if biz_name:
+        resp.set_cookie(
+            key="reachng_biz_name", value=biz_name,
+            max_age=60 * 60 * 24 * 90, samesite="lax", httponly=False, path="/",
+        )
+    if trade:
+        resp.set_cookie(
+            key="reachng_biz_trade", value=trade,
+            max_age=60 * 60 * 24 * 90, samesite="lax", httponly=False, path="/",
+        )
     return resp
 
 
