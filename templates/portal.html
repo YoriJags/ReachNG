@@ -792,7 +792,7 @@
       }
     </script>
 
-    <!-- Autopilot toggle -->
+    <!-- Autopilot toggle + readiness gate -->
     <div class="section-label">AI Settings</div>
     <div id="autopilot-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;">
       <div>
@@ -810,6 +810,27 @@
           </span>
         </label>
       </div>
+    </div>
+
+    <!-- Tone-fit confidence meter (gates Autopilot per locked rule: earned, not defaulted) -->
+    <div id="ap-readiness-card" style="display:none;background:#0e1218;border:1px solid #1e2530;border-radius:10px;padding:18px 24px;margin-bottom:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:600;color:#d8eaf8;">Autopilot readiness</div>
+        <div id="ap-ready-status" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#ff9b66;">Earning trust…</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px;">
+        <div>
+          <div style="font-size:11px;color:#6b7280;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:4px;">Approvals (30d)</div>
+          <div style="height:6px;background:#1e2530;border-radius:3px;overflow:hidden;"><div id="ap-bar-approvals" style="height:100%;background:linear-gradient(90deg,#ff5500,#ff9b66);width:0%;transition:width .4s;"></div></div>
+          <div style="font-size:12px;color:#d8eaf8;margin-top:4px;"><strong id="ap-count">0</strong> / <strong>20</strong> needed</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#6b7280;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:4px;">Unedited tone match</div>
+          <div style="height:6px;background:#1e2530;border-radius:3px;overflow:hidden;"><div id="ap-bar-rate" style="height:100%;background:linear-gradient(90deg,#ff5500,#ff9b66);width:0%;transition:width .4s;"></div></div>
+          <div style="font-size:12px;color:#d8eaf8;margin-top:4px;"><strong id="ap-rate">0%</strong> · <strong>70%</strong> needed</div>
+        </div>
+      </div>
+      <p id="ap-ready-msg" style="font-size:11px;color:#6b7280;margin:6px 0 0;line-height:1.55;">Autopilot is earned, not defaulted. Each draft you approve without editing teaches the agent your voice. The gate unlocks the moment both bars hit green.</p>
     </div>
 
     <!-- Business Brief -->
@@ -1300,6 +1321,7 @@ async function load() {
     // Autopilot toggle state
     const apEnabled = data.autopilot === true;
     _setApState(apEnabled);
+    loadAutopilotReadiness();
 
     // Business Brief
     briefLoad();
@@ -1345,14 +1367,54 @@ async function portalToggleAutopilot(enabled) {
     const resp = await fetch(`/api/v1/clients/{{ client_name }}/autopilot?enabled=${enabled}`, {
       method: "PATCH",
     });
+    if (resp.status === 409) {
+      // Autopilot not yet earned. Surface the meter, revert toggle, refresh readiness.
+      const body = await resp.json();
+      const r = (body.detail && body.detail.readiness) || {};
+      const need = r.threshold || 20;
+      const haveRate = Math.round((r.unedited_pct || 0) * 100);
+      alert(`Autopilot not yet earned.\n\n${r.approvals_count || 0}/${need} approvals (last 30 days)\n${haveRate}% unedited tone match (need 70%)\n\nApprove a few more drafts without editing and the gate will unlock automatically.`);
+      _setApState(false);
+      document.getElementById("ap-portal-toggle").checked = false;
+      loadAutopilotReadiness();
+      return;
+    }
     if (!resp.ok) throw new Error(await resp.text());
     _setApState(enabled);
   } catch(e) {
     alert("Could not update autopilot: " + e.message);
-    // Revert toggle
     _setApState(!enabled);
     document.getElementById("ap-portal-toggle").checked = !enabled;
   }
+}
+
+async function loadAutopilotReadiness() {
+  // Only shows the meter while Autopilot is off — once unlocked, the meter retires.
+  try {
+    const r = await fetch(`/api/v1/clients/{{ client_name }}/autopilot/readiness`);
+    if (!r.ok) return;
+    const d = await r.json();
+    const card = document.getElementById("ap-readiness-card");
+    if (!card) return;
+    const isOn = document.getElementById("ap-portal-toggle")?.checked;
+    if (isOn) { card.style.display = "none"; return; }
+    card.style.display = "block";
+    const countEl = document.getElementById("ap-count");
+    const rateEl  = document.getElementById("ap-rate");
+    const barC    = document.getElementById("ap-bar-approvals");
+    const barR    = document.getElementById("ap-bar-rate");
+    const status  = document.getElementById("ap-ready-status");
+    const msg     = document.getElementById("ap-ready-msg");
+    countEl.textContent = d.approvals_count;
+    rateEl.textContent  = Math.round((d.unedited_pct || 0) * 100) + "%";
+    barC.style.width    = Math.min(100, (d.approvals_count / d.threshold) * 100) + "%";
+    barR.style.width    = Math.min(100, (d.unedited_pct / d.rate_threshold) * 100) + "%";
+    if (d.ready) {
+      status.textContent = "Unlocked — toggle when ready";
+      status.style.color = "#5dd28a";
+      msg.textContent = "You've earned it. Flip the Autopilot toggle whenever you're ready to let EYO send safe replies directly.";
+    }
+  } catch(e) { /* silent */ }
 }
 
 // ─── Business Brief ────────────────────────────────────────────────

@@ -452,7 +452,21 @@ async def list_invoices(name: str):
 
 @router.patch("/{name}/autopilot")
 async def set_autopilot(name: str, enabled: bool):
-    """Toggle autopilot mode on/off for a client."""
+    """Toggle autopilot mode on/off for a client.
+
+    Gate: enabling Autopilot requires the client to have earned it —
+    >=20 approvals in last 30 days AND >=70% unedited tone match. Disabling
+    is always allowed. See services/autopilot.py for the readiness math."""
+    if enabled:
+        from services.autopilot import assert_eligible, AutopilotNotReadyError
+        try:
+            assert_eligible(name)
+        except AutopilotNotReadyError as exc:
+            raise HTTPException(409, {
+                "error": "autopilot_not_ready",
+                "message": str(exc),
+                "readiness": exc.readiness,
+            })
     result = get_clients().update_one(
         {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}},
         {"$set": {"autopilot": enabled, "updated_at": datetime.now(timezone.utc)}},
@@ -460,6 +474,14 @@ async def set_autopilot(name: str, enabled: bool):
     if result.matched_count == 0:
         raise HTTPException(404, f"Client '{name}' not found")
     return {"success": True, "client": name, "autopilot": enabled}
+
+
+@router.get("/{name}/autopilot/readiness")
+async def get_autopilot_readiness(name: str):
+    """Returns the tone-fit confidence meter values for the Autopilot gate.
+    Drives the portal widget that shows owners how close they are to unlocking."""
+    from services.autopilot import compute_readiness
+    return {"client": name, **compute_readiness(name).to_dict()}
 
 
 @router.patch("/{name}/signal-listening")
