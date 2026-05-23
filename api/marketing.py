@@ -48,6 +48,91 @@ def _templates(request: Request):
     return request.app.state.templates
 
 
+# ─── Cover personalization — scene packs per vertical ────────────────────────
+# Each pack swaps the hero HITL mock content. Cookie `reachng_vertical` set by
+# /set-vertical/{slug} drives the lookup. Default = hospitality so cold organic
+# traffic keeps its current Lagos venue scene.
+SCENE_PACKS = {
+    "hospitality": {
+        "label": "Restaurants & venues",
+        "demo_url": "/portal/demo/hospitality",
+        "customer_name": "Funke Adebayo",
+        "customer_initials": "FA",
+        "avatar_grad": "linear-gradient(135deg,#a8e6cf,#56cfa1)",
+        "avatar_text_color": "#0a3d2a",
+        "voice_duration": "0:34",
+        "transcript": "\"Hi, I want to book your rooftop for Saturday around 9pm, table of 6. It's my friend's birthday. Do you still have something near the DJ booth, and how much is the deposit?\"",
+        "classifier_verdict": "🔥 HOT · qualifying",
+        "transcribe_sec": "2.4",
+        "biz_name": "Altitude Lagos",
+        "draft_text": "Hey Funke! Yes, we have one DJ-booth table left for Saturday 9pm, perfect for 6. Bottle minimum is ₦180,000 and we hold the table with a ₦90,000 deposit.\n\nSend to GTBank · 0123456789 · Altitude Lagos Ltd and screenshot back. Table is locked the moment it lands. 🎉",
+    },
+    "real_estate": {
+        "label": "Real estate",
+        "demo_url": "/portal/demo/real_estate",
+        "customer_name": "Tunde Bakare",
+        "customer_initials": "TB",
+        "avatar_grad": "linear-gradient(135deg,#d4b896,#a8845c)",
+        "avatar_text_color": "#3d2812",
+        "voice_duration": "0:42",
+        "transcript": "\"Hi, I saw your listing for the 5-bedroom in Banana Island on Instagram. Budget is around ₦650M. Is it still on the market? Can I view this Saturday?\"",
+        "classifier_verdict": "🔥 HOT · qualifying",
+        "transcribe_sec": "2.7",
+        "biz_name": "Sapphire Estates",
+        "draft_text": "Hi Tunde, yes the Banana Island 5-bedroom is still available — ₦680M asking, all-in. Quick PoF check first (standard — just confirms budget), then I can lock a Saturday viewing window for you.\n\nSend a short bank statement or PoF letter via WhatsApp here, I'll confirm your slot today. 🏛",
+    },
+    "professional_services": {
+        "label": "Law & advisory",
+        "demo_url": "/portal/demo/professional_services",
+        "customer_name": "Olumide Kareem",
+        "customer_initials": "OK",
+        "avatar_grad": "linear-gradient(135deg,#b8c5d1,#5a7185)",
+        "avatar_text_color": "#0f1e2c",
+        "voice_duration": "0:28",
+        "transcript": "\"Good evening. I run a fintech and just got a CBN compliance notice on our agency banking license. Need a quick consult — can we talk this weekend?\"",
+        "classifier_verdict": "🔥 HOT · qualifying",
+        "transcribe_sec": "2.2",
+        "biz_name": "Adesina & Co",
+        "draft_text": "Hi Olumide, sorry to hear that — CBN agency-banking notices are time-sensitive, glad you reached out. Quick conflict check first: anyone at your firm currently in contention with our existing clients? (Just yes / no.)\n\nIf clear, I can lock you in for a 45-min consult Saturday morning. Retainer for initial response is ₦450k. ⚖",
+    },
+    "education": {
+        "label": "Schools",
+        "demo_url": "/portal/demo/education",
+        "customer_name": "Ngozi Eze",
+        "customer_initials": "NE",
+        "avatar_grad": "linear-gradient(135deg,#f5c2c7,#d96878)",
+        "avatar_text_color": "#4a1018",
+        "voice_duration": "0:38",
+        "transcript": "\"Hello, I'm writing from London about Year 7 admission for September. My daughter currently attends a school in Hampstead. Is the prospectus on your website current?\"",
+        "classifier_verdict": "🔥 HOT · qualifying",
+        "transcribe_sec": "2.5",
+        "biz_name": "Lagoon British International",
+        "draft_text": "Good morning Mrs Eze, thank you for reaching out from London. The September Year 7 cohort still has spaces — we'll send the up-to-date 2026 prospectus + fee schedule (₦8.5M/term, all-in) to your inbox tonight.\n\nQuick first step: any safeguarding records or current school reports we should review? Reply here with attachments any time. 🎓",
+    },
+    "small_business": {
+        "label": "Beauty & wellness",
+        "demo_url": "/portal/demo/small_business",
+        "customer_name": "Chiamaka Okeke",
+        "customer_initials": "CO",
+        "avatar_grad": "linear-gradient(135deg,#fde2a8,#e8a93b)",
+        "avatar_text_color": "#5c3a08",
+        "voice_duration": "0:25",
+        "transcript": "\"Hi, I want to book a full hair appointment + manicure for Saturday afternoon. Last time was perfect — same stylist if possible?\"",
+        "classifier_verdict": "🔥 HOT · returning",
+        "transcribe_sec": "2.0",
+        "biz_name": "Glow Studio Lagos",
+        "draft_text": "Welcome back Chiamaka! 🙌 Yes, Tola has Saturday 2:30pm and 4:00pm open — both 90 mins (hair + manicure). Deposit to lock is ₦15,000.\n\nSend to OPay · 8101234567 · Glow Studio and reply with your slot. ✨",
+    },
+}
+
+
+def _pick_scene(request: Request) -> dict:
+    """Read the personalization cookie set by /set-vertical/{slug}.
+    Returns the matching scene pack, falls back to hospitality if missing/unknown."""
+    v = (request.cookies.get("reachng_vertical") or "").lower().strip()
+    return SCENE_PACKS.get(v, SCENE_PACKS["hospitality"])
+
+
 @router.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def landing(request: Request):
     accept = (request.headers.get("accept") or "").lower()
@@ -56,6 +141,7 @@ async def landing(request: Request):
             content='{"service":"ReachNG","status":"running","docs":"/docs","health":"/health"}',
             media_type="application/json",
         )
+    scene = _pick_scene(request)
     track_page_viewed(
         page="landing", path="/",
         referrer=request.headers.get("referer", ""),
@@ -64,7 +150,47 @@ async def landing(request: Request):
         utm_campaign=request.query_params.get("utm_campaign"),
         user_agent=request.headers.get("user-agent", ""),
     )
-    return _templates(request).TemplateResponse(request, "marketing/landing.html")
+    return _templates(request).TemplateResponse(
+        request, "marketing/landing.html",
+        {"scene": scene, "active_vertical": scene.get("label", "Restaurants & venues")},
+    )
+
+
+@router.get("/start", response_class=HTMLResponse, include_in_schema=False)
+async def cover(request: Request):
+    """Magazine-style personalization cover. Visitor picks a vertical, gets routed
+    to the landing with their scene-pack already loaded."""
+    track_page_viewed(
+        page="cover", path="/start",
+        referrer=request.headers.get("referer", ""),
+        utm_source=request.query_params.get("utm_source"),
+        utm_medium=request.query_params.get("utm_medium"),
+        utm_campaign=request.query_params.get("utm_campaign"),
+    )
+    return _templates(request).TemplateResponse(
+        request, "marketing/cover.html",
+        {"scenes": SCENE_PACKS},
+    )
+
+
+@router.get("/set-vertical/{slug}", include_in_schema=False)
+async def set_vertical(slug: str, request: Request):
+    """Persist the picked vertical as a cookie + route to landing.
+    Unknown slug falls back to hospitality (matches the landing default)."""
+    slug = (slug or "").lower().strip()
+    if slug not in SCENE_PACKS:
+        slug = "hospitality"
+    target = request.query_params.get("next") or "/"
+    # Force the redirect target to a same-origin path to prevent open-redirect
+    if not target.startswith("/"):
+        target = "/"
+    resp = RedirectResponse(url=target, status_code=302)
+    resp.set_cookie(
+        key="reachng_vertical", value=slug,
+        max_age=60 * 60 * 24 * 90,  # 90 days
+        samesite="lax", httponly=False, path="/",
+    )
+    return resp
 
 
 @router.get("/how-it-works", response_class=HTMLResponse, include_in_schema=False)
