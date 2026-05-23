@@ -181,6 +181,130 @@
 
 
 <!-- ─────────────────────────────────────────────────────────────────────────
+     1.7 TRY-EYO  (live sandbox — type a customer message, see EYO draft)
+     ───────────────────────────────────────────────────────────────────── -->
+<section style="background: var(--bg); border-bottom: 1px solid var(--border);">
+  <div class="inner" style="max-width: 900px;">
+    <div class="section-label" style="color: var(--orange);">Try EYO live</div>
+    <h2 class="section-h2">Paste a customer message. <em>Watch EYO draft a reply.</em></h2>
+    <p class="section-sub" style="max-width: 680px;">No signup. No email. Type the kind of WhatsApp enquiry you actually get, pick your industry, see EYO draft in seconds. This is the same engine your portal uses on day 1.</p>
+
+    <div style="margin-top: 32px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 26px 28px;">
+      <!-- Vertical picker -->
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:8px;">Industry</label>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;" id="try-vertical-pills">
+          <button type="button" data-v="hospitality"            class="tv-pill tv-active">🍽 Restaurant / Venue</button>
+          <button type="button" data-v="real_estate"            class="tv-pill">🏛 Real estate</button>
+          <button type="button" data-v="clinics"                class="tv-pill">🩺 Clinic</button>
+          <button type="button" data-v="professional_services"  class="tv-pill">⚖ Law / advisory</button>
+          <button type="button" data-v="education"              class="tv-pill">🎓 School</button>
+        </div>
+      </div>
+
+      <!-- Textarea -->
+      <label style="display:block; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:8px;">Customer message</label>
+      <textarea id="try-input" rows="3" maxlength="600"
+                placeholder="e.g. Hi, do you still have a table for 6 this Saturday around 9pm? It's my friend's birthday."
+                style="width:100%; padding:14px 16px; background:var(--bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; font-family:inherit; resize:vertical; line-height:1.55;"></textarea>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; gap:14px; flex-wrap:wrap;">
+        <span style="font-size:11px; color:var(--muted);" id="try-hint">3 free tries per minute · 20 per day</span>
+        <button id="try-btn" onclick="window.runTryEyo()" data-ph="try_eyo_submit"
+                style="background:var(--orange); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; letter-spacing:0.04em;">
+          Draft my reply →
+        </button>
+      </div>
+
+      <!-- Output -->
+      <div id="try-output" style="display:none; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;">
+          <div style="font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--orange); font-weight:700;">EYO drafted</div>
+          <div style="font-size:11px; color:var(--muted);" id="try-latency">·</div>
+        </div>
+        <div id="try-reply" style="background:linear-gradient(180deg, rgba(255,85,0,0.05), rgba(255,85,0,0.02)); border:1px solid rgba(255,85,0,0.30); color:var(--text-strong); padding:16px 18px; border-radius:12px; font-size:14px; line-height:1.7; white-space:pre-wrap;"></div>
+        <p style="margin-top:14px; font-size:12px; color:var(--muted-strong); line-height:1.6;">
+          ⚡ <strong style="color:var(--text-strong);">This is the same engine your portal uses.</strong> On day 1 you teach EYO your tone, prices, never-say list — drafts get sharper each week.
+          <a href="/waitlist" data-ph="try_eyo_to_waitlist" style="color:var(--orange); font-weight:600; text-decoration:none;">Join early access →</a>
+        </p>
+      </div>
+
+      <div id="try-error" style="display:none; margin-top:18px; padding:12px 16px; background:rgba(255,85,0,0.08); border:1px solid rgba(255,85,0,0.30); border-radius:8px; font-size:13px; color:var(--text-strong);"></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tv-pill {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--muted-strong); padding: 8px 14px; border-radius: 100px;
+    font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit;
+    transition: 0.15s;
+  }
+  .tv-pill:hover { border-color: var(--orange); color: var(--text-strong); }
+  .tv-pill.tv-active { background: var(--orange); color: #fff; border-color: var(--orange); }
+</style>
+
+<script>
+  (function () {
+    let activeVertical = 'hospitality';
+    const pills = document.querySelectorAll('.tv-pill');
+    pills.forEach(p => p.addEventListener('click', () => {
+      pills.forEach(x => x.classList.remove('tv-active'));
+      p.classList.add('tv-active');
+      activeVertical = p.dataset.v;
+    }));
+
+    window.runTryEyo = async function () {
+      const btn   = document.getElementById('try-btn');
+      const input = document.getElementById('try-input').value.trim();
+      const out   = document.getElementById('try-output');
+      const err   = document.getElementById('try-error');
+      const reply = document.getElementById('try-reply');
+      const latency = document.getElementById('try-latency');
+      err.style.display = 'none';
+      if (input.length < 4) {
+        err.textContent = 'Type a customer message to see EYO draft a reply.';
+        err.style.display = 'block';
+        return;
+      }
+      btn.disabled = true;
+      const orig = btn.textContent;
+      btn.textContent = 'EYO is drafting…';
+      out.style.display = 'block';
+      reply.textContent = '...';
+      latency.textContent = '·';
+      try {
+        const t0 = Date.now();
+        const r = await fetch('/api/v1/try-eyo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ vertical: activeVertical, message: input }),
+        });
+        const d = await r.json();
+        if (!r.ok) {
+          out.style.display = 'none';
+          err.textContent = d.detail || 'Something went wrong. Try again in a moment.';
+          err.style.display = 'block';
+          return;
+        }
+        reply.textContent = d.reply || '';
+        const ms = d.latency_ms || (Date.now() - t0);
+        latency.textContent = (ms / 1000).toFixed(1) + 's';
+      } catch (e) {
+        out.style.display = 'none';
+        err.textContent = 'Could not reach EYO. Try again.';
+        err.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
+    };
+  })();
+</script>
+
+
+<!-- ─────────────────────────────────────────────────────────────────────────
      2. THE PROBLEM  (pain copy + HBR anchor + leakage calculator inline)
      ───────────────────────────────────────────────────────────────────── -->
 <section style="background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
