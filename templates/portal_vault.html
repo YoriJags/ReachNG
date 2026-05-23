@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EYO Vault · {{ client_name }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --bg:#0b0f14; --bg-2:#0e1218; --surface:#111720; --line:#1e2530;
+    --line-strong:#2a3340; --ink:#e8e8e8; --muted:#7b8896; --muted-strong:#a8b3c0;
+    --orange:#ff5500; --green:#5dd28a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+  a{color:var(--orange);text-decoration:none}
+  .top{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:#0a0d12;border-bottom:1px solid var(--line)}
+  .top .logo{font-weight:700;font-size:18px}.top .logo span{color:var(--orange)}
+  .top .back{color:var(--muted-strong);font-size:12px;border:1px solid var(--line);padding:6px 12px;border-radius:6px}
+  .wrap{display:grid;grid-template-columns:1fr 460px;gap:20px;padding:24px;max-width:1400px;margin:0 auto}
+  @media (max-width:880px){.wrap{grid-template-columns:1fr}.dossier{display:none}.dossier.open{display:block}}
+  h1{font-family:Georgia,serif;font-size:28px;font-weight:600;letter-spacing:-0.4px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+  .search-row{display:flex;gap:10px;margin-bottom:14px}
+  .search-row input{flex:1;background:var(--bg-2);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:10px 14px;font-size:14px;font-family:inherit}
+  .search-row input:focus{outline:none;border-color:var(--orange)}
+  .list{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .row{display:grid;grid-template-columns:1fr auto;gap:14px;padding:14px 18px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .12s}
+  .row:hover{background:var(--bg-2)}
+  .row:last-child{border-bottom:0}
+  .row.active{background:var(--bg-2);border-left:3px solid var(--orange);padding-left:15px}
+  .r-name{font-weight:600;color:var(--ink);font-size:14px}
+  .r-phone{font-size:12px;color:var(--muted);margin-top:2px}
+  .r-fact{font-size:12px;color:var(--muted-strong);margin-top:6px;line-height:1.5}
+  .r-meta{text-align:right;font-size:11px;color:var(--muted)}
+  .r-meta .spend{color:var(--green);font-weight:700;font-size:13px;margin-bottom:2px}
+  .empty{padding:60px 20px;text-align:center;color:var(--muted)}
+  .empty strong{color:var(--ink);display:block;font-size:16px;margin-bottom:8px}
+  .dossier{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto}
+  .dossier h2{font-family:Georgia,serif;font-size:22px;font-weight:600;margin:0 0 4px;letter-spacing:-0.3px}
+  .dossier .phone{color:var(--muted);font-size:13px;margin-bottom:18px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+  .stat{background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:12px}
+  .stat .label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:4px}
+  .stat .val{font-weight:700;color:var(--ink);font-size:15px}
+  .stat .val.green{color:var(--green)}
+  .group{margin-bottom:18px}
+  .group-title{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);font-weight:700;margin-bottom:8px}
+  .fact{background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:13px;line-height:1.55;color:var(--muted-strong)}
+  .fact .when{font-size:10px;color:var(--muted);margin-top:4px}
+  .placeholder{padding:80px 20px;text-align:center;color:var(--muted)}
+  .placeholder strong{color:var(--ink);display:block;font-size:16px;margin-bottom:8px}
+  .placeholder em{color:var(--muted);font-style:normal;font-size:13px}
+  .ladder{margin:12px 0 16px;padding:12px 14px;background:rgba(255,85,0,0.06);border-left:3px solid var(--orange);border-radius:6px;font-size:12px;color:var(--muted-strong);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo">Reach<span>NG</span> · Vault</div>
+  <a class="back" href="/portal/{{ token }}">← Back to portal</a>
+</div>
+
+<div class="wrap">
+  <div>
+    <h1>The Vault</h1>
+    <p class="sub">Everything EYO has learned about your customers, sorted by who messaged last. Tap any row to see the full dossier.</p>
+
+    <div class="ladder">
+      🧠 <strong>This is your switching-cost moat.</strong> Every approved message teaches EYO another fact about a customer. After 30 days you have a CRM nobody else can rebuild.
+    </div>
+
+    <div class="search-row">
+      <input id="search" type="text" placeholder="Search by name, phone, or any fact (e.g. 'Saturday DJ booth')…" />
+    </div>
+
+    <div id="list" class="list"><div class="empty"><strong>Loading…</strong></div></div>
+  </div>
+
+  <aside class="dossier" id="dossier">
+    <div class="placeholder">
+      <strong>Pick a customer</strong>
+      <em>Each customer's full dossier — preferences, spend, complaints, milestones — lands here.</em>
+    </div>
+  </aside>
+</div>
+
+<script>
+  const TOKEN = {{ token | tojson }};
+  const FMT_NGN = n => '₦' + (n || 0).toLocaleString();
+  const FMT_DATE = iso => {
+    if (!iso) return '—';
+    const d = new Date(iso); const now = new Date();
+    const days = Math.floor((now - d) / 86400000);
+    if (days === 0) return 'today';
+    if (days === 1) return 'yesterday';
+    if (days < 30) return days + 'd ago';
+    if (days < 365) return Math.floor(days / 30) + 'mo ago';
+    return Math.floor(days / 365) + 'y ago';
+  };
+  const FMT_DATE_FULL = iso => iso ? new Date(iso).toLocaleDateString('en-NG', {day:'numeric',month:'short',year:'numeric'}) : '—';
+
+  let customers = [];
+  let activePhone = null;
+
+  async function loadList(search) {
+    const url = '/portal/' + encodeURIComponent(TOKEN) + '/vault/customers' + (search ? '?search=' + encodeURIComponent(search) : '');
+    const r = await fetch(url);
+    if (!r.ok) { document.getElementById('list').innerHTML = '<div class="empty"><strong>Could not load</strong></div>'; return; }
+    const d = await r.json();
+    customers = d.customers || [];
+    renderList();
+  }
+
+  function renderList() {
+    const el = document.getElementById('list');
+    if (customers.length === 0) {
+      el.innerHTML = '<div class="empty"><strong>No customer memory yet.</strong>EYO builds the Vault from every WhatsApp conversation. Come back after a few days of inbound.</div>';
+      return;
+    }
+    el.innerHTML = customers.map(c => `
+      <div class="row ${c.contact_phone === activePhone ? 'active' : ''}" onclick="openDossier('${c.contact_phone.replace(/'/g, "\\\\'")}')">
+        <div>
+          <div class="r-name">${escapeHtml(c.contact_name || '—')}</div>
+          <div class="r-phone">${escapeHtml(c.contact_phone)}</div>
+          ${c.top_fact ? `<div class="r-fact">▸ ${escapeHtml(c.top_fact)}</div>` : ''}
+        </div>
+        <div class="r-meta">
+          ${c.lifetime_ngn > 0 ? `<div class="spend">${FMT_NGN(c.lifetime_ngn)}</div>` : ''}
+          <div>${c.fact_count} fact${c.fact_count === 1 ? '' : 's'}</div>
+          <div>${FMT_DATE(c.last_seen_at)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function openDossier(phone) {
+    activePhone = phone;
+    renderList();
+    const dos = document.getElementById('dossier');
+    dos.classList.add('open');
+    dos.innerHTML = '<div class="placeholder"><strong>Loading…</strong></div>';
+    const url = '/portal/' + encodeURIComponent(TOKEN) + '/vault/customer?phone=' + encodeURIComponent(phone);
+    const r = await fetch(url);
+    if (!r.ok) { dos.innerHTML = '<div class="placeholder"><strong>Could not load</strong></div>'; return; }
+    const d = await r.json();
+    renderDossier(d);
+  }
+
+  function renderDossier(d) {
+    const dos = document.getElementById('dossier');
+    const groups = Object.keys(d.facts_by_type || {}).sort();
+    const groupsHtml = groups.map(g => `
+      <div class="group">
+        <div class="group-title">${escapeHtml(g)}</div>
+        ${d.facts_by_type[g].map(f => `
+          <div class="fact">${escapeHtml(f.fact_text)}<div class="when">${FMT_DATE(f.created_at)}${f.times_referenced ? ' · referenced ' + f.times_referenced + 'x' : ''}</div></div>
+        `).join('')}
+      </div>
+    `).join('');
+    dos.innerHTML = `
+      <h2>${escapeHtml(d.contact_name || '—')}</h2>
+      <div class="phone">${escapeHtml(d.contact_phone)}</div>
+      <div class="stats">
+        <div class="stat"><div class="label">Lifetime</div><div class="val ${d.lifetime_ngn > 0 ? 'green' : ''}">${d.lifetime_ngn > 0 ? FMT_NGN(d.lifetime_ngn) : '—'}</div></div>
+        <div class="stat"><div class="label">Facts</div><div class="val">${d.fact_count}</div></div>
+        <div class="stat"><div class="label">First seen</div><div class="val">${FMT_DATE_FULL(d.first_seen_at)}</div></div>
+      </div>
+      ${groups.length ? groupsHtml : '<div class="placeholder">No facts yet</div>'}
+    `;
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+      .replaceAll('"','&quot;').replaceAll("'",'&#39;');
+  }
+
+  let searchTimer = null;
+  document.getElementById('search').addEventListener('input', (e) => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadList(e.target.value.trim()), 250);
+  });
+
+  loadList();
+</script>
+</body>
+</html>

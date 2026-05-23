@@ -398,6 +398,61 @@ async def client_portal(token: str, request: Request):
     })
 
 
+# ─── EYO Vault (SPRINT 2 #6) ────────────────────────────────────────────────
+
+@router.get("/{token}/vault", response_class=HTMLResponse)
+async def vault_page(token: str, request: Request):
+    """Render the per-customer memory dossier — switching-cost moat made visible."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found")
+    templates = request.app.state.templates
+    return templates.TemplateResponse(request, "portal_vault.html", {
+        "token":       token,
+        "client_name": client["name"],
+        "vertical":    (client.get("vertical") or "").replace("_", " ").title(),
+    })
+
+
+@router.get("/{token}/vault/customers")
+async def vault_list(token: str, search: str | None = None, limit: int = 200):
+    """JSON list of customers with rollup (fact_count, last_seen, lifetime_ngn)."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found")
+    from services.vault import list_customers
+    rows = list_customers(str(client["_id"]), limit=limit, search=search)
+    # Serialise datetimes
+    for r in rows:
+        for k in ("last_seen_at", "first_seen_at"):
+            v = r.get(k)
+            if v: r[k] = v.isoformat()
+    return {"customers": rows, "count": len(rows)}
+
+
+@router.get("/{token}/vault/customer")
+async def vault_customer(token: str, phone: str):
+    """JSON dossier for one customer — full facts grouped by type + spend."""
+    if not phone:
+        raise HTTPException(400, "phone required")
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found")
+    from services.vault import get_customer
+    dossier = get_customer(str(client["_id"]), phone)
+    # Serialise datetimes
+    def _ser(d):
+        for k, v in list(d.items()):
+            if hasattr(v, "isoformat"):
+                d[k] = v.isoformat()
+        return d
+    _ser(dossier)
+    for facts in dossier.get("facts_by_type", {}).values():
+        for f in facts: _ser(f)
+    for f in dossier.get("facts", []): _ser(f)
+    return dossier
+
+
 @router.get("/{token}/configure", response_class=HTMLResponse)
 async def configure_page(token: str, request: Request):
     """Client-facing AI Configuration page — KB upload, Rules, Scenarios, Sandbox.

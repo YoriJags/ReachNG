@@ -41,7 +41,7 @@ The two gaps that block first paying client: (1) nobody visits the landing, (2) 
 
 Built only after sprint 1 ships AND first paid client is live (real data starts flowing).
 
-- [ ] **6. EYO Vault tab in client portal** *(1-2 days, BACKLOG P1 #4)*
+- [x] ~~**6. EYO Vault tab in client portal**~~ — ✅ shipped. `services/vault.py` aggregates per-customer facts from `client_memory`; `/portal/{token}/vault` page with searchable list + slide-in dossier (lifetime spend, fact count, first/last seen, all facts grouped by type). "🧠 Vault" link in topbar.
   - Per-customer memory surfaced as CRM view: lifetime spend, preferred table, allergies, last 3 deposits, last cancellation reason
   - Data already in `services/client_memory.py` — this is a portal surface, not a build
   - **Reason:** turns switching cost from "low" to "structural." Owners can't leave once 30 days of customer memory accumulates.
