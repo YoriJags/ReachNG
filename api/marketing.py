@@ -133,6 +133,24 @@ def _pick_scene(request: Request) -> dict:
     return SCENE_PACKS.get(v, SCENE_PACKS["hospitality"])
 
 
+# User-Agent fragments belonging to crawlers/social previewers that must NEVER
+# be redirected to /start (we need them to index /). Cheap substring check —
+# all checks lowercased.
+_BOT_UA_FRAGMENTS = (
+    "googlebot", "bingbot", "duckduckbot", "yandex", "baiduspider",
+    "slurp", "applebot", "facebookexternalhit", "facebot",
+    "twitterbot", "linkedinbot", "whatsapp", "telegrambot", "slackbot",
+    "discordbot", "embedly", "pinterest", "redditbot",
+    "semrushbot", "ahrefsbot", "mj12bot", "dotbot",
+    "lighthouse", "headlesschrome",
+)
+
+
+def _looks_like_bot(user_agent: str) -> bool:
+    ua = (user_agent or "").lower()
+    return any(f in ua for f in _BOT_UA_FRAGMENTS)
+
+
 @router.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def landing(request: Request):
     accept = (request.headers.get("accept") or "").lower()
@@ -141,6 +159,23 @@ async def landing(request: Request):
             content='{"service":"ReachNG","status":"running","docs":"/docs","health":"/health"}',
             media_type="application/json",
         )
+
+    # Cover-first routing — first-time human visitors get sent to /start.
+    # Exemptions (no redirect, render landing directly):
+    #   - cookie reachng_vertical is set (returning visitor or already picked)
+    #   - any crawler / social previewer user-agent (SEO + link unfurl integrity)
+    #   - explicit opt-out via ?skip_cover=1 (used by the Skip link on /start)
+    #   - any UTM-tracked arrival (paid traffic, partner links — they get the
+    #     landing they were promised, no surprise cover)
+    has_cookie  = bool(request.cookies.get("reachng_vertical"))
+    is_bot      = _looks_like_bot(request.headers.get("user-agent", ""))
+    skip_cover  = request.query_params.get("skip_cover") in ("1", "true", "yes")
+    has_utm     = any(
+        request.query_params.get(k) for k in ("utm_source", "utm_medium", "utm_campaign")
+    )
+    if not (has_cookie or is_bot or skip_cover or has_utm):
+        return RedirectResponse(url="/start", status_code=302)
+
     scene = _pick_scene(request)
     track_page_viewed(
         page="landing", path="/",
