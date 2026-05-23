@@ -5,175 +5,312 @@
 
 {% block content %}
 
-<section class="cover-mag">
-  <div class="cover-mag-inner">
+<section class="mag">
+  <!-- Editorial top rail -->
+  <div class="mag-rail">
+    <div class="mag-rail-l">ReachNG &nbsp;·&nbsp; Issue 01 &nbsp;·&nbsp; May 2026</div>
+    <div class="mag-rail-r">Personalize · ⓟ&nbsp;Cover</div>
+  </div>
 
-    <div class="eyebrow">Issue 01 · Choose your industry</div>
+  <div class="mag-wrap">
 
-    <h1 class="cover-headline">
-      <span class="cover-headline-top">What kind of business</span>
-      <span class="cover-headline-em">do you run?</span>
-    </h1>
+    <!-- Editorial masthead -->
+    <header class="mag-head">
+      <div class="mag-eyebrow">The Cover · Choose your industry</div>
+      <h1 class="mag-h1">
+        <span class="mag-drop">W</span>hat kind of business
+        <span class="mag-em">do you run?</span>
+      </h1>
+      <p class="mag-sub">
+        We tailor every example, every script, every demo to your trade. Skim a card — tap one — the whole site reshapes around you.
+      </p>
+      <div class="mag-hair"></div>
+    </header>
 
-    <p class="cover-sub">
-      Pick one. We will tailor every scene, every example, every script you see next to your kind of business. No generic AI, no off-the-shelf demo.
-    </p>
+    <!-- Six cards · numbered, accented, asymmetric weight on hover -->
+    <div class="mag-grid">
 
-    <div class="cover-grid">
-      <a href="/set-vertical/hospitality?next=/" data-ph="cover_pick_hospitality" class="cover-card">
-        <span class="cover-card-emoji">🍽</span>
-        <h3 class="cover-card-title">Restaurants &amp; venues</h3>
-        <p class="cover-card-body">Bookings, deposits, no-shows, owambe weekends.</p>
-        <span class="cover-card-go">See the experience →</span>
+      <a href="/set-vertical/hospitality?next=/" data-ph="cover_pick_hospitality" class="mag-card" style="--tint:#ffe5d6; --ink:#7a3013;">
+        <div class="mag-card-no">01</div>
+        <div class="mag-card-meta">Hospitality</div>
+        <h3 class="mag-card-title">Restaurants &amp; venues</h3>
+        <p class="mag-card-body">Saturday tables, deposits in by midnight, owambe waves handled before lunch.</p>
+        <blockquote class="mag-card-quote">
+          "Funke just asked for table of 6, near the DJ. EYO already drafted the reply — with the deposit ask and your bank line. Tap to approve."
+        </blockquote>
+        <div class="mag-card-go">Open this experience <span>↗</span></div>
       </a>
 
-      <a href="/set-vertical/real_estate?next=/" data-ph="cover_pick_real_estate" class="cover-card">
-        <span class="cover-card-emoji">🏛</span>
-        <h3 class="cover-card-title">Real estate</h3>
-        <p class="cover-card-body">PoF screening, viewings, Banana Island to Lekki enquiries.</p>
-        <span class="cover-card-go">See the experience →</span>
+      <a href="/set-vertical/real_estate?next=/" data-ph="cover_pick_real_estate" class="mag-card" style="--tint:#efe7d6; --ink:#5a3a14;">
+        <div class="mag-card-no">02</div>
+        <div class="mag-card-meta">Property</div>
+        <h3 class="mag-card-title">Real estate</h3>
+        <p class="mag-card-body">PoF screening, Saturday viewing slots, Banana Island to Lekki enquiries threaded.</p>
+        <blockquote class="mag-card-quote">
+          "Tunde DM'd about the ₦650M five-bedroom on Instagram. EYO ran the PoF prompt and locked the viewing window. You said yes from the car."
+        </blockquote>
+        <div class="mag-card-go">Open this experience <span>↗</span></div>
       </a>
 
-      <a href="/set-vertical/professional_services?next=/" data-ph="cover_pick_professional_services" class="cover-card">
-        <span class="cover-card-emoji">⚖</span>
-        <h3 class="cover-card-title">Law &amp; advisory</h3>
-        <p class="cover-card-body">Confidential intake, conflict checks, retainer follow-through.</p>
-        <span class="cover-card-go">See the experience →</span>
+      <a href="/set-vertical/professional_services?next=/" data-ph="cover_pick_professional_services" class="mag-card" style="--tint:#e2e6ec; --ink:#1d2c3d;">
+        <div class="mag-card-no">03</div>
+        <div class="mag-card-meta">Advisory</div>
+        <h3 class="mag-card-title">Law &amp; advisory</h3>
+        <p class="mag-card-body">Confidential intake, conflict checks, retainer follow-through — without breaking the seal.</p>
+        <blockquote class="mag-card-quote">
+          "Olumide brought a CBN compliance notice in at 9pm Friday. EYO drafted the conflict-check question and a Saturday slot. Retainer signed Monday."
+        </blockquote>
+        <div class="mag-card-go">Open this experience <span>↗</span></div>
       </a>
 
-      <a href="/set-vertical/education?next=/" data-ph="cover_pick_education" class="cover-card">
-        <span class="cover-card-emoji">🎓</span>
-        <h3 class="cover-card-title">Schools</h3>
-        <p class="cover-card-body">Admissions, fee chase, diaspora parents on UK and US timezones.</p>
-        <span class="cover-card-go">See the experience →</span>
+      <a href="/set-vertical/education?next=/" data-ph="cover_pick_education" class="mag-card" style="--tint:#f6dde2; --ink:#5a1a26;">
+        <div class="mag-card-no">04</div>
+        <div class="mag-card-meta">Education</div>
+        <h3 class="mag-card-title">Schools</h3>
+        <p class="mag-card-body">Admissions, fee chase, diaspora parents on UK and US timezones, term-fee plans.</p>
+        <blockquote class="mag-card-quote">
+          "Ngozi emailed from London about Year 7. EYO replied 90 seconds later with the prospectus and fee tier. She booked the call from Hampstead."
+        </blockquote>
+        <div class="mag-card-go">Open this experience <span>↗</span></div>
       </a>
 
-      <a href="/set-vertical/small_business?next=/" data-ph="cover_pick_small_business" class="cover-card">
-        <span class="cover-card-emoji">✨</span>
-        <h3 class="cover-card-title">Beauty &amp; wellness</h3>
-        <p class="cover-card-body">Bookings, deposit catching, polite reminders, zero leaks.</p>
-        <span class="cover-card-go">See the experience →</span>
+      <a href="/set-vertical/small_business?next=/" data-ph="cover_pick_small_business" class="mag-card" style="--tint:#fbe7c4; --ink:#5e3a08;">
+        <div class="mag-card-no">05</div>
+        <div class="mag-card-meta">Wellness</div>
+        <h3 class="mag-card-title">Beauty &amp; wellness</h3>
+        <p class="mag-card-body">Bookings, deposit catching, polite reminders, no-shows down to almost zero.</p>
+        <blockquote class="mag-card-quote">
+          "Chiamaka wanted Saturday afternoon with Tola. EYO replied with both open slots and the deposit number. ₦15k landed before sunset."
+        </blockquote>
+        <div class="mag-card-go">Open this experience <span>↗</span></div>
       </a>
 
-      <a href="/set-vertical/hospitality?next=/?skip_cover=1" data-ph="cover_pick_other" class="cover-card cover-card-other">
-        <span class="cover-card-emoji">→</span>
-        <h3 class="cover-card-title">Something else</h3>
-        <p class="cover-card-body">Show me the default experience — I'll tell you what I run later.</p>
-        <span class="cover-card-go">Continue →</span>
+      <a href="/set-vertical/hospitality?next=/?skip_cover=1" data-ph="cover_pick_other" class="mag-card mag-card-other" style="--tint:#f2eee5; --ink:#3b342a;">
+        <div class="mag-card-no">06</div>
+        <div class="mag-card-meta">Other</div>
+        <h3 class="mag-card-title">Something else</h3>
+        <p class="mag-card-body">Run something we haven't named? Skip to the default landing — tell us your trade on the form.</p>
+        <blockquote class="mag-card-quote">
+          "If your work runs on WhatsApp, EYO already handles 80% of it. The remaining 20% is what your first onboarding call decides."
+        </blockquote>
+        <div class="mag-card-go">Continue with default <span>→</span></div>
       </a>
+
     </div>
 
-    <p class="cover-footnote">
-      Your pick is remembered for 90 days. You can change it any time from the landing.
-    </p>
+    <!-- Editorial footer -->
+    <footer class="mag-foot">
+      <div class="mag-foot-l">Your pick is remembered for <strong>90 days</strong>. You can change it anytime from the landing.</div>
+      <div class="mag-foot-r">Page 01 / 01 &nbsp;·&nbsp; Continued inside →</div>
+    </footer>
 
   </div>
 </section>
 
 <style>
-  .cover-mag {
-    background: var(--bg);
-    padding: 64px 24px 80px;
+  /* ── Editorial / magazine cover ─────────────────────────────────────── */
+  .mag {
+    background:
+      radial-gradient(ellipse at top, rgba(255,85,0,0.06) 0%, transparent 55%),
+      radial-gradient(circle at 20% 80%, rgba(255,85,0,0.04) 0%, transparent 50%),
+      var(--bg);
     min-height: calc(100vh - 80px);
-    display: flex; align-items: center; justify-content: center;
+    padding: 0 0 60px;
+    position: relative;
+    overflow: hidden;
   }
-  .cover-mag-inner {
-    max-width: 1080px; width: 100%;
-    text-align: center;
+  /* Subtle paper grain via SVG noise */
+  .mag::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.42 0 0 0 0 0.28 0 0 0 0.08 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+    opacity: 0.55; mix-blend-mode: multiply;
   }
 
-  .cover-mag .eyebrow {
+  /* Top rail — editorial masthead bar */
+  .mag-rail {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 28px;
+    border-bottom: 1px solid rgba(122,48,19,0.18);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted-strong);
+    position: relative; z-index: 1;
+  }
+  .mag-rail-r { color: var(--orange); font-weight: 700; }
+
+  .mag-wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 28px 0;
+    position: relative; z-index: 1;
+  }
+
+  /* Masthead */
+  .mag-head {
+    text-align: left;
+    max-width: 880px;
+    margin: 0 0 56px;
+  }
+  .mag-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
     font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
     color: var(--orange); font-weight: 700;
-    margin-bottom: 22px;
+    margin-bottom: 18px;
   }
-
-  .cover-headline {
+  .mag-h1 {
     font-family: Georgia, 'Times New Roman', serif;
-    font-weight: 600; letter-spacing: -1.5px;
+    font-weight: 600; letter-spacing: -2px;
+    font-size: clamp(48px, 8vw, 96px); line-height: 0.98;
     color: var(--text-strong);
     margin: 0 0 22px;
-    line-height: 1.05;
   }
-  .cover-headline-top {
-    display: block;
-    font-size: clamp(36px, 6vw, 64px);
+  .mag-em {
+    display: block; font-style: italic;
+    color: var(--orange);
+    margin-top: 4px;
   }
-  .cover-headline-em {
-    display: block;
-    font-style: italic;
-    font-size: clamp(36px, 6vw, 64px);
+  /* Editorial drop-cap */
+  .mag-drop {
+    font-family: Georgia, serif;
+    font-style: italic; font-weight: 700;
     color: var(--orange);
   }
-
-  .cover-sub {
-    max-width: 640px;
-    margin: 0 auto 48px;
-    font-size: 17px; line-height: 1.65;
+  .mag-sub {
+    max-width: 620px;
+    font-size: 18px; line-height: 1.6;
     color: var(--muted-strong);
+    margin: 0 0 28px;
+    font-style: italic;
+    font-family: Georgia, serif;
+  }
+  .mag-hair {
+    width: 80px; height: 2px;
+    background: var(--orange);
+    margin-top: 8px;
   }
 
-  .cover-grid {
+  /* Grid */
+  .mag-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    text-align: left;
+    gap: 22px;
   }
 
-  .cover-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 26px 26px 22px;
+  /* Cards — editorial weight */
+  .mag-card {
+    --tint: #ffe5d6;
+    --ink:  #7a3013;
+    position: relative;
+    background: linear-gradient(180deg, var(--tint) 0%, #ffffff 100%);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 4px;            /* sharper corners = editorial */
+    padding: 32px 28px 26px;
     text-decoration: none;
     color: var(--text-strong);
+    overflow: hidden;
+    transition: transform 0.28s cubic-bezier(0.2,0.9,0.3,1),
+                box-shadow 0.28s,
+                border-color 0.2s;
+    box-shadow:
+      0 1px 0 rgba(0,0,0,0.04),
+      0 12px 24px -16px rgba(0,0,0,0.18);
     display: flex; flex-direction: column;
-    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-    position: relative;
+    min-height: 320px;
   }
-  .cover-card:hover {
-    border-color: var(--orange);
-    transform: translateY(-2px);
-    box-shadow: 0 18px 40px rgba(255,85,0,0.10);
+  .mag-card::before {
+    /* Accent rail down the left edge */
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--ink); opacity: 0;
+    transition: opacity 0.25s;
   }
-  .cover-card-emoji {
-    font-size: 28px;
-    margin-bottom: 14px;
+  .mag-card::after {
+    /* Corner page-fold tab */
+    content: ''; position: absolute; top: 0; right: 0;
+    width: 28px; height: 28px;
+    background: linear-gradient(225deg, rgba(0,0,0,0.04) 50%, transparent 50%);
   }
-  .cover-card-title {
-    margin: 0 0 8px;
-    font-size: 19px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
+  .mag-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 2px 0 var(--ink),
+      0 24px 48px -20px rgba(0,0,0,0.28);
+    border-color: rgba(0,0,0,0.10);
+  }
+  .mag-card:hover::before { opacity: 0.85; }
+
+  .mag-card-no {
+    font-family: Georgia, serif;
+    font-size: 38px; font-weight: 700; font-style: italic;
+    color: var(--ink); opacity: 0.55;
+    line-height: 1; margin-bottom: 18px;
+    letter-spacing: -1px;
+  }
+  .mag-card-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.20em; text-transform: uppercase;
+    color: var(--ink); opacity: 0.7; font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .mag-card-title {
+    font-family: Georgia, serif;
+    font-weight: 600; letter-spacing: -0.6px;
+    font-size: 26px; line-height: 1.1;
     color: var(--text-strong);
+    margin: 0 0 12px;
   }
-  .cover-card-body {
-    margin: 0 0 18px;
-    font-size: 13.5px;
-    line-height: 1.6;
+  .mag-card-body {
+    margin: 0 0 16px;
+    font-size: 14px; line-height: 1.55;
     color: var(--muted-strong);
+  }
+  .mag-card-quote {
+    margin: 0 0 22px;
+    padding: 12px 0 0 14px;
+    border-left: 2px solid var(--ink);
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 13px; line-height: 1.6;
+    color: var(--text-strong);
+    opacity: 0.88;
     flex-grow: 1;
   }
-  .cover-card-go {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--orange);
+  .mag-card-go {
+    margin-top: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink); font-weight: 700;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(0,0,0,0.08);
   }
-  .cover-card-other { border-style: dashed; }
+  .mag-card-go span { transition: transform 0.25s; }
+  .mag-card:hover .mag-card-go span { transform: translate(3px, -3px); }
+  .mag-card-other { border-style: dashed; }
 
-  .cover-footnote {
-    margin-top: 42px;
-    font-size: 12px; letter-spacing: 0.04em;
+  /* Footer */
+  .mag-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 56px; padding-top: 22px;
+    border-top: 1px solid rgba(122,48,19,0.18);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--muted);
+    flex-wrap: wrap; gap: 14px;
   }
+  .mag-foot-l { color: var(--muted-strong); text-transform: none; letter-spacing: 0.02em; font-family: inherit; font-size: 12px; }
+  .mag-foot-l strong { color: var(--orange); }
+  .mag-foot-r { color: var(--orange); font-weight: 700; }
 
-  @media (max-width: 880px) {
-    .cover-grid { grid-template-columns: repeat(2, 1fr); }
+  /* Responsive */
+  @media (max-width: 920px) {
+    .mag-grid { grid-template-columns: repeat(2, 1fr); }
+    .mag-wrap { padding: 40px 22px 0; }
   }
-  @media (max-width: 540px) {
-    .cover-mag { padding: 40px 18px 56px; }
-    .cover-grid { grid-template-columns: 1fr; }
+  @media (max-width: 600px) {
+    .mag-grid { grid-template-columns: 1fr; }
+    .mag-card { min-height: 0; padding: 26px 22px 22px; }
+    .mag-h1 { letter-spacing: -1px; }
+    .mag-foot { flex-direction: column; align-items: flex-start; }
   }
 </style>
 
