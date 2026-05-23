@@ -54,7 +54,9 @@ def _templates(request: Request):
 # traffic keeps its current Lagos venue scene.
 SCENE_PACKS = {
     "hospitality": {
+        "slug": "hospitality",
         "label": "Restaurants & venues",
+        "label_emoji": "🍽 Restaurants & venues",
         "demo_url": "/portal/demo/hospitality",
         "customer_name": "Funke Adebayo",
         "customer_initials": "FA",
@@ -66,9 +68,17 @@ SCENE_PACKS = {
         "transcribe_sec": "2.4",
         "biz_name": "Altitude Lagos",
         "draft_text": "Hey Funke! Yes, we have one DJ-booth table left for Saturday 9pm, perfect for 6. Bottle minimum is ₦180,000 and we hold the table with a ₦90,000 deposit.\n\nSend to GTBank · 0123456789 · Altitude Lagos Ltd and screenshot back. Table is locked the moment it lands. 🎉",
+        "examples": [
+            "Table for 6 Saturday 9pm — birthday",
+            "Bottle service for 4, this Friday",
+            "Brunch for 8 Sunday — any garden tables?",
+        ],
+        "input_placeholder": "Hi, do you still have a table for 6 this Saturday around 9pm? It's my friend's birthday.",
     },
     "real_estate": {
+        "slug": "real_estate",
         "label": "Real estate",
+        "label_emoji": "🏛 Real estate",
         "demo_url": "/portal/demo/real_estate",
         "customer_name": "Tunde Bakare",
         "customer_initials": "TB",
@@ -80,9 +90,17 @@ SCENE_PACKS = {
         "transcribe_sec": "2.7",
         "biz_name": "Sapphire Estates",
         "draft_text": "Hi Tunde, yes the Banana Island 5-bedroom is still available — ₦680M asking, all-in. Quick PoF check first (standard — just confirms budget), then I can lock a Saturday viewing window for you.\n\nSend a short bank statement or PoF letter via WhatsApp here, I'll confirm your slot today. 🏛",
+        "examples": [
+            "5-bed Banana Island — ₦650M, can I view?",
+            "1-bed Lekki Phase 1 short-let, December",
+            "Off-plan Ikoyi — payment plan options?",
+        ],
+        "input_placeholder": "Hi, saw the listing for the 5-bedroom in Banana Island. Budget around ₦650M. Can I view this Saturday?",
     },
     "professional_services": {
+        "slug": "professional_services",
         "label": "Law & advisory",
+        "label_emoji": "⚖ Law & advisory",
         "demo_url": "/portal/demo/professional_services",
         "customer_name": "Olumide Kareem",
         "customer_initials": "OK",
@@ -94,9 +112,17 @@ SCENE_PACKS = {
         "transcribe_sec": "2.2",
         "biz_name": "Adesina & Co",
         "draft_text": "Hi Olumide, sorry to hear that — CBN agency-banking notices are time-sensitive, glad you reached out. Quick conflict check first: anyone at your firm currently in contention with our existing clients? (Just yes / no.)\n\nIf clear, I can lock you in for a 45-min consult Saturday morning. Retainer for initial response is ₦450k. ⚖",
+        "examples": [
+            "CBN compliance notice — urgent consult",
+            "Tenancy dispute — Lagos State, need advice",
+            "M&A diligence — fintech, NDA needed first",
+        ],
+        "input_placeholder": "Good evening. I run a fintech and just got a CBN compliance notice. Need a consult this weekend.",
     },
     "education": {
+        "slug": "education",
         "label": "Schools",
+        "label_emoji": "🎓 Schools",
         "demo_url": "/portal/demo/education",
         "customer_name": "Ngozi Eze",
         "customer_initials": "NE",
@@ -108,9 +134,17 @@ SCENE_PACKS = {
         "transcribe_sec": "2.5",
         "biz_name": "Lagoon British International",
         "draft_text": "Good morning Mrs Eze, thank you for reaching out from London. The September Year 7 cohort still has spaces — we'll send the up-to-date 2026 prospectus + fee schedule (₦8.5M/term, all-in) to your inbox tonight.\n\nQuick first step: any safeguarding records or current school reports we should review? Reply here with attachments any time. 🎓",
+        "examples": [
+            "Year 7 admission, September — diaspora",
+            "School fees plan for SS2 — can we phase?",
+            "Bus route from Lekki Phase 2 — available?",
+        ],
+        "input_placeholder": "Hello, writing from London about Year 7 admission for September. Is the prospectus current?",
     },
     "small_business": {
+        "slug": "small_business",
         "label": "Beauty & wellness",
+        "label_emoji": "✨ Beauty & wellness",
         "demo_url": "/portal/demo/small_business",
         "customer_name": "Chiamaka Okeke",
         "customer_initials": "CO",
@@ -122,6 +156,12 @@ SCENE_PACKS = {
         "transcribe_sec": "2.0",
         "biz_name": "Glow Studio Lagos",
         "draft_text": "Welcome back Chiamaka! 🙌 Yes, Tola has Saturday 2:30pm and 4:00pm open — both 90 mins (hair + manicure). Deposit to lock is ₦15,000.\n\nSend to OPay · 8101234567 · Glow Studio and reply with your slot. ✨",
+        "examples": [
+            "Hair appointment Saturday — same stylist?",
+            "Full massage + facial, this weekend",
+            "Manicure for a wedding — Friday morning",
+        ],
+        "input_placeholder": "Hi, I'd love to book a full hair appointment + manicure for Saturday afternoon.",
     },
 }
 
@@ -187,7 +227,12 @@ async def landing(request: Request):
     )
     return _templates(request).TemplateResponse(
         request, "marketing/landing.html",
-        {"scene": scene, "active_vertical": scene.get("label", "Restaurants & venues")},
+        {
+            "scene": scene,
+            "active_vertical": scene.get("label", "Restaurants & venues"),
+            "active_vertical_slug": scene.get("slug", "hospitality"),
+            "active_vertical_label": scene.get("label_emoji", "🍽 Restaurants & venues"),
+        },
     )
 
 
