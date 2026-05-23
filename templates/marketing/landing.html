@@ -9,14 +9,76 @@
      1. HERO  (problem-anchored, ReachNG-led, no "EYO" until visual context)
      ───────────────────────────────────────────────────────────────────── -->
 <section class="hero">
-  <!-- 'Showing for X · change' — vertical is locked from the cover, this is the only re-entry point -->
-  <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 26px; font-size: 12px;">
-    <span style="display:inline-flex; align-items:center; gap:8px; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 6px 14px; color: var(--text-strong); font-weight: 600;">
-      <span style="width:7px;height:7px;border-radius:50%;background:#5dd28a;box-shadow:0 0 8px #5dd28a;"></span>
-      Showing for <strong style="color: var(--orange); margin-left:4px;">{{ active_vertical_label|default('🍽 Restaurants &amp; venues') }}</strong>
-    </span>
-    <a href="/start" data-ph="hero_change_vertical" style="font-size: 11px; color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--border); letter-spacing: 0.04em;">change →</a>
+  <!-- 'Showing for X · change industry' — bold, impossible-to-miss vertical switcher.
+       Clicking 'Change' routes to /start (cover) where the new pick sets the cookie
+       and lands back on this page with refreshed scenes. -->
+  <div class="vertical-strip">
+    <div class="vertical-strip-left">
+      <span class="vertical-strip-pulse"></span>
+      <span class="vertical-strip-label">Showing for</span>
+      <span class="vertical-strip-tag">{{ active_vertical_label|default('🍽 Restaurants &amp; venues') }}</span>
+    </div>
+    <a href="/start" data-ph="hero_change_vertical" class="vertical-strip-change">
+      Wrong fit? <strong>Change industry</strong> <span class="vertical-strip-arrow">↻</span>
+    </a>
   </div>
+
+  <style>
+    .vertical-strip {
+      display: flex; justify-content: center; align-items: center;
+      gap: 14px; margin: 0 auto 32px; flex-wrap: wrap;
+      max-width: 720px;
+      padding: 12px 18px;
+      background: linear-gradient(135deg, rgba(255,85,0,0.10) 0%, rgba(255,85,0,0.04) 100%);
+      border: 1.5px solid rgba(255,85,0,0.35);
+      border-radius: 14px;
+      box-shadow: 0 6px 20px rgba(255,85,0,0.10);
+    }
+    .vertical-strip-left {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 14px; color: var(--text-strong); font-weight: 600;
+    }
+    .vertical-strip-pulse {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #5dd28a; box-shadow: 0 0 12px #5dd28a;
+      animation: vsDot 1.4s ease-in-out infinite;
+    }
+    .vertical-strip-label {
+      font-size: 13px; color: var(--muted-strong); letter-spacing: 0.02em;
+    }
+    .vertical-strip-tag {
+      font-size: 14px; font-weight: 800; color: var(--orange);
+      background: #fff; padding: 4px 12px; border-radius: 100px;
+      border: 1px solid rgba(255,85,0,0.35);
+      letter-spacing: 0.01em;
+    }
+    .vertical-strip-change {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--text-strong); font-weight: 600;
+      text-decoration: none;
+      background: var(--orange); color: #fff;
+      padding: 8px 16px; border-radius: 100px;
+      box-shadow: 0 6px 16px rgba(255,85,0,0.30);
+      transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+    }
+    .vertical-strip-change:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+      box-shadow: 0 10px 22px rgba(255,85,0,0.42);
+    }
+    .vertical-strip-change strong { font-weight: 800; }
+    .vertical-strip-arrow { display: inline-block; transition: transform 0.4s; }
+    .vertical-strip-change:hover .vertical-strip-arrow { transform: rotate(180deg); }
+
+    @keyframes vsDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.9); } }
+    @media (prefers-reduced-motion: reduce) {
+      .vertical-strip-pulse, .vertical-strip-change, .vertical-strip-arrow { animation: none !important; transition: none !important; }
+    }
+    @media (max-width: 540px) {
+      .vertical-strip { flex-direction: column; padding: 14px 16px; gap: 12px; }
+      .vertical-strip-left { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
   <div class="eyebrow">AI WhatsApp operator for premium Lagos &amp; Abuja businesses</div>
   <h1>One WhatsApp operator. <em>Never sleeps.</em> Never takes a break. Replies in your voice.</h1>
   <p class="sub">ReachNG is your agentic employee for WhatsApp. Replies first, qualifies the lead, catches payments, briefs you every morning. Always on, always in your voice. You only tap to approve.</p>
