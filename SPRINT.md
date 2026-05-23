@@ -19,10 +19,7 @@ Last updated: 2026-05-21 · North Star: **first paying client + path to 100 clie
 
 The two gaps that block first paying client: (1) nobody visits the landing, (2) silent failure modes that would burn first client's trust.
 
-- [ ] **1. Try-EYO sandbox widget on landing** *(2 days, BACKLOG P1 #1)* ← **next big build**
-  - Backend: `POST /api/v1/try-eyo` using our Anthropic key, IP-rate-limited, ~600 token cap, server-side PostHog logging
-  - Frontend: textarea below hero with vertical selector (hospitality / RE / clinic), 2.4s response, typing indicator
-  - **Reason:** single biggest landing-conversion lever. Each visit becomes a live product demo. Generates shareable Twitter artifacts.
+- [x] ~~**1. Try-EYO sandbox widget on landing**~~ — ✅ shipped `20607ba`. `POST /api/v1/try-eyo` + 5-vertical pill picker + 600-char textarea + 3/min IP rate limit. Same Haiku engine the portal uses; PostHog `try_eyo_used` event.
 
 - [x] ~~**2. Wire `services/subscription_invoice.py` into Paystack webhook**~~ — ✅ shipped `cb48ca1`. Receipt now auto-emails on charge.success.
 
@@ -34,11 +31,7 @@ The two gaps that block first paying client: (1) nobody visits the landing, (2) 
 
 - [x] ~~**5b. Visible founder-slots counter on /pricing**~~ — ✅ shipped `1b19c7e`. Live "X of 50 founder slots taken · Y remaining" pill above tier cards, with sold-out fallback.
 
-- [ ] **5c. Tone-fit confidence meter + Autopilot ≥20 gate** *(half day — decision (b) locked last session)*
-  - Confidence meter in client portal grows with each approved draft per reply-type
-  - Autopilot toggle per reply-type gates at ≥20 approvals (was unbounded)
-  - Matches the locked PLAN.md rule: "Autopilot is earned, not defaulted"
-  - Files: `services/autopilot.py` threshold check + new meter widget in `templates/portal.html`
+- [x] ~~**5c. Tone-fit confidence meter + Autopilot ≥20 gate**~~ — ✅ shipped `41f1f12`. `services/autopilot.py` + `assert_eligible()` gate (≥20 approvals, ≥70% unedited last 30d). Portal meter shows both bars, 409 response intercepted with the unlock math.
 
 **Sprint 1 ship gate:** all 5 ticked. After this, the landing converts, receipts auto-email, and WhatsApp expiry can't kill a paid client silently. Safe to push for first paid client.
 
@@ -53,7 +46,7 @@ Built only after sprint 1 ships AND first paid client is live (real data starts 
   - Data already in `services/client_memory.py` — this is a portal surface, not a build
   - **Reason:** turns switching cost from "low" to "structural." Owners can't leave once 30 days of customer memory accumulates.
 
-- [ ] **7. Streak counter on Owner Brief** *(half day, BACKLOG P1 #3)*
+- [x] ~~**7. Streak counter on Owner Brief**~~ — ✅ shipped `40717d4`. `services/brief_streak.py` records sends idempotent per Lagos day; brief body adds `🔥 *N-day brief streak* · ₦X caught since EYO went live`.
   - "EYO has briefed you 47 mornings in a row · ₦14.2M in deposits caught"
   - Reads from `brief_dispatch_log` + `paystack_events`
   - **Reason:** habit loop. Premium owners check WhatsApp first thing every morning anyway — make EYO the daily anchor.
