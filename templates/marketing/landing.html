@@ -79,26 +79,23 @@
         </div>
         <div style="background: #25D366; color: #fff; padding: 12px 14px; border-radius: 12px 12px 12px 4px; font-size: 14px; line-height: 1.5; max-width: 92%;">
           🎤 Voice note · 0:34<br>
-          <span style="opacity: 0.85; font-size: 12px; font-style: italic; line-height: 1.6; display: block; margin-top: 6px;">"Hi, I want to book your rooftop for Saturday around 9pm, table of 6. It's my friend's birthday. Do you still have something near the DJ booth, and how much is the deposit?"</span>
+          <span id="hero-transcript" data-full="&quot;Hi, I want to book your rooftop for Saturday around 9pm, table of 6. It's my friend's birthday. Do you still have something near the DJ booth, and how much is the deposit?&quot;" style="opacity: 0.85; font-size: 12px; font-style: italic; line-height: 1.6; display: block; margin-top: 6px; min-height: 1.6em;"></span>
         </div>
         <div style="margin-top: 12px; font-size: 11px; color: var(--muted); display:flex; gap: 10px; align-items: center;">
-          <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#5dd28a;display:inline-block;"></span> Transcribed in 2.4s</span>
+          <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#5dd28a;display:inline-block;"></span> Transcribed in <span id="hero-transcribe-ms" data-target="2.4">·</span>s</span>
           <span>·</span>
-          <span style="color: #ff5500; font-weight: 600;">🔥 HOT · qualifying</span>
+          <span id="hero-classifier" style="color: var(--muted); font-weight: 600; transition: color 0.3s;">classifying…</span>
         </div>
       </div>
 
-      <div style="background: var(--surface); border: 1px solid var(--orange); border-radius: 14px; padding: 20px 22px; box-shadow: 0 12px 32px rgba(255,85,0,0.12); position: relative;">
-        <div style="position: absolute; top: -10px; left: 18px; background: var(--orange); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 100px; text-transform: uppercase;">EYO drafted · awaiting your tap</div>
+      <div id="hero-draft-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); position: relative; transition: border-color 0.4s, box-shadow 0.4s;">
+        <div id="hero-pill" style="position: absolute; top: -10px; left: 18px; background: var(--muted); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 100px; text-transform: uppercase; transition: background 0.3s;">EYO is drafting…</div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; margin-bottom: 14px;">
           <div style="font-size: 12px; color: var(--muted-strong);">Reply as <strong style="color: var(--text-strong);">Altitude Lagos</strong></div>
-          <div style="font-size: 11px; color: var(--muted);">drafted 9s ago</div>
+          <div style="font-size: 11px; color: var(--muted);" id="hero-draft-meta">·</div>
         </div>
-        <div style="background: var(--bg-2); border: 1px solid var(--border); padding: 14px 16px; border-radius: 10px; font-size: 13.5px; line-height: 1.65; color: var(--text-strong);">
-          Hey Funke! Yes, we have one DJ-booth table left for Saturday 9pm, perfect for 6. Bottle minimum is ₦180,000 and we hold the table with a <strong>₦90,000 deposit</strong>.<br><br>
-          Send to <strong>GTBank · 0123456789 · Altitude Lagos Ltd</strong> and screenshot back. Table is locked the moment it lands. 🎉
-        </div>
-        <div style="display: flex; gap: 8px; margin-top: 16px;">
+        <div id="hero-draft-text" data-full="Hey Funke! Yes, we have one DJ-booth table left for Saturday 9pm, perfect for 6. Bottle minimum is ₦180,000 and we hold the table with a ₦90,000 deposit.&#10;&#10;Send to GTBank · 0123456789 · Altitude Lagos Ltd and screenshot back. Table is locked the moment it lands. 🎉" style="background: var(--bg-2); border: 1px solid var(--border); padding: 14px 16px; border-radius: 10px; font-size: 13.5px; line-height: 1.65; color: var(--text-strong); min-height: 7em; white-space: pre-wrap;"></div>
+        <div id="hero-actions" style="display: flex; gap: 8px; margin-top: 16px; opacity: 0.3; transition: opacity 0.4s;">
           <button style="flex:1; background: var(--orange); color:#fff; border:0; padding: 12px; border-radius: 9px; font-weight: 700; font-size: 13px; cursor: pointer; letter-spacing: 0.02em;">✓ Approve &amp; send</button>
           <button style="background: transparent; color: var(--muted-strong); border: 1px solid var(--border); padding: 12px 14px; border-radius: 9px; font-weight: 600; font-size: 13px; cursor: pointer;">Edit</button>
           <button style="background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 12px 14px; border-radius: 9px; font-weight: 600; font-size: 13px; cursor: pointer;">Skip</button>
@@ -128,6 +125,86 @@
       .reassure-grid p { font-size: 12px !important; }
     }
   </style>
+
+  <script>
+    /* Hero HITL mock — animated reveal. Fires once when scrolled into view.
+       Stages: typewriter transcript → classify badge flip → typewriter draft → action buttons glow. */
+    (function () {
+      const mock = document.getElementById('hero-draft-card');
+      if (!mock) return;
+      const trans   = document.getElementById('hero-transcript');
+      const transMs = document.getElementById('hero-transcribe-ms');
+      const classy  = document.getElementById('hero-classifier');
+      const pill    = document.getElementById('hero-pill');
+      const draft   = document.getElementById('hero-draft-text');
+      const meta    = document.getElementById('hero-draft-meta');
+      const actions = document.getElementById('hero-actions');
+      if (!trans || !draft) return;
+
+      const transcriptFull = trans.dataset.full || '';
+      const draftFull      = draft.dataset.full || '';
+
+      function typewriter(el, full, ms, done) {
+        let i = 0;
+        const step = Math.max(1, Math.floor(full.length / (ms / 22)));
+        const tick = () => {
+          i = Math.min(full.length, i + step);
+          el.textContent = full.slice(0, i);
+          if (i < full.length) setTimeout(tick, 22);
+          else if (done) done();
+        };
+        tick();
+      }
+
+      function countUp(el, target, ms) {
+        const start = performance.now();
+        const tick = (now) => {
+          const p = Math.min(1, (now - start) / ms);
+          el.textContent = (target * p).toFixed(1);
+          if (p < 1) requestAnimationFrame(tick);
+          else el.textContent = target.toFixed(1);
+        };
+        requestAnimationFrame(tick);
+      }
+
+      let played = false;
+      function play() {
+        if (played) return;
+        played = true;
+        // 1. Type the customer transcript
+        typewriter(trans, transcriptFull, 1900, function () {
+          // 2. Latency counter ticks up
+          countUp(transMs, 2.4, 800);
+          // 3. Classifier badge flips to HOT
+          setTimeout(function () {
+            classy.textContent = '🔥 HOT · qualifying';
+            classy.style.color = '#ff5500';
+          }, 600);
+          // 4. EYO finishes drafting → pill flips to orange, draft text types
+          setTimeout(function () {
+            pill.textContent = 'EYO drafted · awaiting your tap';
+            pill.style.background = 'var(--orange)';
+            mock.style.borderColor = 'var(--orange)';
+            mock.style.boxShadow = '0 12px 32px rgba(255,85,0,0.12)';
+            meta.textContent = 'drafted in 1.8s';
+            typewriter(draft, draftFull, 2400, function () {
+              actions.style.opacity = '1';
+            });
+          }, 1100);
+        });
+      }
+
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { if (e.isIntersecting) { play(); io.disconnect(); } });
+        }, { threshold: 0.35 });
+        io.observe(mock);
+      } else {
+        // No IO support — just play immediately
+        play();
+      }
+    })();
+  </script>
 
   <p id="wl-counter" style="margin-top: 14px; font-size: 13px; color: var(--muted-strong); letter-spacing: 0.02em; display: none;">
     <span style="display:inline-flex;align-items:center;gap:8px;">
