@@ -171,6 +171,8 @@ async def lifespan(app: FastAPI):
     _safe("subscription_receipts", ensure_receipt_indexes)
     from services.whatsapp_health import ensure_health_indexes
     _safe("whatsapp_health", ensure_health_indexes)
+    from services.brief_streak import ensure_brief_streak_indexes
+    _safe("brief_streak", ensure_brief_streak_indexes)
     from services.usage_meter import ensure_usage_indexes
     _safe("usage",       ensure_usage_indexes)
     from api.legal import ensure_legal_indexes as ensure_legal_api_indexes

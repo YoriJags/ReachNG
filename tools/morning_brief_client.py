@@ -210,6 +210,26 @@ def compile_client_brief(client_name: str, portal_url: str = "") -> str:
 
     activity_recap = " · ".join(activity_parts) if activity_parts else "quiet night"
 
+    # ── Streak + cumulative caught (habit hook + visible ROI) ──────────
+    streak_line = ""
+    try:
+        from services.brief_streak import compute_streak, cumulative_deposits_ngn
+        streak = compute_streak(client_name)
+        cum    = cumulative_deposits_ngn(client_name)
+        # Streak counts the brief about to be sent. compute_streak() reads
+        # what's already recorded; we'll record AFTER the send, so add 1
+        # to reflect the brief being delivered right now.
+        days = (streak.get("days") or 0) + 1
+        bits = []
+        if days >= 2:
+            bits.append(f"🔥 *{days}-day brief streak*")
+        if cum > 0:
+            bits.append(f"₦{cum:,.0f} caught since EYO went live")
+        if bits:
+            streak_line = "\n" + " · ".join(bits)
+    except Exception:
+        pass
+
     # ── Compose ─────────────────────────────────────────────────────────
     brief = f"""🌅 *Good morning, {client_name.split()[0]}!*
 {day_str} — Owner Brief{cap_line}
@@ -218,7 +238,7 @@ def compile_client_brief(client_name: str, portal_url: str = "") -> str:
 
 {approval_line}
 
-_Overnight: {activity_recap}_
+_Overnight: {activity_recap}_{streak_line}
 _Powered by ReachNG — your AI sales engine_"""
 
     return brief.strip()
@@ -299,6 +319,12 @@ async def run_all_client_briefs() -> dict:
         ok = await send_client_brief(phone, message)
         if ok:
             sent += 1
+            # Record the successful send so tomorrow's brief shows the streak.
+            try:
+                from services.brief_streak import record_send
+                record_send(name)
+            except Exception:
+                pass
         else:
             skipped += 1
 
