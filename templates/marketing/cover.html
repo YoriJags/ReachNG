@@ -30,51 +30,64 @@
     <!-- Six cards · numbered, accented, asymmetric weight on hover -->
     <div class="mag-grid">
 
-      <a href="/set-vertical/hospitality?next=/" data-ph="cover_pick_hospitality" class="mag-card" style="--tint:#ffe5d6; --ink:#7a3013;">
+      <form method="post" action="/set-vertical-custom" class="mag-card" style="--tint:#ffe5d6; --ink:#7a3013;">
+        <input type="hidden" name="slug" value="hospitality">
         <div class="mag-card-no">01</div>
         <div class="mag-card-meta">Hospitality</div>
         <h3 class="mag-card-title">Restaurants &amp; venues</h3>
         <p class="mag-card-body">Saturday tables, deposits in by midnight, owambe waves handled before lunch.</p>
         <blockquote class="mag-card-quote">
-          "Funke just asked for table of 6, near the DJ. EYO already drafted the reply — with the deposit ask and your bank line. Tap to approve."
+          "Funke just asked for table of 6, near the DJ. EYO already drafted the reply — with the deposit ask and your bank line."
         </blockquote>
-        <div class="mag-card-go">Open this experience <span>↗</span></div>
-      </a>
+        <input type="text" name="biz_name" class="mag-card-input" maxlength="80"
+               placeholder="Your venue name (optional)" data-ph="cover_name_hospitality">
+        <button type="submit" class="mag-card-go" data-ph="cover_pick_hospitality">Open this experience <span>↗</span></button>
+      </form>
 
-      <a href="/set-vertical/real_estate?next=/" data-ph="cover_pick_real_estate" class="mag-card" style="--tint:#efe7d6; --ink:#5a3a14;">
+      <form method="post" action="/set-vertical-custom" class="mag-card" style="--tint:#efe7d6; --ink:#5a3a14;">
+        <input type="hidden" name="slug" value="real_estate">
         <div class="mag-card-no">02</div>
         <div class="mag-card-meta">Property</div>
         <h3 class="mag-card-title">Real estate</h3>
         <p class="mag-card-body">PoF screening, Saturday viewing slots, Banana Island to Lekki enquiries threaded.</p>
         <blockquote class="mag-card-quote">
-          "Tunde DM'd about the ₦650M five-bedroom on Instagram. EYO ran the PoF prompt and locked the viewing window. You said yes from the car."
+          "Tunde DM'd about the ₦650M five-bedroom on Instagram. EYO ran the PoF prompt and locked the viewing window."
         </blockquote>
-        <div class="mag-card-go">Open this experience <span>↗</span></div>
-      </a>
+        <input type="text" name="biz_name" class="mag-card-input" maxlength="80"
+               placeholder="Your agency name (optional)" data-ph="cover_name_real_estate">
+        <button type="submit" class="mag-card-go" data-ph="cover_pick_real_estate">Open this experience <span>↗</span></button>
+      </form>
 
-      <a href="/set-vertical/professional_services?next=/" data-ph="cover_pick_professional_services" class="mag-card" style="--tint:#e2e6ec; --ink:#1d2c3d;">
+      <form method="post" action="/set-vertical-custom" class="mag-card" style="--tint:#e2e6ec; --ink:#1d2c3d;">
+        <input type="hidden" name="slug" value="professional_services">
         <div class="mag-card-no">03</div>
         <div class="mag-card-meta">Advisory</div>
         <h3 class="mag-card-title">Law &amp; advisory</h3>
         <p class="mag-card-body">Confidential intake, conflict checks, retainer follow-through — without breaking the seal.</p>
         <blockquote class="mag-card-quote">
-          "Olumide brought a CBN compliance notice in at 9pm Friday. EYO drafted the conflict-check question and a Saturday slot. Retainer signed Monday."
+          "Olumide brought a CBN compliance notice in at 9pm Friday. EYO drafted the conflict-check question and a Saturday slot."
         </blockquote>
-        <div class="mag-card-go">Open this experience <span>↗</span></div>
-      </a>
+        <input type="text" name="biz_name" class="mag-card-input" maxlength="80"
+               placeholder="Your firm name (optional)" data-ph="cover_name_professional_services">
+        <button type="submit" class="mag-card-go" data-ph="cover_pick_professional_services">Open this experience <span>↗</span></button>
+      </form>
 
-      <a href="/set-vertical/education?next=/" data-ph="cover_pick_education" class="mag-card" style="--tint:#f6dde2; --ink:#5a1a26;">
+      <form method="post" action="/set-vertical-custom" class="mag-card" style="--tint:#f6dde2; --ink:#5a1a26;">
+        <input type="hidden" name="slug" value="education">
         <div class="mag-card-no">04</div>
         <div class="mag-card-meta">Education</div>
         <h3 class="mag-card-title">Schools</h3>
         <p class="mag-card-body">Admissions, fee chase, diaspora parents on UK and US timezones, term-fee plans.</p>
         <blockquote class="mag-card-quote">
-          "Ngozi emailed from London about Year 7. EYO replied 90 seconds later with the prospectus and fee tier. She booked the call from Hampstead."
+          "Ngozi emailed from London about Year 7. EYO replied 90 seconds later with the prospectus and fee tier."
         </blockquote>
-        <div class="mag-card-go">Open this experience <span>↗</span></div>
-      </a>
+        <input type="text" name="biz_name" class="mag-card-input" maxlength="80"
+               placeholder="Your school name (optional)" data-ph="cover_name_education">
+        <button type="submit" class="mag-card-go" data-ph="cover_pick_education">Open this experience <span>↗</span></button>
+      </form>
 
-      <a href="/set-vertical/small_business?next=/" data-ph="cover_pick_small_business" class="mag-card" style="--tint:#fbe7c4; --ink:#5e3a08;">
+      <form method="post" action="/set-vertical-custom" class="mag-card" style="--tint:#fbe7c4; --ink:#5e3a08;">
+        <input type="hidden" name="slug" value="small_business">
         <div class="mag-card-no">05</div>
         <div class="mag-card-meta">Wellness</div>
         <h3 class="mag-card-title">Beauty &amp; wellness</h3>
@@ -82,27 +95,24 @@
         <blockquote class="mag-card-quote">
           "Chiamaka wanted Saturday afternoon with Tola. EYO replied with both open slots and the deposit number. ₦15k landed before sunset."
         </blockquote>
-        <div class="mag-card-go">Open this experience <span>↗</span></div>
-      </a>
+        <input type="text" name="biz_name" class="mag-card-input" maxlength="80"
+               placeholder="Your studio name (optional)" data-ph="cover_name_small_business">
+        <button type="submit" class="mag-card-go" data-ph="cover_pick_small_business">Open this experience <span>↗</span></button>
+      </form>
 
-      <div class="mag-card mag-card-other" style="--tint:#f2eee5; --ink:#3b342a;">
+      <form method="post" action="/set-vertical-custom" class="mag-card mag-card-other" style="--tint:#f2eee5; --ink:#3b342a;">
         <div class="mag-card-no">06</div>
         <div class="mag-card-meta">Other</div>
         <h3 class="mag-card-title">Something else</h3>
-        <p class="mag-card-body" id="other-pitch">Tell us your business — we'll personalize the experience around your name and trade.</p>
+        <p class="mag-card-body">Tell us your business — we'll personalize the experience around your name and trade.</p>
 
-        <form id="other-form" method="post" action="/set-vertical-custom" style="display:flex; flex-direction:column; gap:10px; margin-top:6px;">
-          <input type="text" name="biz_name" required maxlength="80"
-                 placeholder="Your business name"
-                 class="other-input" data-ph="cover_other_name" />
-          <input type="text" name="trade" required maxlength="60"
-                 placeholder="What you do (e.g. logistics, barber, agency)"
-                 class="other-input" data-ph="cover_other_trade" />
-          <button type="submit" class="other-submit" data-ph="cover_other_submit">
-            Tailor my experience <span>→</span>
-          </button>
-        </form>
-      </div>
+        <input type="text" name="biz_name" required maxlength="80"
+               placeholder="Your business name" class="mag-card-input" data-ph="cover_other_name">
+        <input type="text" name="trade" required maxlength="60"
+               placeholder="What you do (e.g. logistics, barber, agency)"
+               class="mag-card-input" data-ph="cover_other_trade">
+        <button type="submit" class="mag-card-go" data-ph="cover_other_submit">Tailor my experience <span>→</span></button>
+      </form>
 
     </div>
 
@@ -282,48 +292,45 @@
     opacity: 0.88;
     flex-grow: 1;
   }
-  .mag-card-go {
-    margin-top: auto;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--ink); font-weight: 700;
-    display: inline-flex; align-items: center; gap: 6px;
-    padding-top: 14px;
-    border-top: 1px solid rgba(0,0,0,0.08);
-  }
-  .mag-card-go span { transition: transform 0.25s; }
-  .mag-card:hover .mag-card-go span { transform: translate(3px, -3px); }
-  .mag-card-other { border-style: dashed; }
-
-  .other-input {
+  /* Card-internal biz-name input (single-line, optional on canonical cards) */
+  .mag-card-input {
     background: #fff;
     border: 1px solid rgba(0,0,0,0.12);
     border-radius: 3px;
     padding: 10px 12px;
+    margin-bottom: 8px;
     font-size: 13px; font-family: inherit;
     color: var(--text-strong);
     transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+    box-sizing: border-box;
   }
-  .other-input::placeholder { color: var(--muted); }
-  .other-input:focus {
+  .mag-card-input::placeholder { color: var(--muted); font-style: italic; }
+  .mag-card-input:focus {
     outline: none;
-    border-color: var(--ink, var(--orange));
+    border-color: var(--ink);
     box-shadow: 0 0 0 3px rgba(255,85,0,0.12);
   }
-  .other-submit {
-    margin-top: 4px;
-    background: var(--ink, var(--orange));
-    color: #fff; border: 0;
-    padding: 11px 16px; border-radius: 3px;
+
+  /* The Open / Submit CTA — works for both <a> and <button> */
+  .mag-card-go {
+    margin-top: auto;
+    background: var(--ink);
+    color: #fff !important; border: 0;
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
     font-weight: 700; cursor: pointer;
-    display: inline-flex; align-items: center; justify-content: space-between;
+    display: inline-flex; align-items: center; justify-content: space-between; gap: 6px;
+    padding: 12px 14px;
+    border-radius: 3px;
+    text-decoration: none;
+    width: 100%;
     transition: filter 0.15s, transform 0.15s;
   }
-  .other-submit:hover { filter: brightness(1.1); transform: translateY(-1px); }
-  .other-submit span { transition: transform 0.2s; }
-  .other-submit:hover span { transform: translateX(3px); }
+  .mag-card-go:hover { filter: brightness(1.12); transform: translateY(-1px); }
+  .mag-card-go span { transition: transform 0.25s; display: inline-block; }
+  .mag-card:hover .mag-card-go span { transform: translate(3px, -3px); }
+  .mag-card-other { border-style: dashed; }
 
   /* Footer */
   .mag-foot {

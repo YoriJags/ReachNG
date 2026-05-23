@@ -349,19 +349,36 @@ async def set_vertical(slug: str, request: Request):
 
 @router.post("/set-vertical-custom", include_in_schema=False)
 async def set_vertical_custom(request: Request):
-    """Cover's 'Something else' form — visitor types their business name +
-    what they do. We map the trade to the closest SCENE_PACK so the landing
-    still has relevant copy, and overlay their typed biz name + trade label."""
-    form = await request.form()
+    """Single endpoint for both flows on the cover:
+
+      (a) Canonical pick (cards 01-05): visitor picks one of the 5 known
+          verticals + optionally types their business name. Hidden 'slug'
+          field carries the vertical; trade is empty.
+
+      (b) Custom pick (card 06 'Something else'): no slug, but biz_name +
+          trade are typed. We keyword-map the trade to the closest existing
+          SCENE_PACK so the landing still reads as theirs.
+    """
+    form     = await request.form()
     biz_name = (form.get("biz_name") or "").strip()[:80]
     trade    = (form.get("trade") or "").strip()[:60]
-    if not biz_name and not trade:
+    slug     = (form.get("slug") or "").strip().lower()
+
+    if slug in SCENE_PACKS:
+        # (a) canonical pick — visitor optionally typed their biz name
+        use_slug      = slug
+        cookie_trade  = ""      # don't store a trade label for canonical picks
+    elif trade:
+        # (b) 'something else' — typed trade, map to closest pack
+        use_slug      = _map_trade_to_slug(trade)
+        cookie_trade  = trade
+    else:
+        # No slug, no trade — nothing to do, bounce back to the cover
         return RedirectResponse(url="/start", status_code=302)
 
-    slug = _map_trade_to_slug(trade)
     resp = RedirectResponse(url="/?skip_cover=1", status_code=302)
     resp.set_cookie(
-        key="reachng_vertical", value=slug,
+        key="reachng_vertical", value=use_slug,
         max_age=60 * 60 * 24 * 90, samesite="lax", httponly=False, path="/",
     )
     if biz_name:
@@ -369,11 +386,15 @@ async def set_vertical_custom(request: Request):
             key="reachng_biz_name", value=biz_name,
             max_age=60 * 60 * 24 * 90, samesite="lax", httponly=False, path="/",
         )
-    if trade:
+    else:
+        resp.delete_cookie(key="reachng_biz_name", path="/")
+    if cookie_trade:
         resp.set_cookie(
-            key="reachng_biz_trade", value=trade,
+            key="reachng_biz_trade", value=cookie_trade,
             max_age=60 * 60 * 24 * 90, samesite="lax", httponly=False, path="/",
         )
+    else:
+        resp.delete_cookie(key="reachng_biz_trade", path="/")
     return resp
 
 
