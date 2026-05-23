@@ -90,36 +90,194 @@
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────────
-     1.5 MEET EYO  (introduces the agent by name before showing scenes)
+     1.5 MEET EYO  (animated badge + capability grid + network stat strip)
      ───────────────────────────────────────────────────────────────────── -->
 <section style="background: var(--bg-dark); color: #f0e9dc; border-top: 1px solid #2a241b; border-bottom: 1px solid #2a241b;">
-  <div class="inner" style="max-width: 980px;">
-    <div style="display: grid; grid-template-columns: 220px 1fr; gap: 40px; align-items: center;" class="eyo-meet-grid">
+  <div class="inner" style="max-width: 1040px;">
+    <div style="display: grid; grid-template-columns: 240px 1fr; gap: 48px; align-items: start;" class="eyo-meet-grid">
+
+      <!-- Animated badge: breathing glow + 4 orbit pills representing capabilities -->
       <div style="text-align: center;">
-        <div style="width: 156px; height: 156px; border-radius: 50%; background: linear-gradient(135deg, #ff5500 0%, #c63d00 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 18px 48px rgba(255, 85, 0, 0.28); position: relative;">
-          <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 64px; font-weight: 600; color: #fff; letter-spacing: -2px; line-height: 1;">EYO</span>
+        <div class="eyo-orbit-wrap">
+          <div class="eyo-orbit-ring"></div>
+          <div class="eyo-orbit eyo-orbit-1"><span>🎤</span></div>
+          <div class="eyo-orbit eyo-orbit-2"><span>📝</span></div>
+          <div class="eyo-orbit eyo-orbit-3"><span>💰</span></div>
+          <div class="eyo-orbit eyo-orbit-4"><span>📋</span></div>
+          <div class="eyo-badge">
+            <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 60px; font-weight: 600; color: #fff; letter-spacing: -2px; line-height: 1;">EYO</span>
+          </div>
         </div>
-        <div style="margin-top: 14px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ff9b66; font-weight: 700;">The agent</div>
+        <div style="margin-top: 22px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ff9b66; font-weight: 700;">The agent</div>
+        <div style="margin-top: 6px; font-size: 11px; color: #6b6356; letter-spacing: 0.04em;">Rename it from your portal · your name, your voice</div>
       </div>
 
       <div>
         <div style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ff9b66; font-weight: 700; margin-bottom: 14px;">Meet EYO</div>
-        <h2 style="font-family: Georgia, 'Times New Roman', serif; font-size: clamp(28px, 4vw, 38px); font-weight: 600; letter-spacing: -0.8px; color: #fff; margin: 0 0 16px; line-height: 1.15;">Your agentic employee for WhatsApp.</h2>
-        <p style="font-size: 16px; line-height: 1.75; color: #d4c8b3; margin: 0 0 20px; max-width: 620px;">EYO reads every inbound, drafts the reply in your house voice, parses bank-transfer screenshots, qualifies leads, and slides a five-minute brief into your WhatsApp at 7am. Approval-only by default. Autopilot when you flip the switch.</p>
+        <h2 style="font-family: Georgia, 'Times New Roman', serif; font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.8px; color: #fff; margin: 0 0 14px; line-height: 1.12;">An agentic employee that runs your WhatsApp.</h2>
+        <p style="font-size: 16px; line-height: 1.7; color: #d4c8b3; margin: 0 0 28px; max-width: 640px;">Reads every inbound. Drafts every reply in your voice. Parses bank screenshots. Speaks five Nigerian languages. Remembers every customer. Briefs you every morning. <strong style="color:#fff;">You only tap to approve.</strong></p>
 
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 22px; margin-top: 22px; max-width: 620px;" class="eyo-traits">
-          <div style="display: flex; align-items: flex-start; gap: 10px;"><span style="color: #ff9b66; font-weight: 700; font-size: 14px; line-height: 1.5;">·</span><span style="font-size: 13px; color: #c9bda7; line-height: 1.55;">Replies in your voice, not in generic AI</span></div>
-          <div style="display: flex; align-items: flex-start; gap: 10px;"><span style="color: #ff9b66; font-weight: 700; font-size: 14px; line-height: 1.5;">·</span><span style="font-size: 13px; color: #c9bda7; line-height: 1.55;">Reads receipts in 3 seconds, never sends without your tap</span></div>
-          <div style="display: flex; align-items: flex-start; gap: 10px;"><span style="color: #ff9b66; font-weight: 700; font-size: 14px; line-height: 1.5;">·</span><span style="font-size: 13px; color: #c9bda7; line-height: 1.55;">Knows your prices, your never-say list, your tone</span></div>
-          <div style="display: flex; align-items: flex-start; gap: 10px;"><span style="color: #ff9b66; font-weight: 700; font-size: 14px; line-height: 1.5;">·</span><span style="font-size: 13px; color: #c9bda7; line-height: 1.55;">Briefs you every morning before your day starts</span></div>
+        <!-- 6 capability cards — each = icon + title + one-line proof -->
+        <div class="eyo-cap-grid">
+          <div class="eyo-cap">
+            <div class="eyo-cap-icon">🎤</div>
+            <div class="eyo-cap-title">Voice-fluent</div>
+            <div class="eyo-cap-body">Transcribes WhatsApp voice notes in English, Pidgin, Yoruba, Igbo, Hausa — flags low-confidence audio instead of guessing.</div>
+          </div>
+          <div class="eyo-cap">
+            <div class="eyo-cap-icon">📝</div>
+            <div class="eyo-cap-title">Drafts in your voice</div>
+            <div class="eyo-cap-body">Trained on your tone, FAQs, price list, never-say words. Every reply waits for your tap until Autopilot is earned.</div>
+          </div>
+          <div class="eyo-cap">
+            <div class="eyo-cap-icon">💰</div>
+            <div class="eyo-cap-title">Reads bank screenshots</div>
+            <div class="eyo-cap-body">GTBank, OPay, Kuda, UBA, PalmPay in 3 seconds. Matches the receipt to the right invoice and drafts the conditional ack.</div>
+          </div>
+          <div class="eyo-cap">
+            <div class="eyo-cap-icon">🧠</div>
+            <div class="eyo-cap-title">Per-customer memory</div>
+            <div class="eyo-cap-body">Remembers Funke prefers the DJ-booth table, Bola booked the rooftop for his birthday in March. The CRM you didn't have to build.</div>
+          </div>
+          <div class="eyo-cap">
+            <div class="eyo-cap-icon">📋</div>
+            <div class="eyo-cap-title">Morning Owner Brief</div>
+            <div class="eyo-cap-body">A 5-minute WhatsApp at 7am: last night's signals, today's queue, where revenue almost slipped, current streak.</div>
+          </div>
+          <div class="eyo-cap">
+            <div class="eyo-cap-icon">🇳🇬</div>
+            <div class="eyo-cap-title">Lagos-native</div>
+            <div class="eyo-cap-body">Naira, Paystack, owambe season, Detty December, "I don pay sir." Knows your market, not San Francisco's.</div>
+          </div>
         </div>
-
-        <p style="margin-top: 26px; font-size: 12px; color: #8a7e6a; line-height: 1.65; max-width: 620px; letter-spacing: 0.2px;">EYO is the default name. Rename it to anything from your portal: a founder's name, a Yoruba name, your brand mascot. The voice is yours, the relationship stays yours.</p>
       </div>
+    </div>
+
+    <!-- Network heartbeat strip — illustrative micro-stats showing what a single night looks like -->
+    <div class="eyo-pulse-strip">
+      <div class="eyo-pulse-label">
+        <span class="eyo-pulse-dot"></span>
+        <span>What a Saturday night looks like</span>
+      </div>
+      <div class="eyo-pulse-grid">
+        <div class="eyo-pulse-stat"><span class="eyo-pulse-num">312</span><span class="eyo-pulse-cap">drafts queued for tap</span></div>
+        <div class="eyo-pulse-stat"><span class="eyo-pulse-num">47</span><span class="eyo-pulse-cap">🔥 hot leads sorted</span></div>
+        <div class="eyo-pulse-stat"><span class="eyo-pulse-num">₦12.4M</span><span class="eyo-pulse-cap">receipts caught</span></div>
+        <div class="eyo-pulse-stat"><span class="eyo-pulse-num">89</span><span class="eyo-pulse-cap">voice notes transcribed</span></div>
+      </div>
+      <div class="eyo-pulse-foot">Indicative — based on a single premium venue's typical Saturday volume. Your numbers live in the Owner Brief.</div>
     </div>
   </div>
 </section>
-<style>@media (max-width: 720px) { .eyo-meet-grid { grid-template-columns: 1fr !important; gap: 28px !important; text-align: center; } .eyo-traits { grid-template-columns: 1fr !important; } }</style>
+
+<style>
+  /* ── Meet EYO badge — breathing glow + 4 orbiting capability pills ── */
+  .eyo-orbit-wrap {
+    position: relative; width: 220px; height: 220px; margin: 0 auto;
+  }
+  .eyo-badge {
+    position: absolute; inset: 32px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ff7e30, #ff5500 55%, #c63d00 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 18px 48px rgba(255, 85, 0, 0.32), 0 0 0 1px rgba(255,255,255,0.06) inset;
+    animation: eyoBreathe 4s ease-in-out infinite;
+    z-index: 3;
+  }
+  @keyframes eyoBreathe {
+    0%, 100% { box-shadow: 0 18px 48px rgba(255, 85, 0, 0.32), 0 0 0 1px rgba(255,255,255,0.06) inset; }
+    50%      { box-shadow: 0 22px 70px rgba(255, 85, 0, 0.55), 0 0 0 1px rgba(255,255,255,0.10) inset; }
+  }
+  .eyo-orbit-ring {
+    position: absolute; inset: 0;
+    border: 1px dashed rgba(255, 155, 102, 0.22); border-radius: 50%;
+    animation: eyoSpin 22s linear infinite;
+  }
+  @keyframes eyoSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .eyo-orbit {
+    position: absolute; width: 38px; height: 38px; border-radius: 50%;
+    background: #1a1612; border: 1px solid #3a2f24;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; z-index: 2;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    animation: eyoOrbitFloat 5s ease-in-out infinite;
+  }
+  .eyo-orbit-1 { top: -4px;   left: 50%;       transform: translateX(-50%); animation-delay: 0s;   }
+  .eyo-orbit-2 { top: 50%;    right: -4px;     transform: translateY(-50%); animation-delay: 1.2s; }
+  .eyo-orbit-3 { bottom: -4px; left: 50%;      transform: translateX(-50%); animation-delay: 2.4s; }
+  .eyo-orbit-4 { top: 50%;    left: -4px;      transform: translateY(-50%); animation-delay: 3.6s; }
+  @keyframes eyoOrbitFloat {
+    0%, 100% { filter: brightness(1) drop-shadow(0 0 0 rgba(255,155,102,0)); }
+    50%      { filter: brightness(1.25) drop-shadow(0 0 8px rgba(255,155,102,0.55)); }
+  }
+
+  /* ── 6-card capability grid ── */
+  .eyo-cap-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    max-width: 720px;
+  }
+  .eyo-cap {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid #2a241b;
+    border-radius: 12px;
+    padding: 16px 18px;
+    transition: border-color 0.2s, transform 0.2s, background 0.2s;
+  }
+  .eyo-cap:hover {
+    border-color: rgba(255,155,102,0.45);
+    background: rgba(255,85,0,0.04);
+    transform: translateY(-2px);
+  }
+  .eyo-cap-icon { font-size: 20px; line-height: 1; margin-bottom: 10px; }
+  .eyo-cap-title { font-size: 13.5px; font-weight: 700; color: #fff; letter-spacing: -0.1px; margin-bottom: 6px; }
+  .eyo-cap-body { font-size: 12.5px; color: #a8987d; line-height: 1.6; }
+
+  /* ── Network heartbeat strip ── */
+  .eyo-pulse-strip {
+    margin-top: 44px; padding: 22px 26px;
+    background: linear-gradient(135deg, rgba(255,85,0,0.07), rgba(255,85,0,0.02));
+    border: 1px solid rgba(255,155,102,0.22);
+    border-radius: 14px;
+  }
+  .eyo-pulse-label {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: #ff9b66; font-weight: 700; margin-bottom: 16px;
+  }
+  .eyo-pulse-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #ff5500;
+    box-shadow: 0 0 10px #ff5500; animation: eyoPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes eyoPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  .eyo-pulse-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
+  }
+  .eyo-pulse-stat {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .eyo-pulse-num {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(22px, 3vw, 30px); font-weight: 600;
+    color: #fff; letter-spacing: -0.5px; line-height: 1;
+  }
+  .eyo-pulse-cap {
+    font-size: 12px; color: #a8987d; line-height: 1.5;
+  }
+  .eyo-pulse-foot {
+    margin-top: 14px; font-size: 11px; color: #6b6356; letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 820px) {
+    .eyo-meet-grid { grid-template-columns: 1fr !important; gap: 36px !important; text-align: center; }
+    .eyo-cap-grid { grid-template-columns: 1fr 1fr !important; max-width: none !important; }
+    .eyo-pulse-grid { grid-template-columns: 1fr 1fr !important; }
+  }
+  @media (max-width: 480px) {
+    .eyo-cap-grid { grid-template-columns: 1fr !important; }
+    .eyo-pulse-grid { grid-template-columns: 1fr !important; }
+  }
+</style>
 
 <section class="hero" style="padding-top: 0;">
   <!-- Live-looking HITL approval mock. EYO is named here visually, as a label on the orange pill, so cold visitors meet the operator instead of the name. -->
