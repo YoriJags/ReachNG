@@ -1,282 +1,180 @@
 {% extends "marketing/_base.html" %}
 
-{% block title %}Pick what you run · ReachNG{% endblock %}
-{% block description %}Choose your industry — see exactly what EYO does for your kind of business. Premium WhatsApp operator for Lagos and Abuja.{% endblock %}
+{% block title %}Choose your industry · ReachNG{% endblock %}
+{% block description %}Pick what you run. We'll tailor the entire ReachNG experience to your kind of business — Lagos and Abuja WhatsApp operator.{% endblock %}
 
 {% block content %}
 
-<section class="cover-wrap">
-  <div class="cover-head">
-    <div class="eyebrow">Personalize your view</div>
-    <h1>Pick what you run. <em>EYO will show you the rest.</em></h1>
-    <p class="sub" style="max-width: 640px; margin-left: auto; margin-right: auto;">
-      So you do not have to read a hospitality scene when you run a law firm. One click sets the entire site to your kind of business — scenes, examples, voice, scripts.
+<section class="cover-mag">
+  <div class="cover-mag-inner">
+
+    <div class="eyebrow">Issue 01 · Choose your industry</div>
+
+    <h1 class="cover-headline">
+      <span class="cover-headline-top">What kind of business</span>
+      <span class="cover-headline-em">do you run?</span>
+    </h1>
+
+    <p class="cover-sub">
+      Pick one. We will tailor every scene, every example, every script you see next to your kind of business. No generic AI, no off-the-shelf demo.
     </p>
-  </div>
 
-  <!-- Hub + nodes + telemetry ticker -->
-  <div class="hub" style="position: relative; max-width: 1180px; margin: 18px auto 28px; min-height: 660px;">
+    <div class="cover-grid">
+      <a href="/set-vertical/hospitality?next=/" data-ph="cover_pick_hospitality" class="cover-card">
+        <span class="cover-card-emoji">🍽</span>
+        <h3 class="cover-card-title">Restaurants &amp; venues</h3>
+        <p class="cover-card-body">Bookings, deposits, no-shows, owambe weekends.</p>
+        <span class="cover-card-go">See the experience →</span>
+      </a>
 
-    <!-- SVG connectors (desktop only) -->
-    <svg class="hub-svg" viewBox="0 0 1180 660" preserveAspectRatio="none" aria-hidden="true">
-      <path class="hub-path" data-node="n1" d="M590 330 Q380 220 200 140" fill="none" stroke="rgba(255,85,0,0.18)" stroke-width="1.5"/>
-      <path class="hub-path" data-node="n2" d="M590 330 Q800 210 980 120" fill="none" stroke="rgba(255,85,0,0.18)" stroke-width="1.5"/>
-      <path class="hub-path" data-node="n3" d="M590 330 Q380 440 200 520" fill="none" stroke="rgba(255,85,0,0.18)" stroke-width="1.5"/>
-      <path class="hub-path" data-node="n4" d="M590 330 Q800 450 980 540" fill="none" stroke="rgba(255,85,0,0.18)" stroke-width="1.5"/>
-      <path class="hub-path" data-node="n5" d="M590 330 Q830 340 1050 330" fill="none" stroke="rgba(255,85,0,0.18)" stroke-width="1.5"/>
-      <path class="hub-path" data-node="n6" d="M590 330 Q360 340 130 330" fill="none" stroke="rgba(255,85,0,0.18)" stroke-width="1.5"/>
-    </svg>
+      <a href="/set-vertical/real_estate?next=/" data-ph="cover_pick_real_estate" class="cover-card">
+        <span class="cover-card-emoji">🏛</span>
+        <h3 class="cover-card-title">Real estate</h3>
+        <p class="cover-card-body">PoF screening, viewings, Banana Island to Lekki enquiries.</p>
+        <span class="cover-card-go">See the experience →</span>
+      </a>
 
-    <!-- Central EYO hub with concentric pulse rings -->
-    <div class="hub-core">
-      <div class="hub-orb">
-        <span class="hub-orb-text">EYO</span>
-        <span class="hub-ring hub-ring-1"></span>
-        <span class="hub-ring hub-ring-2"></span>
-        <span class="hub-ring hub-ring-3"></span>
-        <!-- Orbiting telemetry dots (visual "ring" without spinning the cards themselves) -->
-        <span class="hub-orbit-dot" style="--i:0"></span>
-        <span class="hub-orbit-dot" style="--i:1"></span>
-        <span class="hub-orbit-dot" style="--i:2"></span>
-        <span class="hub-orbit-dot" style="--i:3"></span>
-      </div>
-      <div class="hub-status">
-        <span class="hub-status-dot"></span> EYO is on · drafting in <span id="hub-vert-count">5</span> verticals
-      </div>
+      <a href="/set-vertical/professional_services?next=/" data-ph="cover_pick_professional_services" class="cover-card">
+        <span class="cover-card-emoji">⚖</span>
+        <h3 class="cover-card-title">Law &amp; advisory</h3>
+        <p class="cover-card-body">Confidential intake, conflict checks, retainer follow-through.</p>
+        <span class="cover-card-go">See the experience →</span>
+      </a>
+
+      <a href="/set-vertical/education?next=/" data-ph="cover_pick_education" class="cover-card">
+        <span class="cover-card-emoji">🎓</span>
+        <h3 class="cover-card-title">Schools</h3>
+        <p class="cover-card-body">Admissions, fee chase, diaspora parents on UK and US timezones.</p>
+        <span class="cover-card-go">See the experience →</span>
+      </a>
+
+      <a href="/set-vertical/small_business?next=/" data-ph="cover_pick_small_business" class="cover-card">
+        <span class="cover-card-emoji">✨</span>
+        <h3 class="cover-card-title">Beauty &amp; wellness</h3>
+        <p class="cover-card-body">Bookings, deposit catching, polite reminders, zero leaks.</p>
+        <span class="cover-card-go">See the experience →</span>
+      </a>
+
+      <a href="/set-vertical/hospitality?next=/?skip_cover=1" data-ph="cover_pick_other" class="cover-card cover-card-other">
+        <span class="cover-card-emoji">→</span>
+        <h3 class="cover-card-title">Something else</h3>
+        <p class="cover-card-body">Show me the default experience — I'll tell you what I run later.</p>
+        <span class="cover-card-go">Continue →</span>
+      </a>
     </div>
 
-    <!-- Nodes — one per vertical scene-pack + escape hatch -->
-    <a href="/set-vertical/hospitality?next=/portal/demo/hospitality"                           data-node="n1" data-ph="cover_pick_hospitality"           class="hub-node" style="top: 4%;  left: 2%;">
-      <span class="hub-node-emoji">🍽</span>
-      <h3 class="hub-node-title">Restaurants &amp; venues</h3>
-      <p class="hub-node-body">Bookings, deposits, no-shows handled before lunch.</p>
-    </a>
-    <a href="/set-vertical/real_estate?next=/portal/demo/real_estate"                           data-node="n2" data-ph="cover_pick_real_estate"           class="hub-node" style="top: 0%;  right: 2%;">
-      <span class="hub-node-emoji">🏛</span>
-      <h3 class="hub-node-title">Real estate</h3>
-      <p class="hub-node-body">PoF screening, viewings, Banana Island to Lekki enquiries.</p>
-    </a>
-    <a href="/set-vertical/professional_services?next=/portal/demo/professional_services"       data-node="n3" data-ph="cover_pick_professional_services" class="hub-node" style="bottom: 12%; left: 2%;">
-      <span class="hub-node-emoji">⚖</span>
-      <h3 class="hub-node-title">Law &amp; advisory</h3>
-      <p class="hub-node-body">Confidential intake, conflict checks, retainer follow-through.</p>
-    </a>
-    <a href="/set-vertical/education?next=/portal/demo/education"                               data-node="n4" data-ph="cover_pick_education"             class="hub-node" style="bottom: 8%; right: 2%;">
-      <span class="hub-node-emoji">🎓</span>
-      <h3 class="hub-node-title">Schools</h3>
-      <p class="hub-node-body">Admissions, fee chase, diaspora parents on UK and US timezones.</p>
-    </a>
-    <a href="/set-vertical/small_business?next=/portal/demo/small_business"                     data-node="n5" data-ph="cover_pick_small_business"        class="hub-node" style="top: 44%; right: -2%;">
-      <span class="hub-node-emoji">✨</span>
-      <h3 class="hub-node-title">Beauty &amp; wellness</h3>
-      <p class="hub-node-body">Bookings, deposit catching, polite reminders, zero leaks.</p>
-    </a>
-    <a href="/set-vertical/hospitality?next=/contact" data-node="n6" data-ph="cover_pick_other" class="hub-node hub-node-other" style="top: 44%; left: -2%;">
-      <span class="hub-node-emoji">→</span>
-      <h3 class="hub-node-title">Something else</h3>
-      <p class="hub-node-body">Tell us what you run — we will tailor the demo for your business.</p>
-    </a>
+    <p class="cover-footnote">
+      Your pick is remembered for 90 days. You can change it any time from the landing.
+    </p>
+
   </div>
-
-  <!-- Telemetry ticker — gives the "satellite dashboard" feel -->
-  <div class="telemetry" aria-hidden="true">
-    <div class="telemetry-label">Live across the network</div>
-    <div class="telemetry-track">
-      <span>EYO drafted reply · Adunni Estates · 2.1s</span>
-      <span>₦450k deposit confirmed · Altitude Lagos</span>
-      <span>Owner brief delivered · 312 owners · 7:00am WAT</span>
-      <span>Voice note transcribed · Yoruba safe-switch · 2.3s</span>
-      <span>Saturday booking locked · table of 6 · DJ booth</span>
-      <span>CBN consult queued · Adesina &amp; Co · 18s response</span>
-      <span>School fees chase · 23 parents · drafts ready</span>
-      <span>Receipt parsed · GTBank · ₦680M earnest · PoF cleared</span>
-      <span>Wellness booking · Tola · Sat 2:30pm · ₦15k deposit</span>
-      <!-- duplicate set for seamless scroll loop -->
-      <span>EYO drafted reply · Adunni Estates · 2.1s</span>
-      <span>₦450k deposit confirmed · Altitude Lagos</span>
-      <span>Owner brief delivered · 312 owners · 7:00am WAT</span>
-      <span>Voice note transcribed · Yoruba safe-switch · 2.3s</span>
-      <span>Saturday booking locked · table of 6 · DJ booth</span>
-      <span>CBN consult queued · Adesina &amp; Co · 18s response</span>
-      <span>School fees chase · 23 parents · drafts ready</span>
-      <span>Receipt parsed · GTBank · ₦680M earnest · PoF cleared</span>
-      <span>Wellness booking · Tola · Sat 2:30pm · ₦15k deposit</span>
-    </div>
-  </div>
-
-  <p class="cover-skip">
-    Already know what you want? <a href="/set-vertical/hospitality?next=/?skip_cover=1" data-ph="cover_skip">Skip the cover and enter the site →</a>
-  </p>
-
 </section>
 
 <style>
-  .cover-wrap {
-    padding: 40px 24px 60px;
-    text-align: center;
-    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  .cover-mag {
+    background: var(--bg);
+    padding: 64px 24px 80px;
     min-height: calc(100vh - 80px);
-  }
-  .cover-head .eyebrow { color: var(--orange); }
-  .cover-head h1 { margin-top: 12px; }
-
-  /* Central orb + rings */
-  .hub-core { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 2; text-align: center; }
-  .hub-orb {
-    width: 178px; height: 178px; border-radius: 50%;
-    background: linear-gradient(135deg, #ff5500 0%, #c63d00 100%);
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 24px 70px rgba(255,85,0,0.36), inset 0 0 0 4px rgba(255,255,255,0.06);
-    position: relative;
-    margin: 0 auto;
   }
-  .hub-orb-text {
+  .cover-mag-inner {
+    max-width: 1080px; width: 100%;
+    text-align: center;
+  }
+
+  .cover-mag .eyebrow {
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--orange); font-weight: 700;
+    margin-bottom: 22px;
+  }
+
+  .cover-headline {
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 64px; font-weight: 600; color: #fff;
-    letter-spacing: -2px; line-height: 1;
-  }
-  .hub-ring {
-    position: absolute; inset: -4px; border-radius: 50%;
-    border: 1.5px solid rgba(255,85,0,0.45);
-    animation: hubPulse 3.5s ease-out infinite;
-  }
-  .hub-ring-2 { animation-delay: 1.2s; border-color: rgba(255,85,0,0.32); }
-  .hub-ring-3 { animation-delay: 2.4s; border-color: rgba(255,85,0,0.20); }
-
-  /* Orbiting telemetry dots — visual "ring" around EYO without spinning the cards */
-  .hub-orbit-dot {
-    position: absolute;
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--orange);
-    box-shadow: 0 0 12px rgba(255,85,0,0.7);
-    top: 50%; left: 50%;
-    margin: -4px 0 0 -4px;
-    animation: hubOrbit 14s linear infinite;
-    animation-delay: calc(var(--i, 0) * -3.5s);
-  }
-
-  .hub-status {
-    margin-top: 16px;
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 14px;
-    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--orange); font-weight: 700;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 100px;
-  }
-  .hub-status-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #5dd28a; box-shadow: 0 0 8px #5dd28a;
-    animation: hubDot 1.6s ease-in-out infinite;
-  }
-
-  /* SVG connectors */
-  .hub-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-  .hub-path { stroke-dasharray: 6 10; animation: hubDash 22s linear infinite; }
-  .hub-path.is-active {
-    stroke: var(--orange) !important; stroke-width: 2.5 !important;
-    filter: drop-shadow(0 0 6px rgba(255,85,0,0.55));
-    animation-duration: 8s;
-  }
-
-  /* Node cards */
-  .hub-node {
-    position: absolute; z-index: 3;
-    width: 260px; text-align: left; text-decoration: none;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 18px 20px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+    font-weight: 600; letter-spacing: -1.5px;
     color: var(--text-strong);
-    transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
+    margin: 0 0 22px;
+    line-height: 1.05;
   }
-  .hub-node:hover {
-    transform: translateY(-4px) scale(1.03);
+  .cover-headline-top {
+    display: block;
+    font-size: clamp(36px, 6vw, 64px);
+  }
+  .cover-headline-em {
+    display: block;
+    font-style: italic;
+    font-size: clamp(36px, 6vw, 64px);
+    color: var(--orange);
+  }
+
+  .cover-sub {
+    max-width: 640px;
+    margin: 0 auto 48px;
+    font-size: 17px; line-height: 1.65;
+    color: var(--muted-strong);
+  }
+
+  .cover-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    text-align: left;
+  }
+
+  .cover-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 26px 26px 22px;
+    text-decoration: none;
+    color: var(--text-strong);
+    display: flex; flex-direction: column;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+  .cover-card:hover {
     border-color: var(--orange);
-    box-shadow: 0 18px 44px rgba(255,85,0,0.20);
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px rgba(255,85,0,0.10);
   }
-  .hub-node-emoji { font-size: 22px; display: inline-block; margin-bottom: 6px; }
-  .hub-node-title { margin: 0 0 6px; font-size: 15.5px; font-weight: 700; letter-spacing: -0.2px; color: var(--text-strong); }
-  .hub-node-body  { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--muted-strong); }
-  .hub-node-other { border-style: dashed; }
+  .cover-card-emoji {
+    font-size: 28px;
+    margin-bottom: 14px;
+  }
+  .cover-card-title {
+    margin: 0 0 8px;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text-strong);
+  }
+  .cover-card-body {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--muted-strong);
+    flex-grow: 1;
+  }
+  .cover-card-go {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--orange);
+  }
+  .cover-card-other { border-style: dashed; }
 
-  /* Telemetry ticker */
-  .telemetry {
-    max-width: 1080px; margin: 8px auto 0;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 18px;
-    display: flex; align-items: center; gap: 18px;
-    overflow: hidden;
-  }
-  .telemetry-label {
-    flex-shrink: 0;
-    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--orange); font-weight: 700;
-    padding-right: 16px; border-right: 1px solid var(--border);
-  }
-  .telemetry-track {
-    display: flex; gap: 28px; white-space: nowrap;
-    animation: telemetryScroll 60s linear infinite;
-    font-size: 12px; color: var(--muted-strong); font-family: 'JetBrains Mono', monospace;
-  }
-  .telemetry-track span { display: inline-block; }
-
-  .cover-skip {
-    margin-top: 26px; font-size: 12px; color: var(--muted);
-  }
-  .cover-skip a {
-    color: var(--muted-strong); text-decoration: none; font-weight: 600;
-    border-bottom: 1px dotted var(--border);
-  }
-  .cover-skip a:hover { color: var(--orange); border-bottom-color: var(--orange); }
-
-  /* ── Animations ────────────────────────────────────────────────────── */
-  @keyframes hubPulse { 0% { transform: scale(1); opacity: 0.85; } 100% { transform: scale(1.55); opacity: 0; } }
-  @keyframes hubDot   { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-  @keyframes hubDash  { to { stroke-dashoffset: -160; } }
-  @keyframes hubOrbit {
-    from { transform: rotate(0deg) translateX(118px) rotate(0deg); }
-    to   { transform: rotate(360deg) translateX(118px) rotate(-360deg); }
-  }
-  @keyframes telemetryScroll {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+  .cover-footnote {
+    margin-top: 42px;
+    font-size: 12px; letter-spacing: 0.04em;
+    color: var(--muted);
   }
 
-  /* ── Mobile reflow ──────────────────────────────────────────────────── */
-  @media (max-width: 900px) {
-    .hub { min-height: 0 !important; }
-    .hub-svg { display: none; }
-    .hub-core { position: static !important; transform: none !important; margin: 0 auto 32px; }
-    .hub-node {
-      position: static !important;
-      width: 100% !important;
-      max-width: 440px;
-      margin: 10px auto;
-      display: block;
-    }
-    .telemetry { flex-direction: column; align-items: flex-start; padding: 12px 14px; }
-    .telemetry-label { border-right: 0; border-bottom: 1px solid var(--border); padding-bottom: 8px; padding-right: 0; margin-bottom: 8px; width: 100%; }
+  @media (max-width: 880px) {
+    .cover-grid { grid-template-columns: repeat(2, 1fr); }
   }
-
-  /* ── Accessibility: kill all motion if user prefers reduced motion ── */
-  @media (prefers-reduced-motion: reduce) {
-    .hub-path, .hub-ring, .hub-orbit-dot, .hub-status-dot,
-    .telemetry-track, .hub-node, .hub-node:hover { animation: none !important; transition: none !important; }
+  @media (max-width: 540px) {
+    .cover-mag { padding: 40px 18px 56px; }
+    .cover-grid { grid-template-columns: 1fr; }
   }
 </style>
-
-<script>
-  /* Node hover → glow the matching SVG path */
-  (function () {
-    document.querySelectorAll('.hub-node').forEach(function (node) {
-      var key  = node.dataset.node;
-      var path = document.querySelector('.hub-path[data-node="' + key + '"]');
-      if (!path) return;
-      node.addEventListener('mouseenter', function () { path.classList.add('is-active'); });
-      node.addEventListener('mouseleave', function () { path.classList.remove('is-active'); });
-    });
-  })();
-</script>
 
 {% endblock %}
