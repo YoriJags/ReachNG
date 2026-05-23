@@ -262,123 +262,508 @@
 <!-- ─────────────────────────────────────────────────────────────────────────
      1.7 TRY-EYO  (live sandbox — type a customer message, see EYO draft)
      ───────────────────────────────────────────────────────────────────── -->
-<section style="background: var(--bg); border-bottom: 1px solid var(--border);">
-  <div class="inner" style="max-width: 900px;">
+<section style="background: var(--bg); border-bottom: 1px solid var(--border); position: relative; overflow: hidden;">
+  <!-- Ambient orange glow under the widget — sells the "alive" feeling without a heavy image -->
+  <div aria-hidden="true" style="position: absolute; left: 50%; top: 55%; transform: translate(-50%, -50%); width: 720px; height: 720px; background: radial-gradient(circle, rgba(255,85,0,0.10) 0%, rgba(255,85,0,0.02) 45%, transparent 70%); filter: blur(40px); pointer-events: none; animation: tryGlow 8s ease-in-out infinite;"></div>
+
+  <div class="inner" style="max-width: 920px; position: relative; z-index: 1;">
     <div class="section-label" style="color: var(--orange);">Try EYO live</div>
     <h2 class="section-h2">Paste a customer message. <em>Watch EYO draft a reply.</em></h2>
-    <p class="section-sub" style="max-width: 680px;">No signup. No email. Type the kind of WhatsApp enquiry you actually get, pick your industry, see EYO draft in seconds. This is the same engine your portal uses on day 1.</p>
+    <p class="section-sub" style="max-width: 680px;">No signup. No email. Type the kind of WhatsApp enquiry you actually get, pick your industry, see EYO draft in seconds. The same engine your portal uses on day one.</p>
 
-    <div style="margin-top: 32px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 26px 28px;">
+    <!-- Glossy 3D widget container -->
+    <div class="try-card" id="try-card">
+      <!-- Live presence header -->
+      <div class="try-presence">
+        <div class="try-presence-left">
+          <div class="try-orb">
+            <span class="try-orb-text">EYO</span>
+            <span class="try-orb-ring"></span>
+          </div>
+          <div>
+            <div class="try-presence-status">
+              <span class="try-presence-dot"></span> EYO is awake
+            </div>
+            <div class="try-presence-meta" id="try-presence-meta">Drafted <strong id="try-count">47</strong> replies in the last hour · avg <strong>2.1s</strong></div>
+          </div>
+        </div>
+        <div class="try-presence-pill" id="try-presence-vert">🍽 Restaurants &amp; venues</div>
+      </div>
+
       <!-- Vertical picker -->
-      <div style="margin-bottom: 16px;">
-        <label style="display:block; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:8px;">Industry</label>
+      <div style="margin-bottom: 14px;">
+        <label class="try-label">Pick your industry</label>
         <div style="display:flex; gap:8px; flex-wrap:wrap;" id="try-vertical-pills">
-          <button type="button" data-v="hospitality"            class="tv-pill tv-active">🍽 Restaurant / Venue</button>
-          <button type="button" data-v="real_estate"            class="tv-pill">🏛 Real estate</button>
-          <button type="button" data-v="clinics"                class="tv-pill">🩺 Clinic</button>
-          <button type="button" data-v="professional_services"  class="tv-pill">⚖ Law / advisory</button>
-          <button type="button" data-v="education"              class="tv-pill">🎓 School</button>
+          <button type="button" data-v="hospitality"            data-label="🍽 Restaurants &amp; venues"        data-example="Hi, do you still have a table for 6 this Saturday around 9pm? It's my friend's birthday — would love something near the DJ booth." class="tv-pill tv-active">🍽 Restaurant / Venue</button>
+          <button type="button" data-v="real_estate"            data-label="🏛 Real estate"                    data-example="Hi, saw your listing for the 5-bedroom in Banana Island. Budget around ₦650M. Still on the market? Can I view this Saturday?" class="tv-pill">🏛 Real estate</button>
+          <button type="button" data-v="clinics"                data-label="🩺 Clinic &amp; wellness"           data-example="Good morning, I'd like to book a consultation with Dr Adekoya. Is there an opening this week? Insurance is Hygeia." class="tv-pill">🩺 Clinic</button>
+          <button type="button" data-v="professional_services"  data-label="⚖ Law &amp; advisory"               data-example="Good evening. I run a fintech and just got a CBN compliance notice on our agency banking license. Need a quick consult — can we talk this weekend?" class="tv-pill">⚖ Law / advisory</button>
+          <button type="button" data-v="education"              data-label="🎓 Schools"                        data-example="Hello, writing from London about Year 7 admission for September. My daughter currently goes to school in Hampstead. Is the prospectus current?" class="tv-pill">🎓 School</button>
         </div>
       </div>
 
       <!-- Textarea -->
-      <label style="display:block; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:8px;">Customer message</label>
-      <textarea id="try-input" rows="3" maxlength="600"
-                placeholder="e.g. Hi, do you still have a table for 6 this Saturday around 9pm? It's my friend's birthday."
-                style="width:100%; padding:14px 16px; background:var(--bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px; font-family:inherit; resize:vertical; line-height:1.55;"></textarea>
+      <label class="try-label" for="try-input">Customer message</label>
+      <div class="try-input-wrap">
+        <textarea id="try-input" rows="3" maxlength="600"
+                  placeholder="Hi, do you still have a table for 6 this Saturday around 9pm? It's my friend's birthday."></textarea>
+      </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; gap:14px; flex-wrap:wrap;">
-        <span style="font-size:11px; color:var(--muted);" id="try-hint">3 free tries per minute · 20 per day</span>
-        <button id="try-btn" onclick="window.runTryEyo()" data-ph="try_eyo_submit"
-                style="background:var(--orange); color:#fff; border:0; padding:12px 22px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; letter-spacing:0.04em;">
-          Draft my reply →
+      <!-- Example chips — quick-fill so visitors don't face a blank box -->
+      <div class="try-examples" id="try-examples"></div>
+
+      <!-- CTA row -->
+      <div class="try-cta-row">
+        <span class="try-hint" id="try-hint">3 free tries / min · 20 / day · no signup</span>
+        <button id="try-btn" onclick="window.runTryEyo()" data-ph="try_eyo_submit" class="try-btn">
+          <span class="try-btn-shine"></span>
+          <span class="try-btn-text">Draft my reply <span class="try-btn-arrow">→</span></span>
         </button>
       </div>
 
       <!-- Output -->
-      <div id="try-output" style="display:none; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px;">
+      <div id="try-output" class="try-output">
         <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;">
-          <div style="font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--orange); font-weight:700;">EYO drafted</div>
-          <div style="font-size:11px; color:var(--muted);" id="try-latency">·</div>
+          <div class="try-output-label" id="try-output-label">EYO is thinking<span class="try-dots"><span></span><span></span><span></span></span></div>
+          <div class="try-latency" id="try-latency">·</div>
         </div>
-        <div id="try-reply" style="background:linear-gradient(180deg, rgba(255,85,0,0.05), rgba(255,85,0,0.02)); border:1px solid rgba(255,85,0,0.30); color:var(--text-strong); padding:16px 18px; border-radius:12px; font-size:14px; line-height:1.7; white-space:pre-wrap;"></div>
-        <p style="margin-top:14px; font-size:12px; color:var(--muted-strong); line-height:1.6;">
-          ⚡ <strong style="color:var(--text-strong);">This is the same engine your portal uses.</strong> On day 1 you teach EYO your tone, prices, never-say list — drafts get sharper each week.
-          <a href="/waitlist" data-ph="try_eyo_to_waitlist" style="color:var(--orange); font-weight:600; text-decoration:none;">Join early access →</a>
-        </p>
+        <div id="try-reply" class="try-reply"></div>
+        <div class="try-output-foot">
+          <div class="try-output-actions">
+            <button type="button" id="try-copy" class="try-mini-btn">📋 Copy reply</button>
+            <a href="/waitlist" data-ph="try_eyo_to_waitlist" class="try-mini-btn try-mini-btn-primary">Approve in real life →</a>
+          </div>
+          <p class="try-output-note">
+            ⚡ <strong>This is the same engine your portal uses.</strong> On day one you teach EYO your tone, prices, never-say list — drafts get sharper each week.
+          </p>
+        </div>
       </div>
 
-      <div id="try-error" style="display:none; margin-top:18px; padding:12px 16px; background:rgba(255,85,0,0.08); border:1px solid rgba(255,85,0,0.30); border-radius:8px; font-size:13px; color:var(--text-strong);"></div>
+      <div id="try-error" class="try-error"></div>
     </div>
   </div>
 </section>
 
 <style>
+  /* ── Glossy 3D Try-EYO widget ──────────────────────────────────────── */
+  .try-card {
+    margin-top: 28px;
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.35) 100%),
+      var(--surface);
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 22px;
+    padding: 28px 30px;
+    box-shadow:
+      0 32px 80px rgba(15,12,8,0.10),
+      0 12px 32px rgba(255,85,0,0.10),
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      inset 0 -1px 0 rgba(0,0,0,0.04);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transform-style: preserve-3d;
+    transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.35s;
+    animation: tryCardPulse 4.2s ease-in-out infinite;
+  }
+  .try-card:hover { animation-play-state: paused; }
+  .try-card.is-busy {
+    animation: tryCardPulseFast 1.2s ease-in-out infinite;
+    box-shadow:
+      0 36px 96px rgba(255,85,0,0.22),
+      0 14px 36px rgba(255,85,0,0.18),
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      inset 0 -1px 0 rgba(0,0,0,0.04);
+  }
+  .try-card::before {
+    /* Glossy top sheen */
+    content: ''; position: absolute; inset: 0;
+    border-radius: inherit; pointer-events: none;
+    background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 35%);
+    z-index: 0;
+  }
+  .try-card > * { position: relative; z-index: 1; }
+
+  /* Live presence bar */
+  .try-presence {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: -6px -8px 22px;
+    padding: 10px 14px;
+    background: rgba(255,85,0,0.05);
+    border: 1px solid rgba(255,85,0,0.18);
+    border-radius: 14px;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .try-presence-left { display: flex; align-items: center; gap: 12px; }
+  .try-orb {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff5500 0%, #c63d00 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 20px rgba(255,85,0,0.42), inset 0 0 0 2px rgba(255,255,255,0.18);
+    position: relative; flex-shrink: 0;
+    animation: tryOrbBreathe 3.6s ease-in-out infinite;
+  }
+  .try-orb-text {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 11px; font-weight: 600; color: #fff; letter-spacing: -0.5px; line-height: 1;
+  }
+  .try-orb-ring {
+    position: absolute; inset: -3px; border-radius: 50%;
+    border: 1.5px solid rgba(255,85,0,0.55);
+    animation: tryOrbPulse 2.4s ease-out infinite;
+  }
+  .try-presence-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; color: var(--text-strong); letter-spacing: 0.02em;
+  }
+  .try-presence-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #5dd28a; box-shadow: 0 0 10px #5dd28a;
+    animation: tryDot 1.4s ease-in-out infinite;
+  }
+  .try-presence-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .try-presence-pill {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--orange); background: #fff;
+    border: 1px solid rgba(255,85,0,0.30); border-radius: 100px;
+    padding: 6px 12px;
+  }
+
+  .try-label {
+    display: block; font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  /* Pill picker (glossier) */
   .tv-pill {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--muted-strong); padding: 8px 14px; border-radius: 100px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--border); color: var(--muted-strong);
+    padding: 8px 14px; border-radius: 100px;
     font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit;
+    transition: all 0.18s cubic-bezier(0.2,0.9,0.3,1);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .tv-pill:hover {
+    border-color: var(--orange); color: var(--text-strong);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(255,85,0,0.14), inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .tv-pill.tv-active {
+    background: linear-gradient(135deg, #ff5500 0%, #c63d00 100%);
+    color: #fff; border-color: var(--orange);
+    box-shadow: 0 10px 26px rgba(255,85,0,0.32), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+
+  /* Textarea */
+  .try-input-wrap {
+    position: relative;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0.2));
+    padding: 1px;
+    transition: box-shadow 0.25s;
+  }
+  .try-input-wrap:focus-within {
+    box-shadow: 0 0 0 3px rgba(255,85,0,0.18), 0 8px 24px rgba(255,85,0,0.10);
+  }
+  #try-input {
+    width: 100%; padding: 14px 16px;
+    background: rgba(255,255,255,0.85);
+    border: 1px solid var(--border); border-radius: 11px;
+    color: var(--text); font-size: 14px; font-family: inherit;
+    resize: vertical; line-height: 1.55;
+    transition: border-color 0.2s;
+  }
+  #try-input:focus { outline: none; border-color: var(--orange); }
+
+  .try-examples { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .try-example {
+    background: transparent; border: 1px dashed var(--border);
+    color: var(--muted); padding: 4px 10px; border-radius: 100px;
+    font-size: 11px; cursor: pointer; font-family: inherit;
     transition: 0.15s;
   }
-  .tv-pill:hover { border-color: var(--orange); color: var(--text-strong); }
-  .tv-pill.tv-active { background: var(--orange); color: #fff; border-color: var(--orange); }
+  .try-example:hover { border-color: var(--orange); color: var(--orange); border-style: solid; }
+
+  .try-cta-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 18px; gap: 14px; flex-wrap: wrap;
+  }
+  .try-hint { font-size: 11px; color: var(--muted); }
+
+  /* Glossy 3D button with shimmer sweep */
+  .try-btn {
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #ff6a1a 0%, #ff5500 50%, #c63d00 100%);
+    color: #fff; border: 0;
+    padding: 13px 24px; border-radius: 11px;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    cursor: pointer; letter-spacing: 0.02em;
+    box-shadow:
+      0 10px 24px rgba(255,85,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.35),
+      inset 0 -1px 0 rgba(0,0,0,0.10);
+    transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
+  }
+  .try-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(255,85,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.10); filter: brightness(1.06); }
+  .try-btn:active { transform: translateY(0); }
+  .try-btn:disabled { cursor: wait; opacity: 0.75; transform: none; }
+  .try-btn-shine {
+    position: absolute; inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.5) 50%, transparent 60%);
+    transform: translateX(-100%); pointer-events: none;
+    animation: tryShine 3.2s ease-in-out infinite;
+  }
+  .try-btn-arrow { display: inline-block; transition: transform 0.18s; }
+  .try-btn:hover .try-btn-arrow { transform: translateX(3px); }
+
+  /* Output panel */
+  .try-output {
+    display: none;
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255,85,0,0.2);
+  }
+  .try-output.is-open { display: block; animation: tryReveal 0.5s ease-out; }
+  .try-output-label {
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--orange); font-weight: 700;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .try-latency {
+    font-size: 11px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .try-reply {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3)),
+      linear-gradient(180deg, rgba(255,85,0,0.06), rgba(255,85,0,0.02));
+    border: 1px solid rgba(255,85,0,0.30);
+    color: var(--text-strong);
+    padding: 18px 20px; border-radius: 14px;
+    font-size: 14px; line-height: 1.7; white-space: pre-wrap;
+    box-shadow: 0 14px 36px rgba(255,85,0,0.14), inset 0 1px 0 rgba(255,255,255,0.5);
+    min-height: 60px;
+  }
+  .try-reply.is-loading {
+    background: linear-gradient(90deg, rgba(255,85,0,0.06) 0%, rgba(255,85,0,0.14) 50%, rgba(255,85,0,0.06) 100%);
+    background-size: 200% 100%;
+    animation: tryShimmer 1.4s linear infinite;
+    color: transparent;
+  }
+  .try-output-foot { margin-top: 14px; }
+  .try-output-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .try-mini-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted-strong); padding: 7px 14px; border-radius: 8px;
+    font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+    text-decoration: none;
+    transition: all 0.18s;
+  }
+  .try-mini-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .try-mini-btn-primary { background: var(--orange); color: #fff; border-color: var(--orange); }
+  .try-mini-btn-primary:hover { color: #fff; filter: brightness(1.08); }
+  .try-output-note { margin: 0; font-size: 11.5px; color: var(--muted-strong); line-height: 1.6; }
+
+  /* Thinking dots */
+  .try-dots { display: inline-flex; gap: 3px; margin-left: 2px; }
+  .try-dots span {
+    width: 4px; height: 4px; border-radius: 50%; background: var(--orange);
+    animation: tryThinkDot 1.2s ease-in-out infinite;
+  }
+  .try-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .try-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  .try-error {
+    display: none; margin-top: 18px;
+    padding: 12px 16px;
+    background: rgba(255,85,0,0.08);
+    border: 1px solid rgba(255,85,0,0.30);
+    border-radius: 10px; font-size: 13px; color: var(--text-strong);
+  }
+
+  /* ── Animations ─────────────────────────────────────────────────────── */
+  @keyframes tryCardPulse {
+    0%, 100% { transform: scale(1);        box-shadow: 0 32px 80px rgba(15,12,8,0.10), 0 12px 32px rgba(255,85,0,0.10), inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.04); }
+    50%      { transform: scale(1.0065);   box-shadow: 0 38px 96px rgba(15,12,8,0.13), 0 16px 42px rgba(255,85,0,0.18), inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.04); }
+  }
+  @keyframes tryCardPulseFast {
+    0%, 100% { transform: scale(1);        }
+    50%      { transform: scale(1.012);    }
+  }
+  @keyframes tryGlow      { 0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); } }
+  @keyframes tryOrbBreathe{ 0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgba(255,85,0,0.42), inset 0 0 0 2px rgba(255,255,255,0.18); } 50% { transform: scale(1.04); box-shadow: 0 8px 26px rgba(255,85,0,0.55), inset 0 0 0 2px rgba(255,255,255,0.18); } }
+  @keyframes tryOrbPulse  { 0% { transform: scale(1); opacity: 0.85; } 100% { transform: scale(1.7); opacity: 0; } }
+  @keyframes tryDot       { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  @keyframes tryShine     { 0% { transform: translateX(-100%); } 50% { transform: translateX(100%); } 100% { transform: translateX(100%); } }
+  @keyframes tryReveal    { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes tryShimmer   { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  @keyframes tryThinkDot  { 0%, 100% { transform: scale(0.6); opacity: 0.4; } 50% { transform: scale(1.1); opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .try-card, .try-orb, .try-orb-ring, .try-presence-dot, .try-btn-shine,
+    .try-dots span, .try-reply.is-loading {
+      animation: none !important; transition: none !important;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .try-card { padding: 22px 20px; border-radius: 18px; }
+    .try-presence { flex-direction: column; align-items: flex-start; }
+    .try-presence-pill { align-self: flex-start; }
+    .try-cta-row { flex-direction: column; align-items: stretch; }
+    .try-btn { width: 100%; }
+  }
 </style>
 
 <script>
   (function () {
     let activeVertical = 'hospitality';
-    const pills = document.querySelectorAll('.tv-pill');
-    pills.forEach(p => p.addEventListener('click', () => {
+    const pills    = document.querySelectorAll('.tv-pill');
+    const card     = document.getElementById('try-card');
+    const input    = document.getElementById('try-input');
+    const vertPill = document.getElementById('try-presence-vert');
+    const examples = document.getElementById('try-examples');
+    const countEl  = document.getElementById('try-count');
+
+    /* Example fragments per vertical — clickable to pre-fill the textarea */
+    const EXAMPLES = {
+      hospitality: [
+        "Table for 6 Saturday 9pm — birthday",
+        "Bottle service for 4, this Friday",
+        "Brunch for 8 Sunday — any garden tables?",
+      ],
+      real_estate: [
+        "5-bed Banana Island — ₦650M, can I view?",
+        "1-bed Lekki Phase 1 short-let, December",
+        "Off-plan Ikoyi — payment plan options?",
+      ],
+      clinics: [
+        "Consultation with Dr Adekoya, this week",
+        "Annual health check — Hygeia insurance",
+        "Pediatric appointment Friday afternoon",
+      ],
+      professional_services: [
+        "CBN compliance notice — urgent consult",
+        "Tenancy dispute — Lagos State, need advice",
+        "M&A diligence — fintech, NDA needed first",
+      ],
+      education: [
+        "Year 7 admission, September — diaspora",
+        "School fees plan for SS2 — can we phase?",
+        "Bus route from Lekki Phase 2 — available?",
+      ],
+    };
+
+    function renderExamples() {
+      const list = EXAMPLES[activeVertical] || [];
+      examples.innerHTML = list.map(t =>
+        '<button type="button" class="try-example" data-fill="' + t.replace(/"/g, '&quot;') + '">' + t + '</button>'
+      ).join('');
+      examples.querySelectorAll('.try-example').forEach(b => {
+        b.addEventListener('click', () => {
+          input.value = b.dataset.fill;
+          input.focus();
+        });
+      });
+    }
+
+    function updateVertical(p) {
       pills.forEach(x => x.classList.remove('tv-active'));
       p.classList.add('tv-active');
       activeVertical = p.dataset.v;
-    }));
+      if (vertPill && p.dataset.label) vertPill.innerHTML = p.dataset.label;
+      if (input && p.dataset.example && !input.value.trim()) input.placeholder = p.dataset.example;
+      renderExamples();
+    }
+
+    pills.forEach(p => p.addEventListener('click', () => updateVertical(p)));
+    renderExamples();
+
+    /* Slowly drift the "drafts in last hour" counter so the widget feels alive */
+    if (countEl) {
+      let n = parseInt(countEl.textContent, 10) || 47;
+      setInterval(() => {
+        n += (Math.random() < 0.6 ? 1 : 0);
+        if (n > 99) n = 47;
+        countEl.textContent = n;
+      }, 6000);
+    }
 
     window.runTryEyo = async function () {
-      const btn   = document.getElementById('try-btn');
-      const input = document.getElementById('try-input').value.trim();
-      const out   = document.getElementById('try-output');
-      const err   = document.getElementById('try-error');
-      const reply = document.getElementById('try-reply');
-      const latency = document.getElementById('try-latency');
+      const btn       = document.getElementById('try-btn');
+      const txtEl     = document.getElementById('try-input');
+      const out       = document.getElementById('try-output');
+      const err       = document.getElementById('try-error');
+      const reply     = document.getElementById('try-reply');
+      const latency   = document.getElementById('try-latency');
+      const outLabel  = document.getElementById('try-output-label');
+      const txt       = txtEl.value.trim();
+
       err.style.display = 'none';
-      if (input.length < 4) {
+      if (txt.length < 4) {
         err.textContent = 'Type a customer message to see EYO draft a reply.';
         err.style.display = 'block';
         return;
       }
+
       btn.disabled = true;
-      const orig = btn.textContent;
-      btn.textContent = 'EYO is drafting…';
+      const orig = btn.querySelector('.try-btn-text').innerHTML;
+      btn.querySelector('.try-btn-text').innerHTML = 'EYO is drafting<span class="try-dots"><span></span><span></span><span></span></span>';
+      out.classList.add('is-open');
       out.style.display = 'block';
-      reply.textContent = '...';
+      card.classList.add('is-busy');
+      reply.textContent = '';
+      reply.classList.add('is-loading');
       latency.textContent = '·';
+      outLabel.innerHTML = 'EYO is thinking<span class="try-dots"><span></span><span></span><span></span></span>';
+
       try {
         const t0 = Date.now();
         const r = await fetch('/api/v1/try-eyo', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ vertical: activeVertical, message: input }),
+          body: JSON.stringify({ vertical: activeVertical, message: txt }),
         });
         const d = await r.json();
         if (!r.ok) {
+          out.classList.remove('is-open');
           out.style.display = 'none';
           err.textContent = d.detail || 'Something went wrong. Try again in a moment.';
           err.style.display = 'block';
           return;
         }
+        reply.classList.remove('is-loading');
         reply.textContent = d.reply || '';
+        outLabel.innerHTML = 'EYO drafted';
         const ms = d.latency_ms || (Date.now() - t0);
         latency.textContent = (ms / 1000).toFixed(1) + 's';
       } catch (e) {
+        out.classList.remove('is-open');
         out.style.display = 'none';
         err.textContent = 'Could not reach EYO. Try again.';
         err.style.display = 'block';
       } finally {
         btn.disabled = false;
-        btn.textContent = orig;
+        btn.querySelector('.try-btn-text').innerHTML = orig;
+        card.classList.remove('is-busy');
+        reply.classList.remove('is-loading');
       }
     };
+
+    /* Copy-to-clipboard from the reply */
+    const copyBtn = document.getElementById('try-copy');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const txt = (document.getElementById('try-reply').textContent || '').trim();
+        if (!txt) return;
+        navigator.clipboard && navigator.clipboard.writeText(txt).then(() => {
+          const orig = copyBtn.textContent;
+          copyBtn.textContent = '✓ Copied';
+          setTimeout(() => { copyBtn.textContent = orig; }, 1500);
+        });
+      });
+    }
   })();
 </script>
 
