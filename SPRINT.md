@@ -19,41 +19,26 @@ Last updated: 2026-05-21 · North Star: **first paying client + path to 100 clie
 
 The two gaps that block first paying client: (1) nobody visits the landing, (2) silent failure modes that would burn first client's trust.
 
-- [ ] **1. Try-EYO sandbox widget on landing** *(2 days, BACKLOG P1 #1)*
+- [ ] **1. Try-EYO sandbox widget on landing** *(2 days, BACKLOG P1 #1)* ← **next big build**
   - Backend: `POST /api/v1/try-eyo` using our Anthropic key, IP-rate-limited, ~600 token cap, server-side PostHog logging
   - Frontend: textarea below hero with vertical selector (hospitality / RE / clinic), 2.4s response, typing indicator
   - **Reason:** single biggest landing-conversion lever. Each visit becomes a live product demo. Generates shareable Twitter artifacts.
 
-- [ ] **2. Wire `services/subscription_invoice.py` into Paystack webhook** *(1 hour)*
-  - File is built (last session). Webhook in `api/marketing.py::paystack_webhook` doesn't call it yet.
-  - Generate receipt → email via Resend → store in `subscription_receipts` collection → link from welcome email.
-  - **Reason:** first paid client will check "where's my receipt?" 30 seconds after Paystack confirms. The Paystack auto-email is generic. We have a branded receipt ready, just not connected.
+- [x] ~~**2. Wire `services/subscription_invoice.py` into Paystack webhook**~~ — ✅ shipped `cb48ca1`. Receipt now auto-emails on charge.success.
 
-- [ ] **3. WhatsApp session-expiry health loop** *(1 day, BACKLOG #8 in P1 from prior session)*
-  - APScheduler job every 6h calling `services.whatsapp_pairing.get_account_status` on every `clients[].whatsapp_account_id`
-  - Writes `whatsapp_health` + `last_health_check_at` to client doc
-  - Portal banner if `whatsapp_health != "OK"` linking to reconnect flow
-  - Owner alert via `OWNER_WHATSAPP` + email to client when health flips OK → NOT_OK
-  - PostHog event `wa_session_expired`
-  - **Reason:** WhatsApp linked-device sessions expire silently after ~14d. Silent expiry = silent product stop = churn before we even know.
+- [x] ~~**3. WhatsApp session-expiry health loop**~~ — ✅ shipped `9e44a1f`. APScheduler every 6h, portal banner, owner WhatsApp alert + client reconnect email, PostHog `wa_session_expired` events.
 
-- [ ] **4. Trust band below hero** *(30 min, BACKLOG P1 #2)*
-  - Inline strip: "Your WhatsApp number stays yours · We never hold funds · Per-client memory isolation, audited nightly · Lagos-built"
-  - All claims already true. Just say it on the homepage.
+- [x] ~~**4. Trust band below hero**~~ — ✅ shipped `fc8ac8f`. 4-column strip between hero and Problem section.
 
-- [ ] **5. Social-proof refresh** *(10 min, BACKLOG P1 #16)*
-  - Remove "2 Lagos & Abuja businesses already on the list" line until 10+ signups
-  - Or swap for: "Founding cohort: applications open"
+- [x] ~~**5. Social-proof refresh**~~ — ✅ shipped `fc8ac8f`. Waitlist counter now hides until total ≥10.
 
-- [ ] **5b. Visible founder-slots counter on /pricing** *(30 min — added from Emergent strategic review 2026-05-21)*
-  - Reads `clients` count, shows "${50 - count} of 50 founder slots remaining" when count < 50
-  - Live scarcity > abstract "first 50" phrase
-  - Emergent insight: "9 of 50 founder slots taken" converts because visible scarcity > abstract scarcity
+- [x] ~~**5b. Visible founder-slots counter on /pricing**~~ — ✅ shipped `1b19c7e`. Live "X of 50 founder slots taken · Y remaining" pill above tier cards, with sold-out fallback.
 
-- [ ] **5c. Bump onboarding tone-calibration from 10 → 20 approved drafts before live** *(half day — added from Emergent strategic review 2026-05-21)*
-  - First-hour-of-onboarding is where churn happens
-  - More approved drafts = sharper tone fit on day 1 = lower week-2 churn
-  - Edit `services/onboarding.py` calibration step + wizard copy + the live-mode gate
+- [ ] **5c. Tone-fit confidence meter + Autopilot ≥20 gate** *(half day — decision (b) locked last session)*
+  - Confidence meter in client portal grows with each approved draft per reply-type
+  - Autopilot toggle per reply-type gates at ≥20 approvals (was unbounded)
+  - Matches the locked PLAN.md rule: "Autopilot is earned, not defaulted"
+  - Files: `services/autopilot.py` threshold check + new meter widget in `templates/portal.html`
 
 **Sprint 1 ship gate:** all 5 ticked. After this, the landing converts, receipts auto-email, and WhatsApp expiry can't kill a paid client silently. Safe to push for first paid client.
 
@@ -73,20 +58,14 @@ Built only after sprint 1 ships AND first paid client is live (real data starts 
   - Reads from `brief_dispatch_log` + `paystack_events`
   - **Reason:** habit loop. Premium owners check WhatsApp first thing every morning anyway — make EYO the daily anchor.
 
-- [ ] **8. Per-vertical landing picker above hero** *(1 day, BACKLOG P1 #5)*
-  - `services/marketing_content.py` already supplies content for 5 verticals
-  - Promote from footer to top of page: "Choose your industry"
-  - **Reason:** 1-click ICP segmentation. Intercom/Pylon model.
+- [x] ~~**8. Per-vertical landing picker above hero**~~ — ✅ shipped `fc8ac8f`. "I run a 🍽 restaurant / 🏛 real estate / ⚖ law / 🎓 school / something else" pill row routes to /for/{slug}.
 
 - [ ] **9. Phase 1.6 Client Book Onboarding (vCard + WhatsApp share-contact)** *(start, see PLAN.md Phase 1.6 for full scope)*
   - Most-friction-free ingest path: owner shares contacts inside their own WhatsApp → EYO thread → vCard parsed → buckets created
   - Then bucket-level approval flow (Past / Dormant / Hot)
   - **Reason:** Phase 1.6 is fully scoped in PLAN.md. Pull Tier 1 (WhatsApp share) first; Tier 2-4 in sprint 3 if needed.
 
-- [ ] **10. Mobile WhatsApp scene fixes ≤380px** *(1 hour, BACKLOG P1 #17)*
-  - Playwright snapshot at iPhone SE width
-  - Fix overflow + flex breakage in the hero mock
-  - **Reason:** most Lagos premium owners view via mobile. Hero breaking on small screens = silent leak.
+- [x] ~~**10. Mobile WhatsApp scene fixes ≤380px**~~ — ✅ shipped `a499545`. iPhone SE breakpoint added: hero h1 30px, CTAs stack full-width, mock cards tighten padding, bubbles 12.5px.
 
 - [ ] **11. Voice-only owner control** *(5-7 days, added 2026-05-21 from Emergent triage A10)*
   - Owner sends a WhatsApp voice note to EYO ("Hold all replies tomorrow", "Update Friday minimum to ₦200k", "How am I doing this week?")
