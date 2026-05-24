@@ -12,12 +12,31 @@ Flow for every inbound message:
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import PlainTextResponse
 from datetime import datetime, timezone
+import hashlib
+import hmac
 from database import get_db
 from config import get_settings
 import structlog
 
 log = structlog.get_logger()
 router = APIRouter(prefix="/webhooks", tags=["Webhooks"])
+
+
+def _verify_meta_signature(raw_body: bytes, header: str | None, secret: str) -> bool:
+    """Meta sends `x-hub-signature-256: sha256=<hex>`."""
+    if not header or not header.startswith("sha256="):
+        return False
+    expected = hmac.new(secret.encode("utf-8"), raw_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, header.split("=", 1)[1].strip())
+
+
+def _verify_unipile_auth(header: str | None, expected: str) -> bool:
+    """Unipile does NOT HMAC-sign — they pass through whatever custom auth
+    header you configure on the webhook. We use `Unipile-Auth: <secret>`
+    (constant-time compared)."""
+    if not header or not expected:
+        return False
+    return hmac.compare_digest(header.strip(), expected.strip())
 
 
 def _db():
@@ -161,10 +180,43 @@ async def whatsapp_verify(request: Request):
 async def whatsapp_inbound(request: Request):
     """
     Handles inbound WhatsApp replies from Unipile or Meta.
-    Always returns 200 — never retry-loops from either provider.
+    Always returns 200 once authenticated — never retry-loops from either provider.
+
+    HMAC verification: when the matching secret env var is set, the request must
+    carry a valid signature for its provider. Requests without a signature are
+    rejected with 401. In dev (no secret configured), verification is skipped so
+    local curling still works — production MUST configure both secrets.
     """
+    raw_body = await request.body()
+    settings = get_settings()
+
+    # Provider detection:
+    #   • Meta sends `X-Hub-Signature-256: sha256=<hex>` (HMAC over raw body).
+    #   • Unipile does NOT HMAC-sign — they forward a custom header you
+    #     configured at webhook-setup time. We standardise on `Unipile-Auth`.
+    meta_sig     = request.headers.get("x-hub-signature-256")
+    unipile_auth = request.headers.get("unipile-auth") or request.headers.get("x-unipile-auth")
+
+    if meta_sig is not None:
+        if settings.meta_app_secret and not _verify_meta_signature(
+                raw_body, meta_sig, settings.meta_app_secret):
+            log.warning("meta_webhook_sig_invalid")
+            return Response(status_code=401)
+    elif unipile_auth is not None:
+        if settings.unipile_webhook_secret and not _verify_unipile_auth(
+                unipile_auth, settings.unipile_webhook_secret):
+            log.warning("unipile_webhook_auth_invalid")
+            return Response(status_code=401)
+    else:
+        # No recognised auth header. If EITHER secret is configured, refuse —
+        # unauthenticated traffic shouldn't reach the drafter in production.
+        if settings.meta_app_secret or settings.unipile_webhook_secret:
+            log.warning("webhook_missing_auth_header")
+            return Response(status_code=401)
+
     try:
-        payload = await request.json()
+        import json as _json
+        payload = _json.loads(raw_body or b"{}")
     except Exception:
         return {"ok": True}
 

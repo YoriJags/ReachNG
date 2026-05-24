@@ -189,12 +189,17 @@ async def lifespan(app: FastAPI):
     _safe("capacity",    ensure_capacity_indexes)
     from tools.client_signal_listener import ensure_signal_indexes
     _safe("signals",     ensure_signal_indexes)
-    scheduler = setup_scheduler()
-    scheduler.start()
-    log.info("scheduler_started", jobs=[job.id for job in scheduler.get_jobs()])
+    scheduler = None
+    if get_settings().scheduler_enabled:
+        scheduler = setup_scheduler()
+        scheduler.start()
+        log.info("scheduler_started", jobs=[job.id for job in scheduler.get_jobs()])
+    else:
+        log.info("scheduler_disabled")
     yield
     # Shutdown
-    scheduler.shutdown(wait=False)
+    if scheduler is not None:
+        scheduler.shutdown(wait=False)
     if _posthog:
         _posthog.shutdown()
     log.info("reachng_stopped")

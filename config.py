@@ -97,6 +97,15 @@ class Settings(BaseSettings):
 
     # WhatsApp inbound webhook verify token (Meta handshake) — set WEBHOOK_VERIFY_TOKEN in env
     webhook_verify_token: str | None = Field(default=None, env="WEBHOOK_VERIFY_TOKEN")
+    # Webhook HMAC verification secrets — when set, inbound POSTs without a
+    # matching signature header are rejected. Leave unset in dev for backwards
+    # compatibility; production MUST set both.
+    meta_app_secret:         str | None = Field(default=None, env="META_APP_SECRET")
+    unipile_webhook_secret:  str | None = Field(default=None, env="UNIPILE_WEBHOOK_SECRET")
+
+    # Scheduler — when false, APScheduler does NOT start. Required for tests
+    # and local dev so we don't fire cron jobs against prod data.
+    scheduler_enabled: bool = Field(default=True, env="SCHEDULER_ENABLED")
 
     # PostHog analytics
     posthog_api_key: str | None = Field(default=None, env="POSTHOG_API_KEY")

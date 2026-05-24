@@ -1,6 +1,21 @@
 """
 Base campaign runner — shared logic for all verticals.
 Each vertical subclass just defines its vertical name and preferred channel.
+
+INTERNAL — Prospect OS only. Never called from any client-facing code path.
+
+This module discovers leads from Maps / Apollo / Apify / DuckDuckGo / IG /
+social signals and runs outreach from ReachNG's OWN Unipile accounts. It is
+Yori's SDR funnel for acquiring ReachNG customers.
+
+Client-facing ReachNG (the EYO agent) NEVER promises lead discovery and never
+routes through this module. Client agents work uploaded contact books + inbound
+WhatsApp/email + scheduled chase ladders — see `services/closer/`, `tools/hitl.py`,
+`api/portal.py`. See PRODUCTS.md for the contract.
+
+If you find yourself wiring a `/portal/*` or `/api/v1/clients/*` route into
+this file, STOP — that's a positioning bug. Add it to the Closer/HITL path
+instead.
 """
 import asyncio
 import re
