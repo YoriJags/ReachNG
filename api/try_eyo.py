@@ -92,6 +92,12 @@ class TryEyoRequest(BaseModel):
     message:  str = Field(min_length=4, max_length=600)
 
 
+# ─── Post-generation tone scrub ──────────────────────────────────────────────
+# Belt-and-braces against the model ignoring the never-say rule. Shared with
+# tools/hitl.py so the same rule applies to real client drafts too.
+from tools.tone import scrub_endearments as _scrub_endearments
+
+
 @router.post("/api/v1/try-eyo", include_in_schema=False)
 async def try_eyo(payload: TryEyoRequest, request: Request):
     settings = get_settings()
@@ -123,6 +129,14 @@ async def try_eyo(payload: TryEyoRequest, request: Request):
         "(GTBank/Opay/Paystack, Lagos venues, naira) where natural. Do NOT "
         "include placeholders like [Name] — write as if you've replied this "
         "kind of message hundreds of times. Output only the reply text, nothing else."
+        "\n\n--- TONE: NEVER-SAY LIST (hard rule) ---\n"
+        "These are PREMIUM businesses replying to PAYING customers. Never use "
+        "casual endearments or familiar slang. NEVER use the following words to "
+        "address the customer: babe, love, dear, darling, sweetie, sweetheart, "
+        "honey, hun, boo, bae, my dear, fam, bro, sis, sister, brother. "
+        "Open with their first name if you have it, otherwise a neutral greeting "
+        "('Hi', 'Good morning', 'Good afternoon', 'Hello'). Warm but professional. "
+        "If your draft contains any of the banned words, rewrite it before responding."
     )
 
     started = time.time()
@@ -146,6 +160,7 @@ async def try_eyo(payload: TryEyoRequest, request: Request):
         text = text.strip()
         if not text:
             raise RuntimeError("empty_response")
+        text = _scrub_endearments(text)
     except Exception as exc:
         log.warning("try_eyo_failed", error=str(exc), vertical=vertical, ip=ip)
         raise HTTPException(502, "EYO is busy right now — try again in a moment.")

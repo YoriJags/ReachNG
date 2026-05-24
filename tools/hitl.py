@@ -112,6 +112,16 @@ def queue_draft(
     _enforce_brief_gate(source=source, client_name=client_name)
     _enforce_account_caps(source=source, client_name=client_name)
 
+    # ── Tone scrub ────────────────────────────────────────────────────────────
+    # Strip casual endearments ("babe", "love", "dear" etc.) that the drafter
+    # may have generated despite the never-say rule in the system prompt.
+    # Centralised at the queue_draft boundary so every drafter inherits it.
+    try:
+        from tools.tone import scrub_endearments
+        message = scrub_endearments(message)
+    except Exception:  # tone scrub must never block a send
+        pass
+
     # ── Autopilot check ───────────────────────────────────────────────────────
     if client_name and _is_autopilot_enabled(client_name):
         sent = _try_autopilot_send(
