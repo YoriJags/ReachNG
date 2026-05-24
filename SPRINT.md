@@ -53,7 +53,7 @@ Built only after sprint 1 ships AND first paid client is live (real data starts 
 
 - [x] ~~**8. Per-vertical landing picker above hero**~~ — ✅ shipped `fc8ac8f`. "I run a 🍽 restaurant / 🏛 real estate / ⚖ law / 🎓 school / something else" pill row routes to /for/{slug}.
 
-- [ ] **9. Phase 1.6 Client Book Onboarding (vCard + WhatsApp share-contact)** *(start, see PLAN.md Phase 1.6 for full scope)*
+- [x] ~~**9. Phase 1.6 Client Book Onboarding — v1 shipped**~~ — vCard upload + paste-in via `/portal/{token}/book` + `services/book_import.py`. Dedupes by phone/email per client. Recent-imports log surfaced on the page. WhatsApp share-contact ingest + bucket triage deferred to Phase 1.6 v2.
   - Most-friction-free ingest path: owner shares contacts inside their own WhatsApp → EYO thread → vCard parsed → buckets created
   - Then bucket-level approval flow (Past / Dormant / Hot)
   - **Reason:** Phase 1.6 is fully scoped in PLAN.md. Pull Tier 1 (WhatsApp share) first; Tier 2-4 in sprint 3 if needed.
@@ -80,11 +80,11 @@ Less build, more execution. Activates the BACKLOG "Founder authority cadence" + 
   - Lead with the *mental-model shift* post Monday morning
   - **Reason:** the only acquisition channel we can run today at zero cost. Every other paid channel needs budget.
 
-- [ ] **12. Off-boarding flow for non-renewing customers** *(1 day, raised prior session, never built)*
+- [x] ~~**12. Off-boarding flow for non-renewing customers**~~ — shipped `6478c0d`. POST `/clients/{name}/offboard` runs: cancel billing flag · Unipile unpair · branded farewell email with reactivation code + data export link · operator WhatsApp alert · PostHog event. Red 🚪 button on every Control Tower client row.
   - Graceful WhatsApp unpair + data export + ledger close + offer reactivation discount + survey "why are you leaving"
   - **Reason:** when first churn happens, we need the playbook ready. Better to build cold than under panic.
 
-- [ ] **13. Add the LinkedIn post + Twitter threads to /blog/** *(half day, BACKLOG P1 #18)*
+- [x] ~~**13. /blog seed + first post**~~ — shipped `f265c96`. `api/blog.py` renders Markdown posts from `content/blog/*.md` with frontmatter (Article + BreadcrumbList JSON-LD). Templates: `blog_index.html`, `blog_post.html`. Seed post: "Why premium Lagos owners stopped trying to use AI." Footer link added.
   - Each Twitter thread becomes a blog post too — SEO + content asset
   - `/blog/why-premium-lagos-owners-stopped-using-ai` and 5 others targeting `"whatsapp ai for [vertical] lagos"`
   - **Reason:** organic compounds. Each post is a Google-indexed entry point.

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Customer Book · {{ client_name }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{--bg:#0b0f14;--bg-2:#0e1218;--surface:#111720;--line:#1e2530;--ink:#e8e8e8;--muted:#7b8896;--muted-strong:#a8b3c0;--orange:#ff5500;--green:#5dd28a;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+  a{color:var(--orange);text-decoration:none}
+  .top{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:#0a0d12;border-bottom:1px solid var(--line)}
+  .top .logo{font-weight:700;font-size:18px}.top .logo span{color:var(--orange)}
+  .top .back{color:var(--muted-strong);font-size:12px;border:1px solid var(--line);padding:6px 12px;border-radius:6px}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 24px 80px}
+  h1{font-family:Georgia,serif;font-size:30px;font-weight:600;letter-spacing:-0.5px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 26px;line-height:1.65}
+  .summary{display:flex;gap:14px;margin-bottom:24px}
+  .stat{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 22px}
+  .stat .label{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
+  .stat .val{font-family:Georgia,serif;font-size:28px;font-weight:600;color:var(--ink);letter-spacing:-0.6px;line-height:1}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-bottom:18px}
+  .card h2{font-family:Georgia,serif;font-size:20px;font-weight:600;letter-spacing:-0.3px;margin:0 0 8px}
+  .card p{margin:0 0 16px;color:var(--muted-strong);font-size:13.5px}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  input[type=file]{flex:1;background:var(--bg-2);border:1px dashed var(--line);border-radius:8px;color:var(--ink);padding:14px;font-size:13px;font-family:inherit;cursor:pointer}
+  textarea{width:100%;min-height:140px;background:var(--bg-2);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:14px 16px;font-size:13.5px;font-family:inherit;line-height:1.6;resize:vertical}
+  textarea:focus,input:focus{outline:none;border-color:var(--orange)}
+  .btn{background:var(--orange);color:#fff;border:0;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.04em;font-family:inherit}
+  .btn:disabled{opacity:0.5;cursor:wait}
+  .result{margin-top:12px;padding:12px 14px;border-radius:8px;font-size:13px;display:none}
+  .result.ok{background:rgba(93,210,138,0.10);border:1px solid rgba(93,210,138,0.30);color:var(--green);display:block}
+  .result.err{background:rgba(255,85,0,0.10);border:1px solid rgba(255,85,0,0.30);color:#ff9b66;display:block}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.06em}
+  td{padding:10px;border-bottom:1px solid var(--line);color:var(--muted-strong)}
+  tr:last-child td{border-bottom:0}
+  .hint{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.55}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo">Reach<span>NG</span> · Customer Book</div>
+  <a class="back" href="/portal/{{ token }}">← Back to portal</a>
+</div>
+
+<div class="wrap">
+  <h1>Bring your customer book in.</h1>
+  <p class="sub">Upload your phone contacts as a <strong>.vcf</strong> file, or paste a list with names + phone numbers. EYO learns who your customers are from day 1 — re-engagement, voice match, and brief context all start sharper.</p>
+
+  <div class="summary">
+    <div class="stat"><div class="label">Customers in book</div><div class="val" id="summary-total">{{ summary.total }}</div></div>
+    <div class="stat"><div class="label">Recent imports</div><div class="val">{{ imports | length }}</div></div>
+  </div>
+
+  <!-- vCard upload -->
+  <div class="card">
+    <h2>📇 Upload .vcf (phone contacts)</h2>
+    <p>iPhone: Contacts → select → Share → Save .vcf · Android: Contacts → menu → Import/Export → Export to .vcf</p>
+    <form id="vcf-form" enctype="multipart/form-data">
+      <div class="row">
+        <input type="file" name="file" id="vcf-file" accept=".vcf,text/vcard,text/x-vcard" required>
+        <button class="btn" type="submit" data-ph="book_upload_vcf">Upload</button>
+      </div>
+    </form>
+    <div id="vcf-result" class="result"></div>
+    <div class="hint">Max 2 MB. We dedupe by phone + email so re-uploading is safe.</div>
+  </div>
+
+  <!-- Paste -->
+  <div class="card">
+    <h2>✏ Paste a list</h2>
+    <p>One contact per line. We pull a phone, an email, and the name from whatever's left. Examples that work:</p>
+    <pre style="background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--muted-strong);overflow-x:auto;margin:0 0 12px;">Funke Adebayo · 0803 555 4141 · funke@altitude.ng
+Bola Olajide, +234 802 999 8589
+Mr Tunde 0703 121 2121</pre>
+    <textarea id="paste-text" placeholder="Paste contacts here, one per line…"></textarea>
+    <div class="row" style="margin-top:12px;justify-content:flex-end">
+      <button class="btn" id="paste-btn" data-ph="book_paste">Import paste</button>
+    </div>
+    <div id="paste-result" class="result"></div>
+  </div>
+
+  <!-- Recent imports -->
+  {% if imports %}
+  <div class="card">
+    <h2>Recent imports</h2>
+    <table>
+      <thead><tr><th>When</th><th>Source</th><th>File</th><th style="text-align:right">Parsed</th><th style="text-align:right">Added</th><th style="text-align:right">Deduped</th></tr></thead>
+      <tbody>
+      {% for imp in imports %}
+        <tr>
+          <td>{{ imp.created_at.strftime("%d %b %H:%M") if imp.created_at else "—" }}</td>
+          <td>{{ imp.source }}</td>
+          <td>{{ imp.filename or "—" }}</td>
+          <td style="text-align:right">{{ imp.parsed_count }}</td>
+          <td style="text-align:right;color:var(--green);font-weight:600">{{ imp.parsed_count - imp.deduped_count }}</td>
+          <td style="text-align:right;color:var(--muted)">{{ imp.deduped_count }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <p style="margin-top:20px;font-size:11px;color:var(--muted);line-height:1.65">
+    🔒 Customer data is scoped to your account only. We never share, sell, or use it across clients. NDPR-compliant: ask us any time for a one-click export or delete.
+  </p>
+</div>
+
+<script>
+  const TOKEN = {{ token | tojson }};
+
+  function show(el, ok, msg) {
+    el.className = "result " + (ok ? "ok" : "err");
+    el.textContent = msg;
+    el.style.display = "block";
+  }
+
+  // vCard upload
+  document.getElementById("vcf-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const f = fd.get("file");
+    if (!f || !f.name) return;
+    const btn = e.target.querySelector("button");
+    btn.disabled = true; btn.textContent = "Uploading…";
+    const out = document.getElementById("vcf-result");
+    try {
+      const r = await fetch("/portal/" + encodeURIComponent(TOKEN) + "/book/upload-vcf", {method:"POST", body:fd});
+      const d = await r.json();
+      if (!r.ok) { show(out, false, d.detail || "Upload failed"); return; }
+      show(out, true, `✓ ${d.parsed} parsed · ${d.added} new · ${d.deduped} already in book`);
+      const total = document.getElementById("summary-total");
+      total.textContent = parseInt(total.textContent || "0", 10) + d.added;
+      setTimeout(()=>location.reload(), 900);
+    } catch (err) { show(out, false, "Upload error: " + err.message); }
+    finally { btn.disabled = false; btn.textContent = "Upload"; }
+  });
+
+  // Paste
+  document.getElementById("paste-btn").addEventListener("click", async () => {
+    const text = document.getElementById("paste-text").value.trim();
+    const out  = document.getElementById("paste-result");
+    if (text.length < 8) { show(out, false, "Paste at least one contact"); return; }
+    const btn = document.getElementById("paste-btn");
+    btn.disabled = true; btn.textContent = "Importing…";
+    try {
+      const r = await fetch("/portal/" + encodeURIComponent(TOKEN) + "/book/paste", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({text}),
+      });
+      const d = await r.json();
+      if (!r.ok) { show(out, false, d.detail || "Import failed"); return; }
+      show(out, true, `✓ ${d.parsed} parsed · ${d.added} new · ${d.deduped} already in book`);
+      const total = document.getElementById("summary-total");
+      total.textContent = parseInt(total.textContent || "0", 10) + d.added;
+      document.getElementById("paste-text").value = "";
+      setTimeout(()=>location.reload(), 900);
+    } catch (err) { show(out, false, "Import error: " + err.message); }
+    finally { btn.disabled = false; btn.textContent = "Import paste"; }
+  });
+</script>
+</body>
+</html>

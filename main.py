@@ -175,6 +175,8 @@ async def lifespan(app: FastAPI):
     _safe("brief_streak", ensure_brief_streak_indexes)
     from services.offboarding import ensure_offboarding_indexes
     _safe("offboarding", ensure_offboarding_indexes)
+    from services.book_import import ensure_book_indexes
+    _safe("client_book", ensure_book_indexes)
     from services.usage_meter import ensure_usage_indexes
     _safe("usage",       ensure_usage_indexes)
     from api.legal import ensure_legal_indexes as ensure_legal_api_indexes

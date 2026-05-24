@@ -398,6 +398,85 @@ async def client_portal(token: str, request: Request):
     })
 
 
+# ─── Client Book Onboarding v1 (SPRINT 2 #9 — slim slice) ──────────────────
+
+@router.get("/{token}/book", response_class=HTMLResponse)
+async def book_page(token: str, request: Request):
+    """Render the customer-book upload page."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found")
+    from services.book_import import list_imports, book_summary
+    cid = str(client["_id"])
+    templates = request.app.state.templates
+    return templates.TemplateResponse(request, "portal_book.html", {
+        "token":       token,
+        "client_name": client["name"],
+        "imports":     list_imports(cid, limit=10),
+        "summary":     book_summary(cid),
+    })
+
+
+@router.post("/{token}/book/upload-vcf")
+async def book_upload_vcf(token: str, request: Request):
+    """Accept a .vcf file upload + persist parsed contacts."""
+    from fastapi import UploadFile
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found")
+    form = await request.form()
+    upload = form.get("file")
+    if not upload or not hasattr(upload, "read"):
+        raise HTTPException(400, "No file uploaded")
+    raw_bytes = await upload.read()
+    if len(raw_bytes) > 2_000_000:  # 2MB cap
+        raise HTTPException(413, "File too large (max 2MB)")
+    try:
+        text = raw_bytes.decode("utf-8", errors="ignore")
+    except Exception:
+        raise HTTPException(400, "Could not read file as text")
+    from services.book_import import parse_vcf, import_book
+    contacts = parse_vcf(text)
+    fwd = request.headers.get("x-forwarded-for") or ""
+    ip = (fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else None))
+    result = import_book(
+        client_id=str(client["_id"]),
+        contacts=contacts,
+        source="vcf",
+        filename=getattr(upload, "filename", None),
+        raw_chars=len(text),
+        uploader_ip=ip,
+    )
+    return result
+
+
+@router.post("/{token}/book/paste")
+async def book_paste(token: str, request: Request):
+    """Accept pasted text + parse + persist."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found")
+    body = await request.json()
+    text = (body.get("text") or "").strip()
+    if len(text) < 8:
+        raise HTTPException(400, "Paste at least one contact (name + phone or email)")
+    if len(text) > 200_000:
+        raise HTTPException(413, "Paste too large (max 200k chars)")
+    from services.book_import import parse_paste, import_book
+    contacts = parse_paste(text)
+    fwd = request.headers.get("x-forwarded-for") or ""
+    ip = (fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else None))
+    result = import_book(
+        client_id=str(client["_id"]),
+        contacts=contacts,
+        source="paste",
+        filename=None,
+        raw_chars=len(text),
+        uploader_ip=ip,
+    )
+    return result
+
+
 # ─── EYO Vault (SPRINT 2 #6) ────────────────────────────────────────────────
 
 @router.get("/{token}/vault", response_class=HTMLResponse)
