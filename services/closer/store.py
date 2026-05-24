@@ -66,6 +66,8 @@ def ensure_closer_indexes() -> None:
     c.create_index([("contact_phone", ASCENDING)], sparse=True)
     c.create_index([("contact_email", ASCENDING)], sparse=True)
     c.create_index([("created_at", DESCENDING)])
+    # Revival sweep — quick scan of quiet leads by stage + updated_at
+    c.create_index([("stage", ASCENDING), ("updated_at", ASCENDING)])
 
 
 # ─── Serialise helper ─────────────────────────────────────────────────────────

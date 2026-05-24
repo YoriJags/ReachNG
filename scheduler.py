@@ -46,6 +46,15 @@ async def _sequence_tick():
         log.error("sequence_tick_failed", error=str(e))
 
 
+async def _closer_revival_run():
+    """Re-draft Closer leads that have gone quiet past per-stage thresholds."""
+    try:
+        from services.closer.revival import run_revival_sweep
+        await run_revival_sweep()
+    except Exception as e:
+        log.error("closer_revival_failed", error=str(e))
+
+
 async def _invoice_reminder_run():
     """Daily invoice collection — queues WhatsApp reminders for overdue invoices into HITL."""
     from tools.invoices import get_due_reminders, REMINDER_SEQUENCE
@@ -524,6 +533,15 @@ def setup_scheduler():
         _sequence_tick,
         CronTrigger(hour="8-20", minute=15, timezone="Africa/Lagos"),
         id="sequence_tick", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=180,
+    )
+
+    # Closer revival sweep — re-draft leads that went quiet (BACKLOG P0 #7).
+    # Every 4h, offset to :17 so it doesn't collide with wa_health (:10) or
+    # sequence_tick (:15).
+    scheduler.add_job(
+        _closer_revival_run,
+        CronTrigger(hour="2,6,10,14,18,22", minute=17, timezone="Africa/Lagos"),
+        id="closer_revival_run", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=600,
     )
 
     scheduler.add_job(
