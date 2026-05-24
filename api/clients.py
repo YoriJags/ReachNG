@@ -450,6 +450,31 @@ async def list_invoices(name: str):
     return invoices
 
 
+# ─── Off-boarding (SPRINT 3 — pre-paid-client safety net) ───────────────────
+
+class OffboardPayload(BaseModel):
+    reason: str = ""
+    by: Literal["owner", "operator", "auto"] = "operator"
+    skip_alerts: bool = False  # set True for tests; default fires email + Slack
+
+
+@router.post("/{name}/offboard")
+async def offboard(name: str, payload: OffboardPayload):
+    """Run the full off-boarding playbook for a client:
+    cancel billing flag · WhatsApp unpair · farewell email with reactivation
+    code + data export link · operator WhatsApp alert · PostHog event."""
+    from services.offboarding import offboard_client
+    result = await offboard_client(
+        name,
+        reason=payload.reason,
+        by=payload.by,
+        skip_alerts=payload.skip_alerts,
+    )
+    if not result.get("ok"):
+        raise HTTPException(400 if result.get("error") == "already_offboarded" else 404, result)
+    return result
+
+
 @router.patch("/{name}/autopilot")
 async def set_autopilot(name: str, enabled: bool):
     """Toggle autopilot mode on/off for a client.
