@@ -1,0 +1,83 @@
+{% extends "marketing/_base.html" %}
+
+{% block title %}{{ meta.title }} — ReachNG{% endblock %}
+{% block description %}{{ meta.description or "Field note from ReachNG — Lagos premium SME operations." }}{% endblock %}
+
+{% block canonical %}https://www.reachng.ng/blog/{{ meta.slug }}{% endblock %}
+{% block og_type %}article{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ meta.title | tojson }},
+  "description": {{ (meta.description or "") | tojson }},
+  "author": { "@type": "Person", "name": {{ (meta.author or "Yori Ajagun") | tojson }} },
+  "datePublished": {{ (meta.date or "") | tojson }},
+  "publisher": { "@type": "Organization", "name": "ReachNG", "logo": { "@type": "ImageObject", "url": "https://www.reachng.ng/static/logo.png" } },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.reachng.ng/blog/{{ meta.slug }}" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type":"ListItem","position":1,"name":"ReachNG","item":"https://www.reachng.ng/"},
+    {"@type":"ListItem","position":2,"name":"Blog","item":"https://www.reachng.ng/blog"},
+    {"@type":"ListItem","position":3,"name":{{ meta.title | tojson }},"item":"https://www.reachng.ng/blog/{{ meta.slug }}"}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<section class="hero" style="padding: 60px 24px 24px;">
+  <div class="inner" style="max-width: 740px;">
+    <div style="margin-bottom: 14px;">
+      <a href="/blog" style="font-size: 12px; color: var(--orange); text-decoration: none; font-weight: 600;">← Field notes</a>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; margin-bottom: 14px;">
+      <span style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange); font-weight: 700;">{{ meta.vertical or "Field notes" }}</span>
+      <span style="font-size: 12px; color: var(--muted);">{{ meta.date }} · {{ meta.author or "Yori Ajagun" }}</span>
+    </div>
+    <h1 style="font-size: clamp(28px, 4.5vw, 42px); line-height: 1.18; letter-spacing: -0.6px; margin: 0;">{{ meta.title }}</h1>
+    {% if meta.description %}
+    <p class="sub" style="margin-top: 18px;">{{ meta.description }}</p>
+    {% endif %}
+  </div>
+</section>
+
+<section style="padding-top: 0;">
+  <div class="inner" style="max-width: 740px;">
+    <article class="blog-article" style="font-size: 16px; line-height: 1.78; color: var(--text-strong);">
+      {{ html | safe }}
+    </article>
+
+    <div style="margin-top: 56px; padding: 28px 32px; background: linear-gradient(135deg, rgba(255,85,0,0.06), rgba(255,85,0,0.02)); border: 1px solid rgba(255,85,0,0.30); border-radius: 14px; text-align: center;">
+      <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange); font-weight: 700; margin-bottom: 10px;">Founding cohort</div>
+      <h3 style="font-family: Georgia, serif; font-size: 22px; font-weight: 600; margin: 0 0 12px; letter-spacing: -0.3px;">Want EYO running on your WhatsApp?</h3>
+      <p style="margin: 0 0 18px; font-size: 14px; color: var(--muted-strong);">Founder pricing locked for the first 50 clients. Hand-onboarded. From ₦60,000/mo.</p>
+      <a href="/waitlist" data-ph="blog_to_waitlist" class="btn btn-primary">Join early access →</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .blog-article h2 { font-family: Georgia, serif; font-size: 26px; font-weight: 600; margin: 48px 0 14px; letter-spacing: -0.4px; color: var(--text-strong); }
+  .blog-article h3 { font-family: Georgia, serif; font-size: 20px; font-weight: 600; margin: 32px 0 10px; letter-spacing: -0.2px; color: var(--text-strong); }
+  .blog-article p { margin: 0 0 18px; }
+  .blog-article ul, .blog-article ol { margin: 0 0 18px; padding-left: 24px; }
+  .blog-article li { margin-bottom: 6px; }
+  .blog-article a { color: var(--orange); }
+  .blog-article blockquote { border-left: 3px solid var(--orange); padding: 6px 18px; margin: 18px 0; color: var(--muted-strong); font-style: italic; background: var(--bg-2); border-radius: 4px; }
+  .blog-article code { font-family: 'JetBrains Mono', Consolas, monospace; font-size: 13px; background: var(--bg-2); padding: 1px 6px; border-radius: 4px; }
+  .blog-article table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+  .blog-article th, .blog-article td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .blog-article thead { background: var(--bg-2); }
+  .blog-article hr { border: 0; border-top: 1px solid var(--border); margin: 32px 0; }
+</style>
+
+{% endblock %}
