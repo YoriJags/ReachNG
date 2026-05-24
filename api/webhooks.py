@@ -308,8 +308,30 @@ async def whatsapp_inbound(request: Request):
             skip_ad = True
         messages_to_process.append((sender, effective_body, account_id, skip_ad))
 
+    # ── Owner-voice control intercept (SPRINT 2 #11) ────────────────────────
+    # If we matched a client AND the sender is that client's owner, try to
+    # interpret the message as a command (pause/resume/status/etc). On a
+    # successful handle, skip the normal drafter path for this message.
+    owner_handled: set[str] = set()
+    try:
+        if _early_client_id:
+            from bson import ObjectId
+            from services.owner_voice import handle_owner_command
+            _client_doc = _db()["clients"].find_one({"_id": ObjectId(_early_client_id)})
+            if _client_doc:
+                for sender_phone, message_body, _src, _ in messages_to_process:
+                    if not sender_phone:
+                        continue
+                    res = await handle_owner_command(_client_doc, sender_phone, message_body)
+                    if res and res.get("handled"):
+                        owner_handled.add(sender_phone)
+    except Exception as e:
+        log.error("owner_voice_intercept_crashed", error=str(e))
+
     for sender_phone, message_body, source, skip_ad in messages_to_process:
         if not sender_phone:
+            continue
+        if sender_phone in owner_handled:
             continue
         try:
             await _handle_message(

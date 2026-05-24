@@ -60,12 +60,7 @@ Built only after sprint 1 ships AND first paid client is live (real data starts 
 
 - [x] ~~**10. Mobile WhatsApp scene fixes ≤380px**~~ — ✅ shipped `a499545`. iPhone SE breakpoint added: hero h1 30px, CTAs stack full-width, mock cards tighten padding, bubbles 12.5px.
 
-- [ ] **11. Voice-only owner control** *(5-7 days, added 2026-05-21 from Emergent triage A10)*
-  - Owner sends a WhatsApp voice note to EYO ("Hold all replies tomorrow", "Update Friday minimum to ₦200k", "How am I doing this week?")
-  - Whisper transcribes (already shipped, multilingual safe-switch) → Haiku parses to structured `{action, params, scope}` → applies to client_rules / brief / HITL queue / scorecard
-  - V1 supports 5 command classes: pause/resume, rule toggle, pricing update, bulk approve/skip, status check
-  - WhatsApp confirmation back to owner ("Done. EYO will hold all replies tomorrow until 6am Tuesday. Active rules: 3.") + one-tap undo
-  - **Reason:** Replaces the portal for 80% of owner control tasks. 90% of needed components already shipped. Lagos owners live on WhatsApp voice notes — daily-driver control surface should match the medium they already use.
+- [x] ~~**11. Voice-only owner control — v1 shipped**~~ — `services/owner_voice.py` + webhook intercept + closer-drafter pause gate. Owner sends voice/text from `owner_phone` → Haiku parses intent → 3 firm handlers (pause / resume / status_check) execute, 3 stubs (set_rule / update_pricing / bulk_approve) reply "in beta, Yori will action". Confirmation goes back via the client's own Unipile account. PostHog `owner_voice_command`. Landing page "Voice-controlled" capability card added to Meet EYO grid.
 
 **Sprint 2 ship gate:** all 5 ticked. After this, first paid client has structural retention and the funnel is per-vertical segmented.
 
