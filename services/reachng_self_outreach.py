@@ -157,10 +157,19 @@ def attach_landing_link(
     (truncated TLDs, missing protocol, inventing tracking params). The
     link is the entire CTA for this campaign — it cannot be flaky.
 
-    Tags: ref=outreach, v=<vertical>, c=<contact_id> — light enough for
-    PostHog to attribute landing visits back to the campaign.
+    Uses real UTM keys (utm_source / utm_medium / utm_campaign) — this is
+    important because the `/` route redirects un-tagged visitors to the /start
+    cover page. UTM-tagged arrivals get sent straight to the landing, which
+    is what an outreach recipient expects.
+
+    Extra params: v=<vertical>, c=<contact_id> for PostHog attribution.
     """
-    params = {"ref": "outreach", "v": vertical}
+    params = {
+        "utm_source":   "email",
+        "utm_medium":   "outreach",
+        "utm_campaign": "founder_cohort",
+        "v":            vertical,
+    }
     if contact_id:
         params["c"] = str(contact_id)
     url = f"{_LANDING_BASE}{path}?{urlencode(params)}"
