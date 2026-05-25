@@ -1,6 +1,11 @@
-# Environment
+# Environment / secrets
 .env
+.env.*
 *.env
+credentials.json
+.credentials
+*.pem
+*.key
 
 # Python
 __pycache__/
@@ -19,6 +24,10 @@ build/
 *.log
 logs/
 
+# Data exports
+exports/
+*.csv
+
 # IDE
 .vscode/
 .idea/
@@ -31,24 +40,5 @@ Thumbs.db
 # Local Claude config
 .claude/
 
-# Data exports
-exports/
-*.csv
--e 
-# Environment and credential files
-.env
-.env.*
-*.env
-credentials.json
-*.pem
-*.key
-.credentials
--e 
-# Environment and credential files
-.env
-.env.*
-*.env
-credentials.json
-*.pem
-*.key
-.credentials
+# Graphify analysis output
+graphify-out/
