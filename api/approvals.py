@@ -2,6 +2,7 @@
 HITL Approvals API — owner reviews and approves outreach drafts before sending.
 This is the kill switch. Nothing goes out without a human tap.
 """
+from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from bson import ObjectId
@@ -83,24 +84,136 @@ async def skip(approval_id: str):
     return {"success": True, "status": "skipped", "contact": draft["contact_name"]}
 
 
+def _filter_pending(pending: list[dict],
+                    client: str | None,
+                    confidence: str | None) -> list[dict]:
+    """Apply optional per-client / per-confidence filters to a pending list."""
+    out = pending
+    if client:
+        out = [d for d in out if (d.get("client_name") or "").lower() == client.lower()]
+    if confidence:
+        wanted = confidence.lower()
+        out = [d for d in out if ((d.get("risk") or {}).get("confidence") == wanted)]
+    return out
+
+
 @router.post("/approve-all")
-async def approve_all(background_tasks: BackgroundTasks, vertical: str | None = None):
-    """Approve all pending drafts at once."""
-    pending = get_pending(vertical=vertical)
+async def approve_all(
+    background_tasks: BackgroundTasks,
+    vertical: str | None = None,
+    client: str | None = None,
+    confidence: str | None = None,
+):
+    """Bulk-approve pending drafts. Optional filters: vertical / client / confidence (high|medium|low)."""
+    pending = _filter_pending(get_pending(vertical=vertical), client, confidence)
     for draft in pending:
         approved = approve_draft(str(draft["_id"]))
         if approved:
             background_tasks.add_task(_send_approved, approved)
-    return {"success": True, "approved_count": len(pending)}
+    return {"success": True, "approved_count": len(pending),
+            "filters": {"vertical": vertical, "client": client, "confidence": confidence}}
 
 
 @router.post("/skip-all")
-async def skip_all(vertical: str | None = None):
-    """Skip all pending drafts."""
-    pending = get_pending(vertical=vertical)
+async def skip_all(
+    vertical: str | None = None,
+    client: str | None = None,
+    confidence: str | None = None,
+):
+    """Bulk-skip pending drafts. Same filters as approve-all."""
+    pending = _filter_pending(get_pending(vertical=vertical), client, confidence)
     for draft in pending:
         skip_draft(str(draft["_id"]))
-    return {"success": True, "skipped_count": len(pending)}
+    return {"success": True, "skipped_count": len(pending),
+            "filters": {"vertical": vertical, "client": client, "confidence": confidence}}
+
+
+# ─── Per-draft regenerate ────────────────────────────────────────────────────
+
+_REGEN_STYLES = {"shorter", "warmer", "firmer", "more_specific"}
+
+_REGEN_INSTRUCTIONS = {
+    "shorter":       "Rewrite this WhatsApp reply to be roughly half as long. Cut filler words and pleasantries. Keep the substance and tone intact. Do NOT add new information.",
+    "warmer":        "Rewrite this WhatsApp reply with a warmer, more personal tone — but stay professional. Lagos premium business voice. No fake endearments (no babe/love/dear). Keep facts identical.",
+    "firmer":        "Rewrite this WhatsApp reply to be firmer and more direct. Drop hedging. Set clear expectations. Stay polite — never rude. Keep facts identical.",
+    "more_specific": "Rewrite this WhatsApp reply to be more specific where it was vague. Replace 'soon' / 'shortly' / 'as discussed' with concrete times, amounts, or details if you can infer them from context. Otherwise leave a clear placeholder.",
+}
+
+
+@router.post("/{approval_id}/regenerate")
+async def regenerate_draft_route(approval_id: str, style: str = "shorter"):
+    """Rewrite a pending draft in a chosen style (shorter / warmer / firmer / more_specific).
+
+    Updates the same approval doc in-place — no new HITL row, no schema
+    change. Risk score is recomputed against the new text.
+    """
+    _validate_id(approval_id)
+    if style not in _REGEN_STYLES:
+        raise HTTPException(400, f"Invalid style. Choose: {sorted(_REGEN_STYLES)}")
+
+    from database import get_db
+    from bson import ObjectId
+    col = get_db()["pending_approvals"]
+    doc = col.find_one({"_id": ObjectId(approval_id)})
+    if not doc:
+        raise HTTPException(404, "Approval not found")
+    if doc.get("status") != "pending":
+        raise HTTPException(400, f"Cannot regenerate — draft is already {doc.get('status')}")
+
+    current = doc.get("edited_message") or doc.get("message") or ""
+    if not current.strip():
+        raise HTTPException(400, "Draft is empty — nothing to regenerate")
+
+    # Single Haiku rewrite. Cheap (~₦2), source-agnostic.
+    try:
+        import anthropic
+        from config import get_settings
+        settings = get_settings()
+        if not settings.anthropic_api_key:
+            raise HTTPException(503, "ANTHROPIC_API_KEY not configured")
+        client_anth = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+        resp = client_anth.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=400,
+            temperature=0.4,
+            system=_REGEN_INSTRUCTIONS[style] + "\n\nOutput ONLY the rewritten reply text. No preamble, no quotes, no commentary.",
+            messages=[{"role": "user", "content": current}],
+        )
+        new_text = "".join(b.text for b in resp.content
+                            if getattr(b, "type", None) == "text").strip()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(502, f"Regenerate failed: {e}")
+
+    # Tone scrub + recompute risk against the new text
+    try:
+        from tools.tone import scrub_endearments
+        new_text = scrub_endearments(new_text)
+    except Exception:
+        pass
+    try:
+        from services.draft_risk import score_draft
+        new_risk = score_draft(
+            message=new_text,
+            classification=doc.get("classification"),
+            inbound_context=doc.get("inbound_context"),
+            vertical=doc.get("vertical"),
+            escalated=bool(doc.get("escalated")),
+        )
+    except Exception:
+        new_risk = doc.get("risk")
+
+    col.update_one(
+        {"_id": ObjectId(approval_id)},
+        {"$set": {"message": new_text,
+                  "edited_message": None,
+                  "risk": new_risk,
+                  "regen_style": style,
+                  "regen_at": datetime.now(timezone.utc)}},
+    )
+    return {"success": True, "approval_id": approval_id, "style": style,
+            "message": new_text, "risk": new_risk}
 
 
 # ─── Internal sender ──────────────────────────────────────────────────────────

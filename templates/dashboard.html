@@ -3081,6 +3081,7 @@ function copyDemoPortalLink(btn){
   </div>
   <div class="approve-all-bar" id="approve-all-bar" style="display:none;">
     <button class="btn btn-approve" onclick="approveAll()" title="Send every draft in the queue now">Approve All</button>
+    <button class="btn btn-approve" style="background:#0d2d1a;border-color:#1e6a3d;color:#5dd28a;" onclick="approveAllByConfidence('high')" title="Send only drafts the risk scorer flagged as low-risk (green badge)">✓ Approve safe only</button>
     <button class="btn btn-skip" onclick="rejectAll()" style="background:#3a1a1a;border-color:#7a2020;color:#f87171;" title="Discard every pending draft — none will be sent">Reject All</button>
     <span class="approve-count" id="approve-all-label" style="color:#6a8aaa;font-size:12px;"></span>
   </div>
@@ -5151,6 +5152,23 @@ function renderApprovals(approvals) {
       }
     }
 
+    // Risk badge (P1 quick-win) — green/amber/red triage signal
+    let riskBadge = "";
+    const r = a.risk || {};
+    if (r.confidence) {
+      const palette = {
+        high:   {bg:"#0d1f12", fg:"#5dd28a", border:"#1e3a25", icon:"✓", label:"safe"},
+        medium: {bg:"#1f1a0d", fg:"#e0b75c", border:"#3a2f1e", icon:"○", label:"eyeball"},
+        low:    {bg:"#2a0e0e", fg:"#ff8a8a", border:"#5a2020", icon:"!", label:"read carefully"},
+      }[r.confidence] || null;
+      if (palette) {
+        const tagsLine = (r.tags || []).length
+          ? ` · <span style="color:#888;">${(r.tags||[]).slice(0,3).join(" · ").replace(/_/g," ")}</span>`
+          : "";
+        riskBadge = `<div style="margin:6px 0 10px;font-size:11px;color:${palette.fg};background:${palette.bg};border:1px solid ${palette.border};border-radius:6px;padding:4px 9px;display:inline-flex;gap:8px;align-items:center;font-family:'JetBrains Mono',monospace;letter-spacing:0.03em;">${palette.icon} ${r.confidence} risk · score ${r.score}${tagsLine}</div>`;
+      }
+    }
+
     return `
     <div class="approval-card" ${a.escalated ? 'style="border-left-color:#ff5050;"' : ""}>
       <div class="approval-header">
@@ -5158,6 +5176,7 @@ function renderApprovals(approvals) {
         <span style="font-size:11px;color:#4a6070;">${channel}${sourceBadge}${igBadge}${profileLink}</span>
       </div>
       <div class="approval-meta">${sourceLabel(a)} &nbsp;·&nbsp; ${created}</div>
+      ${riskBadge}
       ${emoBadge}
       ${escalationBanner}
       ${postCtx}
@@ -5167,6 +5186,11 @@ function renderApprovals(approvals) {
         <button class="action-btn approve" onclick="approveOne('${id}')">Send</button>
         <button class="action-btn edit"    onclick="openEdit('${id}', ${JSON.stringify(msg)})">Edit</button>
         <button class="action-btn skip"    onclick="skipOne('${id}')">Skip</button>
+        <span style="margin-left:8px;display:inline-flex;gap:4px;">
+          <button class="action-btn" style="background:#1e2530;color:#aaa;border:1px solid #2a3340;font-size:10px;padding:4px 8px;" onclick="regenDraft('${id}','shorter')" title="Rewrite shorter">↺ shorter</button>
+          <button class="action-btn" style="background:#1e2530;color:#aaa;border:1px solid #2a3340;font-size:10px;padding:4px 8px;" onclick="regenDraft('${id}','warmer')" title="Rewrite warmer">↺ warmer</button>
+          <button class="action-btn" style="background:#1e2530;color:#aaa;border:1px solid #2a3340;font-size:10px;padding:4px 8px;" onclick="regenDraft('${id}','firmer')" title="Rewrite firmer">↺ firmer</button>
+        </span>
       </div>
     </div>`;
   }).join("");
@@ -5692,6 +5716,29 @@ function generateInvoice() {
 
 async function approveOne(id) { await postJSON(`/api/v1/approvals/${id}/approve`); refresh(); }
 async function skipOne(id)    { await postJSON(`/api/v1/approvals/${id}/skip`);    refresh(); }
+
+async function regenDraft(id, style) {
+  try {
+    const r = await fetch(`/api/v1/approvals/${id}/regenerate?style=${encodeURIComponent(style)}`, {
+      method: 'POST', headers: authHeaders(),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    refresh();
+  } catch (e) { alert(`Regen failed: ${e.message}`); }
+}
+
+async function approveAllByConfidence(level) {
+  if (!confirm(`Approve & send every '${level}' confidence draft? This skips the eyeball.`)) return;
+  try {
+    const r = await fetch(`/api/v1/approvals/approve-all?confidence=${encodeURIComponent(level)}`, {
+      method: 'POST', headers: authHeaders(),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const d = await r.json();
+    alert(`Approved ${d.approved_count} ${level}-confidence draft(s).`);
+    refresh();
+  } catch (e) { alert(`Bulk approve failed: ${e.message}`); }
+}
 
 function openEdit(id, currentMsg) {
   editTargetId = id;

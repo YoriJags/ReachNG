@@ -140,6 +140,19 @@ def queue_draft(
         if sent:
             return sent  # Returns the stored doc _id — no human needed
 
+    # ── Risk score — deterministic, no LLM call ─────────────────────────────
+    try:
+        from services.draft_risk import score_draft
+        _risk = score_draft(
+            message=message,
+            classification=classification,
+            inbound_context=inbound_context,
+            vertical=vertical,
+            escalated=bool(classification and classification.get("escalate")),
+        )
+    except Exception:
+        _risk = {"confidence": "medium", "score": 50, "tags": []}
+
     col = get_approvals()
     result = col.insert_one({
         "contact_id":    ObjectId(contact_id),
@@ -163,6 +176,8 @@ def queue_draft(
         # T0.2 — emotion / stage / urgency read of the inbound that triggered this draft
         "classification": classification,
         "escalated":      bool(classification and classification.get("escalate")),
+        # P1 quick-win — deterministic risk read so the operator knows which drafts to eyeball
+        "risk":           _risk,
     })
     approval_id = str(result.inserted_id)
     log.info("draft_queued", contact=contact_name, channel=channel, source=source)
