@@ -1,612 +1,163 @@
 # ReachNG — Backlog
 
-**Queue of work not yet in PLAN.md.** When a phase completes in PLAN.md, pull the next P0 item here into a new phase.
+**Queue of work not yet in PLAN.md / SPRINT.md.** When a sprint or phase finishes, pull the next P0 item from here into the active board.
 
-PLAN.md = active. BACKLOG.md = queued. Promote items, don't duplicate them.
+PLAN.md = active phases. SPRINT.md = active sprints. BACKLOG.md = queued. Promote items, don't duplicate them.
 
-Last updated: 2026-05-25 (Sprint-3 tickets #11, #8, #4, #2 shipped — bottom-up sweep; #1 was prior)
-
----
-
-## ★ SPRINT-3 BACKLOG — strategic notes packaged for one-by-one build (2026-05-24)
-
-Source: strategic-notes session 2026-05-24. 11 tickets ranked by **value-per-build-day**, each with a clear trigger so we don't build before signal fires. Pull these into PLAN.md one at a time.
-
-| # | Ticket | Why it matters | Effort | Trigger / Dependency |
-|---|---|---|---|---|
-| 1 | ~~**vCard contact import on onboarding**~~ | Solves "address by saved name." | 0.5 day | ✅ **SHIPPED** (bf8a347, services/book_import.py + templates/portal_book.html) |
-| 2 | ~~**T0.4 close-out — Portal "Agent Learning" card**~~ | Surfaces the Outcome Loop so owners *see* EYO improving weekly. | 1 day | ✅ **SHIPPED 2026-05-25** (3c2f125, api/agent_learning.py + portal card). Admin per-client wins/misses dashboard UI still open (JSON endpoint wired). |
-| 3 | **T0.5 Proactive Intelligence — 5 starter behaviours** | Stale revival, festival timing, birthday nudges, capacity nudges, booking reminders. The "agent acts on its own" story without action-queue overhead. | ~4 days | None — already scoped in PLAN.md |
-| 4 | ~~**Wave 2 cover personalization — Three Jobs scenes per vertical**~~ | Tone B/A, Receipt Catcher, Owner Brief now flip per vertical via WAVE2_SCENES. | 1.5 days | ✅ **SHIPPED 2026-05-25** (a572e00) |
-| 5 | **`/api/v1/draft-and-queue` — Infrastructure API tier** | Sells WhatsApp rail to businesses with their own AI (Lagos fintechs running Gemini etc). New flat-volume pricing tier. Net-new revenue surface. | 2 days | Wait until 3+ paying retainer clients |
-| 6 | **Graduated Autopilot Trust** | Owners trust EYO with low-risk reply types after 30d of approvals. Prevents queue starvation at 100+ clients (1k clients × 100 drafts/day = 100k queue items). | 3 days | Trigger when any client crosses 200+ drafts/wk |
-| 7 | **API-key rotation pool (Anthropic + Whisper + Vision)** | Per-client request affinity across 3-5 keys. Removes single-key throttle ceiling at scale. | 2 days | Trigger at ~250 active clients OR first 429 burst |
-| 8 | ~~**NDPR-grade privacy posture doc + DPA**~~ | Counter-signable DPA + sub-processor register for regulated-vertical prospects. | 1 day | ✅ **SHIPPED 2026-05-25** (0b7db6a, docs/PRIVACY_AND_NDPR.md) |
-| 9 | **Self-hosted "Your Mongo, your keys" deployment** | Tier-1 firms (luxury law, fintech, HNW estate) pay ₦2-5M setup for data sovereignty. | 5 days | Trigger when one inbound asks for it |
-| 10 | **End-to-end opaque mode — browser-side WebLLM drafting** | Drafts generated client-side in browser; only metadata hits server. Ultimate privacy story. | ~3 weeks | 12-month horizon — do NOT build now |
-| 11 | ~~**`.gitignore` dedupe + repo root cleanup**~~ | Deduped, `graphify-out/` ignored, stray file dropped. | 15 min | ✅ **SHIPPED 2026-05-25** (3a2fccd) |
-
-### Recommended 30-day sequence
-
-```
-Week 1  →  #1 vCard import      (0.5d)  +  #2 T0.4 close-out UI    (1d)
-Week 2  →  #4 Wave 2 cover     (1.5d)  +  #8 NDPR posture doc      (1d)
-Week 3  →  #3 T0.5 Proactive   (4d — the moat that compounds)
-Week 4  →  #11 cleanup + buffer + start measuring real client signal
-```
-
-### Reasoning
-
-- **Weeks 1-2 are visible polish + trust-builders** — visitors and prospects see immediate upgrades, and we have privacy answers when objections come.
-- **Week 3 is the moat** — Proactive Intelligence is what makes EYO feel like an employee, not a tool. Worth the full sprint.
-- **Tickets 5, 6, 7, 9, 10 are trigger-gated** — don't build before the signal fires, you'll waste cycles tuning for hypothetical loads.
-
-### Strategic frames behind these tickets (don't lose)
-
-- **"Address by saved name"** — WhatsApp doesn't expose the recipient's phone contact book (Meta privacy boundary). vCard upload is the realistic path. Already partially solved via `services/client_memory.py::learn_from_inbound` extracting first names from greetings.
-- **"Integrate with businesses that have their own AI"** — Two product shapes: EYO-as-WhatsApp-rail (their brain, our channel) or EYO-as-conversation-broker (their AI, our inbox). Both are Ticket #5.
-- **"How do we handle privacy?"** — Today: TLS + Atlas encryption + per-client isolation + nightly self-test + NDPR DPA. Tomorrow (Ticket #9): self-hosted. 12-month: opaque mode (Ticket #10).
-- **"How does EYO interface with 10 / 1000 accounts without mistakes?"** — Already isolated by `client_id` (T0.4 outcome learning, client_memory, scorecard). The real scale risks are key throttle (#7) and queue starvation (#6) — both have triggers, not pre-builds.
-- **No "one number serves 1k clients" architecture.** Each client gets their own Unipile-paired WhatsApp number. Zero cross-talk by design. ~$50/mo per slot is the cost.
+Last updated: 2026-05-25 (full sweep — closed 30+ stale items, archived Year-2 aspirational batch, dropped duplicates)
 
 ---
 
-## P0 — "BURST HEAD" Launch Path (do this in order, total ~5 days)
+## P0 — Actionable now (top of queue)
 
-The five things that turn ReachNG from "this works" into "bro, you have to see this." Sequenced. Do them in order — each unlocks the next.
+Pull these into PLAN.md or SPRINT.md one at a time. Ordered by ship-value.
 
-- [x] ~~**1. Build public marketing site**~~ — shipped 2026-05-09 (build) + 2026-05-10 (north-star copy alignment). `templates/marketing/` (_base, landing, pricing, about, how_it_works, contact, vertical, signup, signup_success) + `api/marketing.py` (router, robots, sitemap, signup, Paystack webhook). 5 vertical landers via `services/marketing_content.py`. Schema.org, OG, Twitter cards, FAQ schema. **Domain still pending** — buy `reachng.ng` (or `.co`) and update canonical hosts.
-- [x] ~~**2. Concrete 3-tier pricing**~~ — shipped 2026-05-09. Cash Desk Starter ₦80K / Growth ₦150K (+ 2% recovered) / Scale ₦300K (+ 3% recovered) + annual = 15% off. Pricing page has feature-delta matrix and pain-anchored cost-of-leakage table.
-- [x] ~~**3. Self-serve `/signup` flow + Paystack first-month**~~ — shipped 2026-05-09. `/signup` page with plan picker + annual toggle, `POST /api/v1/signup` initialise, `POST /webhooks/paystack` HMAC-SHA512 verified, auto-creates client doc + portal token on `charge.success`. Pairing automation + welcome email template still TODO before first paid client.
-- [ ] **4. First paid client → public case study** (process, ~1 week after first paid client) — One screenshot, one pull-quote, one number ("18% → 3% no-shows in 30 days"). Lives at `/case-studies/[client]`. Becomes the social-proof anchor. Post the screenshot on Twitter/LinkedIn the day it goes live.
-- [ ] **5. Founder-public authority cadence** (process, ongoing 20 mins/day) — Yori posts 3×/week on Twitter + LinkedIn. Theme: "what the agent did this week" with screenshots. Reply-guy on threads from Iyin@Paystack, Tunde@Bumpa, Olu@Flutterwave. The Lagos AI-for-SME conversation is wide open; whoever talks loudest about it owns the category.
-
-**Total: ~5 days of build + ongoing process. Once these five are real, ReachNG is "ready to burst head".**
-
----
-
-## P0 — Next sprint (queued 2026-05-14, after landing rewrite ship)
-
-Locked sequence — build in this order. Total ~17 days.
-
-**User-locked priority (2026-05-14 EOD):** Receipt Catcher ships first per user direction. Order below is final.
-
-- [x] ~~**1. Receipt Catcher**~~ — shipped 2026-05-14. `tools/inbound_media.py` (Meta + Unipile image download), `tools/receipt_vision.py` (Claude Haiku 4.5 vision → ReceiptData), `services/receipt_match.py` (cascade matcher → rent / invoice / fees / closer / unmatched + acknowledgement drafter + HITL queue). Image branch wired into `api/webhooks.py` with `skip_autodraft` so no duplicate Closer draft.
-
-- [x] ~~**2. Client Memory Layer + Isolation Hardening**~~ — shipped 2026-05-14. `services/client_memory.py` (scope-locked store/fetch/extract + audit log + isolation self-test); auto-extraction wired in webhook inbound (`learn_from_inbound` after Closer intake); retrieval injected into `agent/brain.py::generate_b2c_message` and `services/closer/brain.py::draft_next_move`; `tests/test_isolation.py` (contract guards + synthetic cross-client probe + db self-test); nightly `_isolation_audit` job at 03:00 Lagos in `scheduler.py`, persists to `isolation_audits` collection. P0 rule: every memory op requires `(client_id, contact_phone)` — `MemoryScopeViolationError` on violation. **No UI yet** — admin/portal panel deferred (~1-2h polish add after #3).
-
-- [x] ~~**3. Client AI Configurability — KB + Rules Engine**~~ — shipped 2026-05-15. `services/knowledge_base.py` (chunk + token-overlap retrieval, scope-locked) + `client_kb_docs` / `client_kb_chunks`; `services/client_rules.py` (CRUD + keyword/intent match + prompt-compile, scope-locked) + `client_rules`; `services/scenario_library.py` (prebuilt bundles for hospitality / real_estate / education / professional_services / small_business); `api/knowledge_base.py` + `api/client_rules.py` (admin + portal routes); auto-injection of memory + KB + rules into `agent/brain.py::generate_b2c_message` and `services/closer/brain.py::draft_next_move`; rule-triggered escalation stamps `escalation_flag` on the closer lead. **Portal UI**: new `/portal/{token}/configure` page with 4 tabs (KB / Rules / Scenarios / Sandbox), surfaced via "⚙ Configure agent" link on the main portal topbar. KBScopeViolationError / RulesScopeViolationError enforce client_id on every op.
-
-- [x] ~~**4. Outcomes Engine**~~ — shipped 2026-05-15 across two commits. All 5 layers live: scorecard widget on portal, quality metrics + drift alarm, cohort stats endpoint, weekly digest scheduler (Mon 7am Lagos), milestone engine (13 milestones, branded HTML cards, auto-tweet drafter). Nightly snapshots at 03:30 / 04:00 / 04:15 / 04:30 Lagos.
-  - **Layer A: Per-client Scorecard widget** (~1.5 days) — Live, real-time numbers in client portal + Control Tower: ₦ closed via ReachNG-handled conversations (Paystack-confirmed only, not just touched), ₦ recovered from chase ladders, bookings confirmed, **median response time before vs after** (the killer chart — usually hours → seconds), reply rate before vs after, hours saved (drafts × avg manual-typing time), cost per booking, cost per ₦ recovered. One-tap branded PDF export. Files: new `services/scorecard.py`, new `api/scorecard.py` (`GET /api/v1/scorecard/{client_id}` + `GET /api/v1/scorecard/{client_id}/pdf`), widget on `templates/portal.html` and `templates/dashboard.html`. Materialised nightly via scheduler from raw events (drafts, approvals, paystack_events, chased_invoices, estate_rent_ledger, sf_students, contacts).
-  - **Layer B: Quality Metrics dashboard** (~0.5 day) — Approval rate (% drafts approved unedited — measures voice match), edit distance (avg chars changed before send — draft fidelity), skip rate (relevance), time-to-approve (owner trust), customer reply rate to drafts (conversion power). Per-client + per-vertical breakdown. **Drift alarm**: approval rate dropping >15% triggers operator alert. Surfaces on Control Tower.
-  - **Layer C: Cohort Rollups + landing-page social proof** (~0.5 day) — Anonymised platform-wide aggregates refreshed nightly. New `/api/v1/cohort-stats` endpoint. Render live tiles on landing page (replaces static "Why it works" copy with rolling numbers): *"₦XM closed via ReachNG this week / N businesses on the platform / X seconds median response / N hours of typing saved this month"*. Becomes auto-updating social proof and investor-deck content.
-  - **Layer D: Weekly Owner digest** (~1 day) — Every Monday 7am Lagos time, WhatsApp + email digest to each client owner: last-7-days numbers, top wins, slowest chase, "your agent saved you N hours this week." Auto-drafted, hits HITL when content needs tuning. Builds the share-worthy moment.
-  - **Layer E: Milestone Engine + auto-tweet drafter** (~0.5 day) — Scheduler watches per-client KPIs for milestones (first ₦1M closed, 100th booking, 30-day anniversary, first 1000 drafts approved, etc.). On hit: generate a milestone card (screenshot-ready) + draft a celebratory tweet/LinkedIn post the owner can one-tap share, tagging @reachng. Most clients won't post. The 20% who do compound your reputation faster than any paid acquisition.
-
-- [x] ~~**5. Lead Quality Scorer**~~ — already shipped. `tools/lead_scorer.py::score_lead()` returns Hot/Warm/Cold verdict + reasons + negatives from enrichment signals. Wired into `campaigns/base.py:219` (queue sort), `api/contacts.py:55` (table surface), `tools/memory.py:91` (per-contact tag). Confirmed during 2026-05-24 backlog sweep.
-
-- [x] ~~**6. Closer UI**~~ — shipped 2026-05-25. Closer tab in Control Tower (Recover → Closer) already had client list + lead inbox. Added: clickable lead rows → inline drill-down panel with full thread (in/out/note, color-coded), pending HITL draft preview, Approve / Edit-and-send / Skip / Generate-next-draft buttons, stage selector dropdown (new/qualifying/ready/booked/lost/stalled), add-internal-note input. New endpoint `GET /api/v1/closer/leads/by-id/{lead_id}/pending-draft` looks up the latest pending approval by `contact_id=lead_id, source=closer` (no schema change needed).
-
-- [x] ~~**7. Nurture Sequences trigger**~~ — shipped 2026-05-24. `services/closer/revival.py::run_revival_sweep()` scans `closer_leads` for stalled leads (per-stage quiet thresholds: new=2d, qualifying=3d, ready=4d). For each quiet lead it calls the existing `draft_next_move()` which already pulls thread context, memory, KB, and rules — so the revival draft naturally references the last conversation. Guard rails: skip if outbound exists in last 2d, per-lead floor of 5d between revivals, respects `eyo_paused_until`. APScheduler runs every 4h at :17 past Lagos time. New compound index `(stage, updated_at)`.
-
-- [ ] **7b. Landing page nurture drip** (~1 day, depends on Fix #1 Resend live) — Capture interest beyond just waitlist signup. (1) JS event-bind: capture clicks on hero CTA, pricing rows, vertical demo previews, "WhatsApp us" buttons → POST `/api/v1/marketing/interaction` with `{event, anon_id (cookie), email?, ts}`. (2) Cookie-bridge: on waitlist submit, link the anon_id to the email; back-fill any prior interactions to that email. (3) Drip scheduler: 3-email warm sequence (Day 0 confirm — done in Fix #1, Day 2 vertical-specific demo deep-dive, Day 5 case study + soft CTA to demo call). Uses Resend. Lives in `services/nurture/landing_drip.py` + new `marketing_interactions` collection. Owner can pause from Control Tower. **Blocked until Resend send is verified working.**
-
-- [x] ~~**8. Pricing Settings panel**~~ — already shipped. `services/platform_settings.py` + `api/platform_settings.py` (`GET/POST /api/v1/admin/pricing`) + inline editor in Control Tower with audit tail. `api/marketing.py::_live_pricing()` reads from Mongo with hardcoded fallback. Confirmed during 2026-05-24 backlog sweep.
-- [ ] **7b. Landing nurture drip** (~1 day) — **NOW UNBLOCKED** (Resend confirmed working 2026-05-17). 3-email warm sequence after waitlist signup (Day 0 confirm done · Day 2 vertical-specific deep-dive · Day 5 case study + soft CTA). Lives in `services/nurture/landing_drip.py`. Defer until first 5 pilot applications arrive (so the Day-2 email can reference real signal).
+- [ ] **Sentry + BetterStack + Slack webhook tail** *(½ day, blocked on SENTRY_DSN env var)* — Error tracking, uptime per integration (Unipile / Paystack / Anthropic), webhook-failure tail. Sprint 3 item; ships the moment Yori sets the DSN.
+- [ ] **T0.5 Proactive Intelligence — 5 starter behaviours** *(~4 days)* — The "agent acts without being asked" moat. Stale-lead revival (already shipped via `services/closer/revival.py` — fold in), festival timing (Detty December / Sallah / Owambe), birthday nudges (reads `client_memory` date facts), capacity nudges, booking reminders. Each behaviour is a scheduler job that drafts to HITL. New `services/proactive/` package.
+- [ ] **T0.2.6 Custom-named Engine** *(~2 hours)* — Owners rename their agent. Default `EYO`; clients override in portal Settings. Schema: `clients.agent_name` (1-20 chars). Prompt injection in `agent/brain.py` + `services/closer/brain.py`. Surfaces: HITL queue header, Owner Brief, weekly digest, milestone messages.
+- [ ] **HITL bulk-approve + draft regeneration** *(1 day, P0.5)* — "Approve all 5 from this client" button + per-draft "regenerate shorter" / "regenerate warmer" actions. Reduces operator load ~70% as queue grows.
+- [ ] **HITL draft confidence score** *(~half day, P1 quick win)* — 1-line Haiku call per draft → `confidence: high/medium/low` + risk tag. Operator approves 30 drafts in 90s instead of 6 mins. ~₦0.20/draft.
+- [ ] **T0.4 close-out — Admin per-client wins/misses dashboard** *(~half day)* — JSON endpoint already shipped (`/api/v1/agent-learning/{client_id}`); needs an admin UI tab to render wins/misses with the active `prompt_addendum` per client.
 
 ---
 
-## P1 — Pre-pilot operational gaps (raised 2026-05-17 after demand-engine ship)
+## P0 — Process items (not buildable — execute live)
 
-Things that aren't features but block actual paid clients. These matter when the first 5 pilots want to go live.
-
-- [x] ~~**WhatsApp pairing flow**~~ — already shipped. `services/whatsapp_pairing.py` wraps Unipile hosted-auth (POST /api/v1/hosted/accounts/link), `api/whatsapp_connect.py` exposes portal start/status + admin start + account webhook + connected/failed landings, `templates/portal/connect_whatsapp.html` walks the founder through. Portal main page banners (disconnect, expiry) link to it. Confirmed during 2026-05-25 backlog sweep.
-
-- [ ] **Resend inbound webhook (replaces IMAP polling)** (~2 hrs, unlock when reply volume crosses ~50/day) — Currently inbound replies to hello@reachng.ng land via 60s IMAP polling against Go54 (imap.go54mail.com). Fine for low volumes; at scale this adds latency and contention on the Go54 mailbox. Resend has an "Inbound Parse" feature (paid plan) that webhooks each reply to a URL we own, sub-second. Requires: (a) MX record swap so reachng.ng or a subdomain (e.g. inbound.reachng.ng) routes through Resend; (b) new `POST /webhooks/resend/inbound` endpoint that translates Resend's payload into the same shape `reply_router._route_reply` already consumes from IMAP. Migration plan is non-breaking: run both in parallel for a week, then deprecate IMAP polling once webhook proves reliable. Don't build until needed — IMAP works fine at first-pilot volumes.
-
-- [ ] **SPIKE: deliver Owner Brief via the client's own "Message Yourself" chat** (~30 min experiment) — Raised 2026-05-18. WhatsApp's 2022+ "Me" chat is a thread every user has with their own number for personal notes. Idea: instead of sending the morning brief from ReachNG's dedicated WA number (current plan, second contact in their phone), inject it into the client's own "Me" chat via the paired Unipile session. Pros: zero second-contact friction, brief appears in the surface they already open daily. Risks: (a) WhatsApp may filter or no-op self-sends from third-party APIs; (b) message would appear as sent BY the user themselves, possibly confusing; (c) anti-spam flags could disconnect EYO. Spike scope: paired test account, send one message to self via Unipile, observe delivery + UI rendering + account health over 24h. Decide path after data. Until then, current "ReachNG dedicated WA business line" plan stands.
+- [ ] **First paid client → public case study** *(~1 week post-pilot)* — One screenshot, one pull-quote, one number. Lives at `/case-studies/[client]`. Becomes the social-proof anchor.
+- [ ] **Founder authority cadence** *(ongoing, 20 min/day)* — Yori posts 3×/week on Twitter + LinkedIn. Theme: "what the agent did this week" with screenshots. Reply-guy on Iyin@Paystack, Tunde@Bumpa, Olu@Flutterwave threads.
+- [ ] **Live test with 5 Lagos prospects** — Send one-line WhatsApp asking "what is this and who is it for?" to 2 luxury RE + 2 legal + 1 hospo. Track 5-second-test pass rate + waitlist conversion.
 
 ---
 
-## P0 Principle — Receipt acknowledgments are conditional, not confirmatory (raised 2026-05-18)
+## P1 — Pre-pilot operational gaps
 
-**The rule:** A bank-transfer screenshot is a *workflow trigger*, NOT proof of money received. Nigerian transfers can fail silently (network issues, reversals, pending status, faked screenshots). If ReachNG pre-confirms receipt on a screenshot alone and the money never lands, the business has acknowledged payment for service they never received. Costly, embarrassing, fraud-vector.
+Things that aren't features but matter when first 5 pilots want to go live.
 
-**The principle (now enforced in code as of `services/receipt_match.py::draft_acknowledgement`):**
-- EYO reads + extracts + matches the screenshot
-- EYO drafts a **conditional** acknowledgment: *"I'll confirm receipt once it reflects on our end"*
-- EYO **does NOT** draft confirmatory language like *"₦X confirmed"* in the default template
-- HITL is the verification gate. Owner verifies funds in their bank app, edits draft upward to "confirmed" if appropriate, taps approve
-- Match-row in dashboard says *"Likely match"* + *"awaiting your bank confirmation"*, never bare *"Matched"*
-- Timeline events read *"received"* / *"drafted"* / *"awaiting"*, never *"confirmed"* / *"auto-acknowledged"*
-
-**Surfaces this principle is enforced on:** receipt_match.py draft templates · landing page Scene 2 (Receipt Catcher) · guided demo Scene 3 · Control Room Money Matched panel · all three CONTROL_ROOM_OVERLAYS money_panel.draft fields · timeline entries.
-
-**Owner override:** owners can edit any conditional draft upward to "confirmed" once they verify funds. The default is conservative; the override is conscious.
-- [ ] **Onboarding wizard** (~2-3 days) — DEFERRED until 5 pilots inform what to ask. Codex-spec'd: Business Basics → Voice & Tone → Offer & Pricing → Lead Qualification → Approval Rules → Test EYO → Go-Live Checklist. Lives at `/portal/{token}/onboard`. Build this AFTER manual onboarding the first 5.
-- [ ] **Pass-2 guided demo: per-vertical** (~3 hrs) — Today's guided tour at `/portal/demo` is hospitality-only. Build vertical variants for `/portal/demo/real_estate` and `/portal/demo/professional_services` (Victoria Island PoF storyline + Greenview Fri-6pm storyline). Education + clinics + small_business deferred until demand signal.
-- [ ] **Education + small_business Control Room overlays** (~2 hrs) — Currently fall back to hospitality overlay. Add overlay entries OR keep hidden from public pills (already done in `744776e`). Build when first signup applies in either vertical.
-- [ ] **Fix #2: Paystack welcome email** (~30 min) — DEFERRED per Codex's "de-emphasize self-serve" call. Wire when self-serve checkout is re-prioritized.
-- [ ] **Fix #3: Inbound email → HITL** (~3-4 hrs) — DEFERRED. Email replies route to dashboard same as WhatsApp inbound. Build when email channel is active for clients.
+- [ ] **Auto-enforce WhatsApp warmup ramp at code level** *(½ day)* — Auto-set `client.daily_send_limit` on creation: 10 week 1, 25 week 2, 50+ thereafter. Stops a fresh number from getting banned.
+- [ ] **Onboarding wizard** *(~2-3 days, deferred until 5 pilots inform what to ask)* — Codex-spec'd: Business Basics → Voice & Tone → Offer & Pricing → Lead Qualification → Approval Rules → Test EYO → Go-Live Checklist. Lives at `/portal/{token}/onboard`.
+- [ ] **Pass-2 guided demo: per-vertical** *(~3 hrs, build when demand signal arrives)* — `/portal/demo/real_estate` (Victoria Island PoF storyline) + `/portal/demo/professional_services` (Greenview Fri-6pm storyline). Education + clinics + small_business deferred until signups arrive.
+- [ ] **Portal token rotation** *(½ day)* — `client.portal_token_rotated_at` + "regenerate token" button. Use case: client leaves a partner who had the URL.
+- [ ] **Audit log for client_doc edits** *(½ day)* — Every `clients` collection update writes to `client_audit_log` with who/what/when.
+- [ ] **Empty-state copy on every dashboard tab** *(½ day)* — Helpful next-step copy when a client has 0 leads / 0 invoices / etc.
 
 ---
 
-## Process items (not buildable — execute live)
+## P1 — Cost & cadence levers
 
-- [ ] **Live test with 5 Lagos prospects** — THE NEXT MOVE per Codex. Pick 2 luxury RE + 2 legal + 1 hospo. Send one-line WhatsApp asking "what is this and who is it for?" Track 5-second-test pass rate, calculator engagement, waitlist conversion, triage verdicts.
-- [ ] **First paid client → public case study** (~1 week post-pilot) — Lives at `/case-studies/[client]`. Anchor: one screenshot, one pull-quote, one number.
-- [ ] **Founder authority cadence** (ongoing, 20 min/day) — Yori posts 3×/week on Twitter + LinkedIn. Theme: "what the agent did this week" with screenshots.
-
-## ✅ Railway deploy — green (2026-05-16)
-
-The defensive `_safe()` wrap in the lifespan fixed it. All 33 ensure_*_indexes calls log `startup_ok` on boot. Application startup complete. `GET /health → 200 OK`. www.reachng.ng is live with all latest work (HBR + WhatsApp Nigeria research anchors, trimmed 8-section landing, premium positioning, lean_scraper internal engine).
+- [ ] **Landing page nurture drip** *(~1 day, defer until 5 pilot applications arrive)* — 3-email warm sequence after waitlist signup (Day 0 confirm done · Day 2 vertical-specific deep-dive · Day 5 case study + soft CTA). `services/nurture/landing_drip.py`. Resend confirmed working.
+- [ ] **Anthropic + Mongo + Railway budget alerts** *(½ day)* — Monthly spend monitoring in `tools/system_sweep.py`. Flag in 7am brief if Anthropic > $20/mo, Mongo connections > 400, Railway memory > 400MB sustained.
+- [ ] **Referral mechanic** *(1 day)* — ₦25k credit per referred sign-up. Schema: `referral_code` per client + Paystack discount logic.
+- [ ] **TaxNudge** *(~3 days, HIGH commercial pull)* — PDF bank statement → Haiku categorisation → VAT/CIT estimate per 2024 Nigerian Tax Reform Acts. `pdfplumber` already in stack.
+- [ ] **PayNudge** *(1 day)* — Google Sheets source + Paystack pay-link on existing `services/debt_collector/`.
 
 ---
 
-## ✅ Pre-launch demand engine — shipped 2026-05-17 (massive day)
+## P1 — Trigger-gated infra (do NOT build before signal fires)
 
-Single session pushed the prelaunch funnel from "impressive landing" to a proper demand engine. ~20 commits.
-
-**Email infra**
-- [x] Resend integrated as transactional provider (Go54 SMTP egress was blocked from Railway). `tools/outreach.py::send_email` accepts `html=` + `force_smtp=True`. Domain `reachng.ng` verified in Resend with DKIM + SPF + bounce-MX. Fix #1 (waitlist confirmation email) live.
-- [x] Waitlist phone-index bug fixed (sparse → partial filter; explicit-null collisions on email-only signups).
-- [x] Re-fire confirmation on duplicate waitlist submit (no more silent no-ops).
-
-**Waitlist → Pilot Application funnel**
-- [x] "Apply for the pilot" form with 5 qualifying fields: `enquiry_volume`, `avg_deal_value`, `top_pains` (multi), `trust_ai_draft`, `sample_customer_message`. Soft outside ("Join early access"), sharp inside.
-- [x] Auto-triage classifier: `priority_pilot` / `pilot_candidate` / `qualified` / `curious`. Computed at insert.
-- [x] Admin dashboard "Early Access" tab embedded in `templates/dashboard.html` — sorted-by-triage rows with badges, sample-message blockquote, invite / delete / wipe-all actions.
-- [x] Branded HTML confirmation email (cream + sienna) replaces the plain-text version.
-
-**Landing v2 (visual mocks + positioning)**
-- [x] Hero rewrite: "EYO carries the WhatsApp conversation until you need to step in." Premium ICP named upfront.
-- [x] Single conversion motion across page: "Join early access" everywhere. `/pricing` dropped from nav + footer.
-- [x] First-7-Days timeline section replaces the "Meet EYO" reveal. Truthful tone-learning mechanic copy.
-- [x] Three new mocks: tone before/after, receipt catcher (with wrong-amount edge case), 7am owner brief phone mock.
-- [x] **Leakage calculator** with two sliders + animated ₦ total + Resend email capture. `/api/v1/calculator/leakage` endpoint. 30% labeled as "estimate, not a measurement."
-
-**Cinematic guided demo at /portal/demo**
-- [x] Phone-first 90-sec guided story, 6 scenes (Cold-open → Voice note → EYO drafts → Receipt → Owner brief → Control Room → CTA).
-- [x] Sticky progress rail, sample-data badges per scene, cream/sienna palette matching landing.
-- [x] Compressed timeline: one night arc (Sat 11:47pm → Sun 7:02am).
-- [x] Scroll-driven animations: waveform, transcript reveal, tag cascade, typing dots, extracted-fields stagger, match-row flash.
-
-**EYO Control Room** (replaces old dark dashboard at `/portal/demo/dashboard`)
-- [x] Cream/sienna prospect-facing surface, separate from operator-view dashboard.
-- [x] 4 metric tiles with count-up: Conversations held / Drafts ready / Owner needed / Money matched.
-- [x] 3-col main: Drafts (WhatsApp-style cards) | Story timeline | Money EYO matched (full receipt-extraction visualisation).
-- [x] Full-width Leak Radar row with idle-lead cards + Before/After EYO comparison.
-- [x] 5-col kanban with manifesto-compliant labels (New · Reply ready · Awaiting tap · Money matched · Follow-up).
-- [x] Interactive Approve / Skip / Edit (demo-only): tap Approve → card flips to "Sent from your WhatsApp · just now."
-- [x] Motion: pulse-ring on first pending draft, typing dots, match-flash, scroll-activated timeline dots.
-
-**Tier 2: Per-vertical Control Rooms**
-- [x] `CONTROL_ROOM_OVERLAYS` per vertical in `services/demo_datasets.py`. Hospitality + Real estate (Crown Realty, Victoria Island, ₦12M PoF + Zenith ₦12M viewing deposit, diaspora buyer storyline) + Legal (Greenview Partners, Fri 6pm → Mon 7am arc, ₦300k UBA consult fee, conflict check, partner sign-off).
-- [x] `/portal/demo/{vertical}` redirects to `/portal/demo` if no real dataset (no more silent hospitality fallback under another vertical's name).
-
-**Positioning shift**
-- [x] "EYO closes deals" → "EYO carries the conversation until you need to step in." Applies to landing hero, page title, section labels, guided demo cold-open + Scene 4, Control Room footer CTA, waitlist email, waitlist success copy, landing final CTA.
-
-**Net-new items raised today (queued)**
-- See P1 "Pre-pilot operational gaps" below — WhatsApp pairing flow, Onboarding wizard, Pass-2 guided tour per vertical, etc.
+| Item | Trigger | Effort |
+|---|---|---|
+| Redis caching (Upstash) — vertical prompts, memory reads, account status | Haiku spend > ₦50k/mo OR 10+ paid clients | ~1 day |
+| Background queue (RQ + Redis) — move OCR/voice off APScheduler | 25+ active clients OR rate-limit hits | ~3 days |
+| Mongo M0 → M10 migration | 10–12 paid clients | ~half day |
+| Materialised dashboard snapshots — nightly aggregates | 25+ active clients | ~1 day |
+| HITL audit trail surfaced in portal | First legal/clinic client signs | ~1 day |
+| API-key rotation pool (Anthropic + Whisper + Vision) | ~250 active clients OR first 429 burst | ~2 days |
+| Graduated Autopilot trust | Any client crosses 200+ drafts/wk | ~3 days |
+| Resend inbound webhook (replaces IMAP polling) | Reply volume > 50/day | ~2 hrs |
+| Self-host Whisper | Voice transcription cost > ₦20k/mo | ~1 day |
 
 ---
 
-## P0 — LeanScrape product family (queued 2026-05-17)
+## P1 — Year-1 product surfaces (build after first paid client validates the core)
 
-**Three-product ladder. ReachNG is the internal customer of every layer at cost.**
+Each gated by demand signal, not calendar.
 
-- [x] ~~**1. leanscrape OSS library**~~ — shipped 2026-05-17 at `c:/VIIBE/leanscrape/`. MIT-licensed Python package. 3-tier fetcher (httpx → curl_cffi → Playwright), multi-LLM (Claude/GPT-4o-mini/Gemini), SqliteCache, ProxyPool, schema-driven extraction. 1,394 lines. Not yet pushed to GitHub — user does the `git init` + `gh repo create`. PyPI publish blocked until first paid client (focus on ReachNG revenue first).
-
-- [ ] **2. leanscrape Cloud (hosted SaaS, private repo)** (~1 week) — When OSS hits ~100 GitHub stars OR people start opening issues asking for hosted version. FastAPI service at `api.leanscrape.com`. API key auth, Paystack/Stripe metered billing, managed Playwright cluster + residential proxy pool + shared cache. Tiers: Starter $29/mo (1K scrapes), Pro $99/mo (10K scrapes). ReachNG uses internally at API-cost only (no markup).
-
-- [ ] **3. Enrich premium add-on** (~3-4 days after Cloud ships) — Multi-source aggregation API. Input: domain or business name. Output: structured profile (decision-maker names, direct emails, phone numbers, social handles, tech stack, employee band, news mentions). Chained pipeline = website scrape + DDG search + LinkedIn-style lookup + email-pattern guessing + SMTP probe + tech-stack fingerprinting. Pricing: $0.05/enrich pay-as-you-go OR $499/mo for 15K. ReachNG uses internally for `tools/apify_enrich.py` replacement (kill remaining Apify spend).
-
-**Strategic sequence: OSS drives adoption → traction signals when to build Cloud → Cloud customers signal which Enrich fields to ship first.** Don't build Cloud or Enrich before OSS has 100+ stars / 500+ PyPI installs — that's the YC playbook (Stripe / Supabase / Vercel all did this).
-
-**ReachNG benefits regardless of external adoption**: lean_scraper engine already lives at `services/lean_scraper.py` and saves ~₦40K/month in Apify spend per active campaign.
+- [ ] **`/api/v1/draft-and-queue` — Infrastructure API tier** *(2 days)* — Sell WhatsApp rail to businesses with their own AI (Lagos fintechs running Gemini etc). New flat-volume pricing tier. **Trigger:** 3+ paying retainer clients.
+- [ ] **EYO Across (Instagram DM + Email channels)** *(~3 weeks)* — Same brain, IG DM via Unipile, Gmail via Google API. +₦40k/mo per channel. Doubles ARPU on Growth.
+- [ ] **EYO Voice Operator** *(~3-5 days alpha, Premium add-on)* — ElevenLabs voice clone + LiveKit pipeline + 5-second HITL veto window before bookings confirm. **Trigger:** 3+ Premium clients live.
+- [ ] **Diaspora outbound landing** *(~1 week)* — UK/US/Canada Nigerians use EYO for Lagos comms. £50/mo Stripe Checkout. USD-paying customer mix.
+- [ ] **Outreach dashboard redesign** *(~2 days, sequence carefully)* — Already partially done via Recover/Activate/Clients/System tabs. Close-out includes Control Tower per-client KPI strip + `/admin/prospect-os` surfacing. Do AFTER Owner Brief upgrade + Lead Resurrection are battle-tested.
 
 ---
 
-## P0 — Tier-0 Engine sprint (queued 2026-05-15 — push ReachNG to world-class SDR)
+## P1 — Tech/AI engine batch (do these after first paid client lives 30 days)
 
-Total ~12 days. Goal: move from "great Lagos SDR" → "addictive, impossible-to-leave." Each item compounds on the foundations already shipped (HITL, vertical playbooks, Memory, KB+Rules, Outcomes Engine).
+Survivors of the Emergent 22-idea triage. See `memory/project_reachng_emergent_tech_review.md` for the 8 dumped + 4 already-covered.
 
-- [x] ~~**T0.1 Voice-note inbound (Whisper)**~~ — shipped 2026-05-15. `tools/voice_whisper.py` + audio extractors in `tools/inbound_media.py` + audio branch in `api/webhooks.py`. Transcript flows into the existing drafter as if it were text. Operators see "🎤 Voice note transcript (Ns):" framing in HITL queue. STUB BELOW — Unipile + Meta webhooks deliver audio attachments → download via `tools/inbound_media.py` (already built) → POST to OpenAI Whisper API → transcript flows into existing draft pipeline as if it were text. Drafts cite "voice note transcript:" in the queue UI so the operator knows the source. Falls back gracefully if Whisper unavailable. Files: extend `tools/inbound_media.py` with `transcribe_audio()`, new `tools/voice_whisper.py`, webhook image-branch sibling for audio in `api/webhooks.py`. **Add OPENAI_API_KEY to Railway env + `config.py` settings field.**
-
-- [x] ~~**T0.2 Emotional intelligence — tone-aware drafting**~~ — shipped 2026-05-15. `services/inbound_classifier.py` + injected into `agent/brain.py::handle_payment_reply` + `services/closer/brain.py::draft_next_move`. Classification persists on approval doc, escalation flag auto-set on angry/complaint/on_fire. Dashboard HITL queue renders emotion badge per draft. STUB BELOW —
-  - sentiment ∈ {happy, neutral, frustrated, angry}
-  - stage ∈ {first_touch, qualifying, negotiating, closing, post_sale, complaint}
-  - urgency ∈ {idle, interested, hot, on_fire}
-
-  Classifier is a single Haiku call (~200ms, ~₦2/call). Output injected into prompt as a `TONE GUIDANCE` block. Angry → auto-escalate, draft includes apology framing. Hot → brisk + confident, propose deposit. Drafts surface badges in HITL queue so owner sees the read at a glance. Files: new `services/inbound_classifier.py`, wire into `agent/brain.py` and `services/closer/brain.py` before draft generation.
-
-- [ ] **T0.2.5 Usage Quota & Tiered Billing System** (~3 days) — Critical economics safeguard raised 2026-05-15.
-  - **Layer 1 — per-plan monthly soft caps**: `clients.usage_limits` doc per feature (drafts, voice, receipts, classifier, memory_extract, sends). Plan defaults: Starter (1500 drafts / 200 voice / 200 receipts) → Growth (5000 / 800 / 1000) → Scale (unlimited / 3000 / unlimited). Overridable per client.
-  - **Layer 2 — real-time rate limits (anti-runaway)**: ungated hard ceilings. Max 20 voice/10min, 50 vision/hr, 100 drafts/hr per client. Trip = log + alert + 30-min auto-pause.
-  - **Layer 3 — owner-opt-in overage billing**: at-cap clients can toggle pay-as-you-go in portal (₦12/voice, ₦15/receipt, ₦6/draft) with a monthly ceiling cap. Overage billed via Paystack at month-end.
-  - **Graceful degradation when over cap + no overage**: voice → "voice note received, please listen"; receipt → "screenshot received, match manually"; drafts → owner can send manually, no AI.
-  - **80% warning WhatsApp**: owner gets a heads-up when any feature hits 80% of monthly cap, with one-tap upgrade and one-tap enable-overage.
-  - **Collections**: `usage_events` (per-call, indexed by client_id+feature+ts), `usage_quotas` (current-month totals, hourly materialised), `usage_overage_consent`.
-  - **Service**: `services/usage_meter.py` with `@meter(feature)` decorator. Pre-call: check quota + rate. Post-call: record event with actual cost. Single decorator wraps every cost-incurring call.
-  - **Wire-up**: Whisper, Receipt vision, Inbound Classifier, Drafter, Memory extractor.
-  - **Owner-facing UI**: usage bar chart per feature in portal, "enable overage" toggle with ceiling input, real-time ₦ spent this month.
-  - **Admin Billing Dashboard** (added 2026-05-15): new dashboard tab `Billing` with per-client rows: client name · plan · ₦ revenue · ₦ API cost MTD · margin % · top feature by spend · "you're at risk" flag if margin<70%. Sort by margin asc. Drill-in shows per-feature breakdown + last 7 days trend. This is the operator's single-pane view to prevent any runaway client surprising us at month-end.
-  - **ToS draft**: published rates per overage feature (₦12 voice / ₦15 receipt / ₦6 draft), monthly ceiling mechanism, soft-cap → graceful-degrade → overage path explained in plain English. Linked from signup flow + portal.
-  - **Files**: new `services/usage_meter.py`, new `api/usage.py`, hooks in `tools/voice_whisper.py` + `tools/receipt_vision.py` + `services/inbound_classifier.py` + `agent/brain.py` + `services/client_memory.py`, portal usage tab, dashboard `Billing` tab, ToS markdown at `templates/marketing/terms.html`.
-
-- [ ] **T0.2.7 Feature Menu / A La Carte Pricing** (~4-5 days) — Raised 2026-05-15. Move from fixed Starter/Growth/Scale tiers to a modular menu: customers compose their own plan from feature modules. Less decision fatigue → higher conversion + clearer perceived value.
-  - **Pricing model** (proposed; tune via T0.2.5 cost data once live):
-    - **Core Agent + HITL** (mandatory): ₦40K/mo — drafting, your-number sending, approval queue, vertical playbook, memory layer
-    - **Voice Notes**: +₦20K/mo (includes 200 transcriptions, then overage)
-    - **Receipt Catcher**: +₦15K/mo (includes 200 receipts, then overage)
-    - **Closer Pipeline + Nurture**: +₦25K/mo
-    - **KB + Rules Engine**: +₦20K/mo
-    - **Cash Recovery suite** (rent/invoice/fees chase): +₦30K/mo
-    - **Emotional Intelligence + Predictive Co-pilot**: +₦20K/mo
-    - **Outcomes Engine + Branded PDF**: included
-    - **Owner Brief + Weekly Digest**: included
-    - **Multi-location coordination**: +₦40K/mo
-    Worked example: Lagos restaurant ticks Core + Voice + Receipt + Closer = ₦100K/mo. Real-estate agency ticks Core + Receipt + Closer + KB + Cash Recovery = ₦130K/mo.
-  - **Pricing page rewrite**: configurator at `/pricing` — checkbox each module, live total in naira, save quote, signup with chosen modules.
-  - **Per-client feature flags**: `clients.enabled_features` array. Each cost-incurring call checks the flag before running (drafter, whisper, receipt, classifier, copilot). Feature off → graceful fallback ("voice transcription not enabled — voice note received").
-  - **Module purchase / upgrade UI**: in portal, owner sees the menu, can enable a module mid-cycle (pro-rated billing via Paystack).
-  - **Tiered "starter bundles"** kept as preset shortcuts ("Starter Bundle: Core + Voice + Closer = ₦85K — save ₦20K") so we don't lose the simplicity of presets entirely.
-  - **Trade-off note**: full a la carte adds decision fatigue; bundle presets soften that. Final pricing schedule needs cost data from T0.2.5 (run 30 days first, tune from real usage).
-  - **Files**: `api/marketing.py` PLAN_PRICING → module catalog, `templates/marketing/pricing.html` configurator, `api/clients.py` enabled_features on signup, gating decorator in `services/usage_meter.py`, portal module-purchase UI.
-
-- [ ] **T0.2.6 Custom-named Engine ("you bought an employee — name them")** (~2 hours) — Raised 2026-05-15. If we're selling an agentic employee, owners should be able to name them. Like Artisan's "Ava," like Lindy. Make ReachNG personal. **Default agent name: `EYO`** (Yoruba — the Eyo Festival of Lagos. Uniquely Lagos, 3 letters, distinctive, easy to say globally.) Clients can rename in their portal.
-  - **Schema**: `clients.agent_name` field, default `"EYO"`. Validated: 1-20 chars, alphanumeric + space.
-  - **Prompt injection**: every drafter call adds `Your name is {agent_name}. When introducing yourself or signing off, use this name.` to the system prompt. Inject in `agent/brain.py` + `services/closer/brain.py` after the brief block.
-  - **Surfaces**: HITL queue header (*"{agent_name} drafted this for {customer}"*), Owner Brief WhatsApp ("Morning, here's what {agent_name} did overnight"), Weekly Digest, Milestone messages, portal nav badge, scorecard PDF.
-  - **Portal Settings UI**: one input field, save → persists, takes effect on next draft.
-  - **Brand-safe defaults**: until owner sets a name, signs off generically ("the team at {business_name}"). Never says "ReachNG" in customer-facing messages.
-  - **Files**: `clients` schema, `agent/brain.py` + `services/closer/brain.py` (prompt prefix), portal Settings tab, `services/weekly_digest.py` + `services/milestone_engine.py` (use agent_name in copy).
-
-- [ ] **T0.3 Predictive co-pilot — chat with your agent** (~2 days) — Conversational owner→agent interface. Owner types into a chatbox in the dashboard:
-  - "Who hasn't replied to me in 5 days?" → ranked list
-  - "Show me leads I should call today" → 3 names + reasons
-  - "Summarise this week" → plain English
-  - "Draft a follow-up to that Victoria Island buyer from last month" → ready draft
-
-  Built on top of memory + scorecard + Mongo aggregations. Claude Haiku as the planner; the actual lookups are deterministic Mongo queries the agent assembles. Files: new `services/copilot.py` (intent → query plan → execute → narrate), new `api/copilot.py` with `POST /api/v1/copilot/ask`, dashboard sidebar widget.
-
-- [ ] **T0.4 Outcome-learning loop** (~3 days) — The moat that compounds. Every approved draft tagged with unique outcome_id. When a positive customer reply lands (book / pay / yes), tag conversation as `win`. When silence > 7 days or explicit `no`, tag `miss`. Weekly job: per client, Claude reviews wins vs misses and emits a `prompt_addendum` — auto-merged into that client's BusinessBrief override. Effect: the agent writes better drafts every week per client without anyone tuning manually. Files: new `services/outcome_learning.py`, `outcomes` collection (one per draft), `prompt_addendum` field on `clients` doc, weekly cron Sunday 23:00 Lagos.
-
-- [ ] **T0.5 Proactive intelligence engine** (~4 days, 5 starter behaviours) — The agent acts without being asked:
-  1. **Stale-lead revival** — leads quiet 14+ days, top 5 surfaced daily with draft each
-  2. **Festival timing** — Detty December, Sallah, Easter, Owambe season → vertical-specific campaign drafts a week before
-  3. **Birthday / anniversary nudges** — agent reads memory for date facts, queues warm check-in on the day
-  4. **Capacity nudges** — restaurant <40% on a Tuesday → flash promo draft to warmest leads
-  5. **Booking reminders** — 24h before a booked appointment, agent drafts a "still on?" reminder
-
-  Each behaviour is a scheduler job that produces draft suggestions for HITL — owner approves or skips. Files: new `services/proactive/` package (`stale.py`, `festivals.py`, `birthdays.py`, `capacity.py`, `reminders.py`), new `api/proactive.py` for dashboard surfacing.
+- [ ] **A1. Agentic Actions framework** *(~2 weeks)* — Extend HITL queue to support stateful actions, not just outbound drafts. V1: send Paystack payment link sized to booking · hold a slot for 10 min · schedule follow-up · approve refund flow. **The moat that locks switching cost.**
+- [ ] **A6. Open Banking integration (Mono / Okra)** *(~3 weeks)* — **THE BIGGEST SINGLE MOAT IN THE PLAYBOOK.** Listen for inbound transfers in real-time → owner gets "💰 ₦450k confirmed from Bola O." *before* the customer sends the screenshot. Receipt Catcher becomes the fallback path. **Trigger:** Mono/Okra account approved + first paid client lives 30 days.
+- [ ] **A2. Voice-clone owner brief** *(~4 days, Premium-only)* — 90-second audio brief in the owner's cloned voice (ElevenLabs Multilingual v2). ~₦100/day/client cost, pass-through to Empire tier.
+- [ ] **A5. NDPR / regulatory compliance dashboard** *(~4 weeks)* — Auto PII redaction in logs · "right to be forgotten" export · NDPR breach detection · per-approval audit trail in portal. Unlocks legal/clinic/fintech verticals.
+- [ ] **A4. Synthetic customer testing suite** *(~3 weeks)* — Weekly synthetic Lagos personas DM every active EYO; probe for tone drift, price accuracy, fake-receipt recognition, language safe-switch breaks. First production CI/CD for an AI sales agent in Africa.
+- [ ] **A3. Multi-agent reply orchestration** *(~3 weeks, Empire-only)* — Drafter writes → Critic scores → Fraud-checker scans receipts → Vertical-expert verifies playbook. ~3.5× current draft cost. Justifies the ₦250k Empire tier.
+- [ ] **A8. Visual generation per vertical** *(~3 weeks per vertical)* — RE floor plans, hospitality menu cards, clinic before/after, legal case summaries. Gemini Nano Banana ~₦40/image. **Trigger:** vertical has 3+ paying clients.
+- [ ] **A9. Fraud detection model (Lagos-specific receipts)** *(~6 weeks)* — Train on accumulated receipt dataset to detect Photoshopped GTB/Opay/Kuda screenshots. Productize as standalone API for Lagos fintechs (₦2/check). **Trigger:** monthly receipt volume > 5,000.
+- [ ] **A7. EYO Mesh — federated cross-client insights** *(~4 weeks)* — Privacy-safe aggregates: "Restaurants like yours see 38% more bookings when X". Differential privacy + k-anonymity. **Trigger:** ≥20 paying clients.
 
 ---
 
-- [ ] **9. Marketing site visual overhaul** (~half day, ~4-5 hrs) — Current orange/black palette is wrong for the audience. Re-skin all marketing pages (`templates/marketing/*`). **References**: 11x.ai (dark glass + glow + premium AI energy), Artisan.co (warm editorial cream + serif headlines + sophistication), Landbase.com (clean grid + Linear-esque minimal). **Direction to synthesise**: premium AI-era feel — likely a hybrid of Artisan's editorial typography (large serif headline + clean sans body) with 11x's depth and glow accents in section breaks. Apply across landing, pricing, about, contact, vertical landers, signup, signup_success. Token-driven CSS so dashboard + portal can adopt incrementally.
+## P1 — Pricing structure decision (postponed, gather data first)
+
+- [ ] **T0.2.5 Usage Quota & Tiered Billing System** *(~3 days)* — Per-plan monthly caps, real-time anti-runaway rate limits, owner-opt-in overage billing, 80% warning WhatsApp, admin Billing dashboard with per-client margin %. Required before any meaningful scaling. Defer until 5 pilots produce real cost data.
+- [ ] **T0.2.7 Feature Menu / A La Carte Pricing** *(~4-5 days)* — Modular menu instead of fixed tiers. Configurator at `/pricing`. Per-client `enabled_features` flags gating each cost-incurring call. Final pricing schedule needs T0.2.5 cost data first.
+- [ ] **T0.3 Predictive co-pilot — chat with your agent** *(~2 days)* — Owner types into a chatbox: "Who hasn't replied in 5 days?" / "Summarise this week" / "Draft a follow-up to that Victoria Island buyer". Haiku planner → deterministic Mongo queries → narrate.
 
 ---
 
-## P0 — Pull these into PLAN.md when quota resets
+## P2 — Polish / hardening (after first paid client)
 
-These are next up after current Phase 1.5 (Business Brief + BYO Leads) finishes.
+- [ ] **Split `agent/brain.py`** — File is 770+ lines. Extract into `agent/drafters/` package: outreach, b2c, social, invoice, auto_reply, classifier.
+- [ ] **Mobile-first review of client portal** — Verify portal.html renders cleanly at 375px. Most Lagos clients view on phone.
+- [ ] **"Almost lost" widget on client portal** — Surfaces expired drafts + after-hours unanswered enquiries.
+- [ ] **ROI screenshot generator** — Auto-PNG "Altitude saved 47h, ₦2.4M tracked this month" for client IG/X posts. Uses existing ReportLab + Pillow.
+- [ ] **Integration test suite expansion** — At first paying client, expand beyond `tests/test_smoke.py`: HITL gate, webhook routes, holding reply dedupe, autopilot toggle, portal token auth.
+- [ ] **Lead-signal-injection rules** — Each vertical prompt mandates referencing concrete signals from enrichment payload (Maps rating, decision_maker, place categories, IG handle).
+- [ ] **Marketing site visual overhaul** *(~half day)* — Reference 11x.ai / Artisan.co / Landbase.com. Token-driven CSS so dashboard + portal can adopt incrementally.
 
-- [x] ~~**Holding Reply**~~ — shipped 2026-05-09. Schema + PATCH endpoint, webhook wire (Closer intake), Control Tower button, real portal textarea, demo portal textarea. Always-on (no off-hours guard), verbatim, 24h dedupe per contact via `holding_replies_sent` collection.
-- [ ] **Outreach dashboard redesign** — collapse 11 buttons → 5 tabs, **now anchored on the locked north-star structure**: **Today** (operator Owner Brief — ₦ collectible, hot replies, actions) / **Activate** (Lead Resurrection + Missed Opp Radar + Sales Copilot) / **Recover** (debt collector + invoice + rent + school fees, unified) / **Clients** (Setup + Briefs + Control Tower) / **System** (Prospect OS + tools + flow viewer). Plus new Control Tower per-client KPI strip (booked calls, ₦ collected, reply rate, brief health %). Plus `/admin/prospect-os` and `/admin/playbooks` new sections. **Sequence: do AFTER Owner Brief upgrade + Lead Resurrection + Missed Opp Radar are built — those provide the content the new tabs host.** 2 days.
-- [x] ~~**Per-vertical demo portals**~~ — shipped 2026-05-09. 5 verticals live: `/portal/demo`, `/portal/demo/{hospitality,real_estate,education,professional_services,small_business}` plus aliases (mercury/estate/school/legal/smb). Same product, vertical-tailored sample data, same engine. `services/demo_datasets.py`.
-- [x] ~~**Generalise Closer (drop vertical=real_estate filter)**~~ — shipped 2026-05-09. Closer intake now fires for any client with `closer_enabled` regardless of vertical. Lead vertical inherited from client's vertical, not hard-coded.
-- [x] ~~**Vertical tag enforcement on client upsert**~~ — shipped 2026-05-09. `vertical` required + validated against `SUPPORTED_VERTICALS` whitelist. Lowercased and normalised on save.
-- [x] ~~**HITL drafter reads `enrichment.decision_maker`**~~ — shipped 2026-05-10. `tools/apify_discovery.py` now also propagates `enrichment.title` → `contact_title`. `campaigns/base.py` backfills `biz["contact_name"]` from `enrich_business().team_names[0]` when missing, persists `contact_name`/`contact_title` via `upsert_contact`, passes them into both drafter branches plus follow-ups. `generate_outreach_message_for_client` now accepts + injects `contact_name`/`contact_title`/`enrichment_context` (same `[Partner Name]` placeholder guardrail as the generic drafter).
-- [ ] **Control Tower shows `enrichment.decision_maker` + `title`** on lead detail + "Re-enrich" button. (Phase 1.4 close-out)
-- [x] ~~**APIFY_API_TOKEN to Railway env**~~ — **REACTIVATED 2026-05-10**. User has credits, Lean Discovery Stack not yet built. Code already gates on `settings.apify_api_token` per call site (hooks.py, social.py, signal_intelligence.py, main.py TikTok actor, api/contacts.py). Setting the env var makes all 5 paths go live with no code change.
-
-## P0 — Nigerian Market Fluency Layer (1 day, ship before/with Business Brief)
-
-The SDR engine (Yori's own outreach to Lagos SMEs) needs deeper Nigerian-market context. Audit revealed: only `real_estate.txt` (146 lines) is at gold-standard depth. Most others are 40–70 lines and weak on specific cultural/regulatory/seasonal cues.
-
-- [x] ~~**Create `agent/prompts/_nigerian_context.txt`**~~ — shipped (127-line shared base layer). Covers payment rails, regulators, seasonal triggers, social cues, city tier tonality, pain-language register.
-- [x] ~~**Wire into `agent/brain.py::generate_outreach_message()`**~~ — wired in `generate_outreach_message`, `generate_b2c_message`, `generate_invoice_reminder`, and (2026-05-10) `generate_outreach_message_for_client`. Layered after `self_brief` / `system`, before vertical prompt.
-- [x] ~~**Add 4 missing vertical prompts**~~ — `hospitality.txt` (149 lines, prior), `education.txt`, `professional_services.txt`, `clinics.txt` shipped 2026-05-10 at gold-standard depth (≥150 lines each). Includes pain quantified in ₦, channel strategy, WhatsApp + email templates, message rules, signals to reference, anti-signals, custom-build hooks, reply-pattern playbook, final-check guardrail. `clinics` added to `SUPPORTED_VERTICALS`.
-- [x] ~~**Bring ALL existing verticals to gold standard**~~ — shipped 2026-05-10. All 16 prompts (real_estate, hospitality, education, professional_services, clinics, legal, small_business, fitness, logistics, fintech, recruitment, events, auto, insurance, agency_sales, agriculture, cooperatives) at gold-standard depth. Total: 1195 → 2391 lines. Each carries the standard structure: Hard Truth, Who you're reaching, Pain in ₦, Specific signals, Anti-signals, ReachNG product fit, Channel strategy, WhatsApp + email templates, Message rules, Custom build hook, Reply-pattern playbook, Final check guardrail.
-- [ ] **Lead-signal-injection rules** — each vertical prompt mandates referencing concrete signals from enrichment payload (Maps rating, decision_maker, place categories, IG handle).
-
-## Two parallel discovery tools, different audiences (clarified 2026-05-09 EOD)
-
-The third strategic review's "don't promise lead-gen" applies to **clients**. We still need internal SDR tooling to find Lagos SMEs to pitch ReachNG to ourselves. Both tools build, distinct routing + visibility:
-
-| Tool | Audience | Input | Behaviour |
-|------|----------|-------|-----------|
-| **Scout v1** (below) | Client-facing | Client's own site + uploaded CSVs + competitor URLs they specify | Enriches existing leads, never finds cold ones. Promised in pricing tiers. |
-| **ReachNG Prospect OS** (further below) | Internal — Yori only | Maps + DDG + VConnect + BusinessList + FinelibNG + IG bios | Scrapes EVIDENCE (not just leads) — businesses + leakage signals — to feed our own SDR pipeline. NEVER exposed to clients. NEVER mentioned as a feature. Full spec in `project_reachng_prospect_os.md`. |
-
-Reaffirms `feedback_reachng_agent_scope.md`: discovery is OUR internal funnel only.
-
-## P0 — ReachNG Scout v1 (owned-data research layer, 2 days)
-
-Internal research that enriches and activates leads the client ALREADY HAS. Does NOT scrape the internet for cold leads.
-
-**Capabilities:**
-- Crawl the client's own website (their services, prices, locations) → feeds Business Brief auto-fill
-- Enrich uploaded CSV/contact lists (look up domains they provided, extract decision-maker from each company's site)
-- Monitor specific competitor pages the client asks us to watch
-- Detect new competitor offers / vacancies / events / listings (alerts the client)
-- Summarise "who this business should target" from their existing customer data
-
-**What Scout does NOT do (intentional):**
-- Scrape LinkedIn / IG / FB / Twitter / TikTok
-- Crawl protected platforms
-- Generate cold contact lists from the internet
-
-**Build plan:**
-- [ ] `tools/page_extractor.py` — httpx async + BS4 + Haiku structured extract per URL → `{name, phone, email, address, description, social_links, decision_maker, confidence}` (was already scoped, now scoped to OWNED URLs only)
-- [ ] `tools/scout.py` orchestrator — accepts a list of URLs + extraction intent, returns merged structured data
-- [ ] Wire into BYO Leads CSV ingest — when user uploads `[name, domain]`, Scout enriches each row before drafts get queued
-- [ ] Wire into Business Brief AI intake — already partly done; deepen with Scout's site crawl
-- [ ] Competitor watch — `clients.competitor_urls` field + scheduled diff job, alerts to Owner Brief
-
-## P0 — Lead Activation features (genius wedge, 3-4 days)
-
-The killer features per `project_reachng_lead_activation_pivot.md`:
-
-- [x] ~~**Lead Resurrection flow**~~ — shipped 2026-05-09. `/portal/upload-leads/{token}` CSV upload + NDPR attestation + `/portal/run-resurrection/{token}` HITL-forced campaign run. Entry button lives on the Owner Brief card.
-- [x] ~~**Missed Opportunity Radar**~~ — shipped 2026-05-09. Detects price-asking replies with no follow-up via reply → contact → outreach_log join. Portal endpoint: `/portal/missed-opportunities/{token}`. Portal widget has one-tap WhatsApp deeplink.
-- [x] ~~**WhatsApp Sales Copilot view**~~ — shipped 2026-05-10. Portal: `/portal/sales-copilot/{token}` + per-thread cards on client portal (hot/warm/watch/closed priority, suggested next action, draft approve/skip, WhatsApp deeplink). Operator: `/dashboard/copilot` cross-client surface backed by `tools/sales_copilot.operator_copilot()` + `/api/v1/copilot/operator` JSON, roll-up KPI strip (hot/warm/drafts/total), buckets per client sorted by noise, same approve/skip wired to `/api/v1/approvals`. Header link from main dashboard. Remaining tuning (vertical-specific qualifying prompts, Control Tower deep-linking) folds into the dashboard redesign below.
-- [x] ~~**Owner Brief upgrade**~~ — shipped 2026-05-09. `tools/morning_brief_client.py` is cash-focused: collectible amount, hot replies, actions today, cash landed overnight. Portal card renders same signal pack.
-
-## P0 — ReachNG Prospect OS (internal SDR engine, ~3 days MVP)
-
-**Renamed + sharpened 2026-05-09 EOD** per strategic review #4. Full architecture spec in `project_reachng_prospect_os.md`.
-
-**Core framing shift: scrape EVIDENCE, not leads.** Each prospect record carries the leakage signal that will become the cold-message opening line ("I noticed your IG comments are full of unanswered price questions...").
-
-**Hard rule: internal only.** Never client-facing. Never in pricing. Never on marketing. Lives at `/admin/prospect-os`. Per `feedback_reachng_agent_scope.md`.
-
-**Architecture — 8-stage pipeline (`services/prospect_os/`):**
-
-1. **Query Planner** — vertical × city × neighborhood × buying-pain seeds
-2. **Source Adapters** — `tools/sources/{maps,ddg,vconnect,businesslist,finelib,instagram}.py` — plugin pattern, normalized output
-3. **Crawler** — httpx + BS4 by default (Playwright deferred — too heavy for Railway today)
-4. **Extractor** — Haiku + rules → structured biz data + evidence flags
-5. **Verifier** — phone normalize (E.164), dedup, junk reject
-6. **Scorer** — `likely_to_need_reachng_score` + `likely_reachable_score` (rule-based v1, ML in v2)
-7. **Outreach Brain** — angle-specific drafts tied to scraped evidence (uses existing `agent/brain.py`)
-8. **Feedback Loop** — every reply/no-reply updates Scorer weights. **THE MOAT.**
-
-**MVP day-1 sequence (ship these first):**
-- [ ] `services/prospect_os/__init__.py` + module skeleton
-- [ ] `services/prospect_os/query_planner.py` — vertical × city seeds, simple round-robin
-- [ ] `tools/sources/maps.py` (refactor existing `tools/discovery.py`)
-- [ ] `tools/sources/ddg.py` (already partly in `client_signal_listener.py`)
-- [ ] `tools/sources/vconnect.py`
-- [ ] `tools/sources/businesslist.py`
-- [ ] `tools/page_extractor.py` (shared with Scout v1) — httpx + BS4 + Haiku → `{name, phone, whatsapp, email, location, socials, website, evidence_flags}`
-- [ ] `services/prospect_os/scorer.py` — rule-based v1 (has_whatsapp + has_ig + active_30d + high_ticket_category + visible_owner)
-- [ ] Admin route `/admin/prospect-os` — query manager + scored prospect list + evidence viewer
-
-**Day 2-3:**
-- [ ] `services/prospect_os/verifier.py` — phone normalize + dedup
-- [ ] `services/prospect_os/outreach_brain.py` — angle-specific draft templates per evidence pattern (e.g. "comments_with_price_questions" → "I noticed your IG comments are full of price questions — bet that's eating your time...")
-- [ ] Wire Prospect OS leads into existing HITL queue with `source="prospect_os"`
-- [ ] Feature flag: `USE_APIFY=false` (re-enable when revenue covers it)
-
-**Deferred to v2 (build after first reply data):**
-- [ ] Stage 8 Feedback Loop — train Scorer on reply outcomes
-- [ ] `tools/sources/instagram.py` — public bio extraction (more fragile)
-- [ ] `tools/decision_maker.py` — LinkedIn-via-Google decision-maker resolution
-- [ ] `tools/email_finder.py` — pattern-guess + MX SMTP verify
-- [ ] Playwright crawler (only if a specific source forces it)
-
-**Cost vs Apify:** ~$50/mo+ → ₦0 infra + ~₦1.50 Haiku per prospect (~₦1500 / 1000 prospects).
-
-Replace paid Apify with a self-hosted free stack until we land 3+ paying clients. Apify gets re-enabled via feature flag once revenue covers it.
-
-**Sources to stitch (all free / public):**
-- DuckDuckGo HTML (already in stack via signal listener) — web search
-- Google Maps Places API (already in `tools/discovery.py`) — name, phone, address, rating
-- VConnect (vconnect.com) — Lagos/Nigeria business directory
-- BusinessList.com.ng + FinelibNG + Nigeria Business Directory — backup directories
-- Instagram public bios — website + WhatsApp from profile
-- Company website "About/Team/Contact" pages — decision-maker via Haiku extraction
-- LinkedIn public company pages — decision-maker via `site:linkedin.com/in {{biz}} CEO` Google search
-- Email pattern-guess (firstname@domain) + free MX SMTP verify
-
-**Build plan:**
-- **Day 1 (foundation):**
-  - [ ] `tools/page_extractor.py` — httpx async + BS4 + Haiku structured extract per URL → `{name, phone, email, address, description, social_links, decision_maker, confidence}` (was deferred at P2 — promoted to P0)
-  - [ ] `tools/lean_discovery.py` orchestrator — parallel multi-source fan-out, dedupe, merge
-  - [ ] `tools/sources/ddg.py` + `tools/sources/google_maps.py` (refactor from existing discovery.py)
-- **Day 2 (Nigerian directories + decision-maker):**
-  - [ ] `tools/sources/vconnect.py` — scrape Lagos by category
-  - [ ] `tools/sources/businesslist.py` + `finelib.py`
-  - [ ] `tools/sources/instagram.py` — public bio + website link
-  - [ ] `tools/decision_maker.py` — Google → LinkedIn → BS4 → name + title
-- **Day 3 (half-day) — email finder + integration:**
-  - [ ] `tools/email_finder.py` — pattern-guess + free MX SMTP HELO verify
-  - [ ] Wire `discover_lean_leads()` into `campaigns/base.py` parallel to Apify
-  - [ ] Feature flags: `LEAN_DISCOVERY_ONLY=true` (default), `USE_APIFY=false`
-  - [ ] Smoke-test on 3 verticals × 50 leads each → spot-check quality
-
-**Cost vs Apify:** ~$50/mo+ → ₦0 + ~₦150 per 100 leads in Haiku tokens.
-**Trade-off accepted:** medium reliability (scraping breaks occasionally; fallback chain handles), pattern-guessed emails (good enough for cold), ~30 mins/month maintenance when a source breaks.
-
-## P0 — Cross-project SEO audit (~1 hour, blocks SEO campaign decision)
-
-User wants to run an SEO campaign across ReachNG, VIIBE, and Roomly in prep for prelaunch. Each project is at very different SEO maturity — need a per-project audit before committing budget or scope.
-
-- [ ] **ReachNG audit** — does `/` serve a public marketing page? Currently the codebase is all admin/portal/demo. Needs: landing page, vertical sub-pages (one per demo vertical), blog stack, schema.org Organization + SoftwareApplication, robots.txt, sitemap.xml, OG/Twitter cards. Likely scope: build landing site BEFORE running SEO.
-- [ ] **VIIBE audit** — mobile-first (Expo/React Native) so primary play is **ASO** (App Store Optimization) not SEO. Audit App Store listing readiness + need for one web landing page (vibe.ng?) for press/share-link previews.
-- [ ] **Roomly audit** — repo lives at `C:\Users\OAJAGUN\Documents\roomly`, separate from this workspace. Inspect first to know if web (SEO) or mobile (ASO).
-- [ ] **Cross-project assets** — Schema.org Person entity for Yori (E-E-A-T builder), shared blog stack, footer cross-links between domains as internal-network signal.
-- [ ] **Output:** `SEO_AUDIT.md` per project with: current state, 5 highest-impact fixes, target keywords (Lagos-specific where relevant), estimated effort, recommended order. Then user picks which project to ship first.
-
-## P0.5 — Pressure test follow-ups (do alongside P0 Burst Head path)
-
-Risks and gaps surfaced by the 2026-05-09 pressure test. Each is small but compounds.
-
-- [ ] **Auto-enforce WhatsApp warmup ramp at code level** — today the 10/25/50 ramp is documented in OPS_GUIDE but operator-trusted. Add `client.daily_send_limit` auto-set on creation: 10 for week 1, 25 for week 2, 50+ thereafter. Stops a fresh number from getting banned by accident. ½ day.
-- [ ] **Anthropic + Mongo + Railway budget alerts** — add monthly spend monitoring to `tools/system_sweep.py`. Flag in 7am brief if Anthropic spend > $20/mo, Mongo connections > 400, Railway memory > 400MB sustained. ½ day.
-- [ ] **Portal token rotation** — today every portal URL is permanent forever. Add `client.portal_token_rotated_at` and a "regenerate token" button. Use case: client leaves a partner who had the URL. ½ day.
-- [ ] **Audit log for client_doc edits** — every `clients` collection update writes to `client_audit_log` with who/what/when. Trust + debugging signal at scale. ½ day.
-- [ ] **HITL bulk-approve + draft regeneration** — "approve all 5 from this client" button + per-draft "regenerate shorter" / "regenerate warmer" actions. Reduces operator load by ~70%. 1 day.
-- [ ] **Empty-state copy on every dashboard tab** — when a client has 0 leads, 0 invoices, etc, show a helpful next-step copy not blank tables. ½ day.
-- [ ] **Mobile-first review of client portal** — verify portal.html renders cleanly at 375px viewport. Most Lagos clients view on phone. ½ day.
-- [ ] **Split `agent/brain.py`** — file is 770+ lines and growing. Extract into `agent/drafters/` package: `outreach.py`, `b2c.py`, `social.py`, `invoice.py`, `auto_reply.py`, `classifier.py`. ½ day, code hygiene.
-- [ ] **Referral mechanic** — ₦25K credit per referred sign-up that pays for 1 month. Each happy client becomes 3. Schema: `referral_code` per client + Paystack discount logic. 1 day.
-- [ ] **Integration test suite** — at first paying client, write 5 integration tests: HITL gate (draft never auto-sends), webhook routes (inbound creates Closer lead correctly), holding reply dedupes 24h, autopilot toggle works, portal token auth. 1 day.
-
-## P1 — Quick wins (≤1 day each, high leverage)
-
-- [ ] **PayNudge** — Google Sheets source + Paystack pay-link on existing `services/debt_collector/`. 1 day.
-- [ ] **HITL draft confidence score** — 1-line Haiku call on each draft → `confidence: high/medium/low` + risk tag. Operator approves 30 in 90s instead of 6 mins. ~$0.0001/draft.
-- [ ] **"Almost lost" widget on client portal** — surfaces expired drafts + after-hours unanswered enquiries. Pure DB query, no new infra. Sells autopilot internally.
-- [ ] **ROI screenshot generator** — auto-PNG "Altitude saved 47h, ₦2.4M tracked this month" client posts to IG/X. Uses existing ReportLab + Pillow.
-
-## P2 — Larger builds (2–5 days)
-
-- [ ] **TaxNudge** — PDF bank statement → Haiku categorisation → VAT/CIT estimate per 2024 Nigerian Tax Reform Acts. `pdfplumber` already in stack. **HIGH commercial pull** — Lagos SMEs panicking about new laws. ~3 days.
-- [ ] **Self-serve `/signup`** — Paystack first-month payment + auto-create client + email portal token. Removes Yori-as-bottleneck on hot demos. ~2 days.
-- [ ] **Page extractor (`tools/page_extractor.py`)** — DDG snippet → full-page extraction via `httpx + BS4 + Haiku`. Wire into `tools/social.py`, `client_signal_listener.py`, `discovery.py`. Fallback: silently use snippet if fetch fails. ~2 days. **Fallback if quality disappoints:** swap in `crawl4ai` (Playwright-based, heavier RAM but JS-aware).
+---
 
 ## P3 — Pressure-tested feature ideas (build after first paying client)
 
 From `project_reachng_feature_ideas_may26.md`. Each pressure-tested against the stack.
 
 - [ ] **Ghost-Worker Attendance Auditor** (TalentOS + Government) — selfie + live location → Claude Vision face match + geofence check. Strong public-sector payroll-fraud fit.
-- [ ] **Site-Pulse** (EstateOS) — foreman sends photo → Claude Vision analyses construction milestone (DPC, lintels, roofing) + Lagos building law compliance → ReportLab Progress Certificate PDF. **No blockers, fully buildable.**
-- [ ] **VibeReview** (hospitality upsell) — APScheduler 2h after checkout → Unipile feedback request → Claude sentiment → alert manager if negative + high-spender.
-- [ ] **Title Ledger** (EstateOS) — WhatsApp agent for land title verification (C of O, Governor's Consent, Excision). Vault-first summary. Constraint: client manually populates `property_vault`.
-- [ ] **Voice-Vibe Interviewing** (TalentOS) — async WhatsApp voice-note interviews, Whisper transcription, Claude eval. **Blocker: needs Whisper API.**
-- [ ] **WhatsApp voice-note inbound** — Whisper on inbound voice → existing pipeline. Lagos sends voice; we currently drop it. ~30% inbound uplift.
-
-## P1 — Strategic review batch (added 2026-05-21 from external playbook + own review)
-
-Ranked by ship-effort × distribution impact. Pull the top one into PLAN.md once the active phase ships. The 20% that was premature or restated existing scope was filtered out; these are the items that survived honest review.
-
-### Conversion + retention (do these before more features)
-
-- [ ] **1. Live "Try EYO" sandbox widget on landing** *(2 days, P0-grade)* — Single biggest conversion lever per ACQUISITION.md gap (9 → 700 visitors/week). Below-hero textarea: "Paste a customer message and watch EYO draft in your voice." Vertical selector (hospitality / RE / clinic) so the right playbook loads. Live Haiku call, sandboxed (no DB writes, no Unipile, no per-client memory). Typing indicator, ~2.4s response. PostHog events: `try_eyo_used`, `try_eyo_shared`. Generates shareable artifacts for the Twitter/LinkedIn cadence.
-- [ ] **2. Trust band below hero** *(30 min)* — One inline strip: "Your WhatsApp number stays yours · We never hold funds · Per-client memory isolation, audited nightly · Lagos-built." We already do all of this; the homepage just doesn't say it. Premium signal, zero risk.
-- [ ] **3. Streak counter on Owner Brief** *(half day, ships after first paid client lives a week)* — "EYO has briefed you 47 mornings in a row · ₦14.2M in deposits caught." Habit loop, retention asset. Reads from existing `brief_dispatch_log` + `paystack_events`.
-- [ ] **4. EYO Vault tab in client portal** *(1-2 days)* — Per-customer memory surfaced as a CRM view: lifetime spend, preferred table, allergies, last 3 deposits, why they last cancelled. Data already exists in `services/client_memory.py`; this is a portal surface, not a build. Turns switching cost into structural moat.
-- [ ] **5. Per-vertical landing variants ("Choose your industry")** *(1 day)* — Picker above hero routing to /for/hospitality, /for/real_estate, etc. Templates exist via `services/marketing_content.py`. Right now they live in the footer; promote them. Intercom/Pylon-style 1-click segmentation.
-
-### Infra hardening (before client 50 — not before)
-
-- [ ] **6. Redis caching layer (Upstash, ~$0-10/mo)** — Cache vertical prompts, client memory recent reads, Unipile account-status checks. Drops Haiku tokens ~20-30% and Unipile health-check cost. Highest ROI infra change *once we have meaningful traffic*. **Trigger:** monthly Haiku spend > ₦50k or 10+ paid clients.
-- [ ] **7. Background queue (Cloud Tasks or RQ + Redis)** — Move Receipt OCR, voice transcription, outbound sends off APScheduler. At 50+ clients scheduler becomes a SPOF. **Trigger:** 25 active clients or any client hitting `inbound spike` rate-limit.
-- [ ] **8. Sentry + BetterStack + Slack webhook tail** — Error tracking, uptime per integration (Unipile, Paystack, Anthropic), webhook-failure tail. Silent QR expiry was one of *many* failure modes worth catching pre-paid-client.
-- [ ] **9. Audit trail surfaced in portal (HITL log)** — Every approval already writes an immutable record. Make it queryable: who tapped, draft-vs-sent, edit diff, latency. Legal + clinic verticals will require this for compliance.
-- [ ] **10. Materialised dashboard snapshots** — Heavy aggregate reads (Scorecard, Quality Metrics, Cohort Stats) materialise nightly to `dashboard_snapshots`. Avoids the read-amplification at 50+ clients.
-
-### New product surfaces (build after first paid client validates the core)
-
-- [ ] **11. EYO Voice Operator (Premium add-on, ~3-5 days alpha)** — Already in PLAN.md Phase 5. Add as Premium-only ₦150k/mo add-on once first 3 Premium clients land. ElevenLabs voice clone + LiveKit pipeline + 5-second HITL veto window before bookings confirm. Killer differentiator.
-- [ ] **12. EYO Across (Instagram DM + Email channels, ~3 weeks)** — Same brain, IG DM via Unipile, Gmail via Google API. Premium customers get 40% of leads on IG DM. Add as +₦40k/mo per channel. Doubles ARPU on Growth.
-- [ ] **13. Receipt-as-API (productize OCR, ~5 weeks)** — Train Donut / PaddleOCR fine-tune on Nigerian bank slips, fall back to Claude Vision on low confidence. Standalone API for Lagos fintechs (₦2/receipt parsed, ₦50k Starter tier). Second business line on the same engine. **Trigger:** monthly receipt volume > 5,000.
-- [ ] **14. Diaspora outbound landing (~1 week)** — UK/US/Canada Nigerians use ReachNG to handle their Lagos comms with relatives/contractors. £50/mo on Stripe Checkout. Same backend, separate landing. USD-paying customer mix.
-- [ ] **15. EYO Concierge (B2C white-label)** *(Year 2 only)* — Two-sided market: consumers tell EYO to book a table at Altitude (which is a ReachNG client). Network effect. Defer to Year 2; don't build now.
-
-### Lower-priority polish
-
-- [ ] **16. Replace "2 Lagos & Abuja businesses on the list" social proof** — Either remove until 10+, swap for an unattributed founder quote ("— founder, Victoria Island restaurant"), or flip to "Founding cohort: applications open."
-- [ ] **17. Mobile WhatsApp scene snapshot test (≤380px)** — Playwright snapshot of hero mock at iPhone SE width. Lock visual regression before paid traffic.
-- [ ] **18. SEO: blog at `/blog/` with vertical-targeted posts** — "WhatsApp AI for [restaurant|RE|clinic] Lagos" × 6 posts. Organic compounds; SEO_AUDIT.md flagged this.
-
----
-
-## P1 — Tech/AI engine batch (added 2026-05-21 from Emergent triage)
-
-Survivors of the Emergent 22-idea tech playbook triage. See `memory/project_reachng_emergent_tech_review.md` for verdict per item including the 8 dumped + 4 already-covered. Items below are ordered by ship-readiness.
-
-### Build after first paid client lives 30 days
-
-- [ ] **A1. Agentic Actions framework** *(~2 weeks, P0 once Sprint 1 closes)*
-  - Extend HITL queue to support stateful actions, not just outbound drafts
-  - V1 actions: send Paystack payment link sized to booking · hold a slot for 10 min · schedule a follow-up nudge · approve refund flow
-  - Owner approves the action with one tap (same HITL pattern as drafts)
-  - **Why:** drafts are commoditised. Stateful actions are the moat that locks switching cost.
-
-- [ ] **A2. Voice-clone owner brief** *(~4 days, Premium-only)*
-  - 90-second audio brief in the owner's cloned voice (ElevenLabs Multilingual v2)
-  - Cloned from 60-sec sample at onboarding · plays as WhatsApp voice note at 7am
-  - **Cost:** ~₦100/day/client at $0.06/brief. Pass-through to Empire tier only.
-  - **Why:** daily voice note in their own voice is a habit hook nothing competes with.
-
-- [ ] **A3. Multi-agent reply orchestration** *(~3 weeks, Empire-tier only)*
-  - Drafter writes → Critic scores tone/accuracy/risk → Fraud-checker scans receipts → Vertical-expert verifies playbook
-  - Owner sees winning draft + collapsible runners-up
-  - **Cost:** ~3.5× current draft cost; Empire-tier exclusive
-  - **Why:** justifies the ₦250k Empire tier · owners love seeing the AI "think"
-
-- [ ] **A4. Synthetic customer testing suite** *(~3 weeks, month 3-4)*
-  - Weekly synthetic Lagos personas DM every active EYO; probe for tone drift, price accuracy, fake-receipt recognition, language safe-switch breaks
-  - Results → weekly QA brief to owner
-  - **Why:** first production CI/CD for an AI sales agent in Africa · massive trust moat for legal/clinic verticals
-
-- [ ] **A5. NDPR / regulatory compliance dashboard** *(~4 weeks)*
-  - Automatic PII redaction in logs · one-click "right to be forgotten" customer-data export · NDPR breach detection · per-draft / per-approval / per-send audit trail surfaced in portal
-  - **Why:** unlocks regulated verticals (legal, clinics, fintech) that currently can't legally use cloud AI without this layer. Lagos has 6 active NDPR enforcement cases this year.
-
-### Trigger-gated (build when condition fires)
-
-- [ ] **A6. Open Banking integration (Mono / Okra)** *(~3 weeks)* — **THE BIGGEST SINGLE MOAT IN THE PLAYBOOK**
-  - Listen for inbound transfers to the owner's account in real-time
-  - Owner gets "💰 ₦450k confirmed from Bola O." push *before* the customer sends the screenshot
-  - Receipt Catcher demoted to fallback path for offline cases
-  - **Cost:** ~₦25/transaction via Mono Connect
-  - **Trigger:** first paid client lives 30 days successfully + Mono/Okra account approved
-  - **Why:** eliminates fake screenshots entirely · 2-year competitor lead time · switching cost becomes infinite
-
-- [ ] **A7. EYO Mesh — federated cross-client insights** *(~4 weeks)*
-  - Privacy-safe aggregates: "Restaurants like yours see 38% more bookings when X" · "Network caught ₦47M Saturday 8pm-midnight"
-  - Differential privacy + k-anonymity on the network layer
-  - **Trigger:** ≥20 paying clients (otherwise no statistical signal)
-  - **Why:** every new client makes every existing client smarter — real network effect
-
-- [ ] **A8. Visual generation per vertical** *(~3 weeks per vertical)*
-  - RE: stylised floor plan from property description (FLUX / Gemini Nano Banana)
-  - Hospitality: 1-page menu card from kitchen daily list
-  - Clinics: redacted before/after composite
-  - Legal: 1-page case summary PDF
-  - **Cost:** ~₦40/image · Gemini Nano Banana
-  - **Trigger:** vertical has 3+ paying clients · build only for verticals showing demand
-
-- [ ] **A9. Fraud detection model (Lagos-specific receipts)** *(~6 weeks)*
-  - Train on accumulated receipt dataset to detect Photoshopped GTB/Opay/Kuda screenshots, reversed-transaction patterns, mismatched name/amount/reference combos
-  - Productize as standalone Receipt-as-API for Lagos fintechs (₦2/check)
-  - **Trigger:** monthly receipt volume > 5,000 across the network (otherwise no training data)
-  - **Why:** second revenue line on the same data flywheel · separable defensible asset
-
-### Sprint-level (already promoted to SPRINT.md)
-
-- [x] ~~**A10. Voice-only owner control**~~ — promoted to **SPRINT.md Sprint 2 #11**. Owner sends WhatsApp voice note → Whisper transcribes → Haiku parses intent → applies command (pause, set rule, update pricing, bulk approve, status check) → confirmation reply back. 5-7 day v1. Replaces the portal for 80% of owner control tasks.
+- [ ] **Site-Pulse** (EstateOS) — foreman sends photo → Claude Vision analyses construction milestone → ReportLab Progress Certificate PDF.
+- [ ] **VibeReview** (hospitality upsell) — APScheduler 2h after checkout → feedback request → sentiment → alert manager if negative + high-spender.
+- [ ] **Title Ledger** (EstateOS) — WhatsApp agent for land title verification (C of O, Governor's Consent, Excision). Vault-first summary.
 
 ---
 
 ## P4 — Infra monitoring (wire into `tools/system_sweep.py`)
 
-So the 7am WhatsApp brief flags scaling issues before they bite. From `project_reachng_scaling_reference.md`.
+So the 7am brief flags scaling issues before they bite.
 
-- [ ] MongoDB connection count — `db.command("serverStatus")["connections"]["current"]`; flag at >400
-- [ ] Atlas storage estimate from collection sizes — flag at >400MB
+- [ ] MongoDB connection count — flag at >400
+- [ ] Atlas storage estimate — flag at >400MB
 - [ ] Railway memory (process RSS) — flag at >400MB sustained
-- [ ] DDG error rate in last 24h — query structlog buffer
-- [ ] Unipile delivery fail rate per client — query `outreach_log` — flag at >5% per client
+- [ ] DDG error rate in last 24h
+- [ ] Unipile delivery fail rate per client — flag at >5%
 
-## P5 — Deferred / blocked / not-yet-triggered
+---
+
+## P5 — Deferred / locked
 
 - **LendOS** — full scope in `project_reachng_lendos_scope.md`. Don't touch until user explicitly says start.
-- **Locker / Receipt / Roll Call / Shelf modules** — `project_reachng_future_modules.md`. Build only after unlock triggers fire (see PRODUCTS.md).
-- **Voice Operator** (Phase 5 in PLAN.md) — already queued there.
+- **Locker / Receipt / Roll Call / Shelf modules** — `project_reachng_future_modules.md`. Build only after unlock triggers fire.
+- **LeanScrape Cloud + Enrich premium** — `leanscrape/` OSS shipped. Cloud + Enrich gated until OSS hits ~100 GitHub stars OR people ask for hosted version.
+- **End-to-end opaque mode (browser-side WebLLM drafting)** — 12-month horizon, do NOT build now.
+- **Self-hosted "Your Mongo, your keys" deployment** — Tier-1 firms pay ₦2-5M setup for data sovereignty. **Trigger:** one inbound asks for it.
+- **EYO Concierge (B2C white-label)** — Year 2 only. Two-sided market.
+- **Receipt-as-API for fintechs** — productize OCR as standalone API. **Trigger:** monthly receipt volume > 5,000.
+- **`/api/v1/draft-and-queue` Infrastructure API tier** — see P1 above; gated until 3+ paying retainer clients.
+- **ReachNG Scout v1** — substantially absorbed into existing tooling (`tools/discovery.py`, `tools/apify_enrich.py`, `services/lean_scraper.py`). Page extractor remaining piece tracked under P2.
+- **Prospect OS internal SDR engine** — partly built via existing campaigns/base.py + lean_scraper.py + discovery.py. The 8-stage architectural rewrite is deferred until current funnel proves insufficient.
 
 ---
 
 ## How items get promoted
 
-1. Active phase in PLAN.md completes → mark `[x]` and commit
-2. Pull next P0 item from this file → write a new phase block in PLAN.md with checkbox tasks
-3. Delete the line here (or move to "shipped" archive section)
+1. Active phase in PLAN.md or sprint completes → mark `[x]` and commit
+2. Pull next P0 item from this file → write a new phase block in PLAN.md / SPRINT.md
+3. Mark the line here as done with brief done-date + commit ref, OR delete
 
-Don't let this file rot. If an item sits in P0 for 3+ weeks unreviewed, either commit to it or move it to P3.
+Don't let this file rot. If an item sits in P0 for 3+ weeks unreviewed, either commit to it or move it to P3 / P5.
