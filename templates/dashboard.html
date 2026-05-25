@@ -5987,29 +5987,60 @@ async function quickRunCampaign(name, vertical) {
     const result = await postJSON("/api/v1/campaigns/run", {
       vertical, max_contacts: 10, dry_run: true, client_name: name,
     });
-    const d   = result.discovery || {};
-    const total = d.total_after_dedup || 0;
-    const queued = result.queued_for_approval || 0;
-    const sent   = result.sent || 0;
-    const skippedContacted = result.skipped_already_contacted || 0;
-    const skippedNoChan    = result.skipped_no_channel || 0;
-    const errs   = result.errors || 0;
-    const previews = (result.messages || []).length;
-    const lines = [
-      `${name} · ${vertical} · ${result.dry_run ? "DRY RUN" : "LIVE"}`,
-      ``,
-      `Discovery: ${total} businesses after dedup`,
-      `  · maps ${d.maps||0}  apify ${d.apify||0}  social ${d.social||0}  IG ${d.instagram||0}`,
-      ``,
-      `Sent: ${sent} · Queued (HITL): ${queued} · Previews: ${previews}`,
-      `Skipped: already-contacted ${skippedContacted} · no-channel ${skippedNoChan}`,
-      errs ? `Errors: ${errs}` : ``,
-    ].filter(Boolean).join("\n");
-    alert(lines);
+    _qrRenderPanel(name, vertical, result);
     refresh();
   } catch(e) {
     alert("Error: " + e.message);
   }
+}
+
+function _qrEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function _qrRenderPanel(name, vertical, result) {
+  // Ensure a host panel exists at the top of the page
+  let host = document.getElementById('qr-result-host');
+  if (!host) {
+    host = document.createElement('div');
+    host.id = 'qr-result-host';
+    host.style.cssText = 'position:fixed;top:60px;right:20px;width:min(640px,95vw);max-height:80vh;overflow-y:auto;background:#080c10;border:2px solid #ff5c00;border-radius:10px;padding:18px;z-index:9999;box-shadow:0 12px 40px rgba(0,0,0,0.6);';
+    document.body.appendChild(host);
+  }
+  const d = result.discovery || {};
+  const previews = result.messages || [];
+  const headerBits = [
+    `<strong>${_qrEsc(name)}</strong> · ${_qrEsc(vertical)} · <span style="color:${result.dry_run?'#e0b75c':'#5dd28a'};font-weight:700;">${result.dry_run?'DRY RUN':'LIVE'}</span>`,
+    `<div style="font-size:11px;color:#888;margin-top:4px;">Discovery — maps ${d.maps||0} · apify ${d.apify||0} · social ${d.social||0} · IG ${d.instagram||0} → <strong style="color:#d8eaf8;">${d.total_after_dedup||0} after dedup</strong></div>`,
+    `<div style="font-size:11px;color:#888;">Queued ${result.queued_for_approval||0} · Sent ${result.sent||0} · Skipped (contacted) ${result.skipped_already_contacted||0} · Skipped (no channel) ${result.skipped_no_channel||0}${result.errors?(` · <span style=color:#ff8a8a>Errors ${result.errors}</span>`):''}</div>`,
+  ].join('');
+
+  const cards = previews.length === 0
+    ? `<div style="color:#666;padding:14px 0;text-align:center;font-size:12px;">No draft previews returned. ${(d.total_after_dedup||0)===0 ? 'Discovery returned 0 businesses — check GOOGLE_MAPS_API_KEY in Railway, or your queries.' : 'All businesses were skipped (already contacted or no channel).'}</div>`
+    : previews.map((m,i) => {
+        const wc  = (m.message || m.body || '').split(/\s+/).filter(Boolean).length;
+        const wcC = wc <= 90 ? '#5dd28a' : (wc <= 120 ? '#e0b75c' : '#ff8a8a');
+        const subj = m.subject || '';
+        const body = (m.message || m.body || '').split('\n').map(_qrEsc).join('<br>');
+        const biz  = m.business_name || m.name || `Preview ${i+1}`;
+        return `<div style="background:#0d1117;border:1px solid #1e2530;border-left:3px solid #ff5c00;border-radius:6px;padding:12px;margin-top:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:10px;">
+            <div style="font-weight:700;color:#d8eaf8;font-size:12px;">${_qrEsc(biz)}</div>
+            <span style="background:${wcC}22;color:${wcC};font-size:10px;padding:3px 8px;border-radius:3px;font-weight:700;">${wc} words</span>
+          </div>
+          ${subj ? `<div style="font-size:11px;color:#ff9b66;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">Subject</div>
+                   <div style="font-size:13px;color:#e8e8e8;font-weight:600;margin-bottom:10px;">${_qrEsc(subj)}</div>` : ''}
+          <div style="font-size:11px;color:#ff9b66;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">Body</div>
+          <div style="background:#15171a;border-radius:4px;padding:10px;color:#d8eaf8;font-size:12px;line-height:1.55;font-family:Georgia,serif;white-space:pre-wrap;">${body}</div>
+        </div>`;
+      }).join('');
+
+  host.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:12px;">
+      <div style="font-size:13px;color:#d8eaf8;">${headerBits}</div>
+      <button class="btn" style="font-size:11px;background:#15171a;color:#aaa;border:1px solid #2a3340;padding:4px 10px;" onclick="document.getElementById('qr-result-host').remove();">× Close</button>
+    </div>
+    ${cards}
+  `;
+  host.scrollTop = 0;
 }
 
 function openInvoice(encodedName) {
