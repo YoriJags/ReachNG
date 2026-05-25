@@ -321,6 +321,7 @@ from api.inventory import router as inventory_router
 from api.admin_docs import router as admin_docs_router
 from api.try_eyo import router as try_eyo_router
 from api.blog import router as blog_router
+from api.agent_learning import router as agent_learning_router
 app.include_router(kb_router)
 app.include_router(client_rules_router)
 app.include_router(scorecard_router)
@@ -329,6 +330,7 @@ app.include_router(waitlist_router)
 app.include_router(waitlist_admin_router)
 app.include_router(copilot_router)
 app.include_router(billing_router)
+app.include_router(agent_learning_router, prefix="/api/v1")
 app.include_router(pipeline_router)
 app.include_router(whatsapp_connect_router)
 app.include_router(onboarding_router)

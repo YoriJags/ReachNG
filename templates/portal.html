@@ -650,6 +650,98 @@
       })();
     </script>
 
+    <!-- ── Agent Learning — surfaces the T0.4 Outcome Loop work ─────────── -->
+    <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <span>Agent Learning — how EYO is getting sharper</span>
+      <span id="al-updated" style="font-size:11px;color:#777;font-weight:400;">—</span>
+    </div>
+    <div id="agent-learning-card" style="background:linear-gradient(135deg,#181818 0%,#111 100%);border:1px solid #2a3340;border-radius:12px;padding:22px 24px;margin-bottom:24px;">
+      <div id="al-empty" style="display:none;font-size:13px;color:#888;line-height:1.6;">
+        🧠 EYO needs at least 5 resolved drafts (wins or misses) before the first weekly addendum. Keep approving — the loop tightens itself every Sunday night.
+      </div>
+
+      <div id="al-body" style="display:none;">
+        <!-- Three KPIs across the top -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;">
+          <div style="background:#0e1419;border:1px solid #1f2731;border-radius:9px;padding:12px 14px;">
+            <div style="font-size:10px;color:#7a8590;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:4px;">Wins (30d)</div>
+            <div id="al-wins" style="font-size:22px;font-weight:800;color:#5dd28a;font-family:'JetBrains Mono',monospace;">—</div>
+          </div>
+          <div style="background:#0e1419;border:1px solid #1f2731;border-radius:9px;padding:12px 14px;">
+            <div style="font-size:10px;color:#7a8590;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:4px;">Misses (30d)</div>
+            <div id="al-misses" style="font-size:22px;font-weight:800;color:#ff6b6b;font-family:'JetBrains Mono',monospace;">—</div>
+          </div>
+          <div style="background:#0e1419;border:1px solid #1f2731;border-radius:9px;padding:12px 14px;">
+            <div style="font-size:10px;color:#7a8590;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:4px;">Win rate</div>
+            <div id="al-winrate" style="font-size:22px;font-weight:800;color:#ff5500;font-family:'JetBrains Mono',monospace;">—</div>
+          </div>
+        </div>
+
+        <!-- Addendum — Claude's distilled coaching from last week -->
+        <div id="al-addendum-wrap" style="display:none;background:rgba(255,85,0,0.06);border:1px solid rgba(255,85,0,0.30);border-left:3px solid #ff5500;border-radius:9px;padding:14px 16px;margin-bottom:14px;">
+          <div style="font-size:10px;color:#ff5500;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:8px;">📚 This week's coaching (auto-applied to every draft)</div>
+          <pre id="al-addendum" style="margin:0;font-size:13px;line-height:1.6;color:#e0e0e0;white-space:pre-wrap;font-family:inherit;"></pre>
+        </div>
+
+        <!-- Last 15 resolved outcomes -->
+        <details style="margin-top:6px;">
+          <summary style="cursor:pointer;font-size:12px;color:#9aa5b1;letter-spacing:0.04em;padding:4px 0;">Last 15 resolved drafts ↓</summary>
+          <div id="al-recent" style="margin-top:10px;display:flex;flex-direction:column;gap:6px;"></div>
+        </details>
+      </div>
+    </div>
+
+    <script>
+      (async function loadAgentLearning(){
+        try {
+          const r = await fetch(`/api/v1/portal/agent-learning/{{ token }}`);
+          if (!r.ok) return;
+          const d = await r.json();
+          const wins   = (d.stats || {}).wins   || 0;
+          const misses = (d.stats || {}).misses || 0;
+          const wr     = (d.stats || {}).win_rate;
+          const hasData = (wins + misses) >= 5 || d.addendum;
+          if (!hasData) {
+            document.getElementById('al-empty').style.display = 'block';
+            return;
+          }
+          document.getElementById('al-body').style.display = 'block';
+          document.getElementById('al-wins').textContent   = wins;
+          document.getElementById('al-misses').textContent = misses;
+          document.getElementById('al-winrate').textContent =
+            (wr === null || wr === undefined) ? '—' : (Math.round(wr * 100) + '%');
+
+          if (d.addendum) {
+            document.getElementById('al-addendum-wrap').style.display = 'block';
+            document.getElementById('al-addendum').textContent = d.addendum;
+          }
+          if (d.addendum_updated_at) {
+            const dt = new Date(d.addendum_updated_at);
+            document.getElementById('al-updated').textContent =
+              'last coaching refresh · ' + dt.toLocaleDateString('en-NG', { day:'numeric', month:'short' });
+          }
+
+          const recent = d.recent || [];
+          const recentEl = document.getElementById('al-recent');
+          recentEl.innerHTML = recent.map(o => {
+            const isWin = o.status === 'win';
+            const dot   = isWin ? '#5dd28a' : '#ff6b6b';
+            const label = isWin ? 'WIN'      : 'MISS';
+            const sig   = o.signal ? (' · ' + o.signal) : '';
+            return `<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 10px;background:#0e1419;border:1px solid #1f2731;border-radius:7px;font-size:12px;">
+              <span style="background:${dot};color:#0a0a0a;font-weight:800;font-size:9px;letter-spacing:0.08em;padding:2px 6px;border-radius:3px;flex-shrink:0;">${label}</span>
+              <div style="flex:1;min-width:0;">
+                <div style="color:#9aa5b1;font-size:10.5px;margin-bottom:3px;">${o.source || '·'}${sig}</div>
+                <div style="color:#d0d0d0;line-height:1.5;overflow:hidden;text-overflow:ellipsis;">${(o.draft_excerpt || '').replace(/</g,'&lt;')}</div>
+              </div>
+            </div>`;
+          }).join('');
+        } catch (e) {
+          console.error('agent-learning load failed', e);
+        }
+      })();
+    </script>
+
     <!-- Owner Brief — cash headline -->
     <div class="section-label">Owner Brief — today</div>
     <div id="owner-brief-card" style="background:linear-gradient(135deg,#181818 0%,#111 100%);border:1px solid #2a3340;border-radius:12px;padding:24px;margin-bottom:24px;">
