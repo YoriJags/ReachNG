@@ -1,13 +1,18 @@
 # ReachNG — Legal Pack (Lawyer Review)
 
-Four documents drafted ready for lawyer review. Every clause needing legal verification is marked **[LAWYER REVIEW]** so the lawyer can spot what to focus on.
+Five documents drafted ready for lawyer review. Every clause needing legal verification is marked **[LAWYER REVIEW]** so the lawyer can spot what to focus on.
 
-| File | Purpose | Signed by |
-|---|---|---|
-| [`MSA.md`](MSA.md) | Master Service Agreement — the umbrella contract | Every client |
-| [`DPA.md`](DPA.md) | Data Processing Agreement — NDPR-compliant | Every client |
-| [`MUTUAL_NDA.md`](MUTUAL_NDA.md) | Two-way confidentiality | Every client |
-| [`CLOSER_ADDENDUM.md`](CLOSER_ADDENDUM.md) | Lead ownership + HITL responsibility | Real-estate Closer clients only |
+| File | Purpose | Signed by | Reads in this order |
+|---|---|---|:---:|
+| [`ORDER_FORM.md`](ORDER_FORM.md) | The "front page of the deal" — tier, fees, start date, signatories | Every client | 1 |
+| [`MSA.md`](MSA.md) | Master Service Agreement — the umbrella contract | Every client | 2 |
+| [`DPA.md`](DPA.md) | Data Processing Agreement — NDPR-compliant | Every client | 3 |
+| [`MUTUAL_NDA.md`](MUTUAL_NDA.md) | Two-way confidentiality | Every client | 4 |
+| [`CLOSER_ADDENDUM.md`](CLOSER_ADDENDUM.md) | Lead ownership + HITL responsibility | Real-estate Closer clients only | 5 (if applicable) |
+
+## Regenerating PDFs
+
+Run `python -m legal.build_pdfs` from the repo root. Requires `reportlab>=4.0.0` (already declared in `requirements.txt`). Output lands in [`legal/pdfs/`](pdfs/).
 
 ## Briefing notes for the lawyer
 

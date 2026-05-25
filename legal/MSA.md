@@ -10,7 +10,7 @@
 
 ReachNG provides a software-as-a-service platform that:
 
-- Discovers leads (Closer suite) or accepts uploaded contact lists (BYO Leads).
+- Works the Client's own leads — uploaded contact lists (BYO Leads) and inbound conversations on the Client's WhatsApp number. ReachNG does **not** prospect or generate new leads on the Client's behalf.
 - Drafts personalised outbound messages using AI, scoped to the Client's Business Brief.
 - Holds every draft in a Human-in-the-Loop (HITL) queue for explicit Client approval.
 - Sends approved messages via the Client's own WhatsApp number (paired through Unipile).

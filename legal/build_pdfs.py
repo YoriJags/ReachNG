@@ -2,7 +2,7 @@
 Convert the 4 legal markdown documents to professional-looking PDFs.
 
 Run: python -m legal.build_pdfs
-Output: legal/pdfs/{MSA,DPA,MUTUAL_NDA,CLOSER_ADDENDUM,README}.pdf
+Output: legal/pdfs/{README,ORDER_FORM,MSA,DPA,MUTUAL_NDA,CLOSER_ADDENDUM}.pdf
 
 Uses reportlab — pure Python, no system deps beyond a working pip install.
 The renderer is intentionally light on markdown features (handles headings,
@@ -27,7 +27,7 @@ from reportlab.platypus import (
 
 HERE = Path(__file__).parent
 OUT_DIR = HERE / "pdfs"
-DOCS = ["README", "MSA", "DPA", "MUTUAL_NDA", "CLOSER_ADDENDUM"]
+DOCS = ["README", "ORDER_FORM", "MSA", "DPA", "MUTUAL_NDA", "CLOSER_ADDENDUM"]
 
 
 # ─── Styles ──────────────────────────────────────────────────────────────────
