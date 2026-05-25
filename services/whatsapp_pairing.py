@@ -33,7 +33,8 @@ log = structlog.get_logger()
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=6))
 async def start_hosted_auth(*, client_id: str, app_base_url: str,
-                             expires_minutes: int = 30) -> dict:
+                             expires_minutes: int = 30,
+                             label: str = "primary") -> dict:
     """Request a hosted-auth link from Unipile. Returns {url, id}.
 
     `client_id` is passed in `name` so the webhook can route the result back
@@ -55,7 +56,10 @@ async def start_hosted_auth(*, client_id: str, app_base_url: str,
         "providers":             ["WHATSAPP"],
         "api_url":               base,
         "expiresOn":             expires_on,
-        "name":                  f"client:{client_id}",  # routes back via webhook.name
+        # Encode both client and label so the webhook can route the pairing
+        # into the right slot in whatsapp_accounts[]. Old single-line format
+        # (`client:<id>`) still parses fine — see parse_client_id_from_name.
+        "name":                  f"client:{client_id}|label:{label}",
         "success_redirect_url":  f"{app_base_url}/portal/whatsapp/connected",
         "failure_redirect_url":  f"{app_base_url}/portal/whatsapp/failed",
         "notify_url":            f"{app_base_url}/api/v1/webhooks/unipile/account",
@@ -116,8 +120,20 @@ def is_account_healthy(account_doc: dict) -> bool:
 # ─── Helpers ────────────────────────────────────────────────────────────────
 
 def parse_client_id_from_name(name: Optional[str]) -> Optional[str]:
-    """Webhook payload echoes back the `name` we sent. We use `client:{id}`
-    so this just splits it back out."""
+    """Webhook payload echoes back the `name` we sent. Accepts both formats:
+       - `client:<id>`             (legacy single-line)
+       - `client:<id>|label:<lbl>` (multi-line, label-aware)
+    """
     if not name or not name.startswith("client:"):
         return None
-    return name.split(":", 1)[1].strip() or None
+    body = name[len("client:"):]
+    cid = body.split("|", 1)[0].strip()
+    return cid or None
+
+
+def parse_label_from_name(name: Optional[str]) -> str:
+    """Extract the line label from the echoed name. Defaults to 'primary'
+    when no label was encoded (legacy pairings)."""
+    if not name or "|label:" not in name:
+        return "primary"
+    return name.split("|label:", 1)[1].strip() or "primary"

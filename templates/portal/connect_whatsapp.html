@@ -184,6 +184,22 @@
     </div>
   </div>
 
+  <!-- Paired lines & backups (multi-line failover) ──────────────────────────-->
+  <div class="step-card" id="lines-card" style="display:none;">
+    <div class="card-header">
+      <div class="card-num">☎</div>
+      <div class="card-title">Your paired lines</div>
+    </div>
+    <div class="card-body">
+      <p style="margin-top:0;color:var(--ink2);">EYO can pair multiple WhatsApp numbers on this account. If your primary gets restricted by Meta, sends automatically fail over to the next healthy line.</p>
+      <div id="lines-list"></div>
+      <div class="cta-row" style="margin-top:14px;">
+        <button class="btn-ghost" id="add-backup-btn" onclick="addBackupLine()">+ Pair a backup line</button>
+        <span class="meta" id="lines-meta"></span>
+      </div>
+    </div>
+  </div>
+
   <div class="error-banner" id="error-banner"></div>
 
 </div>
@@ -192,6 +208,7 @@
 const TOKEN = "{{ token }}";
 const STATUS_URL = `/api/v1/portal/${TOKEN}/whatsapp/connect/status`;
 const START_URL  = `/api/v1/portal/${TOKEN}/whatsapp/connect/start`;
+const LINES_URL  = `/api/v1/portal/${TOKEN}/whatsapp/lines`;
 
 const statusNum   = document.getElementById('status-num');
 const statusTitle = document.getElementById('status-title');
@@ -291,6 +308,86 @@ async function pollStatus() {
 }
 
 pollStatus();
+
+// ── Multi-line management (WhatsApp ban defence UI) ──────────────────────
+async function refreshLines() {
+  try {
+    const r = await fetch(LINES_URL);
+    if (!r.ok) return;
+    const d = await r.json();
+    const lines = d.lines || [];
+    const card  = document.getElementById('lines-card');
+    const list  = document.getElementById('lines-list');
+    if (!lines.length) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    list.innerHTML = lines.map(l => {
+      const isOK   = (l.health || 'OK') === 'OK';
+      const since  = l.paired_at ? new Date(l.paired_at).toLocaleDateString() : '—';
+      const badge  = l.primary
+        ? '<span style="background:#1e6a3d;color:#5dd28a;font-size:10px;padding:3px 8px;border-radius:3px;font-weight:700;">PRIMARY</span>'
+        : '<span style="background:#1e2530;color:#888;font-size:10px;padding:3px 8px;border-radius:3px;">BACKUP</span>';
+      const health = isOK
+        ? '<span style="color:#5dd28a;font-size:11px;">✓ healthy</span>'
+        : '<span style="color:#ff8a8a;font-size:11px;">⚠ flagged</span>';
+      const promote = l.primary ? '' : `<button class="btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="promoteLine('${l.label}')">Promote</button>`;
+      const reset   = isOK ? '' : `<button class="btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="resetLine('${l.label}')">Reset health</button>`;
+      const remove  = (lines.length > 1) ? `<button class="btn-ghost" style="font-size:11px;padding:4px 10px;color:#ff8a8a;" onclick="removeLine('${l.label}')">Remove</button>` : '';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);gap:10px;flex-wrap:wrap;">
+        <div>
+          <div style="font-weight:600;color:var(--ink);font-size:14px;">${l.label}</div>
+          <div style="font-size:11px;color:var(--ink2);">paired ${since} · ${health}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">${badge}${promote}${reset}${remove}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('lines-meta').textContent =
+      lines.length === 1 ? 'No backup yet — pair one before your primary gets restricted.' : `${lines.length} lines paired.`;
+  } catch (e) { /* quiet */ }
+}
+
+async function addBackupLine() {
+  const lbl = (prompt('Label for the backup line (e.g. backup_1):', 'backup_1') || '').trim().toLowerCase();
+  if (!lbl) return;
+  try {
+    const r = await fetch(`${START_URL}?label=${encodeURIComponent(lbl)}`, { method: 'POST' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    if (!data.url) throw new Error('No pairing URL returned');
+    window.open(data.url, '_blank', 'noopener');
+    // Re-poll lines after a delay to pick up the new entry
+    setTimeout(refreshLines, 8000);
+  } catch (e) { showError('Could not start pairing: ' + e.message); }
+}
+
+async function promoteLine(label) {
+  if (!confirm(`Promote '${label}' to primary? New sends will route through it first.`)) return;
+  await fetch(`/api/v1/portal/${TOKEN}/whatsapp/lines/promote`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({label}),
+  });
+  refreshLines();
+}
+
+async function resetLine(label) {
+  await fetch(`/api/v1/portal/${TOKEN}/whatsapp/lines/reset-health`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({label}),
+  });
+  refreshLines();
+}
+
+async function removeLine(label) {
+  if (!confirm(`Remove '${label}'? You'll need to re-pair to get it back.`)) return;
+  const r = await fetch(`/api/v1/portal/${TOKEN}/whatsapp/lines/remove`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({label}),
+  });
+  if (!r.ok) { const t = await r.text(); showError(t); return; }
+  refreshLines();
+}
+
+refreshLines();
+setInterval(refreshLines, 15000);
 </script>
 
 </body>

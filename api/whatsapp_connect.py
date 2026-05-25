@@ -31,6 +31,7 @@ from services.whatsapp_pairing import (
     get_account_status,
     is_account_healthy,
     parse_client_id_from_name,
+    parse_label_from_name,
     start_hosted_auth,
 )
 
@@ -62,15 +63,22 @@ async def portal_connect_whatsapp_page(token: str, request: Request):
 
 
 @router.post("/api/v1/portal/{token}/whatsapp/connect/start")
-async def portal_start_pairing(token: str):
+async def portal_start_pairing(token: str, label: str = "primary"):
     client = _get_client_by_token(token)
     if not client:
         raise HTTPException(404, "portal not found")
+
+    # Label hygiene — alphanum + underscore, 1-24 chars
+    lbl = (label or "primary").strip().lower()
+    import re as _re
+    if not _re.fullmatch(r"[a-z0-9_]{1,24}", lbl):
+        raise HTTPException(400, "label must be 1-24 chars: a-z 0-9 _")
 
     settings = get_settings()
     link = await start_hosted_auth(
         client_id=str(client["_id"]),
         app_base_url=settings.app_base_url.rstrip("/"),
+        label=lbl,
     )
 
     # Persist the pending link so the status endpoint can verify nothing's
@@ -177,8 +185,10 @@ async def unipile_account_webhook(request: Request):
     acc_type   = (body.get("type") or "").upper()
 
     client_id = parse_client_id_from_name(name)
+    label     = parse_label_from_name(name)  # 'primary' for legacy callbacks
     log.info("unipile_account_webhook_received",
-             account_id=account_id, status=status, type=acc_type, has_client_id=bool(client_id))
+             account_id=account_id, status=status, type=acc_type,
+             has_client_id=bool(client_id), label=label)
 
     if not (account_id and client_id):
         # No-op — could be a different notification type, don't 4xx Unipile
@@ -193,20 +203,141 @@ async def unipile_account_webhook(request: Request):
         except Exception:
             return JSONResponse({"ok": False, "error": "bad client_id"})
 
-        res = _clients().update_one(
-            {"_id": oid},
-            {"$set": {
-                "whatsapp_account_id":    account_id,
-                "whatsapp_provider":      "unipile",
-                "whatsapp_connected_at":  datetime.now(timezone.utc),
-                "whatsapp_pairing_pending": False,
-            }},
-        )
+        now = datetime.now(timezone.utc)
+        existing = _clients().find_one({"_id": oid},
+                                        {"whatsapp_accounts": 1, "whatsapp_account_id": 1})
+        if not existing:
+            return JSONResponse({"ok": False, "error": "client not found"})
+
+        accounts = list(existing.get("whatsapp_accounts") or [])
+        # Replace any prior entry with the same label, else append
+        accounts = [a for a in accounts if (a.get("label") or "primary") != label]
+        is_primary = (label == "primary") or (not accounts)
+        if is_primary:
+            for a in accounts:
+                a["primary"] = False
+        accounts.append({
+            "label":               label,
+            "account_id":          account_id,
+            "primary":             is_primary,
+            "health":              "OK",
+            "paired_at":           now,
+            "last_failure_at":     None,
+        })
+
+        patch = {
+            "whatsapp_accounts":        accounts,
+            "whatsapp_provider":        "unipile",
+            "whatsapp_connected_at":    now,
+            "whatsapp_pairing_pending": False,
+        }
+        # Maintain backwards compat: keep legacy single-field in sync with primary
+        primary_acc = next((a for a in accounts if a.get("primary")), accounts[0])
+        patch["whatsapp_account_id"] = primary_acc["account_id"]
+
+        res = _clients().update_one({"_id": oid}, {"$set": patch})
         if res.modified_count:
-            log.info("whatsapp_paired", client_id=client_id, account_id=account_id)
-        return JSONResponse({"ok": True, "stored": bool(res.modified_count)})
+            log.info("whatsapp_paired", client_id=client_id,
+                     account_id=account_id, label=label, is_primary=is_primary)
+        return JSONResponse({"ok": True, "stored": bool(res.modified_count), "label": label})
 
     return JSONResponse({"ok": True, "ignored_status": status})
+
+
+# ─── Multi-line management (portal, token-gated) ──────────────────────────
+
+class LineLabelPayload(BaseModel):
+    label: str
+
+
+def _sanitised_line(a: dict) -> dict:
+    """Strip credentials before sending to the portal client."""
+    return {
+        "label":           a.get("label") or "primary",
+        "account_id":      a.get("account_id"),
+        "primary":         bool(a.get("primary")),
+        "health":          a.get("health") or "OK",
+        "paired_at":       (a.get("paired_at").isoformat() if hasattr(a.get("paired_at"), "isoformat") else a.get("paired_at")),
+        "last_failure_at": (a.get("last_failure_at").isoformat() if hasattr(a.get("last_failure_at"), "isoformat") else a.get("last_failure_at")),
+    }
+
+
+@router.get("/api/v1/portal/{token}/whatsapp/lines")
+async def portal_list_lines(token: str):
+    """Owner-facing list of paired WhatsApp lines on this client."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "portal not found")
+    accounts = list(client.get("whatsapp_accounts") or [])
+    # Surface a legacy single-line client as a one-entry list so the UI is
+    # uniform.
+    if not accounts and client.get("whatsapp_account_id"):
+        accounts = [{
+            "label":      "primary",
+            "account_id": client["whatsapp_account_id"],
+            "primary":    True,
+            "health":     "OK",
+            "paired_at":  client.get("whatsapp_connected_at"),
+        }]
+    return {"client": client.get("name"),
+            "lines":  [_sanitised_line(a) for a in accounts]}
+
+
+@router.post("/api/v1/portal/{token}/whatsapp/lines/promote")
+async def portal_promote_line(token: str, payload: LineLabelPayload):
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "portal not found")
+    accounts = list(client.get("whatsapp_accounts") or [])
+    target = next((a for a in accounts if (a.get("label") or "primary") == payload.label), None)
+    if not target:
+        raise HTTPException(404, f"line '{payload.label}' not found")
+    for a in accounts:
+        a["primary"] = ((a.get("label") or "primary") == payload.label)
+    _clients().update_one(
+        {"_id": client["_id"]},
+        {"$set": {"whatsapp_accounts":  accounts,
+                  "whatsapp_account_id": target["account_id"]}},
+    )
+    return {"ok": True, "primary": payload.label}
+
+
+@router.post("/api/v1/portal/{token}/whatsapp/lines/reset-health")
+async def portal_reset_health(token: str, payload: LineLabelPayload):
+    """Owner taps after Meta restores the line — clears health flag back to OK."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "portal not found")
+    res = _clients().update_one(
+        {"_id": client["_id"], "whatsapp_accounts.label": payload.label},
+        {"$set": {"whatsapp_accounts.$.health":          "OK",
+                  "whatsapp_accounts.$.last_failure_at": None}},
+    )
+    if not res.matched_count:
+        raise HTTPException(404, f"line '{payload.label}' not found")
+    return {"ok": True, "label": payload.label, "health": "OK"}
+
+
+@router.post("/api/v1/portal/{token}/whatsapp/lines/remove")
+async def portal_remove_line(token: str, payload: LineLabelPayload):
+    """Owner removes a backup line. Refuses to remove the only line."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "portal not found")
+    accounts = list(client.get("whatsapp_accounts") or [])
+    remaining = [a for a in accounts if (a.get("label") or "primary") != payload.label]
+    if not remaining:
+        raise HTTPException(400, "cannot remove the only paired line — pair a backup first")
+    # Ensure something is still primary
+    if not any(a.get("primary") for a in remaining):
+        remaining[0]["primary"] = True
+    primary = next((a for a in remaining if a.get("primary")), remaining[0])
+    _clients().update_one(
+        {"_id": client["_id"]},
+        {"$set": {"whatsapp_accounts":  remaining,
+                  "whatsapp_account_id": primary["account_id"]}},
+    )
+    return {"ok": True, "removed": payload.label, "primary": primary.get("label")}
 
 
 # ─── Static OK/fail landing pages (Unipile redirects here post-scan) ───────

@@ -2315,6 +2315,99 @@ function copyDemoPortalLink(btn){
     </div>
   </div>
 
+  <!-- Agent Learning (T0.4 close-out) -->
+  <div class="ct-section">
+    <div class="ct-section-title">Agent Learning — outcomes engine (last 30 days)</div>
+    <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Per-client wins / misses from the Outcome Loop. Active addendum = the prompt patch the weekly distil wrote into the agent. Click a row to open the per-client detail.</p>
+    <div id="agent-learning-list" style="font-size:12px;">
+      <div style="color:#556;padding:14px 0;">Loading…</div>
+    </div>
+  </div>
+
+  <script>
+    async function loadAgentLearning() {
+      const el = document.getElementById('agent-learning-list');
+      if (!el) return;
+      try {
+        const r = await fetch('/api/v1/admin/agent-learning', {headers: authHeaders()});
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const d = await r.json();
+        const rows = d.clients || [];
+        if (!rows.length) { el.innerHTML = '<div style="color:#556;padding:8px 0;">No active clients yet.</div>'; return; }
+        el.innerHTML = `
+          <table class="data-table" style="width:100%;font-size:12px;">
+            <thead><tr>
+              <th>Client</th><th>Vertical</th>
+              <th style="text-align:right;">Wins</th>
+              <th style="text-align:right;">Misses</th>
+              <th style="text-align:right;">Pending</th>
+              <th style="text-align:right;">Win rate</th>
+              <th>Addendum</th>
+            </tr></thead>
+            <tbody>${rows.map(c => {
+              const wr  = Math.round((c.win_rate || 0) * 100);
+              const wrC = wr >= 60 ? '#5dd28a' : (wr >= 30 ? '#e0b75c' : '#ff8a8a');
+              const add = c.has_addendum
+                ? `<span style="color:#5dd28a;">✓ active</span> <span style="color:#666;font-size:10px;">${(c.addendum_updated||'').slice(0,10)}</span>`
+                : '<span style="color:#666;">—</span>';
+              return `<tr style="cursor:pointer;" onclick="openAgentLearning('${c.client_id}','${(c.client_name||'').replace(/'/g,"\\'")}')">
+                <td><strong>${c.client_name || '—'}</strong></td>
+                <td style="color:#889;font-size:11px;">${c.vertical || '—'}</td>
+                <td style="text-align:right;color:#5dd28a;">${c.wins}</td>
+                <td style="text-align:right;color:#ff8a8a;">${c.misses}</td>
+                <td style="text-align:right;color:#889;">${c.pending}</td>
+                <td style="text-align:right;color:${wrC};font-weight:700;">${wr}%</td>
+                <td>${add}</td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+          <div id="agent-learning-detail" style="margin-top:14px;"></div>`;
+      } catch (e) {
+        el.innerHTML = `<div style="color:#ef4444;font-size:11px;padding:8px 0;">Error loading: ${e.message}</div>`;
+      }
+    }
+
+    async function openAgentLearning(clientId, clientName) {
+      const det = document.getElementById('agent-learning-detail');
+      if (!det) return;
+      det.innerHTML = '<div style="color:#556;font-size:12px;padding:14px;">Loading…</div>';
+      try {
+        const r = await fetch(`/api/v1/admin/agent-learning/${clientId}`, {headers: authHeaders()});
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const d = await r.json();
+        const recent = (d.recent || []).map(x => `
+          <div style="padding:6px 10px;margin:4px 0;background:${x.status === 'win' ? '#0d1a12' : '#1a0d0d'};border-left:2px solid ${x.status === 'win' ? '#5dd28a' : '#ff8a8a'};border-radius:3px;">
+            <div style="font-size:10px;color:${x.status === 'win' ? '#5dd28a' : '#ff8a8a'};letter-spacing:0.08em;text-transform:uppercase;">
+              ${x.status} · ${(x.signal || '—')} · <span style="color:#666;">${(x.resolved_at||'').slice(0,16).replace('T',' ')}</span>
+            </div>
+            <div style="font-size:11px;color:#aaa;margin-top:2px;">${x.draft_excerpt || ''}</div>
+          </div>`).join('') || '<div style="color:#556;padding:8px 0;">No resolved outcomes yet.</div>';
+
+        const add = d.addendum
+          ? `<pre style="background:#0d1117;color:#d8eaf8;padding:10px;border-radius:4px;border:1px solid #1e2530;white-space:pre-wrap;font-size:11px;margin:0;">${d.addendum.replace(/</g,'&lt;')}</pre>`
+          : '<div style="color:#556;padding:8px 0;">No addendum written yet — needs ≥10 outcomes for the weekly distil to run.</div>';
+
+        det.innerHTML = `
+          <div style="background:#080c10;border:1px solid #ff5c00;border-radius:8px;padding:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div style="font-size:13px;font-weight:700;color:#d8eaf8;">${clientName}</div>
+              <button class="btn" style="font-size:11px;background:#15171a;color:#888;border:1px solid #2a3340;" onclick="document.getElementById('agent-learning-detail').innerHTML='';">Close</button>
+            </div>
+            <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;margin-bottom:4px;">Active prompt addendum</div>
+            ${add}
+            <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;margin:14px 0 4px;">Recent outcomes (last 15)</div>
+            ${recent}
+          </div>`;
+      } catch (e) {
+        det.innerHTML = `<div style="color:#ef4444;padding:8px 0;">Error: ${e.message}</div>`;
+      }
+    }
+
+    // Lazy-load on dashboard render — same pattern as loadPricing()
+    if (document.readyState !== 'loading') loadAgentLearning();
+    else document.addEventListener('DOMContentLoaded', loadAgentLearning);
+  </script>
+
   <!-- Pricing Settings (live, no deploy) -->
   <div class="ct-section">
     <div class="ct-section-title">Pricing — live, no deploy needed</div>

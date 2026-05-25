@@ -99,3 +99,35 @@ async def admin_agent_learning(client_id: str):
     if not client:
         raise HTTPException(404, "Client not found")
     return _build_payload(client, include_recent=True)
+
+
+@router.get("/admin/agent-learning", dependencies=[Depends(require_auth)])
+async def admin_agent_learning_summary():
+    """Cross-client wins/misses summary for the Control Tower dashboard tab.
+    One row per active client with last-30d totals + addendum freshness."""
+    db = get_db()
+    rows = []
+    for c in db["clients"].find(
+        {"active": True},
+        {"name": 1, "vertical": 1, "prompt_addendum": 1, "prompt_addendum_at": 1},
+    ).sort("name", 1):
+        cid = str(c["_id"])
+        try:
+            stats = client_outcome_stats(cid, lookback_days=30)
+        except Exception:
+            stats = {"wins": 0, "misses": 0, "pending": 0}
+        rows.append({
+            "client_id":         cid,
+            "client_name":       c.get("name"),
+            "vertical":          c.get("vertical"),
+            "wins":              int(stats.get("wins") or 0),
+            "misses":            int(stats.get("misses") or 0),
+            "pending":           int(stats.get("pending") or 0),
+            "win_rate":          (stats.get("win_rate")
+                                   if isinstance(stats.get("win_rate"), (int, float))
+                                   else (stats["wins"] / max(1, stats["wins"] + stats["misses"]))
+                                        if (stats.get("wins") or stats.get("misses")) else 0.0),
+            "has_addendum":      bool(c.get("prompt_addendum")),
+            "addendum_updated":  _iso(c.get("prompt_addendum_at")),
+        })
+    return {"clients": rows, "count": len(rows)}
