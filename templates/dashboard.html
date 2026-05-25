@@ -5987,7 +5987,25 @@ async function quickRunCampaign(name, vertical) {
     const result = await postJSON("/api/v1/campaigns/run", {
       vertical, max_contacts: 10, dry_run: true, client_name: name,
     });
-    alert(`Done: ${result.new_leads_found || 0} leads found, ${result.messages_sent || 0} sent.`);
+    const d   = result.discovery || {};
+    const total = d.total_after_dedup || 0;
+    const queued = result.queued_for_approval || 0;
+    const sent   = result.sent || 0;
+    const skippedContacted = result.skipped_already_contacted || 0;
+    const skippedNoChan    = result.skipped_no_channel || 0;
+    const errs   = result.errors || 0;
+    const previews = (result.messages || []).length;
+    const lines = [
+      `${name} · ${vertical} · ${result.dry_run ? "DRY RUN" : "LIVE"}`,
+      ``,
+      `Discovery: ${total} businesses after dedup`,
+      `  · maps ${d.maps||0}  apify ${d.apify||0}  social ${d.social||0}  IG ${d.instagram||0}`,
+      ``,
+      `Sent: ${sent} · Queued (HITL): ${queued} · Previews: ${previews}`,
+      `Skipped: already-contacted ${skippedContacted} · no-channel ${skippedNoChan}`,
+      errs ? `Errors: ${errs}` : ``,
+    ].filter(Boolean).join("\n");
+    alert(lines);
     refresh();
   } catch(e) {
     alert("Error: " + e.message);
