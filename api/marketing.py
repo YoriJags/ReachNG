@@ -166,6 +166,164 @@ SCENE_PACKS = {
 }
 
 
+# ─── Wave 2 scene packs — per-vertical Three Jobs scenes (Tone / Receipt / Brief)
+# These overlay onto SCENE_PACKS at render time. Keys map to the three scene
+# blocks on the landing's 'Three jobs' section. Used to stop a real-estate
+# visitor seeing a restaurant scene mid-scroll.
+WAVE2_SCENES = {
+    "hospitality": {
+        "tone": {
+            "customer_q": "Hi, do you still have a table for 6 this Saturday?",
+            "draft_reply": "Hey Funke 🙌 yes, we still have one 9pm table for 6 near the DJ booth. Deposit is ₦90k to lock it. Want me to hold it for 10 mins?",
+            "time_label": "Saturday · 8:42 PM",
+        },
+        "receipt": {
+            "customer_name": "Bola Olajide", "customer_initials": "BO",
+            "avatar_grad": "linear-gradient(135deg,#fce4a8,#f5b942)", "avatar_text_color": "#7a4a00",
+            "phone_masked": "+234 802 ••• 89", "time_label": "11:23 AM",
+            "bank": "GTBank", "amount_naira": "450,000", "amount_short": "₦450k",
+            "from_name_caps": "BOLA O. OLAJIDE", "to_name_caps": "ALTITUDE LAGOS LTD",
+            "ref": "Table booking Sat", "datetime_label": "17 May 2026 · 11:22:48",
+            "biz_name": "Altitude Lagos",
+            "match_line": "booking #ALT-2614 · Funke + 5 · Saturday 9pm DJ booth · ₦450k deposit",
+            "draft_reply": "Hey Bola, thanks for the screenshot 🙏 I'll lock in your Saturday 9pm booking (booth near the DJ, table of 6) the moment ₦450k reflects on our end (usually under 10 mins). I'll ping you the second it lands.",
+        },
+        "brief": {
+            "day_label": "SATURDAY · 7:02 AM",
+            "headline": "12 conversations held · 8 drafts ready · 2 🔥 need your tap",
+            "money_label": "💰 ₦450k collected",
+            "money_detail": "Bola Olajide · GTB transfer · matched to Saturday booking",
+            "hot_lines": [
+                "Funke A. · table of 6, Sat 9pm DJ booth",
+                "Tunde K. · ₦12M apartment viewing request",
+            ],
+            "leak_alert": "Adunni Properties · 2 unanswered enquiries since Friday night. Drafts ready.",
+            "slowest_reply": "4 min (vs 6 hrs before ReachNG)",
+        },
+    },
+    "real_estate": {
+        "tone": {
+            "customer_q": "Hi, is the 5-bed in Banana Island still available?",
+            "draft_reply": "Hi Tunde, yes — still available at ₦680M asking. Quick PoF check first (standard), then I lock a Saturday viewing window. Share a short bank statement here and I'll confirm your slot today. 🏛",
+            "time_label": "Friday · 9:14 PM",
+        },
+        "receipt": {
+            "customer_name": "Tunde Bakare", "customer_initials": "TB",
+            "avatar_grad": "linear-gradient(135deg,#d4b896,#a8845c)", "avatar_text_color": "#3d2812",
+            "phone_masked": "+234 803 ••• 17", "time_label": "10:08 AM",
+            "bank": "Access Bank", "amount_naira": "5,000,000", "amount_short": "₦5M",
+            "from_name_caps": "TUNDE A. BAKARE", "to_name_caps": "SAPPHIRE ESTATES LTD",
+            "ref": "Banana Island earnest", "datetime_label": "21 May 2026 · 10:07:32",
+            "biz_name": "Sapphire Estates",
+            "match_line": "lead #SE-0418 · Tunde Bakare · 5-bed Banana Island · ₦680M asking · earnest tier",
+            "draft_reply": "Hi Tunde, ₦5M earnest received — thank you 🏛 I'll lock the viewing for Saturday 10am once it reflects on our end. PoF clean, I'll send the access code + parking pass an hour before.",
+        },
+        "brief": {
+            "day_label": "MONDAY · 7:02 AM",
+            "headline": "9 enquiries held · 6 drafts ready · 3 🔥 need your tap",
+            "money_label": "💰 ₦5M earnest received",
+            "money_detail": "Tunde Bakare · Access transfer · matched to Banana Island lead",
+            "hot_lines": [
+                "Adekunle O. · Lekki off-plan, ₦180M, asking for payment plan",
+                "Mrs Edet · short-let December Eko Atlantic, family of 4",
+            ],
+            "leak_alert": "Ikoyi maisonette · 2 unanswered enquiries since Saturday. Drafts ready.",
+            "slowest_reply": "6 min (vs 9 hrs before ReachNG)",
+        },
+    },
+    "professional_services": {
+        "tone": {
+            "customer_q": "Good evening — can I get a quick consult this weekend?",
+            "draft_reply": "Hi Olumide, glad you reached out. Quick conflict check first: anyone at your firm currently in contention with our existing clients? If clear, I'll lock a 45-min slot Saturday morning. Retainer for initial response is ₦450k. ⚖",
+            "time_label": "Friday · 6:48 PM",
+        },
+        "receipt": {
+            "customer_name": "Olumide Kareem", "customer_initials": "OK",
+            "avatar_grad": "linear-gradient(135deg,#b8c5d1,#5a7185)", "avatar_text_color": "#0f1e2c",
+            "phone_masked": "+234 805 ••• 02", "time_label": "9:46 AM",
+            "bank": "Zenith Bank", "amount_naira": "450,000", "amount_short": "₦450k",
+            "from_name_caps": "OLUMIDE A. KAREEM", "to_name_caps": "ADESINA & CO. SOLICITORS",
+            "ref": "Retainer — CBN response", "datetime_label": "22 May 2026 · 09:45:18",
+            "biz_name": "Adesina & Co",
+            "match_line": "matter #AC-2026-0211 · Olumide Kareem · CBN agency-banking response · retainer phase",
+            "draft_reply": "Hi Olumide, retainer received — thank you ⚖ I'll confirm the Saturday 10am slot once funds reflect. We'll send a brief intake form for your records and the call link an hour before.",
+        },
+        "brief": {
+            "day_label": "MONDAY · 7:02 AM",
+            "headline": "11 enquiries reviewed · 5 drafts ready · 2 🔥 need your tap",
+            "money_label": "💰 ₦450k retainer in",
+            "money_detail": "Olumide Kareem · Zenith transfer · matched to CBN matter",
+            "hot_lines": [
+                "Mrs Adeola · tenancy dispute Lekki, hearing next Thursday",
+                "Bayo I. (fintech CEO) · M&A diligence, NDA outstanding",
+            ],
+            "leak_alert": "Solicitor enquiry · 3 days, no response. Conflict check still open.",
+            "slowest_reply": "8 min (vs Monday-9am before ReachNG)",
+        },
+    },
+    "education": {
+        "tone": {
+            "customer_q": "Hello, do you still have spaces for Year 7 in September?",
+            "draft_reply": "Good morning Mrs Eze, yes — September Year 7 cohort still has spaces. We'll send the 2026 prospectus + fee schedule (₦8.5M/term, all-in) to your inbox tonight. Any current school reports we should review? Reply here with attachments any time. 🎓",
+            "time_label": "Wednesday · 4:12 PM",
+        },
+        "receipt": {
+            "customer_name": "Ngozi Eze", "customer_initials": "NE",
+            "avatar_grad": "linear-gradient(135deg,#f5c2c7,#d96878)", "avatar_text_color": "#4a1018",
+            "phone_masked": "+44 7700 ••• 41", "time_label": "8:55 AM",
+            "bank": "First Bank", "amount_naira": "200,000", "amount_short": "₦200k",
+            "from_name_caps": "NGOZI A. EZE", "to_name_caps": "LAGOON BIS LTD",
+            "ref": "Application fee — Y7 Sept", "datetime_label": "23 May 2026 · 08:54:07",
+            "biz_name": "Lagoon British International",
+            "match_line": "application #LB-2026-0118 · Ngozi Eze · Year 7 September · diaspora (London)",
+            "draft_reply": "Good morning Mrs Eze, application fee received — thank you 🎓 We'll confirm the Saturday assessment slot once funds reflect and send the family pack to your inbox tonight. Any preferred time-window for the assessment? Diaspora calls Mon/Fri only.",
+        },
+        "brief": {
+            "day_label": "TUESDAY · 7:02 AM",
+            "headline": "18 admissions enquiries · 9 drafts ready · 4 🔥 need your tap",
+            "money_label": "💰 ₦200k application fee in",
+            "money_detail": "Ngozi Eze (London) · First Bank · matched to Y7 application",
+            "hot_lines": [
+                "Mr Adesina · SS2 transfer, asking for fee plan",
+                "The Okafors (Atlanta) · Year 9 + Year 5 sibling discount enquiry",
+            ],
+            "leak_alert": "Year 10 enquiry from Houston · 4 days no response. Time-zone draft ready.",
+            "slowest_reply": "12 min (vs next-day before ReachNG)",
+        },
+    },
+    "small_business": {
+        "tone": {
+            "customer_q": "Hi, can I book a full hair appointment + manicure Saturday?",
+            "draft_reply": "Welcome back Chiamaka 🙌 Tola has Saturday 2:30pm or 4:00pm open — both 90 mins (hair + manicure). Deposit to lock is ₦15k. Send to OPay · 8101234567 · Glow Studio and reply with your slot. ✨",
+            "time_label": "Thursday · 7:21 PM",
+        },
+        "receipt": {
+            "customer_name": "Chiamaka Okeke", "customer_initials": "CO",
+            "avatar_grad": "linear-gradient(135deg,#fde2a8,#e8a93b)", "avatar_text_color": "#5c3a08",
+            "phone_masked": "+234 806 ••• 28", "time_label": "12:34 PM",
+            "bank": "OPay", "amount_naira": "15,000", "amount_short": "₦15k",
+            "from_name_caps": "CHIAMAKA O. OKEKE", "to_name_caps": "GLOW STUDIO LAGOS",
+            "ref": "Hair + manicure Sat 2:30pm", "datetime_label": "24 May 2026 · 12:33:51",
+            "biz_name": "Glow Studio Lagos",
+            "match_line": "booking #GS-3217 · Chiamaka Okeke · Sat 2:30pm · Tola · hair + manicure",
+            "draft_reply": "Hey Chiamaka 🙌 ₦15k deposit received — Saturday 2:30pm with Tola is locked. We'll ping you the morning of with the studio address + parking note. ✨",
+        },
+        "brief": {
+            "day_label": "FRIDAY · 7:02 AM",
+            "headline": "14 bookings held · 7 drafts ready · 3 🔥 need your tap",
+            "money_label": "💰 ₦15k deposit confirmed",
+            "money_detail": "Chiamaka Okeke · OPay · matched to Saturday slot",
+            "hot_lines": [
+                "Adaeze N. · bridal trial Sunday, asking for package",
+                "Funmi A. · monthly facial sub, December slot request",
+            ],
+            "leak_alert": "Birthday glam enquiry · 2 days no response. Tola free Saturday morning.",
+            "slowest_reply": "5 min (vs 4 hrs before ReachNG)",
+        },
+    },
+}
+
+
 # ─── Custom-vertical trade → closest pack keyword routing ────────────────────
 # When a visitor on the cover picks 'Something else' and types their trade,
 # we route to the closest existing SCENE_PACK so they still see relevant copy.
@@ -215,9 +373,15 @@ def _pick_scene(request: Request) -> dict:
     Returns the matching scene pack, falls back to hospitality if missing/unknown.
 
     For custom (typed) verticals, overlays the typed business name + trade onto
-    the closest matching scene-pack so the landing reads as theirs."""
+    the closest matching scene-pack so the landing reads as theirs.
+
+    Wave 2: merges the per-vertical 'Three Jobs' scenes (tone / receipt / brief)
+    into the returned pack so the mid-page mocks flip with the cookie too."""
     v = (request.cookies.get("reachng_vertical") or "").lower().strip()
     base = SCENE_PACKS.get(v, SCENE_PACKS["hospitality"])
+    # Overlay Wave 2 scenes — sensible per-vertical fallback to hospitality
+    wave2 = WAVE2_SCENES.get(v, WAVE2_SCENES["hospitality"])
+    base = {**base, "tone": wave2["tone"], "receipt": wave2["receipt"], "brief": wave2["brief"]}
 
     custom_biz   = (request.cookies.get("reachng_biz_name") or "").strip()[:80]
     custom_trade = (request.cookies.get("reachng_biz_trade") or "").strip()[:60]

@@ -1049,16 +1049,16 @@
         <div style="background: var(--surface); border: 1px solid var(--orange); border-radius: 18px; padding: 22px 22px 18px 22px; box-shadow: 0 12px 36px rgba(255,85,0,0.14);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <div style="width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg,#a8e6cf,#56cfa1); display:flex; align-items:center; justify-content:center; font-weight:700; color:#0a3d2a; font-size: 12px;">FA</div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-strong);">Funke Adebayo</div>
+              <div style="width: 30px; height: 30px; border-radius: 50%; background: {{ s.avatar_grad|default('linear-gradient(135deg,#a8e6cf,#56cfa1)') }}; display:flex; align-items:center; justify-content:center; font-weight:700; color:{{ s.avatar_text_color|default('#0a3d2a') }}; font-size: 12px;">{{ s.customer_initials|default('FA') }}</div>
+              <div style="font-size: 12px; font-weight: 600; color: var(--text-strong);">{{ s.customer_name|default('Funke Adebayo') }}</div>
             </div>
-            <div style="font-size: 10px; color: var(--muted);">Saturday · 8:42 PM</div>
+            <div style="font-size: 10px; color: var(--muted);">{{ s.tone.time_label|default('Saturday · 8:42 PM') }}</div>
           </div>
           <div style="background: #25D366; color: #fff; padding: 10px 13px; border-radius: 12px 12px 12px 4px; font-size: 13px; line-height: 1.5; max-width: 88%; margin-bottom: 14px;">
-            Hi, do you still have a table for 6 this Saturday?
+            {{ s.tone.customer_q|default('Hi, do you still have a table for 6 this Saturday?') }}
           </div>
           <div style="background: linear-gradient(180deg, rgba(255,85,0,0.04), rgba(255,85,0,0.02)); border: 1px solid rgba(255,85,0,0.3); color: var(--text-strong); padding: 12px 14px; border-radius: 12px 12px 4px 12px; font-size: 13px; line-height: 1.6; max-width: 88%; margin-left: auto;">
-            Hey Funke 🙌 yes, we still have one 9pm table for 6 near the DJ booth. Deposit is ₦90k to lock it. Want me to hold it for 10 mins?
+            {{ s.tone.draft_reply|default('Hey Funke 🙌 yes, we still have one 9pm table for 6 near the DJ booth. Deposit is ₦90k to lock it. Want me to hold it for 10 mins?') }}
           </div>
           <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(255,85,0,0.3); font-size: 11px; color: var(--orange); display: flex; gap: 12px; align-items: center;">
             <span>⚡ Drafted in 2.1s</span><span style="color: var(--muted);">·</span><span>👍 Awaiting your tap</span>
@@ -1083,26 +1083,26 @@
         <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 22px 22px 18px 22px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <div style="width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg,#fce4a8,#f5b942); display:flex; align-items:center; justify-content:center; font-weight:700; color:#7a4a00; font-size: 12px;">BO</div>
+              <div style="width: 30px; height: 30px; border-radius: 50%; background: {{ s.receipt.avatar_grad|default('linear-gradient(135deg,#fce4a8,#f5b942)') }}; display:flex; align-items:center; justify-content:center; font-weight:700; color:{{ s.receipt.avatar_text_color|default('#7a4a00') }}; font-size: 12px;">{{ s.receipt.customer_initials|default('BO') }}</div>
               <div>
-                <div style="font-size: 12px; font-weight: 600; color: var(--text-strong);">Bola Olajide</div>
-                <div style="font-size: 10px; color: var(--muted);">+234 802 ••• 89 · WhatsApp</div>
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-strong);">{{ s.receipt.customer_name|default('Bola Olajide') }}</div>
+                <div style="font-size: 10px; color: var(--muted);">{{ s.receipt.phone_masked|default('+234 802 ••• 89') }} · WhatsApp</div>
               </div>
             </div>
-            <div style="font-size: 10px; color: var(--muted);">11:23 AM</div>
+            <div style="font-size: 10px; color: var(--muted);">{{ s.receipt.time_label|default('11:23 AM') }}</div>
           </div>
 
           <div style="background: linear-gradient(135deg, #fff8e1 0%, #fff3c4 100%); border: 1px solid #f9a825; border-radius: 12px; padding: 16px 18px; max-width: 90%; font-family: 'Courier New', monospace;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <div style="font-weight: 700; color: #f57f17; font-size: 14px;">GTBank</div>
+              <div style="font-weight: 700; color: #f57f17; font-size: 14px;">{{ s.receipt.bank|default('GTBank') }}</div>
               <div style="background: #2e7d32; color: #fff; font-size: 9px; padding: 2px 7px; border-radius: 3px; font-family: -apple-system, sans-serif; letter-spacing: 0.5px;">SUCCESSFUL</div>
             </div>
-            <div style="font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;">₦450,000.00</div>
+            <div style="font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;">₦{{ s.receipt.amount_naira|default('450,000') }}.00</div>
             <div style="font-size: 11px; color: #5a5a5a; line-height: 1.7;">
-              From: BOLA O. OLAJIDE<br>
-              To: ALTITUDE LAGOS LTD<br>
-              Ref: TABLE BOOKING SAT<br>
-              Date: 17 May 2026 · 11:22:48
+              From: {{ s.receipt.from_name_caps|default('BOLA O. OLAJIDE') }}<br>
+              To: {{ s.receipt.to_name_caps|default('ALTITUDE LAGOS LTD') }}<br>
+              Ref: {{ s.receipt.ref|default('TABLE BOOKING SAT') }}<br>
+              Date: {{ s.receipt.datetime_label|default('17 May 2026 · 11:22:48') }}
             </div>
           </div>
           <div style="margin-top: 10px; font-size: 11px; color: var(--muted); font-style: italic;">[Image · 1 of 1]</div>
@@ -1116,31 +1116,31 @@
           <div style="position: absolute; top: -10px; left: 18px; background: var(--orange); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 100px; text-transform: uppercase;">EYO read it · drafted · awaiting your tap</div>
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
-            <div style="font-size: 12px; color: var(--muted-strong);">Reply as <strong style="color: var(--text-strong);">Altitude Lagos</strong></div>
+            <div style="font-size: 12px; color: var(--muted-strong);">Reply as <strong style="color: var(--text-strong);">{{ s.receipt.biz_name|default('Altitude Lagos') }}</strong></div>
             <div style="font-size: 10px; color: var(--muted);">processed in 3.2s</div>
           </div>
 
           <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;">
             <div style="font-size: 9px; color: var(--orange); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">Extracted from screenshot</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; font-size: 11px;">
-              <div><span style="color: var(--muted);">Bank:</span> <strong style="color: var(--text-strong);">GTBank</strong></div>
+              <div><span style="color: var(--muted);">Bank:</span> <strong style="color: var(--text-strong);">{{ s.receipt.bank|default('GTBank') }}</strong></div>
               <div><span style="color: var(--muted);">Status:</span> <span style="color: #2e7d32; font-weight: 700;">Successful</span></div>
-              <div><span style="color: var(--muted);">Amount:</span> <strong style="color: var(--text-strong);">₦450,000</strong></div>
-              <div><span style="color: var(--muted);">Ref:</span> <strong style="color: var(--text-strong);">Table booking Sat</strong></div>
-              <div><span style="color: var(--muted);">From:</span> <strong style="color: var(--text-strong);">Bola O. Olajide</strong></div>
-              <div><span style="color: var(--muted);">At:</span> <strong style="color: var(--text-strong);">11:22:48</strong></div>
+              <div><span style="color: var(--muted);">Amount:</span> <strong style="color: var(--text-strong);">₦{{ s.receipt.amount_naira|default('450,000') }}</strong></div>
+              <div><span style="color: var(--muted);">Ref:</span> <strong style="color: var(--text-strong);">{{ s.receipt.ref|default('Table booking Sat') }}</strong></div>
+              <div><span style="color: var(--muted);">From:</span> <strong style="color: var(--text-strong);">{{ s.receipt.customer_name|default('Bola O. Olajide') }}</strong></div>
+              <div><span style="color: var(--muted);">At:</span> <strong style="color: var(--text-strong);">{{ s.receipt.time_label|default('11:22:48') }}</strong></div>
             </div>
           </div>
 
           <div style="background: rgba(211,165,46,0.08); border: 1px solid rgba(211,165,46,0.35); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
             <div style="width: 18px; height: 18px; border-radius: 50%; background: #b8862a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">⏳</div>
             <div style="font-size: 12px; color: var(--text-strong);">
-              <strong>Likely match:</strong> booking <span style="color: var(--muted);">#ALT-2614 · Funke + 5 · Saturday 9pm DJ booth · ₦450k deposit</span> · waiting for your bank confirmation
+              <strong>Likely match:</strong> <span style="color: var(--muted);">{{ s.receipt.match_line|default('#ALT-2614 · Funke + 5 · Saturday 9pm DJ booth · ₦450k deposit') }}</span> · waiting for your bank confirmation
             </div>
           </div>
 
           <div style="background: linear-gradient(180deg, rgba(255,85,0,0.04), rgba(255,85,0,0.02)); border: 1px solid rgba(255,85,0,0.3); color: var(--text-strong); padding: 12px 14px; border-radius: 12px 12px 4px 12px; font-size: 13px; line-height: 1.6;">
-            Hey Bola, thanks for the screenshot 🙏 I'll lock in your Saturday 9pm booking (booth near the DJ, table of 6) the moment ₦450k reflects on our end (usually under 10 mins). I'll ping you the second it lands.
+            {{ s.receipt.draft_reply|default("Hey Bola, thanks for the screenshot 🙏 I'll lock in your Saturday 9pm booking (booth near the DJ, table of 6) the moment ₦450k reflects on our end (usually under 10 mins). I'll ping you the second it lands.") }}
           </div>
 
           <div style="margin-top: 16px; display: flex; gap: 8px;">
@@ -1187,39 +1187,38 @@
 
             <div style="background: #ECE5DD; padding: 20px 16px 24px 16px; min-height: 480px;">
               <div style="text-align: center; margin-bottom: 14px;">
-                <span style="background: rgba(255,255,255,0.85); color: #5a5a5a; font-size: 10px; padding: 3px 10px; border-radius: 8px; letter-spacing: 0.3px;">SATURDAY · 7:02 AM</span>
+                <span style="background: rgba(255,255,255,0.85); color: #5a5a5a; font-size: 10px; padding: 3px 10px; border-radius: 8px; letter-spacing: 0.3px;">{{ s.brief.day_label|default('SATURDAY · 7:02 AM') }}</span>
               </div>
 
               <div style="background: #fff; border-radius: 12px 12px 12px 4px; padding: 14px 16px; max-width: 92%; box-shadow: 0 1px 1px rgba(0,0,0,0.06); font-size: 12.5px; line-height: 1.65; color: #1a1a1a;">
                 <div style="font-weight: 700; color: var(--orange); font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px;">📋 Last night · 11pm to 6am</div>
 
                 <div style="margin-bottom: 10px;">
-                  <strong>12 conversations held</strong> · <strong>8 drafts ready</strong> · <strong>2 🔥 need your tap</strong>
+                  {{ s.brief.headline|default('<strong>12 conversations held</strong> · <strong>8 drafts ready</strong> · <strong>2 🔥 need your tap</strong>')|safe }}
                 </div>
 
                 <div style="border-top: 1px solid #f0ebe1; padding-top: 10px; margin-bottom: 10px;">
-                  <div style="font-weight: 600; color: #2e7d32; font-size: 11px; margin-bottom: 4px;">💰 ₦450k collected</div>
-                  <div style="font-size: 11.5px; color: #4a4a4a;">Bola Olajide · GTB transfer · matched to Saturday booking</div>
+                  <div style="font-weight: 600; color: #2e7d32; font-size: 11px; margin-bottom: 4px;">{{ s.brief.money_label|default('💰 ₦450k collected') }}</div>
+                  <div style="font-size: 11.5px; color: #4a4a4a;">{{ s.brief.money_detail|default('Bola Olajide · GTB transfer · matched to Saturday booking') }}</div>
                 </div>
 
                 <div style="border-top: 1px solid #f0ebe1; padding-top: 10px; margin-bottom: 10px;">
                   <div style="font-weight: 600; color: var(--orange); font-size: 11px; margin-bottom: 4px;">🔥 Awaiting your tap</div>
                   <div style="font-size: 11.5px; color: #4a4a4a; line-height: 1.6;">
-                    • Funke A. · table of 6, Sat 9pm DJ booth<br>
-                    • Tunde K. · ₦12M apartment viewing request
+                    {% for line in (s.brief.hot_lines if s.brief and s.brief.hot_lines else ['Funke A. · table of 6, Sat 9pm DJ booth', 'Tunde K. · ₦12M apartment viewing request']) %}• {{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}
                   </div>
                 </div>
 
                 <div style="border-top: 1px solid #f0ebe1; padding-top: 10px; margin-bottom: 10px;">
                   <div style="font-weight: 600; color: #c62828; font-size: 11px; margin-bottom: 4px;">⚠️ Leak alert</div>
                   <div style="font-size: 11.5px; color: #4a4a4a; line-height: 1.6;">
-                    Adunni Properties · 2 unanswered enquiries since Friday night. Drafts ready.
+                    {{ s.brief.leak_alert|default('Adunni Properties · 2 unanswered enquiries since Friday night. Drafts ready.') }}
                   </div>
                 </div>
 
                 <div style="border-top: 1px solid #f0ebe1; padding-top: 10px;">
                   <div style="font-weight: 600; color: #1a1a1a; font-size: 11px; margin-bottom: 4px;">⚡ Slowest reply</div>
-                  <div style="font-size: 11.5px; color: #4a4a4a;">4 min (vs 6 hrs before ReachNG)</div>
+                  <div style="font-size: 11.5px; color: #4a4a4a;">{{ s.brief.slowest_reply|default('4 min (vs 6 hrs before ReachNG)') }}</div>
                 </div>
 
                 <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #f0ebe1; font-size: 11px; color: var(--orange); font-weight: 600;">
