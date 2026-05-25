@@ -2315,6 +2315,170 @@ function copyDemoPortalLink(btn){
     </div>
   </div>
 
+  <!-- Prospect Interviews (Phase A validation capture) -->
+  <div class="ct-section">
+    <div class="ct-section-title">Prospect Interviews — real conversations from outreach replies</div>
+    <p style="color:#666;font-size:11px;margin:-4px 0 12px;">When a cold-outreach reply turns into a real DM/call, capture it here. The strongest <em>killer quotes</em> later land on the landing page as anonymous social proof.</p>
+
+    <div id="pi-stats-row" style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <div class="ct-kpi" style="padding:10px 14px;min-width:90px;"><div style="font-size:9px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;">Total</div><div id="pi-total" style="font-size:20px;font-weight:700;color:#e8e8e8;">0</div></div>
+      <div class="ct-kpi" style="padding:10px 14px;min-width:90px;border-color:#1e6a3d;"><div style="font-size:9px;color:#5dd28a;text-transform:uppercase;letter-spacing:0.08em;">Hot</div><div id="pi-hot" style="font-size:20px;font-weight:700;color:#5dd28a;">0</div></div>
+      <div class="ct-kpi" style="padding:10px 14px;min-width:90px;border-color:#5a3f1e;"><div style="font-size:9px;color:#e0b75c;text-transform:uppercase;letter-spacing:0.08em;">Warm</div><div id="pi-warm" style="font-size:20px;font-weight:700;color:#e0b75c;">0</div></div>
+      <div class="ct-kpi" style="padding:10px 14px;min-width:90px;border-color:#3a2030;"><div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:0.08em;">Cold</div><div id="pi-cold" style="font-size:20px;font-weight:700;color:#888;">0</div></div>
+    </div>
+
+    <button class="btn btn-approve" style="font-size:12px;padding:8px 18px;margin-bottom:14px;" onclick="document.getElementById('pi-create-form').style.display='block';">+ Log new interview</button>
+
+    <div id="pi-create-form" style="display:none;background:#080c10;border:1px solid #1e2530;border-radius:8px;padding:14px;margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">
+        <label>Prospect name<input id="pi-prospect-name" placeholder="Adunni Okafor" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label>Business<input id="pi-business-name" placeholder="Altitude Lagos" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label>Vertical<select id="pi-vertical" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;">
+          <option value="">— select —</option>
+          <option value="hospitality">hospitality</option>
+          <option value="real_estate">real estate</option>
+          <option value="professional_services">professional services</option>
+          <option value="clinics">clinics</option>
+          <option value="education">education</option>
+          <option value="small_business">small business</option>
+          <option value="other">other</option>
+        </select></label>
+        <label>Channel<select id="pi-channel" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;">
+          <option value="whatsapp">WhatsApp</option>
+          <option value="email">Email</option>
+          <option value="instagram">Instagram DM</option>
+          <option value="call">Phone call</option>
+          <option value="in_person">In person</option>
+        </select></label>
+        <label>Decision-maker role<input id="pi-role" placeholder="Founder / GM / Partner" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label>What do they use today?<input id="pi-current-tool" placeholder="Manual / RheoChat / nothing" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label>Monthly WA volume<input id="pi-volume" type="number" min="0" placeholder="200" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label>Sentiment<select id="pi-sentiment" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;">
+          <option value="warm" selected>warm</option>
+          <option value="hot">hot — wants to pilot</option>
+          <option value="cold">cold — not ready</option>
+        </select></label>
+        <label style="grid-column:1/-1;">Pain today (what's broken in their flow)<textarea id="pi-pain" rows="2" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"></textarea></label>
+        <label style="grid-column:1/-1;">What they'd pay for (verbatim if possible)<textarea id="pi-pay" rows="2" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"></textarea></label>
+        <label style="grid-column:1/-1;">Killer quote (one line, exact words)<input id="pi-quote" placeholder='"We lose 3 bookings a weekend because nobody replies on Sundays"' style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;font-style:italic;"/></label>
+        <label style="grid-column:1/-1;">Next step<input id="pi-next-step" placeholder="Demo Tue 3pm / Send Solo pricing / no follow-up" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label style="grid-column:1/-1;">Notes<textarea id="pi-notes" rows="3" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"></textarea></label>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;">
+        <button class="btn btn-approve" style="font-size:12px;padding:6px 16px;" onclick="piSave()">Save interview</button>
+        <button class="btn" style="font-size:12px;padding:6px 16px;background:#15171a;color:#888;border:1px solid #2a3340;" onclick="document.getElementById('pi-create-form').style.display='none';piClear();">Cancel</button>
+        <span id="pi-save-status" style="font-size:11px;color:#6a7280;align-self:center;"></span>
+      </div>
+    </div>
+
+    <div id="pi-list" style="font-size:12px;"><div style="color:#556;padding:8px 0;">Loading…</div></div>
+  </div>
+
+  <script>
+    function piEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+    async function loadProspectInterviews() {
+      try {
+        const [statsR, listR] = await Promise.all([
+          fetch('/api/v1/admin/prospect-interviews/stats', {headers: authHeaders()}),
+          fetch('/api/v1/admin/prospect-interviews', {headers: authHeaders()}),
+        ]);
+        const s = statsR.ok ? await statsR.json() : {total:0,hot:0,warm:0,cold:0};
+        document.getElementById('pi-total').textContent = s.total || 0;
+        document.getElementById('pi-hot').textContent   = s.hot   || 0;
+        document.getElementById('pi-warm').textContent  = s.warm  || 0;
+        document.getElementById('pi-cold').textContent  = s.cold  || 0;
+
+        const d = listR.ok ? await listR.json() : {interviews:[]};
+        const rows = d.interviews || [];
+        const el = document.getElementById('pi-list');
+        if (!rows.length) { el.innerHTML = '<div style="color:#556;padding:8px 0;">No interviews yet. Capture your first one when a cold reply turns into a real conversation.</div>'; return; }
+        el.innerHTML = rows.map(r => {
+          const cMap = {hot:'#5dd28a', warm:'#e0b75c', cold:'#888'};
+          const c = cMap[r.sentiment] || '#888';
+          const when = r.created_at ? new Date(r.created_at).toLocaleString() : '';
+          return `<div style="background:#080c10;border:1px solid #1e2530;border-left:3px solid ${c};border-radius:6px;padding:12px;margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;">
+              <div>
+                <strong style="color:#d8eaf8;font-size:13px;">${piEsc(r.prospect_name)}</strong>
+                <span style="color:#889;font-size:11px;"> · ${piEsc(r.business_name)}</span>
+                ${r.vertical ? `<span style="color:#666;font-size:10px;"> · ${piEsc(r.vertical)}</span>` : ''}
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <span style="background:${c}22;color:${c};font-size:10px;padding:3px 8px;border-radius:3px;font-weight:700;text-transform:uppercase;">${piEsc(r.sentiment)}</span>
+                <span style="color:#444;font-size:10px;">${when}</span>
+                <button class="btn" style="font-size:10px;padding:2px 8px;background:transparent;color:#666;border:1px solid #2a3340;" onclick="piDelete('${r._id}')">×</button>
+              </div>
+            </div>
+            ${r.killer_quote ? `<div style="margin-top:8px;padding-left:10px;border-left:2px solid #ff5c00;color:#e8e8e8;font-style:italic;font-size:12px;">"${piEsc(r.killer_quote)}"</div>` : ''}
+            ${r.pain_today ? `<div style="margin-top:6px;font-size:11px;color:#aaa;"><strong style="color:#888;">Pain:</strong> ${piEsc(r.pain_today)}</div>` : ''}
+            ${r.what_theyd_pay_for ? `<div style="margin-top:4px;font-size:11px;color:#aaa;"><strong style="color:#888;">Pay for:</strong> ${piEsc(r.what_theyd_pay_for)}</div>` : ''}
+            ${r.next_step ? `<div style="margin-top:6px;font-size:11px;color:#5dd28a;"><strong>Next:</strong> ${piEsc(r.next_step)}</div>` : ''}
+          </div>`;
+        }).join('');
+      } catch (e) {
+        document.getElementById('pi-list').innerHTML = `<div style="color:#ef4444;padding:8px 0;">Error loading: ${e.message}</div>`;
+      }
+    }
+
+    async function piSave() {
+      const body = {
+        prospect_name:           document.getElementById('pi-prospect-name').value,
+        business_name:           document.getElementById('pi-business-name').value,
+        vertical:                document.getElementById('pi-vertical').value || null,
+        channel:                 document.getElementById('pi-channel').value,
+        decision_maker_role:     document.getElementById('pi-role').value || null,
+        current_tool:            document.getElementById('pi-current-tool').value || null,
+        monthly_whatsapp_volume: parseInt(document.getElementById('pi-volume').value) || null,
+        sentiment:               document.getElementById('pi-sentiment').value,
+        pain_today:              document.getElementById('pi-pain').value,
+        what_theyd_pay_for:      document.getElementById('pi-pay').value,
+        killer_quote:            document.getElementById('pi-quote').value,
+        next_step:               document.getElementById('pi-next-step').value,
+        notes:                   document.getElementById('pi-notes').value,
+      };
+      if (!body.prospect_name || !body.business_name) {
+        document.getElementById('pi-save-status').innerHTML = '<span style="color:#ff7a7a;">Prospect + Business required.</span>';
+        return;
+      }
+      try {
+        const r = await fetch('/api/v1/admin/prospect-interviews', {
+          method: 'POST',
+          headers: {...authHeaders(), 'Content-Type':'application/json'},
+          body: JSON.stringify(body),
+        });
+        if (!r.ok) throw new Error(await r.text());
+        document.getElementById('pi-save-status').innerHTML = '<span style="color:#5dd28a;">✓ Saved.</span>';
+        piClear();
+        document.getElementById('pi-create-form').style.display = 'none';
+        loadProspectInterviews();
+      } catch (e) {
+        document.getElementById('pi-save-status').innerHTML = `<span style="color:#ff7a7a;">${piEsc(e.message)}</span>`;
+      }
+    }
+
+    function piClear() {
+      ['pi-prospect-name','pi-business-name','pi-vertical','pi-role','pi-current-tool','pi-volume',
+       'pi-pain','pi-pay','pi-quote','pi-next-step','pi-notes'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+      });
+      document.getElementById('pi-channel').value   = 'whatsapp';
+      document.getElementById('pi-sentiment').value = 'warm';
+    }
+
+    async function piDelete(id) {
+      if (!confirm('Delete this interview?')) return;
+      try {
+        const r = await fetch(`/api/v1/admin/prospect-interviews/${id}`, {method:'DELETE', headers: authHeaders()});
+        if (!r.ok) throw new Error(await r.text());
+        loadProspectInterviews();
+      } catch (e) { alert('Delete failed: ' + e.message); }
+    }
+
+    if (document.readyState !== 'loading') loadProspectInterviews();
+    else document.addEventListener('DOMContentLoaded', loadProspectInterviews);
+  </script>
+
   <!-- Agent Learning (T0.4 close-out) -->
   <div class="ct-section">
     <div class="ct-section-title">Agent Learning — outcomes engine (last 30 days)</div>

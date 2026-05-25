@@ -161,6 +161,8 @@ async def lifespan(app: FastAPI):
     _safe("edit_tone",   ensure_tone_indexes)
     from services.spike_guard import ensure_spike_indexes
     _safe("spike_guard", ensure_spike_indexes)
+    from services.prospect_interviews import ensure_interview_indexes
+    _safe("prospect_interviews", ensure_interview_indexes)
     from services.sales_alerter import ensure_sales_alert_indexes
     _safe("sales_alert", ensure_sales_alert_indexes)
     from services.waitlist import ensure_waitlist_indexes
@@ -326,6 +328,7 @@ from api.admin_docs import router as admin_docs_router
 from api.try_eyo import router as try_eyo_router
 from api.blog import router as blog_router
 from api.agent_learning import router as agent_learning_router
+from api.prospect_interviews import router as prospect_interviews_router
 app.include_router(kb_router)
 app.include_router(client_rules_router)
 app.include_router(scorecard_router)
@@ -335,6 +338,7 @@ app.include_router(waitlist_admin_router)
 app.include_router(copilot_router)
 app.include_router(billing_router)
 app.include_router(agent_learning_router, prefix="/api/v1")
+app.include_router(prospect_interviews_router)
 app.include_router(pipeline_router)
 app.include_router(whatsapp_connect_router)
 app.include_router(onboarding_router)
