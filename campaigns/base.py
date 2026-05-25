@@ -367,6 +367,25 @@ class BaseCampaign:
                         profile_url=biz.get("profile_url", ""),
                         address=biz.get("address"),
                     )
+                elif _client_doc and (_client_doc.get("vertical") or "").lower() == "b2b_saas":
+                    # ReachNG self-outreach (Client #0 path): bypass the standard
+                    # vertical drafter and use the founder-voice prompt.
+                    from services.reachng_self_outreach import draft_with_link
+                    _reviews_excerpt = (biz.get("reviews_excerpt")
+                                         or biz.get("review_excerpt")
+                                         or (biz.get("reviews") or [{}])[0].get("text") if isinstance(biz.get("reviews"), list) else None)
+                    generated = draft_with_link(
+                        business_name=biz["name"],
+                        vertical=biz.get("vertical") or "general",
+                        address=biz.get("address"),
+                        category=biz.get("category"),
+                        rating=biz.get("rating"),
+                        reviews_excerpt=_reviews_excerpt,
+                        contact_name=biz.get("contact_name"),
+                        contact_title=biz.get("contact_title"),
+                        website=biz.get("website"),
+                        contact_id=str(biz.get("_id") or biz.get("id") or ""),
+                    )
                 elif client_brief:
                     generated = generate_outreach_message_for_client(
                         vertical=self.vertical,

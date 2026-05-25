@@ -329,6 +329,7 @@ from api.try_eyo import router as try_eyo_router
 from api.blog import router as blog_router
 from api.agent_learning import router as agent_learning_router
 from api.prospect_interviews import router as prospect_interviews_router
+from api.self_outreach import router as self_outreach_router
 app.include_router(kb_router)
 app.include_router(client_rules_router)
 app.include_router(scorecard_router)
@@ -339,6 +340,7 @@ app.include_router(copilot_router)
 app.include_router(billing_router)
 app.include_router(agent_learning_router, prefix="/api/v1")
 app.include_router(prospect_interviews_router)
+app.include_router(self_outreach_router)
 app.include_router(pipeline_router)
 app.include_router(whatsapp_connect_router)
 app.include_router(onboarding_router)

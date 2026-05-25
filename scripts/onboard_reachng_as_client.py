@@ -22,7 +22,9 @@ from database import get_db
 log = structlog.get_logger()
 
 
-CLIENT_NAME = "ReachNG"
+CLIENT_NAME = "ReachNG Self-Outreach"
+# Legacy names we may need to migrate from (older onboard runs used "ReachNG")
+LEGACY_NAMES = ("ReachNG",)
 
 BRIEF = """\
 ReachNG is a Lagos-built AI WhatsApp operator (EYO) for premium Nigerian
@@ -79,11 +81,38 @@ Annual prepay = 15% off. Never offer < ₦60k Starter under any pressure.
 """
 
 
+def _migrate_legacy_names(clients) -> None:
+    """One-shot rename: any client doc still on a LEGACY_NAMES entry gets
+    re-titled to CLIENT_NAME. Preserves _id, portal_token, outreach history,
+    and any whatsapp_accounts pairings.
+    """
+    for old in LEGACY_NAMES:
+        if old == CLIENT_NAME:
+            continue
+        old_doc = clients.find_one({"name": old})
+        if not old_doc:
+            continue
+        # Collision check — if a doc with CLIENT_NAME already exists, leave
+        # the legacy one alone (operator needs to decide which to keep).
+        new_doc = clients.find_one({"name": CLIENT_NAME})
+        if new_doc and new_doc["_id"] != old_doc["_id"]:
+            log.warning("legacy_rename_skipped_collision",
+                        legacy=old, target=CLIENT_NAME,
+                        legacy_id=str(old_doc["_id"]),
+                        target_id=str(new_doc["_id"]))
+            continue
+        clients.update_one({"_id": old_doc["_id"]},
+                            {"$set": {"name": CLIENT_NAME}})
+        log.info("legacy_client_renamed", from_=old, to=CLIENT_NAME,
+                 id=str(old_doc["_id"]))
+
+
 def upsert_client() -> dict:
     db = get_db()
     clients = db["clients"]
     now = datetime.now(timezone.utc)
 
+    _migrate_legacy_names(clients)
     existing = clients.find_one({"name": CLIENT_NAME})
     set_doc = {
         "name":                 CLIENT_NAME,

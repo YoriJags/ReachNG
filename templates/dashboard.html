@@ -2315,6 +2315,129 @@ function copyDemoPortalLink(btn){
     </div>
   </div>
 
+  <!-- Self-Outreach Dry-Run Preview (Client #0 founder-voice copy) -->
+  <div class="ct-section">
+    <div class="ct-section-title">Self-Outreach — dry-run copy preview</div>
+    <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Generate the actual cold-outreach drafts Client #0 will send. Nothing sends, nothing queues — pure copy preview so you can grade the tone before any real campaign fires. Cost ≈ ₦4 per draft.</p>
+
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+      <button class="btn btn-approve" style="font-size:12px;padding:8px 18px;" onclick="soGenerateBaked()">Generate 5 sample drafts (₦20)</button>
+      <button class="btn" style="font-size:12px;padding:8px 18px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="document.getElementById('so-custom-form').style.display='block';">+ Preview a real business</button>
+      <span id="so-status" style="font-size:11px;color:#6a7280;"></span>
+    </div>
+
+    <div id="so-custom-form" style="display:none;background:#080c10;border:1px solid #1e2530;border-radius:8px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#ff5c00;margin-bottom:10px;">Preview one custom business</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">
+        <label>Business name *<input id="so-name" placeholder="Cocoon Lagos" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label>Vertical<select id="so-vertical" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;">
+          <option value="hospitality">hospitality</option>
+          <option value="real_estate">real estate</option>
+          <option value="professional_services">professional services</option>
+          <option value="clinics">clinics</option>
+          <option value="education">education</option>
+          <option value="small_business">small business</option>
+          <option value="general">general</option>
+        </select></label>
+        <label>Address<input id="so-address" placeholder="Eko Atlantic, Victoria Island, Lagos" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label>Category<input id="so-category" placeholder="Rooftop restaurant & lounge" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label>Maps rating<input id="so-rating" type="number" step="0.1" min="1" max="5" placeholder="4.6" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label>Website<input id="so-website" placeholder="https://cocoon.ng" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label>Decision-maker name<input id="so-contact" placeholder="Adunni Okafor" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label>Decision-maker title<input id="so-title" placeholder="General Manager" style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"/></label>
+        <label style="grid-column:1/-1;">Recent review excerpt (verbatim — the more specific, the better the opener)<textarea id="so-review" rows="2" placeholder='"Took 4 hours to confirm my reservation, went elsewhere."' style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px;font-family:inherit;font-size:12px;"></textarea></label>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;">
+        <button class="btn btn-approve" style="font-size:12px;padding:6px 16px;" onclick="soPreviewOne()">Generate draft</button>
+        <button class="btn" style="font-size:12px;padding:6px 16px;background:#15171a;color:#888;border:1px solid #2a3340;" onclick="document.getElementById('so-custom-form').style.display='none';">Cancel</button>
+      </div>
+    </div>
+
+    <div id="so-drafts" style="display:grid;gap:10px;"></div>
+  </div>
+
+  <script>
+    function soEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+    function soRenderDraft(d) {
+      if (d.error) {
+        return `<div style="background:#2a0e0e;border:1px solid #5a2020;border-left:3px solid #ff5050;border-radius:6px;padding:12px;">
+          <div style="font-size:12px;color:#ff8a8a;font-weight:700;margin-bottom:4px;">✗ ${soEsc(d.label || d.business_name)}</div>
+          <div style="font-size:11px;color:#aaa;">${soEsc(d.error)}</div>
+        </div>`;
+      }
+      const wc = d.word_count || 0;
+      const wcColor = wc <= 90 ? '#5dd28a' : (wc <= 120 ? '#e0b75c' : '#ff8a8a');
+      const lines = (d.message || '').split('\n').map(l => soEsc(l)).join('<br>');
+      return `<div style="background:#080c10;border:1px solid #1e2530;border-left:3px solid #ff5c00;border-radius:6px;padding:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:8px;">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#d8eaf8;">${soEsc(d.label || d.business_name)}</div>
+            <div style="font-size:10px;color:#666;">${soEsc(d.vertical || '')}</div>
+          </div>
+          <span style="background:${wcColor}22;color:${wcColor};font-size:10px;padding:3px 8px;border-radius:3px;font-weight:700;">${wc} words</span>
+        </div>
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#ff9b66;margin-bottom:4px;">Subject</div>
+        <div style="font-size:13px;color:#e8e8e8;margin-bottom:10px;font-weight:600;">${soEsc(d.subject || '')}</div>
+        <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#ff9b66;margin-bottom:4px;">Body</div>
+        <div style="background:#0d1117;border-radius:4px;padding:10px;color:#d8eaf8;font-size:12px;line-height:1.55;white-space:pre-wrap;font-family:Georgia,serif;">${lines}</div>
+      </div>`;
+    }
+
+    async function soGenerateBaked() {
+      const status = document.getElementById('so-status');
+      const wrap = document.getElementById('so-drafts');
+      status.innerHTML = '<span style="color:#888;">Generating 5 drafts… ~10s</span>';
+      wrap.innerHTML = '';
+      try {
+        const r = await fetch('/api/v1/admin/self-outreach/dry-run', {
+          method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'},
+          body: JSON.stringify({}),
+        });
+        if (!r.ok) throw new Error(await r.text());
+        const d = await r.json();
+        wrap.innerHTML = (d.drafts || []).map(soRenderDraft).join('');
+        status.innerHTML = `<span style="color:#5dd28a;">✓ ${d.count} drafts · est ₦${d.cost_ngn_est}</span>`;
+      } catch (e) {
+        status.innerHTML = `<span style="color:#ff7a7a;">Failed: ${soEsc(e.message)}</span>`;
+      }
+    }
+
+    async function soPreviewOne() {
+      const status = document.getElementById('so-status');
+      const wrap = document.getElementById('so-drafts');
+      const body = {
+        business_name:   document.getElementById('so-name').value,
+        vertical:        document.getElementById('so-vertical').value,
+        address:         document.getElementById('so-address').value || null,
+        category:        document.getElementById('so-category').value || null,
+        rating:          parseFloat(document.getElementById('so-rating').value) || null,
+        website:         document.getElementById('so-website').value || null,
+        contact_name:    document.getElementById('so-contact').value || null,
+        contact_title:   document.getElementById('so-title').value || null,
+        reviews_excerpt: document.getElementById('so-review').value || null,
+      };
+      if (!body.business_name) {
+        status.innerHTML = '<span style="color:#ff7a7a;">Business name required.</span>';
+        return;
+      }
+      status.innerHTML = '<span style="color:#888;">Generating draft… ~2s</span>';
+      try {
+        const r = await fetch('/api/v1/admin/self-outreach/preview-one', {
+          method:'POST', headers:{...authHeaders(),'Content-Type':'application/json'},
+          body: JSON.stringify(body),
+        });
+        if (!r.ok) throw new Error(await r.text());
+        const d = await r.json();
+        const card = soRenderDraft({...d, label: body.business_name, vertical: body.vertical, business_name: body.business_name});
+        wrap.innerHTML = card + wrap.innerHTML;
+        status.innerHTML = '<span style="color:#5dd28a;">✓ draft ready</span>';
+      } catch (e) {
+        status.innerHTML = `<span style="color:#ff7a7a;">Failed: ${soEsc(e.message)}</span>`;
+      }
+    }
+  </script>
+
   <!-- Prospect Interviews (Phase A validation capture) -->
   <div class="ct-section">
     <div class="ct-section-title">Prospect Interviews — real conversations from outreach replies</div>
