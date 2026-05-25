@@ -164,11 +164,18 @@
     max-width: var(--maxw); margin: 0 auto; padding: 0 28px;
     display: flex; justify-content: space-between; align-items: center; gap: 24px;
   }
+  nav.site-nav .logo-stack { display: flex; flex-direction: column; gap: 1px; line-height: 1; }
   nav.site-nav .logo {
     font-family: var(--serif); font-size: 20px; font-weight: 400; letter-spacing: -0.3px;
-    color: var(--text-strong);
+    color: var(--text-strong); line-height: 1;
   }
   nav.site-nav .logo span { color: var(--accent); font-style: italic; }
+  nav.site-nav .logo-signature {
+    font-size: 10.5px; color: var(--text-soft); letter-spacing: 0.02em;
+    margin-top: 2px; opacity: 0.75; transition: opacity 0.15s, color 0.15s;
+  }
+  nav.site-nav .logo-signature:hover { opacity: 1; color: var(--accent); }
+  @media (max-width: 540px) { nav.site-nav .logo-signature { display: none; } }
   nav.site-nav ul { list-style: none; display: flex; gap: 32px; margin: 0; padding: 0; align-items: center; }
   nav.site-nav ul a { color: var(--text-soft); font-size: 14px; font-weight: 500; }
   nav.site-nav ul a:hover { color: var(--text-strong); }
@@ -353,7 +360,10 @@
 
 <nav class="site-nav">
   <div class="nav-inner">
-    <a href="/" class="logo">Reach<span>NG</span></a>
+    <div class="logo-stack">
+      <a href="/" class="logo">Reach<span>NG</span></a>
+      <a href="/about" class="logo-signature" data-ph="nav_founder_signature">Made in Lagos by Yori →</a>
+    </div>
     <ul>
       <li><a href="/how-it-works">How it works</a></li>
       <li><a href="/about">About</a></li>
