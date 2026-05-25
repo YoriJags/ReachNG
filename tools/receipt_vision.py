@@ -4,24 +4,31 @@ Receipt Catcher — vision extraction.
 Takes raw image bytes (a customer's bank-transfer screenshot from WhatsApp) and
 returns structured fields: bank, amount, sender, reference, time, recipient.
 
-Uses Claude Haiku 4.5 vision. Handles:
-  - GTBank app / email
-  - OPay, PalmPay, Kuda, Moniepoint
-  - Access mobile / FirstMobile / Zenith mobile
-  - POS slip photos
-  - USSD confirmation screenshots
-  - Receipt-like screenshots that aren't actually bank transfers (returns is_receipt=False)
+Two-tier extraction (cost optimisation, 2026-05-25):
+  1. Gemini 1.5 Flash takes the first pass — ~10–15× cheaper than Haiku for
+     pure OCR. Forces JSON output via responseMimeType.
+  2. If Flash returns low confidence (<0.6) OR claims `is_receipt=true` but
+     missed the critical fields (amount + recipient), Haiku 4.5 retries.
+     Haiku is also the fallback when no Gemini key is configured.
+
+Both tiers handle:
+  - GTBank app / email, OPay, PalmPay, Kuda, Moniepoint, Carbon
+  - Access mobile / FirstMobile / Zenith mobile / UBA / Stanbic / FCMB
+  - POS slip photos, USSD confirmation screenshots
+  - Non-receipts (selfies, menus, IDs, memes) → is_receipt=False
 
 Returns a `ReceiptData` Pydantic model. All fields optional except `is_receipt`.
 """
 from __future__ import annotations
 
+import asyncio
 import base64
 import json
 import re
 from typing import Optional
 
 import anthropic
+import httpx
 import structlog
 from pydantic import BaseModel, Field
 
@@ -98,22 +105,101 @@ Return ONLY a JSON object with these keys (no preamble, no markdown):
 
 # ─── Public API ───────────────────────────────────────────────────────────────
 
+# Quality gate — if Flash's output falls below either of these we retry on Haiku.
+_MIN_FLASH_CONFIDENCE = 0.6
+
+
+def _needs_haiku_retry(r: ReceiptData) -> bool:
+    """Decide whether to escalate Flash's draft to Haiku."""
+    if r.confidence < _MIN_FLASH_CONFIDENCE:
+        return True
+    # Flash claimed it's a receipt but missed the two fields we actually need
+    # to match it against a tenant/invoice/lead. Worth the second pass.
+    if r.is_receipt and (r.amount_ngn is None or not r.recipient_name):
+        return True
+    return False
+
+
+def _normalise_mime(mime_type: str) -> str:
+    mime = (mime_type or "image/jpeg").lower().split(";")[0].strip()
+    if mime not in {"image/jpeg", "image/png", "image/gif", "image/webp"}:
+        mime = "image/jpeg"
+    return mime
+
+
+async def _extract_with_flash(b64: str, mime: str, api_key: str) -> Optional[ReceiptData]:
+    """First-pass extraction via Gemini 1.5 Flash. Returns None on failure."""
+    url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
+           f"gemini-1.5-flash:generateContent?key={api_key}")
+    body = {
+        "systemInstruction": {"parts": [{"text": _VISION_SYSTEM}]},
+        "contents": [{
+            "role": "user",
+            "parts": [
+                {"inline_data": {"mime_type": mime, "data": b64}},
+                {"text": "Extract receipt fields. Return ONLY the JSON object."},
+            ],
+        }],
+        "generationConfig": {
+            "temperature": 0.0,
+            "maxOutputTokens": 800,
+            "responseMimeType": "application/json",
+        },
+    }
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as cx:
+            resp = await cx.post(url, json=body)
+            resp.raise_for_status()
+            data = resp.json()
+        raw = data["candidates"][0]["content"]["parts"][0]["text"]
+    except Exception as e:
+        log.warning("flash_receipt_vision_failed", error=str(e))
+        return None
+    return _parse_json_to_receipt(raw)
+
+
+def _extract_with_haiku(b64: str, mime: str, api_key: str) -> Optional[ReceiptData]:
+    """Second-pass extraction via Claude Haiku 4.5. Returns None on failure."""
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        resp = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=600,
+            system=_VISION_SYSTEM,
+            messages=[{
+                "role": "user",
+                "content": [
+                    {"type": "image", "source": {"type": "base64",
+                                                  "media_type": mime, "data": b64}},
+                    {"type": "text", "text": "Extract receipt fields. Return ONLY the JSON object."},
+                ],
+            }],
+        )
+        raw = "".join(b.text for b in resp.content
+                       if getattr(b, "type", None) == "text").strip()
+    except Exception as e:
+        log.error("haiku_receipt_vision_failed", error=str(e))
+        return None
+    return _parse_json_to_receipt(raw)
+
+
 async def extract_receipt(image_bytes: bytes, mime_type: str,
                            client_id: Optional[str] = None) -> ReceiptData:
     """
-    Run a Nigerian bank-receipt extraction over an image.
+    Two-tier Nigerian bank-receipt extraction.
 
-    `client_id` enables T0.2.5 metering — pass it from the webhook caller so
-    every vision call is rate-limited + recorded against that client's bill.
+    Tier 1: Gemini 1.5 Flash (cheap, ~₦0.40/call) — first pass.
+    Tier 2: Claude Haiku 4.5 — retries when Flash is uncertain or missed
+            critical fields, or runs alone when no Gemini key is set.
 
-    Synchronous Anthropic client wrapped — Anthropic Python SDK is sync, but the
-    call is short enough to run inline. If we ever batch, move to AsyncAnthropic.
+    `client_id` enables T0.2.5 metering — every vision call is rate-limited
+    and recorded against that client's bill. Tier is tracked in `extra.tier`.
     """
     settings = get_settings()
-    if not settings.anthropic_api_key:
-        log.warning("anthropic_key_missing_for_receipt_vision")
+    if not settings.anthropic_api_key and not settings.gemini_api_key:
+        log.warning("no_vision_keys_configured")
         return ReceiptData(is_receipt=False, confidence=0.0,
-                           extraction_notes="ANTHROPIC_API_KEY not set")
+                           extraction_notes="no vision API keys configured")
 
     # T0.2.5 — anti-runaway rate-limit gate (20 vision calls/min per client)
     if client_id:
@@ -126,41 +212,41 @@ async def extract_receipt(image_bytes: bytes, mime_type: str,
         except Exception:
             pass
 
-    # Normalise mime — Anthropic accepts image/jpeg, image/png, image/gif, image/webp
-    mime = (mime_type or "image/jpeg").lower().split(";")[0].strip()
-    if mime not in {"image/jpeg", "image/png", "image/gif", "image/webp"}:
-        # Default to jpeg — most WhatsApp images compress to jpeg anyway
-        mime = "image/jpeg"
-
+    mime = _normalise_mime(mime_type)
     b64 = base64.standard_b64encode(image_bytes).decode("utf-8")
 
-    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+    tier_used = "haiku"
+    receipt: Optional[ReceiptData] = None
 
-    try:
-        resp = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=600,
-            system=_VISION_SYSTEM,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "image", "source": {"type": "base64", "media_type": mime, "data": b64}},
-                    {"type": "text", "text": "Extract receipt fields. Return ONLY the JSON object."},
-                ],
-            }],
-        )
-    except Exception as e:
-        log.error("receipt_vision_call_failed", error=str(e))
-        return ReceiptData(is_receipt=False, confidence=0.0,
-                           extraction_notes=f"vision call failed: {e}")
+    # ── Tier 1: Flash ────────────────────────────────────────────────────────
+    if settings.gemini_api_key:
+        receipt = await _extract_with_flash(b64, mime, settings.gemini_api_key)
+        if receipt is not None:
+            tier_used = "flash"
+            if _needs_haiku_retry(receipt) and settings.anthropic_api_key:
+                log.info("receipt_flash_uncertain_retrying_haiku",
+                         conf=receipt.confidence,
+                         is_receipt=receipt.is_receipt,
+                         had_amount=receipt.amount_ngn is not None)
+                haiku_result = await asyncio.to_thread(
+                    _extract_with_haiku, b64, mime, settings.anthropic_api_key)
+                if haiku_result is not None:
+                    receipt = haiku_result
+                    tier_used = "flash+haiku"
 
-    raw = "".join(
-        block.text for block in resp.content if getattr(block, "type", None) == "text"
-    ).strip()
+    # ── Tier 2 (or sole tier when no Gemini key): Haiku ──────────────────────
+    if receipt is None:
+        if not settings.anthropic_api_key:
+            return ReceiptData(is_receipt=False, confidence=0.0,
+                               extraction_notes="Flash failed, no Haiku fallback configured")
+        receipt = await asyncio.to_thread(
+            _extract_with_haiku, b64, mime, settings.anthropic_api_key)
+        tier_used = "haiku"
+        if receipt is None:
+            return ReceiptData(is_receipt=False, confidence=0.0,
+                               extraction_notes="all vision tiers failed")
 
-    receipt = _parse_json_to_receipt(raw)
-
-    # T0.2.5 — record successful usage event
+    # T0.2.5 — record usage with tier breakdown for cost visibility
     if client_id:
         try:
             from services.usage_meter import record
@@ -168,7 +254,12 @@ async def extract_receipt(image_bytes: bytes, mime_type: str,
                 client_id=str(client_id),
                 feature="receipt",
                 units=1,
-                extra={"is_receipt": bool(receipt.is_receipt), "amount": receipt.amount_ngn},
+                extra={
+                    "tier":       tier_used,
+                    "is_receipt": bool(receipt.is_receipt),
+                    "amount":     receipt.amount_ngn,
+                    "confidence": receipt.confidence,
+                },
             )
         except Exception:
             pass
