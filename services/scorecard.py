@@ -94,6 +94,8 @@ class Scorecard:
     drafts_edited:           int              = 0
     drafts_skipped:          int              = 0
     approval_rate:           float            = 0.0
+    # WhatsApp ban-defence signal — Meta watches this; <30% over 100+ sends is a red flag
+    customer_reply_rate:     Optional[float]  = None
 
     # Time / cost savings
     hours_saved:             float            = 0.0
@@ -307,6 +309,28 @@ def compute_scorecard(
     # Speed
     median_resp = _median_response_seconds(cid, period_start)
 
+    # Customer reply rate (Meta's primary anti-spam signal). Counts outbound
+    # WhatsApp sends in window vs inbound replies that followed. Cheap proxy
+    # using outreach_log + inbound_messages on the same phone.
+    customer_reply_rate: Optional[float] = None
+    try:
+        if cname:
+            out_phones = list(_db()["outreach_log"].aggregate([
+                {"$match": {"client_name": cname, "channel": "whatsapp",
+                             "sent_at": {"$gte": period_start}, "phone": {"$ne": None}}},
+                {"$group": {"_id": "$phone"}},
+            ]))
+            phones = [d["_id"] for d in out_phones if d.get("_id")]
+            if len(phones) >= 20:  # min sample to avoid noise
+                replied = _db()["inbound_messages"].distinct(
+                    "sender_phone",
+                    {"client_name": cname, "sender_phone": {"$in": phones},
+                     "received_at": {"$gte": period_start}},
+                )
+                customer_reply_rate = round(len(replied) / len(phones), 4)
+    except Exception:
+        pass
+
     # Cost
     hours_saved = (drafts_approved * MINUTES_PER_MANUAL_REPLY) / 60.0
     api_cost = drafts_approved * NGN_PER_DRAFT_API_COST
@@ -328,6 +352,7 @@ def compute_scorecard(
         drafts_edited=drafts_edited,
         drafts_skipped=drafts_skipped,
         approval_rate=round(approval_rate, 4),
+        customer_reply_rate=customer_reply_rate,
         hours_saved=round(hours_saved, 1),
         api_cost_ngn=round(api_cost, 2),
         cost_per_booking_ngn=cost_per_booking,

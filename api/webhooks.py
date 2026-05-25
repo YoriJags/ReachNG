@@ -239,6 +239,34 @@ async def whatsapp_inbound(request: Request):
     except Exception:
         pass
 
+    # ── Spike guard — record one inbound per client, trip pause if rate exceeds cap
+    _spike_client_name: str | None = None
+    try:
+        if _early_client_id:
+            _cdoc = _db()["clients"].find_one(
+                {"_id": __import__("bson").ObjectId(_early_client_id)}, {"name": 1, "owner_phone": 1})
+            if _cdoc:
+                _spike_client_name = _cdoc.get("name")
+                if _spike_client_name:
+                    from services.spike_guard import record_inbound_and_check
+                    _spike = record_inbound_and_check(_spike_client_name)
+                    if _spike.get("just_tripped") and _cdoc.get("owner_phone"):
+                        # Best-effort one-shot WhatsApp alert to the operator
+                        try:
+                            from tools.outreach import send_whatsapp_for_client
+                            await send_whatsapp_for_client(
+                                phone=_cdoc["owner_phone"],
+                                message=(f"⚠ EYO paused autopilot for 30 min — your number got "
+                                         f"{_spike['count']} inbounds in the last 5 minutes "
+                                         f"(safe ceiling: {_spike['cap']}). "
+                                         f"Replies will buffer in the queue. Tap to send manually."),
+                                client_doc=_cdoc,
+                            )
+                        except Exception as _se:
+                            log.warning("spike_alert_send_failed", error=str(_se))
+    except Exception as _se:
+        log.error("spike_guard_record_failed", error=str(_se))
+
     # ── Voice-note transcription (T0.1) — runs FIRST so transcript becomes text ──
     # If the inbound carries a voice note / audio attachment, transcribe it via
     # Whisper and substitute the transcript as the message body so every

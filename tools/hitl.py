@@ -112,6 +112,24 @@ def queue_draft(
     _enforce_brief_gate(source=source, client_name=client_name)
     _enforce_account_caps(source=source, client_name=client_name)
 
+    # ── 24h session-vs-template window (WhatsApp ban defence) ───────────────
+    # Meta forbids non-template outbound to a phone that hasn't messaged us in
+    # the last 24h. Flag the draft so the operator sees it needs a template
+    # send (or sees that this is a legitimate cold/transactional source like
+    # invoice / closer_revival that ships under an approved template).
+    requires_template = False
+    try:
+        if channel == "whatsapp" and phone and client_name:
+            last_in = get_db()["inbound_messages"].find_one(
+                {"client_name": client_name, "sender_phone": phone,
+                 "received_at": {"$gte": datetime.now(timezone.utc) - timedelta(hours=24)}},
+                {"_id": 1},
+            )
+            if not last_in:
+                requires_template = True
+    except Exception:
+        pass
+
     # ── Tone scrub ────────────────────────────────────────────────────────────
     # Strip casual endearments ("babe", "love", "dear" etc.) that the drafter
     # may have generated despite the never-say rule in the system prompt.
@@ -178,6 +196,9 @@ def queue_draft(
         "escalated":      bool(classification and classification.get("escalate")),
         # P1 quick-win — deterministic risk read so the operator knows which drafts to eyeball
         "risk":           _risk,
+        # WhatsApp ban defence — flag drafts outside the 24h session window so
+        # the operator knows a template send is required by Meta's policy.
+        "requires_template": requires_template,
     })
     approval_id = str(result.inserted_id)
     log.info("draft_queued", contact=contact_name, channel=channel, source=source)

@@ -80,17 +80,22 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
     if current_stage in ("lost", "booked"):
         return None
 
-    # ── Owner-pause gate (SPRINT 2 #11) — short-circuit if owner paused EYO
+    # ── Owner-pause + spike gates — short-circuit if either is active ───────
     try:
         lcid = lead.get("client_id")
         if lcid:
             from datetime import datetime, timezone
             from database import get_db as _gdb_paused
             cdoc = _gdb_paused()["clients"].find_one(
-                {"_id": ObjectId(str(lcid))}, {"eyo_paused_until": 1})
-            paused = (cdoc or {}).get("eyo_paused_until")
-            if paused and paused > datetime.now(timezone.utc):
+                {"_id": ObjectId(str(lcid))},
+                {"eyo_paused_until": 1, "spike_paused_until": 1, "name": 1})
+            now_utc = datetime.now(timezone.utc)
+            if (cdoc or {}).get("eyo_paused_until") and cdoc["eyo_paused_until"] > now_utc:
                 log.info("closer_draft_skipped_owner_paused", lead=lead_id)
+                return None
+            if (cdoc or {}).get("spike_paused_until") and cdoc["spike_paused_until"] > now_utc:
+                log.info("closer_draft_skipped_spike_paused", lead=lead_id,
+                         client=cdoc.get("name"))
                 return None
     except Exception:
         pass

@@ -90,21 +90,94 @@ async def send_whatsapp_meta(
         return {"success": True, "message_id": msg_id}
 
 
+def _pick_active_meta_account(client_doc: dict) -> Optional[dict]:
+    """Multi-line failover (WhatsApp ban defence).
+
+    Schema: `client_doc.whatsapp_accounts` is an ordered list of dicts
+        [{"label": "primary", "meta_phone_number_id": ..., "meta_access_token": ...,
+          "health": "OK"|"NOT_OK", "primary": True/False}, ...]
+    We pick the first entry with health == "OK" (or unset), preferring the one
+    flagged `primary`. Falls back to legacy single-field fields when no list.
+    """
+    accounts = client_doc.get("whatsapp_accounts") or []
+    if accounts:
+        ordered = sorted(accounts, key=lambda a: (not a.get("primary"), 0))
+        for a in ordered:
+            if (a.get("health") or "OK") == "OK" and a.get("meta_phone_number_id") and a.get("meta_access_token"):
+                return a
+        # All marked NOT_OK — try any with creds as last resort
+        for a in ordered:
+            if a.get("meta_phone_number_id") and a.get("meta_access_token"):
+                log.warning("all_whatsapp_lines_unhealthy_using_last_resort",
+                            client=client_doc.get("name"), label=a.get("label"))
+                return a
+        return None
+    # Legacy single-line
+    if client_doc.get("meta_phone_number_id") and client_doc.get("meta_access_token"):
+        return {"meta_phone_number_id": client_doc["meta_phone_number_id"],
+                "meta_access_token":    client_doc["meta_access_token"],
+                "label":                "legacy"}
+    return None
+
+
 async def send_whatsapp_for_client(
     phone: str,
     message: str,
     client_doc: Optional[dict] = None,
 ) -> dict:
     """
-    Route WhatsApp through the right Meta credentials.
-    If client has their own Meta credentials, use those.
-    Otherwise fall back to the default Meta account (env vars).
+    Route WhatsApp through the right Meta credentials with failover.
+
+    If the client has `whatsapp_accounts: [...]` configured, picks the
+    healthy primary first; on send failure, marks that account NOT_OK and
+    retries on the next available line. Single-line clients fall through
+    unchanged.
     """
     if client_doc and client_doc.get("whatsapp_provider") == "meta":
-        phone_number_id = client_doc.get("meta_phone_number_id")
-        access_token    = client_doc.get("meta_access_token")
-        if phone_number_id and access_token:
-            return await send_whatsapp_meta(phone, message, phone_number_id, access_token)
+        accounts = client_doc.get("whatsapp_accounts") or []
+        if accounts:
+            # Try each healthy account, failing over on send error
+            last_error = None
+            ordered = sorted(accounts, key=lambda a: (not a.get("primary"), 0))
+            for a in ordered:
+                if (a.get("health") or "OK") != "OK":
+                    continue
+                pn = a.get("meta_phone_number_id")
+                tok = a.get("meta_access_token")
+                if not (pn and tok):
+                    continue
+                try:
+                    result = await send_whatsapp_meta(phone, message, pn, tok)
+                    if result.get("success"):
+                        return result
+                    last_error = result
+                except Exception as e:
+                    last_error = {"success": False, "error": str(e), "label": a.get("label")}
+                # Mark this line as unhealthy and try the next
+                try:
+                    from database import get_db
+                    get_db()["clients"].update_one(
+                        {"_id": client_doc["_id"], "whatsapp_accounts.label": a.get("label")},
+                        {"$set": {"whatsapp_accounts.$.health": "NOT_OK",
+                                  "whatsapp_accounts.$.last_failure_at":
+                                      __import__("datetime").datetime.now(
+                                          __import__("datetime").timezone.utc)}},
+                    )
+                except Exception:
+                    pass
+                log.warning("whatsapp_line_failover",
+                            client=client_doc.get("name"),
+                            failed_label=a.get("label"))
+            if last_error:
+                log.error("all_whatsapp_lines_failed",
+                          client=client_doc.get("name"), last=last_error)
+                return last_error or {"success": False, "error": "all lines failed"}
+        # No accounts list → try the legacy single-line credentials
+        pick = _pick_active_meta_account(client_doc)
+        if pick:
+            return await send_whatsapp_meta(phone, message,
+                                             pick["meta_phone_number_id"],
+                                             pick["meta_access_token"])
         log.warning("client_meta_credentials_missing", client=client_doc.get("name"))
 
     # Default: ReachNG's own Meta account

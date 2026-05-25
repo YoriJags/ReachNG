@@ -5177,6 +5177,7 @@ function renderApprovals(approvals) {
       </div>
       <div class="approval-meta">${sourceLabel(a)} &nbsp;·&nbsp; ${created}</div>
       ${riskBadge}
+      ${a.requires_template ? '<div style="margin:6px 0 10px;font-size:11px;color:#ffb454;background:#2a1f0a;border:1px solid #5a3f1e;border-radius:6px;padding:4px 9px;display:inline-flex;gap:8px;align-items:center;font-family:JetBrains Mono,monospace;letter-spacing:0.03em;">⚠ outside 24h session · Meta requires an approved template for this send</div>' : ''}
       ${emoBadge}
       ${escalationBanner}
       ${postCtx}

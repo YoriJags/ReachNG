@@ -230,13 +230,29 @@ def compile_client_brief(client_name: str, portal_url: str = "") -> str:
     except Exception:
         pass
 
+    # ── Reply-rate health line (WhatsApp ban defence) ─────────────────────
+    # Surface in the brief if Meta is likely to flag this number for spam.
+    health_line = ""
+    try:
+        from services.scorecard import compute_scorecard
+        sc = compute_scorecard(client_id=str(client["_id"]), period_days=14)
+        d = sc.model_dump() if hasattr(sc, "model_dump") else (sc if isinstance(sc, dict) else sc.__dict__)
+        rr = d.get("customer_reply_rate")
+        if rr is not None and rr < 0.30:
+            pct = int(round(rr * 100))
+            health_line = (f"\n\n⚠ *WhatsApp health:* only {pct}% of people you message back. "
+                            f"Meta flags numbers below 30% — review what's going out before "
+                            f"you lose the line.")
+    except Exception:
+        pass
+
     # ── Compose ─────────────────────────────────────────────────────────
     brief = f"""🌅 *Good morning, {client_name.split()[0]}!*
 {day_str} — Owner Brief{cap_line}
 
 {headline_block}
 
-{approval_line}
+{approval_line}{health_line}
 
 _Overnight: {activity_recap}_{streak_line}
 _Powered by ReachNG — your AI sales engine_"""
