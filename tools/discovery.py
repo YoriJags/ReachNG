@@ -213,6 +213,20 @@ VERTICAL_QUERIES = {
         "logistics company {city}",
         "accounting firm {city}",
     ],
+    # ReachNG Self-Outreach (Client #0) — premium Lagos/Abuja ICP for EYO.
+    # Mix of verticals where money enters the business via WhatsApp.
+    "b2b_saas": [
+        "luxury restaurant {city}",
+        "premium hotel {city}",
+        "boutique law firm {city}",
+        "luxury real estate {city}",
+        "aesthetic clinic {city}",
+        "premium fashion atelier {city}",
+        "high-end events venue {city}",
+        "luxury car dealership {city}",
+        "private clinic {city}",
+        "concierge service {city}",
+    ],
 }
 
 # Sector-level query groups within agency_sales — used for targeted outreach
