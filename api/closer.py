@@ -232,6 +232,34 @@ async def draft_next_for_lead(lead_id: str):
     return {"success": True, **result}
 
 
+@router.get("/leads/by-id/{lead_id}/pending-draft")
+async def get_lead_pending_draft(lead_id: str):
+    """Latest pending HITL draft for this lead, if any.
+
+    The drafter writes approvals with contact_id=lead_id and source='closer',
+    so we can find them with a scoped query — no schema changes needed.
+    Returns {draft: {...}|null}.
+    """
+    try:
+        ObjectId(lead_id)
+    except Exception:
+        raise HTTPException(400, "Invalid lead_id")
+    now = datetime.now(timezone.utc)
+    col = get_db()["pending_approvals"]
+    doc = col.find_one(
+        {"contact_id": lead_id, "source": "closer", "status": "pending",
+         "$or": [{"expires_at": {"$gt": now}}, {"expires_at": {"$exists": False}}]},
+        sort=[("created_at", -1)],
+    )
+    if not doc:
+        return {"draft": None}
+    doc["_id"] = str(doc["_id"])
+    for k in ("created_at", "updated_at", "expires_at"):
+        if doc.get(k):
+            doc[k] = doc[k].isoformat() if hasattr(doc[k], "isoformat") else doc[k]
+    return {"draft": doc}
+
+
 @router.post("/leads/by-id/{lead_id}/note")
 async def add_note(lead_id: str, payload: NotePayload):
     try:

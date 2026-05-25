@@ -9970,7 +9970,7 @@ async function closerAdminRenderDetail(name) {
                 const when = l.created_at ? new Date(l.created_at).toLocaleString() : '—';
                 const contact = l.contact_name || l.contact_phone || l.contact_email || '—';
                 const preview = (l.inquiry_text || '').replace(/\s+/g,' ').slice(0, 70);
-                return `<tr>
+                return `<tr style="cursor:pointer;" onclick="closerAdminOpenLead('${l.id}')" title="Open thread + draft">
                   <td style="color:#889;font-size:11px">${when}</td>
                   <td>${contact}</td>
                   <td style="color:#889;font-size:11px">${l.source || '—'}</td>
@@ -9981,6 +9981,8 @@ async function closerAdminRenderDetail(name) {
             </table>
           </div>`}
       </div>
+
+      <div id="closer-lead-panel" style="margin-top:14px;"></div>
     `;
   } catch (e) {
     el.innerHTML = '<div style="color:#ef4444;font-size:12px;padding:40px;text-align:center;">Error loading client.</div>';
@@ -10003,6 +10005,176 @@ async function closerAdminDryRun() {
   } catch (e) {
     alert('Error: ' + e.message);
   }
+}
+
+// ── Closer lead drill-down (BACKLOG #6: Closer UI) ─────────────────────────
+let _closerLeadOpen = null;
+
+function _esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+async function closerAdminOpenLead(leadId) {
+  _closerLeadOpen = leadId;
+  const panel = document.getElementById('closer-lead-panel');
+  if (!panel) return;
+  panel.innerHTML = '<div style="color:#556;font-size:12px;padding:20px;text-align:center;">Loading lead…</div>';
+  try {
+    const [leadR, draftR] = await Promise.all([
+      fetch(`/api/v1/closer/leads/by-id/${leadId}`, {headers: authHeaders()}),
+      fetch(`/api/v1/closer/leads/by-id/${leadId}/pending-draft`, {headers: authHeaders()}),
+    ]);
+    if (!leadR.ok) throw new Error(await leadR.text());
+    const lead = await leadR.json();
+    const draftD = await draftR.json();
+    const draft = draftD.draft;
+    closerAdminRenderLead(lead, draft);
+  } catch (e) {
+    panel.innerHTML = `<div style="color:#ef4444;font-size:12px;padding:20px;">Error: ${_esc(e.message)}</div>`;
+  }
+}
+
+function closerAdminRenderLead(lead, draft) {
+  const panel = document.getElementById('closer-lead-panel');
+  const thread = lead.thread || [];
+  const stages = ['new','qualifying','ready','booked','lost','stalled'];
+  const stageOptions = stages.map(s =>
+    `<option value="${s}" ${s === lead.stage ? 'selected' : ''}>${s}</option>`).join('');
+
+  const threadHtml = thread.length === 0
+    ? '<div style="color:#556;font-size:12px;padding:8px 0;">No messages yet.</div>'
+    : thread.map(ev => {
+        const dir = ev.direction || 'note';
+        const color = dir === 'in' ? '#7ec0ee' : (dir === 'out' ? '#a3e635' : '#a0a8b8');
+        const bg = dir === 'in' ? '#0d1a25' : (dir === 'out' ? '#0e1a0e' : '#15171a');
+        const label = dir === 'in' ? '← In' : (dir === 'out' ? 'Out →' : '· Note');
+        const when = ev.at ? new Date(ev.at).toLocaleString() : '';
+        return `<div style="margin:6px 0;padding:8px 10px;background:${bg};border-left:2px solid ${color};border-radius:3px;">
+          <div style="font-size:10px;color:${color};letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px;">
+            ${label} · ${_esc(ev.channel || '')} · <span style="color:#556;">${when}</span>
+          </div>
+          <div style="font-size:12px;color:#d8eaf8;white-space:pre-wrap;">${_esc(ev.body || '')}</div>
+        </div>`;
+      }).join('');
+
+  const draftHtml = !draft
+    ? `<div style="color:#556;font-size:12px;padding:8px 0;">No pending draft.
+         <button class="btn" style="font-size:11px;background:#1e2530;color:#aaa;border:1px solid #2a3340;margin-left:8px;"
+                 onclick="closerAdminDraftNext('${lead.id}')">Generate next draft</button></div>`
+    : `<textarea id="closer-draft-text-${draft._id}" rows="5"
+                  style="width:100%;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:8px;font-family:inherit;font-size:12px;">${_esc(draft.message || '')}</textarea>
+       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+         <button class="btn btn-approve" style="font-size:11px;" onclick="closerAdminApproveDraft('${draft._id}', '${lead.id}')">✓ Approve & send</button>
+         <button class="btn" style="font-size:11px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="closerAdminEditDraft('${draft._id}', '${lead.id}')">Edit & send</button>
+         <button class="btn" style="font-size:11px;background:#15171a;color:#888;border:1px solid #2a3340;" onclick="closerAdminSkipDraft('${draft._id}', '${lead.id}')">Skip</button>
+       </div>`;
+
+  panel.innerHTML = `
+    <div style="background:#080c10;border:1px solid #ff5c00;border-radius:8px;padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#d8eaf8;">${_esc(lead.contact_name || lead.contact_phone || '(no contact)')}</div>
+          <div style="font-size:10px;color:#556;letter-spacing:0.08em;text-transform:uppercase;">Lead · ${_esc(lead.id)}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <label style="font-size:11px;color:#889;">Stage:</label>
+          <select onchange="closerAdminSetStage('${lead.id}', this.value)" style="background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:4px 6px;font-size:11px;">${stageOptions}</select>
+          <button class="btn" style="font-size:11px;background:#15171a;color:#888;border:1px solid #2a3340;" onclick="document.getElementById('closer-lead-panel').innerHTML='';">Close</button>
+        </div>
+      </div>
+
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;margin:8px 0 4px;">Pending draft</div>
+      ${draftHtml}
+
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;margin:14px 0 4px;">Thread</div>
+      <div style="max-height:320px;overflow-y:auto;">${threadHtml}</div>
+
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;margin:14px 0 4px;">Add internal note</div>
+      <div style="display:flex;gap:8px;">
+        <input id="closer-note-${lead.id}" placeholder="Note (not sent to lead)" style="flex:1;background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px 8px;font-size:12px;">
+        <button class="btn" style="font-size:11px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="closerAdminAddNote('${lead.id}')">Add</button>
+      </div>
+    </div>
+  `;
+}
+
+async function closerAdminSetStage(leadId, stage) {
+  try {
+    const r = await fetch(`/api/v1/closer/leads/by-id/${leadId}/stage`, {
+      method: 'PATCH',
+      headers: {...authHeaders(), 'Content-Type': 'application/json'},
+      body: JSON.stringify({stage}),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    if (_closerSelected) closerAdminRenderDetail(_closerSelected);
+    closerAdminOpenLead(leadId);
+  } catch (e) { alert('Stage update failed: ' + e.message); }
+}
+
+async function closerAdminDraftNext(leadId) {
+  try {
+    const r = await fetch(`/api/v1/closer/leads/by-id/${leadId}/draft-next`, {
+      method: 'POST', headers: authHeaders(),
+    });
+    const d = await r.json();
+    if (d.success === false) alert(d.reason || 'Drafter declined.');
+    closerAdminOpenLead(leadId);
+  } catch (e) { alert('Draft failed: ' + e.message); }
+}
+
+async function closerAdminApproveDraft(approvalId, leadId) {
+  try {
+    const r = await fetch(`/api/v1/approvals/${approvalId}/approve`, {
+      method: 'POST', headers: authHeaders(),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    closerAdminOpenLead(leadId);
+    if (_closerSelected) closerAdminRenderDetail(_closerSelected);
+  } catch (e) { alert('Approve failed: ' + e.message); }
+}
+
+async function closerAdminEditDraft(approvalId, leadId) {
+  const ta = document.getElementById(`closer-draft-text-${approvalId}`);
+  const edited = ta ? ta.value : '';
+  if (!edited.trim()) { alert('Draft is empty.'); return; }
+  try {
+    const r = await fetch(`/api/v1/approvals/${approvalId}/edit`, {
+      method: 'POST',
+      headers: {...authHeaders(), 'Content-Type': 'application/json'},
+      body: JSON.stringify({new_message: edited}),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    closerAdminOpenLead(leadId);
+    if (_closerSelected) closerAdminRenderDetail(_closerSelected);
+  } catch (e) { alert('Edit & send failed: ' + e.message); }
+}
+
+async function closerAdminSkipDraft(approvalId, leadId) {
+  if (!confirm('Skip this draft? It will not be sent.')) return;
+  try {
+    const r = await fetch(`/api/v1/approvals/${approvalId}/skip`, {
+      method: 'POST', headers: authHeaders(),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    closerAdminOpenLead(leadId);
+  } catch (e) { alert('Skip failed: ' + e.message); }
+}
+
+async function closerAdminAddNote(leadId) {
+  const inp = document.getElementById(`closer-note-${leadId}`);
+  const body = (inp && inp.value || '').trim();
+  if (!body) return;
+  try {
+    const r = await fetch(`/api/v1/closer/leads/by-id/${leadId}/note`, {
+      method: 'POST',
+      headers: {...authHeaders(), 'Content-Type': 'application/json'},
+      body: JSON.stringify({body, author: 'admin'}),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    inp.value = '';
+    closerAdminOpenLead(leadId);
+  } catch (e) { alert('Note failed: ' + e.message); }
 }
 
 async function closerAdminSaveBrief() {
