@@ -4,7 +4,7 @@
 
 PLAN.md = active. BACKLOG.md = queued. Promote items, don't duplicate them.
 
-Last updated: 2026-05-24 (Sprint-3 strategic-notes backlog added at top)
+Last updated: 2026-05-25 (Sprint-3 tickets #11, #8, #4, #2 shipped — bottom-up sweep; #1 was prior)
 
 ---
 
@@ -14,17 +14,17 @@ Source: strategic-notes session 2026-05-24. 11 tickets ranked by **value-per-bui
 
 | # | Ticket | Why it matters | Effort | Trigger / Dependency |
 |---|---|---|---|---|
-| 1 | **vCard contact import on onboarding** | Solves "address by saved name." Owner uploads phone contacts (`.vcf`), drafter uses *their* saved name (not WhatsApp `push_name`). Cheap perceived-intelligence win. | 0.5 day | None — ship anytime |
-| 2 | **T0.4 close-out — Portal "Agent Learning" card + admin wins/misses view** | Outcome Loop already runs invisibly; surfaces it so owners *see* EYO improving weekly. Trust-builder. | 1 day | T0.4 foundation already shipped (commit 8fb7cdb) |
+| 1 | ~~**vCard contact import on onboarding**~~ | Solves "address by saved name." | 0.5 day | ✅ **SHIPPED** (bf8a347, services/book_import.py + templates/portal_book.html) |
+| 2 | ~~**T0.4 close-out — Portal "Agent Learning" card**~~ | Surfaces the Outcome Loop so owners *see* EYO improving weekly. | 1 day | ✅ **SHIPPED 2026-05-25** (3c2f125, api/agent_learning.py + portal card). Admin per-client wins/misses dashboard UI still open (JSON endpoint wired). |
 | 3 | **T0.5 Proactive Intelligence — 5 starter behaviours** | Stale revival, festival timing, birthday nudges, capacity nudges, booking reminders. The "agent acts on its own" story without action-queue overhead. | ~4 days | None — already scoped in PLAN.md |
-| 4 | **Wave 2 cover personalization — Three Jobs scenes per vertical** | Hero HITL mock already flips per vertical (SCENE_PACKS). Mid-page scenes (Tone B/A, Receipt Catcher, Owner Brief) still hospitality-only. Real-estate visitor still sees Funke booking a table mid-scroll. | 1.5 days | Cover at /start already shipped |
+| 4 | ~~**Wave 2 cover personalization — Three Jobs scenes per vertical**~~ | Tone B/A, Receipt Catcher, Owner Brief now flip per vertical via WAVE2_SCENES. | 1.5 days | ✅ **SHIPPED 2026-05-25** (a572e00) |
 | 5 | **`/api/v1/draft-and-queue` — Infrastructure API tier** | Sells WhatsApp rail to businesses with their own AI (Lagos fintechs running Gemini etc). New flat-volume pricing tier. Net-new revenue surface. | 2 days | Wait until 3+ paying retainer clients |
 | 6 | **Graduated Autopilot Trust** | Owners trust EYO with low-risk reply types after 30d of approvals. Prevents queue starvation at 100+ clients (1k clients × 100 drafts/day = 100k queue items). | 3 days | Trigger when any client crosses 200+ drafts/wk |
 | 7 | **API-key rotation pool (Anthropic + Whisper + Vision)** | Per-client request affinity across 3-5 keys. Removes single-key throttle ceiling at scale. | 2 days | Trigger at ~250 active clients OR first 429 burst |
-| 8 | **NDPR-grade privacy posture doc + DPA** | Handles the "DM through 3rd party" objection from legal / clinics / fintech. Direct conversion lever for regulated verticals. | 1 day | Ship now if pitching regulated SMEs |
+| 8 | ~~**NDPR-grade privacy posture doc + DPA**~~ | Counter-signable DPA + sub-processor register for regulated-vertical prospects. | 1 day | ✅ **SHIPPED 2026-05-25** (0b7db6a, docs/PRIVACY_AND_NDPR.md) |
 | 9 | **Self-hosted "Your Mongo, your keys" deployment** | Tier-1 firms (luxury law, fintech, HNW estate) pay ₦2-5M setup for data sovereignty. | 5 days | Trigger when one inbound asks for it |
 | 10 | **End-to-end opaque mode — browser-side WebLLM drafting** | Drafts generated client-side in browser; only metadata hits server. Ultimate privacy story. | ~3 weeks | 12-month horizon — do NOT build now |
-| 11 | **`.gitignore` dedupe + repo root cleanup** | Cosmetic. Duplicate `.env` blocks, occasional shell-spill stray files. | 15 min | Drive-by anytime |
+| 11 | ~~**`.gitignore` dedupe + repo root cleanup**~~ | Deduped, `graphify-out/` ignored, stray file dropped. | 15 min | ✅ **SHIPPED 2026-05-25** (3a2fccd) |
 
 ### Recommended 30-day sequence
 
