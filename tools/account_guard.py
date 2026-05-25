@@ -32,14 +32,18 @@ OPTOUT_WINDOW_HOURS                = 24
 OPTOUT_MIN_REPLIES_FOR_TRIGGER     = 30     # don't auto-pause off a tiny sample
 
 # Sender warm-up — prevents Meta WhatsApp suspension on fresh accounts.
-# A new client doc gets ramped over the first 7 days unless they explicitly
+# Tightened 2026-05-25 to the conservative 10/25/50 ramp recommended by Meta
+# for fresh WhatsApp Business numbers. The old 50/100 schedule was too
+# aggressive and risked first-week bans on brand-new pairings.
+# A new client doc gets ramped over the first 21 days unless they explicitly
 # set outreach_warmup_skip=True (their number is already warm from prior use).
-WARMUP_DAYS_TOTAL = 7
+WARMUP_DAYS_TOTAL = 21
 WARMUP_SCHEDULE = [
-    # (days_since_start_inclusive, daily_cap_during_this_phase)
-    (3, 50),    # days 0-2: hard 50/day
-    (7, 100),   # days 3-6: 100/day
-]                # day 7+: configured cap (no ramp)
+    # (days_since_start_exclusive_upper, daily_cap_during_this_phase)
+    (7,  10),   # week 1 (days 0-6):  hard 10/day — let Meta build trust
+    (14, 25),   # week 2 (days 7-13): 25/day
+    (21, 50),   # week 3 (days 14-20): 50/day
+]                # day 21+: configured cap (no ramp)
 
 
 class OutreachCapExceeded(Exception):

@@ -157,6 +157,8 @@ async def lifespan(app: FastAPI):
     _safe("milestone",   ensure_milestone_indexes)
     from services.platform_settings import ensure_settings_indexes
     _safe("settings",    ensure_settings_indexes)
+    from services.edit_tone_loop import ensure_tone_indexes
+    _safe("edit_tone",   ensure_tone_indexes)
     from services.sales_alerter import ensure_sales_alert_indexes
     _safe("sales_alert", ensure_sales_alert_indexes)
     from services.waitlist import ensure_waitlist_indexes

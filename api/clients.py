@@ -273,8 +273,12 @@ async def upsert_client(payload: ClientUpsert):
         {
             "$set": set_doc,
             "$setOnInsert": {
-                "created_at": now,
-                "onboarded_at": payload.onboarded_at or now,
+                "created_at":           now,
+                "onboarded_at":         payload.onboarded_at or now,
+                # Seed the warm-up window at client creation, not first send.
+                # Ensures the 10/25/50 ramp ticks from pairing day, not from
+                # the day the owner finally taps Approve on something.
+                "outreach_started_at":  now,
             },
         },
         upsert=True,

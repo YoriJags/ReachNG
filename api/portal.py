@@ -5,7 +5,7 @@ Shows their contacts, outreach stats, and ROI.
 """
 import re
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from bson import ObjectId
@@ -130,6 +130,255 @@ async def update_agent_name(token: str, payload: dict):
         {"$set": {"agent_name": name, "updated_at": datetime.now(timezone.utc)}},
     )
     return {"ok": True, "agent_name": name}
+
+
+@router.get("/journey/{token}")
+async def get_customer_journey(token: str, phone: str, limit: int = 200):
+    """Full timeline for one customer phone — inbounds, transcripts, drafts,
+    approvals, outbounds, receipts matched, facts extracted, stage changes.
+
+    The single best 'wow' surface for the per-customer memory layer.
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    if not phone or len(phone) < 5:
+        raise HTTPException(400, "phone required")
+
+    from database import get_db
+    db = get_db()
+    cid = str(client["_id"])
+    cname = client["name"]
+
+    events: list[dict] = []
+
+    def _add(ts, kind: str, body: str, meta: dict | None = None):
+        if not ts:
+            return
+        try:
+            iso = ts.isoformat() if hasattr(ts, "isoformat") else str(ts)
+        except Exception:
+            return
+        events.append({"at": iso, "kind": kind, "body": body[:600] if body else "",
+                        "meta": meta or {}})
+
+    # 1) Inbound messages
+    try:
+        for m in db["inbound_messages"].find(
+            {"client_name": cname, "sender_phone": phone},
+            {"received_at": 1, "body": 1, "voice_transcript": 1, "media_type": 1},
+        ).sort("received_at", -1).limit(limit):
+            kind = "voice_in" if m.get("voice_transcript") else "msg_in"
+            body = m.get("voice_transcript") or m.get("body") or ""
+            _add(m.get("received_at"), kind, body,
+                  {"media_type": m.get("media_type")})
+    except Exception:
+        pass
+
+    # 2) Drafts queued + their resolution
+    try:
+        for a in db["pending_approvals"].find(
+            {"client_name": cname, "phone": phone},
+            {"created_at": 1, "actioned_at": 1, "status": 1, "message": 1,
+             "edited_message": 1, "risk": 1, "classification": 1},
+        ).sort("created_at", -1).limit(limit):
+            _add(a.get("created_at"), "draft_queued",
+                  (a.get("message") or "")[:600],
+                  {"risk": a.get("risk"), "classification": a.get("classification")})
+            if a.get("actioned_at"):
+                _add(a.get("actioned_at"), f"draft_{a.get('status','actioned')}",
+                      (a.get("edited_message") or a.get("message") or "")[:600],
+                      {"status": a.get("status")})
+    except Exception:
+        pass
+
+    # 3) Outbound sends
+    try:
+        for o in db["outreach_log"].find(
+            {"client_name": cname, "phone": phone},
+            {"sent_at": 1, "message": 1, "channel": 1},
+        ).sort("sent_at", -1).limit(limit):
+            _add(o.get("sent_at"), "msg_out", o.get("message") or "",
+                  {"channel": o.get("channel")})
+    except Exception:
+        pass
+
+    # 4) Receipts matched
+    try:
+        for r in db["receipt_matches"].find(
+            {"client_name": cname, "contact_phone": phone},
+            {"matched_at": 1, "receipt": 1, "match_kind": 1, "amount_ngn": 1},
+        ).sort("matched_at", -1).limit(limit):
+            amt = r.get("amount_ngn") or (r.get("receipt") or {}).get("amount_ngn")
+            _add(r.get("matched_at"), "receipt_matched",
+                  f"₦{amt:,.0f} via {(r.get('receipt') or {}).get('bank','?')}" if amt else "Receipt",
+                  {"match_kind": r.get("match_kind"), "amount_ngn": amt})
+    except Exception:
+        pass
+
+    # 5) Facts extracted (memory)
+    try:
+        for f in db["client_memory"].find(
+            {"client_id": cid, "contact_phone": phone},
+            {"created_at": 1, "fact_type": 1, "value": 1, "source": 1},
+        ).sort("created_at", -1).limit(limit):
+            _add(f.get("created_at"), "fact_extracted",
+                  f"{f.get('fact_type')}: {f.get('value')}",
+                  {"source": f.get("source")})
+    except Exception:
+        pass
+
+    # 6) Closer stage changes
+    try:
+        lead = db["closer_leads"].find_one(
+            {"client_id": cid, "contact_phone": phone},
+            {"thread": 1, "stage": 1, "created_at": 1},
+        )
+        if lead:
+            _add(lead.get("created_at"), "lead_opened",
+                  f"Stage: {lead.get('stage','new')}",
+                  {"stage": lead.get("stage")})
+            for ev in (lead.get("thread") or []):
+                if ev.get("direction") == "note":
+                    _add(ev.get("at"), "operator_note", ev.get("body") or "",
+                          {"author": ev.get("author")})
+    except Exception:
+        pass
+
+    # Sort newest first
+    events.sort(key=lambda e: e["at"], reverse=True)
+    events = events[:limit]
+
+    # Lightweight rollup
+    rollup = {
+        "events_total":      len(events),
+        "first_seen":        events[-1]["at"] if events else None,
+        "last_seen":         events[0]["at"]  if events else None,
+        "drafts_queued":     sum(1 for e in events if e["kind"] == "draft_queued"),
+        "msgs_in":           sum(1 for e in events if e["kind"] in ("msg_in", "voice_in")),
+        "msgs_out":          sum(1 for e in events if e["kind"] == "msg_out"),
+        "receipts_matched":  sum(1 for e in events if e["kind"] == "receipt_matched"),
+        "facts_known":       sum(1 for e in events if e["kind"] == "fact_extracted"),
+    }
+    return {"client": cname, "phone": phone, "rollup": rollup, "events": events}
+
+
+@router.get("/share-card/{token}")
+async def get_share_card(token: str, period: str = "this month"):
+    """Render the owner's ROI share card as a 1200x630 PNG.
+
+    Pulled from the live scorecard so we never invent numbers. Owner taps,
+    saves, posts to IG/X.
+    """
+    from fastapi.responses import Response
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+
+    naira = 0
+    hours = 0.0
+    bookings = 0
+    try:
+        from services.scorecard import compute_scorecard
+        sc = compute_scorecard(client_id=str(client["_id"]), period_days=30)
+        # compute_scorecard returns a dataclass / pydantic-ish object
+        d = sc.model_dump() if hasattr(sc, "model_dump") else (sc if isinstance(sc, dict) else sc.__dict__)
+        naira    = int((d.get("naira_closed_via_reachng") or 0)
+                       + (d.get("naira_recovered_chase")  or 0))
+        hours    = float(d.get("hours_saved") or 0)
+        bookings = int(d.get("bookings_confirmed") or 0)
+    except Exception:
+        pass
+
+    from services.roi_card import render_roi_card
+    png = render_roi_card(
+        business_name=client["name"],
+        naira_tracked=naira,
+        hours_saved=hours,
+        bookings=bookings,
+        period_label=period,
+        agent_name=client.get("agent_name") or "EYO",
+    )
+    return Response(content=png, media_type="image/png",
+                    headers={"Content-Disposition": 'inline; filename="eyo-share-card.png"'})
+
+
+@router.get("/almost-lost/{token}")
+async def get_almost_lost(token: str, hours: int = 24):
+    """Drafts that expired without being approved + recent inbounds with no
+    outbound reply within the after-hours window.
+
+    Sells autopilot internally — the owner sees what they almost let slip.
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+
+    from database import get_db
+    db = get_db()
+    cname = client["name"]
+    now = datetime.now(timezone.utc)
+    since = now - timedelta(hours=max(1, min(168, hours)))
+
+    # 1) Expired drafts that were never approved
+    expired = list(db["pending_approvals"].find(
+        {"client_name": cname,
+         "status": "pending",
+         "expires_at": {"$lt": now, "$gt": since}},
+        {"contact_name": 1, "phone": 1, "message": 1, "created_at": 1,
+         "expires_at": 1, "risk": 1, "classification": 1},
+    ).sort("expires_at", -1).limit(20))
+
+    # 2) Inbound messages older than 4 hours with no outbound to that phone
+    inbound_col = db.get_collection("inbound_messages")
+    silent = []
+    if inbound_col is not None:
+        cutoff = now - timedelta(hours=4)
+        cursor = inbound_col.find(
+            {"client_name": cname,
+             "received_at": {"$gte": since, "$lt": cutoff}},
+            {"sender_phone": 1, "body": 1, "received_at": 1, "contact_name": 1},
+        ).sort("received_at", -1).limit(40)
+        seen_phones: set[str] = set()
+        for m in cursor:
+            phone = m.get("sender_phone") or ""
+            if not phone or phone in seen_phones:
+                continue
+            seen_phones.add(phone)
+            # Was anything sent back to this phone since the inbound?
+            replied = db["outreach_log"].find_one(
+                {"client_name": cname, "phone": phone,
+                 "sent_at": {"$gte": m["received_at"]}},
+                {"_id": 1},
+            )
+            if replied:
+                continue
+            silent.append({
+                "contact_name":  m.get("contact_name") or "Unknown",
+                "phone":         phone,
+                "received_at":   m["received_at"].isoformat() if hasattr(m["received_at"], "isoformat") else m["received_at"],
+                "preview":       (m.get("body") or "")[:140],
+                "hours_silent":  round((now - m["received_at"]).total_seconds() / 3600, 1),
+            })
+            if len(silent) >= 10:
+                break
+
+    out_expired = [{
+        "contact_name": d.get("contact_name") or "Unknown",
+        "phone":        d.get("phone"),
+        "preview":      (d.get("message") or "")[:140],
+        "expired_at":   d["expires_at"].isoformat() if d.get("expires_at") and hasattr(d["expires_at"], "isoformat") else d.get("expires_at"),
+        "confidence":   ((d.get("risk") or {}).get("confidence")),
+        "urgency":      ((d.get("classification") or {}).get("urgency")),
+    } for d in expired]
+
+    return {
+        "client":       cname,
+        "window_hours": hours,
+        "expired":      out_expired,
+        "silent":       silent,
+        "totals":       {"expired": len(out_expired), "silent": len(silent)},
+    }
 
 
 @router.get("/missed-opportunities/{token}")

@@ -33,7 +33,7 @@ Pull these into PLAN.md or SPRINT.md one at a time. Ordered by ship-value.
 
 Things that aren't features but matter when first 5 pilots want to go live.
 
-- [ ] **Auto-enforce WhatsApp warmup ramp at code level** *(½ day)* — Auto-set `client.daily_send_limit` on creation: 10 week 1, 25 week 2, 50+ thereafter. Stops a fresh number from getting banned.
+- [x] ~~**Auto-enforce WhatsApp warmup ramp at code level**~~ — shipped 2026-05-25. `tools/account_guard.WARMUP_SCHEDULE` tightened to the conservative Meta-recommended 10/25/50 over weeks 1/2/3 (was 50/100). `api/clients.py` now seeds `outreach_started_at` at client creation in `$setOnInsert` so the ramp ticks from pairing day, not first send.
 - [ ] **Onboarding wizard** *(~2-3 days, deferred until 5 pilots inform what to ask)* — Codex-spec'd: Business Basics → Voice & Tone → Offer & Pricing → Lead Qualification → Approval Rules → Test EYO → Go-Live Checklist. Lives at `/portal/{token}/onboard`.
 - [ ] **Pass-2 guided demo: per-vertical** *(~3 hrs, build when demand signal arrives)* — `/portal/demo/real_estate` (Victoria Island PoF storyline) + `/portal/demo/professional_services` (Greenview Fri-6pm storyline). Education + clinics + small_business deferred until signups arrive.
 - [ ] **Portal token rotation** *(½ day)* — `client.portal_token_rotated_at` + "regenerate token" button. Use case: client leaves a partner who had the URL.
@@ -108,8 +108,8 @@ Survivors of the Emergent 22-idea triage. See `memory/project_reachng_emergent_t
 
 - [ ] **Split `agent/brain.py`** — File is 770+ lines. Extract into `agent/drafters/` package: outreach, b2c, social, invoice, auto_reply, classifier.
 - [ ] **Mobile-first review of client portal** — Verify portal.html renders cleanly at 375px. Most Lagos clients view on phone.
-- [ ] **"Almost lost" widget on client portal** — Surfaces expired drafts + after-hours unanswered enquiries.
-- [ ] **ROI screenshot generator** — Auto-PNG "Altitude saved 47h, ₦2.4M tracked this month" for client IG/X posts. Uses existing ReportLab + Pillow.
+- [x] ~~**"Almost lost" widget on client portal**~~ — endpoint shipped 2026-05-25 (`GET /portal/almost-lost/{token}`). Returns expired-but-never-approved drafts + inbounds older than 4h with no outbound reply. Portal-page surface deferred (data queryable today).
+- [x] ~~**ROI screenshot generator**~~ — shipped 2026-05-25. `services/roi_card.py::render_roi_card()` returns 1200×630 PNG; `GET /portal/share-card/{token}` serves it inline. Pulls live numbers from `services/scorecard.compute_scorecard`. Pillow-only, no new deps.
 - [ ] **Integration test suite expansion** — At first paying client, expand beyond `tests/test_smoke.py`: HITL gate, webhook routes, holding reply dedupe, autopilot toggle, portal token auth.
 - [ ] **Lead-signal-injection rules** — Each vertical prompt mandates referencing concrete signals from enrichment payload (Maps rating, decision_maker, place categories, IG handle).
 - [ ] **Marketing site visual overhaul** *(~half day)* — Reference 11x.ai / Artisan.co / Landbase.com. Token-driven CSS so dashboard + portal can adopt incrementally.

@@ -10089,21 +10089,42 @@ function closerAdminRenderLead(lead, draft) {
   const stageOptions = stages.map(s =>
     `<option value="${s}" ${s === lead.stage ? 'selected' : ''}>${s}</option>`).join('');
 
-  const threadHtml = thread.length === 0
+  // Thread filter (drafts/out-only) — local state per panel
+  const filterMode = window._closerThreadFilter || 'all';
+  const visible = (thread || []).filter(ev => {
+    if (filterMode === 'drafts') return ev.direction === 'out';
+    return true;
+  });
+
+  const threadHtml = visible.length === 0
     ? '<div style="color:#556;font-size:12px;padding:8px 0;">No messages yet.</div>'
-    : thread.map(ev => {
+    : visible.map(ev => {
         const dir = ev.direction || 'note';
         const color = dir === 'in' ? '#7ec0ee' : (dir === 'out' ? '#a3e635' : '#a0a8b8');
         const bg = dir === 'in' ? '#0d1a25' : (dir === 'out' ? '#0e1a0e' : '#15171a');
         const label = dir === 'in' ? '← In' : (dir === 'out' ? 'Out →' : '· Note');
         const when = ev.at ? new Date(ev.at).toLocaleString() : '';
+        const body = ev.body || '';
+        // Receipt detection — body usually contains "₦" + match metadata
+        const looksReceiptLinked = ev.receipt_id || /₦[\d,]+|receipt|payment confirm/i.test(body);
+        const copyBtn = `<button class="action-btn" style="background:transparent;color:#7cb8ff;border:none;font-size:10px;padding:2px 6px;cursor:pointer;" onclick='closerCopyToWa(${JSON.stringify(body)})' title="Copy + open WhatsApp">⧉ Copy → WA</button>`;
+        const receiptBtn = looksReceiptLinked
+          ? `<button class="action-btn" style="background:transparent;color:#a3e635;border:none;font-size:10px;padding:2px 6px;cursor:pointer;" onclick="closerJumpToReceipts('${_esc(lead.contact_phone || '')}')" title="See matched receipts for this contact">💰 Receipts</button>`
+          : '';
         return `<div style="margin:6px 0;padding:8px 10px;background:${bg};border-left:2px solid ${color};border-radius:3px;">
-          <div style="font-size:10px;color:${color};letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px;">
-            ${label} · ${_esc(ev.channel || '')} · <span style="color:#556;">${when}</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:10px;color:${color};letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px;">
+            <span>${label} · ${_esc(ev.channel || '')} · <span style="color:#556;">${when}</span></span>
+            <span>${dir === 'out' ? copyBtn : ''}${receiptBtn}</span>
           </div>
-          <div style="font-size:12px;color:#d8eaf8;white-space:pre-wrap;">${_esc(ev.body || '')}</div>
+          <div style="font-size:12px;color:#d8eaf8;white-space:pre-wrap;">${_esc(body)}</div>
         </div>`;
       }).join('');
+
+  const filterPills = `
+    <div style="display:inline-flex;gap:4px;margin-left:auto;">
+      <button class="action-btn" style="font-size:10px;padding:3px 8px;background:${filterMode === 'all' ? '#1e2530' : 'transparent'};color:${filterMode === 'all' ? '#d8eaf8' : '#666'};border:1px solid #2a3340;border-radius:3px;cursor:pointer;" onclick="closerSetThreadFilter('all','${lead.id}')">all</button>
+      <button class="action-btn" style="font-size:10px;padding:3px 8px;background:${filterMode === 'drafts' ? '#1e2530' : 'transparent'};color:${filterMode === 'drafts' ? '#a3e635' : '#666'};border:1px solid #2a3340;border-radius:3px;cursor:pointer;" onclick="closerSetThreadFilter('drafts','${lead.id}')">drafts only</button>
+    </div>`;
 
   const draftHtml = !draft
     ? `<div style="color:#556;font-size:12px;padding:8px 0;">No pending draft.
@@ -10134,7 +10155,10 @@ function closerAdminRenderLead(lead, draft) {
       <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;margin:8px 0 4px;">Pending draft</div>
       ${draftHtml}
 
-      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;margin:14px 0 4px;">Thread</div>
+      <div style="display:flex;align-items:center;margin:14px 0 4px;">
+        <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;">Thread</div>
+        ${filterPills}
+      </div>
       <div style="max-height:320px;overflow-y:auto;">${threadHtml}</div>
 
       <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;margin:14px 0 4px;">Add internal note</div>
@@ -10206,6 +10230,46 @@ async function closerAdminSkipDraft(approvalId, leadId) {
     if (!r.ok) throw new Error(await r.text());
     closerAdminOpenLead(leadId);
   } catch (e) { alert('Skip failed: ' + e.message); }
+}
+
+function closerCopyToWa(text) {
+  if (!text) return;
+  try {
+    navigator.clipboard.writeText(text).then(() => {
+      // After copy, try opening wa.me with the current lead's phone if we have it
+      const panel = document.getElementById('closer-lead-panel');
+      const phoneMatch = panel ? panel.innerHTML.match(/\+\d{6,}/) : null;
+      if (phoneMatch) {
+        const ph = phoneMatch[0].replace(/[^\d]/g,'');
+        window.open(`https://wa.me/${ph}?text=${encodeURIComponent(text)}`, '_blank');
+      } else {
+        alert('Copied to clipboard.');
+      }
+    });
+  } catch (e) { alert('Copy failed: ' + e.message); }
+}
+
+function closerJumpToReceipts(phone) {
+  if (!phone) { alert('No phone on this lead — receipts indexed by phone.'); return; }
+  // Switch to Recover → Receipts sub-tab if it exists, with phone in filter
+  try {
+    if (typeof recoverNav === 'function') recoverNav('receipts', null);
+    const q = document.getElementById('recv-search') || document.getElementById('receipts-search');
+    if (q) { q.value = phone; q.dispatchEvent(new Event('input')); }
+  } catch (e) {}
+  // Always also pop a quick filtered view via the receipts API as a fallback
+  fetch(`/api/v1/receipts?phone=${encodeURIComponent(phone)}&limit=5`, {headers: authHeaders()})
+    .then(r => r.json())
+    .then(d => {
+      const n = (d && d.receipts || []).length;
+      if (n === 0) alert('No matched receipts on file for ' + phone);
+    })
+    .catch(() => {});
+}
+
+function closerSetThreadFilter(mode, leadId) {
+  window._closerThreadFilter = mode;
+  if (leadId) closerAdminOpenLead(leadId);
 }
 
 async function closerAdminAddNote(leadId) {

@@ -276,18 +276,34 @@ def skip_draft(approval_id: str) -> dict | None:
 
 
 def edit_draft(approval_id: str, new_message: str) -> dict | None:
-    """Update message text and mark as approved with edited content."""
+    """Update message text and mark as approved with edited content.
+
+    Persists the original message as `original_message` (idempotent — set
+    only on first edit) so the never-say tone-loop job can diff edits over
+    time. See services/edit_tone_loop.py.
+    """
     col = get_approvals()
     now = datetime.now(timezone.utc)
-    col.update_one(
-        {"_id": ObjectId(approval_id)},
-        {"$set": {
-            "status": ApprovalStatus.EDITED,
-            "edited_message": new_message,
-            "actioned_at": now,
-        }},
-    )
+    existing = col.find_one({"_id": ObjectId(approval_id)}, {"message": 1, "original_message": 1})
+    patch: dict = {
+        "status":         ApprovalStatus.EDITED,
+        "edited_message": new_message,
+        "actioned_at":    now,
+    }
+    # Preserve the very first version we generated — survives multiple edits.
+    if existing and not existing.get("original_message"):
+        patch["original_message"] = existing.get("message")
+
+    col.update_one({"_id": ObjectId(approval_id)}, {"$set": patch})
     doc = col.find_one({"_id": ObjectId(approval_id)})
+
+    # Tone-loop hook: best-effort, never blocks the edit
+    try:
+        from services.edit_tone_loop import record_edit
+        record_edit(doc, new_message=new_message)
+    except Exception as e:
+        log.warning("edit_tone_loop_record_failed", error=str(e))
+
     _open_outcome_safe(doc)
     return doc
 
