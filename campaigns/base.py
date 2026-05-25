@@ -8,6 +8,10 @@ This module discovers leads from Maps / Apollo / Apify / DuckDuckGo / IG /
 social signals and runs outreach from ReachNG's OWN Unipile accounts. It is
 Yori's SDR funnel for acquiring ReachNG customers.
 
+Legacy note: a few `client_name` branches still exist from the old agency-mode
+campaign runner. Treat them as deprecated compatibility code, not a product
+surface. Do not add new client-facing behavior here.
+
 Client-facing ReachNG (the EYO agent) NEVER promises lead discovery and never
 routes through this module. Client agents work uploaded contact books + inbound
 WhatsApp/email + scheduled chase ladders — see `services/closer/`, `tools/hitl.py`,
@@ -65,11 +69,13 @@ class BaseCampaign:
         Returns summary stats.
         """
         settings = get_settings()
-        # Store on instance so _pick_channel can detect mode (self-promotion vs client campaign)
+        # Deprecated agency-mode compatibility. Prospect OS callers should leave
+        # client_name empty; client-facing routes must not use this runner.
         self.client_name = client_name
         log.info("campaign_start", vertical=self.vertical, dry_run=dry_run, hitl_mode=hitl_mode, client=client_name)
 
-        # Agency mode: pull client config to personalise messages + route via their accounts
+        # Deprecated agency mode: retained for old ops scripts only. New client
+        # work belongs in Closer/HITL/client-book paths, not this discovery runner.
         client_brief = None
         client_whatsapp_account_id = None
         client_email_account_id = None

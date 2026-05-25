@@ -48,3 +48,6 @@ reportlab>=4.0.0
 
 # Markdown → HTML for printable internal docs (ECONOMICS, PRICING, INVESTOR)
 markdown>=3.5
+
+# Tests
+pytest>=8.0.0

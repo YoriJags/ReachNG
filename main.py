@@ -211,7 +211,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="ReachNG",
-    description="AI-powered outreach machine for Lagos businesses — Real Estate, Recruitment, Events",
+    description="Human-approved AI WhatsApp operator for Nigerian businesses — activates owned leads, catches payments, and briefs owners daily.",
     version="1.0.0",
     lifespan=lifespan,
 )
