@@ -50,7 +50,7 @@ We do **not** collect: government IDs, BVN, NIN, bank account credentials, card 
  Customer's WhatsApp
        │
        ▼
- Unipile (or Meta Cloud API) — TLS, signed webhook
+ Unipile (or Meta Cloud API) — TLS, authenticated webhook
        │
        ▼
  ReachNG webhook handler (api/webhooks.py)
@@ -97,7 +97,7 @@ Adding a sub-processor requires 30-day prior notice to you. You can object; if y
 | No PII in server logs | structlog convention enforced in code review + `CLAUDE.md` rule | Grep our `*.log` files for any phone/name — should return zero |
 | HITL gate on every outbound | `tools/hitl.py::queue_draft()` — only send path | Read the file. There is no other send code path. |
 | Tone scrub | `tools/tone.py::scrub_endearments()` | Strips "babe", "love", "dear" etc from every draft before queueing |
-| Webhook signature verification | HMAC-SHA256 (Meta) / HMAC-SHA256 (Unipile) in `api/webhooks.py` | Reject any inbound without a valid signature in production |
+| Webhook authentication | HMAC-SHA256 signature verification for Meta, shared `Unipile-Auth` header for Unipile in `api/webhooks.py` | Reject any inbound without valid provider authentication in production |
 | Portal token entropy | `secrets.token_urlsafe(24)` — 192 bits | ~10⁵⁷ possible tokens, unguessable |
 
 ---
