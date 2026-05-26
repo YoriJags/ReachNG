@@ -2,6 +2,7 @@
 HITL Approvals API — owner reviews and approves outreach drafts before sending.
 This is the kill switch. Nothing goes out without a human tap.
 """
+import re
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
@@ -228,21 +229,36 @@ async def _send_approved(draft: dict):
         if channel == "whatsapp" and draft.get("phone"):
             result = await send_whatsapp(phone=draft["phone"], message=message)
         elif channel == "email" and draft.get("email"):
+            # Self-outreach campaigns (Client #0) need force_smtp=True so the
+            # send routes through hello@reachng.ng via Resend rather than the
+            # client's connected Unipile mailbox. Detect by source.
+            _force = (draft.get("source") in ("closer", "maps", "byo_leads", "social", "signal"))
             result = await send_email(
                 to_email=draft["email"],
                 subject=draft.get("subject", f"Quick question for {draft['contact_name']}"),
                 body=message,
+                force_smtp=_force,
             )
         else:
             log.warning("approved_draft_no_channel", draft_id=str(draft["_id"]))
             return
 
         if result.get("success", True):
+            # Extract the /hi/{slug} from the body so we can attribute the
+            # eventual click/open back to this row.
+            slug_match = re.search(r"www\.reachng\.ng/hi/([a-z0-9]+)", message or "")
+            outreach_slug = slug_match.group(1) if slug_match else None
             record_outreach(
                 contact_id=contact_id,
                 channel=channel,
                 message=message,
                 attempt_number=1,
+                client_name=draft.get("client_name"),
+                subject=draft.get("subject"),
+                to_email=draft.get("email"),
+                to_phone=draft.get("phone"),
+                provider_message_id=result.get("message_id") or result.get("id"),
+                outreach_slug=outreach_slug,
             )
             log_roi_event(
                 contact_name=draft["contact_name"],

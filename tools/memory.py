@@ -236,19 +236,46 @@ def record_outreach(
     channel: str,          # "whatsapp" | "email"
     message: str,
     attempt_number: int = 1,
+    client_name: str | None = None,
+    subject: str | None = None,
+    to_email: str | None = None,
+    to_phone: str | None = None,
+    provider_message_id: str | None = None,
+    outreach_slug: str | None = None,
 ) -> str:
-    """Log a sent message and update contact status. Returns log entry _id."""
+    """Log a sent message and update contact status. Returns log entry _id.
+
+    Extended fields back the outreach analytics view: provider_message_id
+    is the Resend (or Meta) message id we received on send — it's how the
+    Resend webhook joins open/click events back to the right row.
+    outreach_slug is the personalised /hi/{slug} embedded in the email so
+    we can attribute conversions back to a specific recipient."""
     settings = get_settings()
     now = datetime.now(timezone.utc)
     next_followup = now + timedelta(hours=settings.followup_delay_hours)
 
     log = get_outreach_log()
     entry = log.insert_one({
-        "contact_id": ObjectId(contact_id),
-        "channel": channel,
-        "message": message,
-        "attempt_number": attempt_number,
-        "sent_at": now,
+        "contact_id":          ObjectId(contact_id),
+        "channel":             channel,
+        "message":             message,
+        "attempt_number":      attempt_number,
+        "sent_at":             now,
+        "client_name":         client_name,
+        "subject":             subject,
+        "to_email":            to_email,
+        "to_phone":            to_phone,
+        "provider_message_id": provider_message_id,
+        "outreach_slug":       outreach_slug,
+        # Analytics events — Resend webhook updates these in-place
+        "delivered_at":        None,
+        "opened_at":           None,
+        "first_open_at":       None,
+        "open_count":          0,
+        "clicked_at":          None,
+        "click_count":         0,
+        "bounced_at":          None,
+        "bounce_reason":       None,
     })
 
     get_contacts().update_one(

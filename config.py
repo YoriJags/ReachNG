@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     # Resend — transactional email API (HTTPS, no SMTP egress required)
     resend_api_key: str | None = Field(default=None, env="RESEND_API_KEY")
     resend_from_email: str = Field(default="EYO from ReachNG <hello@reachng.ng>", env="RESEND_FROM_EMAIL")
+    # Resend webhook signing secret — required to verify email.* events
+    resend_webhook_secret: str | None = Field(default=None, env="RESEND_WEBHOOK_SECRET")
 
     # Gmail SMTP/IMAP — email sending and reply polling (replaces Unipile for email)
     gmail_address: str | None = Field(default=None, env="GMAIL_ADDRESS")

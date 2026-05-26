@@ -2438,6 +2438,117 @@ function copyDemoPortalLink(btn){
     }
   </script>
 
+  <!-- Outreach Analytics (open / click / convert funnel) -->
+  <div class="ct-section">
+    <div class="ct-section-title">Outreach Analytics — open rate, click rate, conversion</div>
+    <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Live funnel for ReachNG Self-Outreach (Client #0). Opens + clicks come from Resend webhooks; conversions from waitlist signups attributed back via the /hi/{slug} link.</p>
+
+    <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap;">
+      <select id="oa-client" style="background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px 10px;font-size:12px;">
+        <option value="ReachNG Self-Outreach">ReachNG Self-Outreach</option>
+      </select>
+      <select id="oa-days" style="background:#0d1117;border:1px solid #1e2530;color:#d8eaf8;border-radius:4px;padding:6px 10px;font-size:12px;">
+        <option value="7">Last 7 days</option>
+        <option value="30" selected>Last 30 days</option>
+        <option value="90">Last 90 days</option>
+      </select>
+      <button class="btn" style="font-size:11px;padding:6px 14px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="oaRefresh()">Refresh</button>
+      <span id="oa-status" style="font-size:11px;color:#6a7280;"></span>
+    </div>
+
+    <div id="oa-funnel-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px;"></div>
+    <div id="oa-rates-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px;"></div>
+
+    <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#ff5c00;margin:18px 0 8px;">Per-prospect</div>
+    <div id="oa-table" style="overflow-x:auto;font-size:12px;"></div>
+  </div>
+
+  <script>
+    function oaEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+    function oaFmtDT(s){ if (!s) return '—'; const d = new Date(s); return isNaN(d) ? '—' : d.toLocaleString(); }
+
+    async function oaRefresh() {
+      const client = document.getElementById('oa-client').value;
+      const days   = document.getElementById('oa-days').value;
+      const status = document.getElementById('oa-status');
+      status.innerHTML = '<span style="color:#888;">Loading…</span>';
+      try {
+        const [funnelR, rowsR] = await Promise.all([
+          fetch(`/api/v1/admin/outreach-analytics/funnel?client_name=${encodeURIComponent(client)}&days=${days}`, {headers: authHeaders()}),
+          fetch(`/api/v1/admin/outreach-analytics/per-prospect?client_name=${encodeURIComponent(client)}&days=${days}&limit=100`, {headers: authHeaders()}),
+        ]);
+        if (!funnelR.ok) throw new Error('funnel: ' + await funnelR.text());
+        if (!rowsR.ok)   throw new Error('rows: '   + await rowsR.text());
+        const f = await funnelR.json();
+        const d = await rowsR.json();
+
+        const tiles = [
+          {label:'Sent',           value:f.sent,           color:'#d8eaf8'},
+          {label:'Delivered',      value:f.delivered,      color:'#5dd28a'},
+          {label:'Opened (unique)',value:f.opened,         color:'#7cb8ff'},
+          {label:'Clicked (email)',value:f.clicked,        color:'#a3e635'},
+          {label:'Slug clicks',    value:f.slug_clicks,    color:'#ffd2a8'},
+          {label:'Bounced',        value:f.bounced,        color:'#ff8a8a'},
+          {label:'Joined waitlist',value:f.waitlist_joins, color:'#ff9b66'},
+        ];
+        document.getElementById('oa-funnel-row').innerHTML = tiles.map(t => `
+          <div class="ct-kpi" style="padding:14px;text-align:center;">
+            <div style="font-size:9px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:6px;">${t.label}</div>
+            <div style="font-size:24px;font-weight:700;color:${t.color};">${t.value}</div>
+          </div>`).join('');
+
+        const r = f.rates || {};
+        const rateTiles = [
+          {label:'Delivery rate', v:r.delivery_rate,   c:'#5dd28a'},
+          {label:'Open rate',     v:r.open_rate,       c:'#7cb8ff'},
+          {label:'Click rate',    v:r.click_rate,      c:'#a3e635'},
+          {label:'Click-to-open', v:r.click_to_open,   c:'#a3e635'},
+          {label:'Bounce rate',   v:r.bounce_rate,     c:'#ff8a8a'},
+          {label:'Conversion',    v:r.conversion_rate, c:'#ff9b66'},
+        ];
+        document.getElementById('oa-rates-row').innerHTML = rateTiles.map(t => `
+          <div class="ct-kpi" style="padding:12px;text-align:center;border-color:#1e2530;">
+            <div style="font-size:9px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:4px;">${t.label}</div>
+            <div style="font-size:18px;font-weight:700;color:${t.c};">${(t.v||0).toFixed(1)}%</div>
+          </div>`).join('');
+
+        const rows = d.rows || [];
+        if (!rows.length) {
+          document.getElementById('oa-table').innerHTML = '<div style="color:#556;padding:14px 0;">No outreach sends yet in this window. Run a campaign and approve drafts to populate.</div>';
+        } else {
+          document.getElementById('oa-table').innerHTML = `
+            <table class="data-table" style="width:100%;font-size:11px;">
+              <thead><tr>
+                <th>Recipient</th><th>Subject</th>
+                <th>Sent</th><th>Opens</th><th>Clicks</th><th>Status</th>
+              </tr></thead>
+              <tbody>${rows.map(r => {
+                let badge = '<span style="color:#666;">—</span>';
+                if (r.bounced) badge = '<span style="color:#ff8a8a;">⚠ bounced</span>';
+                else if (r.clicked) badge = '<span style="color:#a3e635;">↗ clicked</span>';
+                else if (r.opened) badge = '<span style="color:#7cb8ff;">👁 opened</span>';
+                else if (r.delivered_at) badge = '<span style="color:#5dd28a;">✓ delivered</span>';
+                else badge = '<span style="color:#666;">sent</span>';
+                return `<tr>
+                  <td>${oaEsc(r.to_email||'—')}</td>
+                  <td style="color:#889;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${oaEsc(r.subject||'')}</td>
+                  <td style="color:#889;">${oaFmtDT(r.sent_at)}</td>
+                  <td style="text-align:right;color:#7cb8ff;">${r.open_count||0}</td>
+                  <td style="text-align:right;color:#a3e635;">${(r.click_count||0)+(r.slug_clicks||0)}</td>
+                  <td>${badge}</td>
+                </tr>`;
+              }).join('')}</tbody>
+            </table>`;
+        }
+        status.innerHTML = `<span style="color:#5dd28a;">✓ updated</span>`;
+      } catch (e) {
+        status.innerHTML = `<span style="color:#ff7a7a;">${oaEsc(e.message)}</span>`;
+      }
+    }
+    if (document.readyState !== 'loading') oaRefresh();
+    else document.addEventListener('DOMContentLoaded', oaRefresh);
+  </script>
+
   <!-- Prospect Interviews (Phase A validation capture) -->
   <div class="ct-section">
     <div class="ct-section-title">Prospect Interviews — real conversations from outreach replies</div>
