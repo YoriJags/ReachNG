@@ -9,6 +9,27 @@
      1. HERO  (problem-anchored, ReachNG-led, no "EYO" until visual context)
      ───────────────────────────────────────────────────────────────────── -->
 <section class="hero">
+  {% if prospect %}
+  <!-- Personalised arrival banner — set when the recipient tapped /hi/{slug}
+       from a cold-outreach email. Surfaces their name + business so the
+       landing feels like it was prepared for them. -->
+  <div style="background: linear-gradient(90deg, #1f160a 0%, #2a1a0e 100%); border-bottom: 1px solid #ff5c00; padding: 12px 24px; text-align: center; color: #ffd2a8; font-size: 13.5px; letter-spacing: 0.2px;">
+    <span style="font-size: 16px; margin-right: 6px;">👋</span>
+    <strong style="color: #fff;">Hi{% if prospect.first_name %} {{ prospect.first_name }}{% endif %}{% if not prospect.first_name and prospect.business_name %} team at {{ prospect.business_name }}{% endif %}</strong>
+    <span style="color: #ffd2a8; opacity: 0.85;"> — Yori sent you this.{% if prospect.business_name %} Here's what EYO would look like for <strong style="color:#fff;">{{ prospect.business_name }}</strong>.{% endif %}</span>
+  </div>
+  <script>
+    // Surface to client-side scripts (Try-EYO widget, forms) so they can
+    // pre-fill business name + vertical without re-parsing the cookie.
+    (function(){
+      try {
+        window.__reachng_prospect = JSON.parse(decodeURIComponent(
+          (document.cookie.match(/(?:^|;\s*)reachng_prospect=([^;]+)/) || [,'{}'])[1]
+        ));
+      } catch (e) { window.__reachng_prospect = null; }
+    })();
+  </script>
+  {% endif %}
   <!-- 'Showing for X · change industry' — bold, impossible-to-miss vertical switcher.
        Clicking 'Change' routes to /start (cover) where the new pick sets the cookie
        and lands back on this page with refreshed scenes. -->

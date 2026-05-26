@@ -177,61 +177,42 @@ def attach_landing_link(
     vertical: str = "general",
     contact_id: Optional[str] = None,
     path: str = "/",
+    prospect_profile: Optional[dict] = None,
 ) -> str:
     """
-    Append a clean CTA block with TWO visible links:
-      - The main landing URL (so the recipient can see we exist as a company)
-      - A direct link to the Try-EYO sandbox at /#try (the actual demo)
+    Two-link CTA:
+      - Plain `www.reachng.ng` lives in the signature (trust signal). Anyone
+        forwarding the email or typing it in by hand gets there cleanly.
+      - A personalised short link `www.reachng.ng/hi/{slug}` lives in a P.S.
+        line. When the recipient taps it, the landing page knows who they
+        are and pre-fills their business name, vertical, and forms — no
+        retyping. Strangers who landed via the plain URL just see the
+        generic landing.
 
-    Why post-draft injection: the LLM drops or mangles URLs. The link is
-    the entire CTA — it cannot be flaky.
-
-    Uses real UTM keys (utm_source / utm_medium / utm_campaign). Without
-    them, the `/` route redirects to the /start cover page. UTM-tagged
-    arrivals land directly on the landing, which is what a recipient
-    expects.
-
-    Extra params: v=<vertical>, c=<contact_id> for PostHog attribution.
+    `prospect_profile` is what gets stored against the slug:
+        {business_name, contact_name, first_name, vertical, category}
+    The /hi/{slug} handler reads this and sets a 24h cookie.
     """
-    params = {
-        "utm_source":   "email",
-        "utm_medium":   "outreach",
-        "utm_campaign": "founder_cohort",
-        "v":            vertical,
-    }
-    if contact_id:
-        params["c"] = str(contact_id)
-
-    qs            = urlencode(params)
-    full_site_url = f"{_LANDING_BASE}{path}?{qs}"
-    full_try_url  = f"{_LANDING_BASE}/?{qs}#try"   # anchor onto the Try-EYO widget
-
-    # Mint clean short slugs so the email never shows the raw UTM string.
-    # /o/{slug} resolves server-side to the real UTM-tagged URL.
-    try:
-        from services.outreach_links import mint as _mint_slug
-        site_slug = _mint_slug(target_url=full_site_url, vertical=vertical,
-                                contact_id=contact_id, variant="site")
-        try_slug  = _mint_slug(target_url=full_try_url,  vertical=vertical,
-                                contact_id=contact_id, variant="try")
-        site_url = f"{_LANDING_BASE}/o/{site_slug}"
-        try_url  = f"{_LANDING_BASE}/o/{try_slug}"
-    except Exception:
-        # If minting fails (Mongo down, etc), fall back to the long URLs so
-        # the email is still functional. Not ideal, but better than no link.
-        site_url = full_site_url
-        try_url  = full_try_url
-
     body = (message or "").rstrip()
     # Strip any URL the LLM tried to add despite the rule
     body = re.sub(r"https?://\S+", "", body).rstrip()
+    body = re.sub(r"www\.reachng\.ng\S*", "www.reachng.ng", body)
 
-    cta = (
-        f"\n\n---\n"
-        f"Site: {site_url}\n"
-        f"Try EYO live (no signup): {try_url}"
-    )
-    return body + cta
+    # Mint a personalised short link. Fail-safe: if Mongo is down or minting
+    # errors, the email still ships with the plain URL in the signature.
+    try:
+        from services.outreach_links import mint as _mint_slug
+        slug = _mint_slug(
+            target_url="/",
+            vertical=vertical,
+            contact_id=contact_id,
+            variant="hi",
+            prospect_profile=prospect_profile or {"vertical": vertical},
+        )
+        return f"{body}\n\nP.S. www.reachng.ng/hi/{slug} — one-tap, takes you straight to a demo set up for you."
+    except Exception as e:
+        log.info("personal_link_mint_failed_falling_back", error=str(e))
+        return body
 
 
 # ── End-to-end convenience: draft + inject in one call ─────────────────────
@@ -243,9 +224,31 @@ def draft_with_link(
     vertical: str = "general",
     **fields,
 ) -> dict:
-    """Single entry-point used by the campaign runner."""
+    """Single entry-point used by the campaign runner.
+
+    Builds the prospect_profile that backs the /hi/{slug} personalisation
+    from the enrichment fields we already have, so the landing page can
+    pre-fill the recipient's business name, vertical, and forms.
+    """
     out = draft_outreach_email(business_name=business_name, vertical=vertical, **fields)
+
+    contact_name = fields.get("contact_name") or ""
+    first_name   = contact_name.strip().split()[0] if contact_name else ""
+    prospect_profile = {
+        "business_name": business_name,
+        "contact_name":  contact_name or None,
+        "first_name":    first_name or None,
+        "vertical":      vertical,
+        "category":      fields.get("category"),
+        "address":       fields.get("address"),
+    }
+    # Drop empty values so the cookie payload stays tight
+    prospect_profile = {k: v for k, v in prospect_profile.items() if v}
+
     out["message"] = attach_landing_link(
-        out["message"], vertical=vertical, contact_id=contact_id,
+        out["message"],
+        vertical=vertical,
+        contact_id=contact_id,
+        prospect_profile=prospect_profile,
     )
     return out

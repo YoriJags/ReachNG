@@ -434,23 +434,35 @@ async def landing(request: Request):
             media_type="application/json",
         )
 
+    # Personalised-arrival check — a recipient who tapped /hi/{slug} has a
+    # `reachng_prospect` cookie set. They jump straight to the landing,
+    # bypass the cover, and the template gets their profile for personalisation.
+    prospect_profile = _read_prospect_cookie(request)
+
     # Cover-first routing — first-time human visitors get sent to /start.
     # Exemptions (no redirect, render landing directly):
     #   - cookie reachng_vertical is set (returning visitor or already picked)
+    #   - cookie reachng_prospect is set (came in via personalised /hi link)
     #   - any crawler / social previewer user-agent (SEO + link unfurl integrity)
     #   - explicit opt-out via ?skip_cover=1 (used by the Skip link on /start)
     #   - any UTM-tracked arrival (paid traffic, partner links — they get the
     #     landing they were promised, no surprise cover)
-    has_cookie  = bool(request.cookies.get("reachng_vertical"))
-    is_bot      = _looks_like_bot(request.headers.get("user-agent", ""))
-    skip_cover  = request.query_params.get("skip_cover") in ("1", "true", "yes")
-    has_utm     = any(
+    has_cookie     = bool(request.cookies.get("reachng_vertical"))
+    has_prospect   = bool(prospect_profile)
+    is_bot         = _looks_like_bot(request.headers.get("user-agent", ""))
+    skip_cover     = request.query_params.get("skip_cover") in ("1", "true", "yes")
+    has_utm        = any(
         request.query_params.get(k) for k in ("utm_source", "utm_medium", "utm_campaign")
     )
-    if not (has_cookie or is_bot or skip_cover or has_utm):
+    if not (has_cookie or has_prospect or is_bot or skip_cover or has_utm):
         return RedirectResponse(url="/start", status_code=302)
 
-    scene = _pick_scene(request)
+    # If the prospect cookie names a vertical, override the scene with theirs.
+    if prospect_profile and prospect_profile.get("vertical"):
+        scene = _pick_scene_for_slug(prospect_profile["vertical"]) or _pick_scene(request)
+    else:
+        scene = _pick_scene(request)
+
     track_page_viewed(
         page="landing", path="/",
         referrer=request.headers.get("referer", ""),
@@ -466,8 +478,38 @@ async def landing(request: Request):
             "active_vertical": scene.get("label", "Restaurants & venues"),
             "active_vertical_slug": scene.get("slug", "hospitality"),
             "active_vertical_label": scene.get("label_emoji", "🍽 Restaurants & venues"),
+            "prospect": prospect_profile,
         },
     )
+
+
+def _read_prospect_cookie(request: Request) -> Optional[dict]:
+    """Safely parse the reachng_prospect cookie. Returns None on any error."""
+    raw = request.cookies.get("reachng_prospect")
+    if not raw:
+        return None
+    try:
+        import json as _json
+        data = _json.loads(raw)
+        if not isinstance(data, dict):
+            return None
+        # Whitelist + clip
+        out = {}
+        for k in ("business_name", "contact_name", "first_name", "vertical",
+                  "category", "slug"):
+            v = data.get(k)
+            if isinstance(v, str) and v.strip():
+                out[k] = v.strip()[:200]
+        return out or None
+    except Exception:
+        return None
+
+
+def _pick_scene_for_slug(slug: str) -> Optional[dict]:
+    """Return the scene pack matching a vertical slug, or None."""
+    if not slug:
+        return None
+    return SCENE_PACKS.get(slug.lower().strip())
 
 
 @router.get("/start", response_class=HTMLResponse, include_in_schema=False)
@@ -591,22 +633,56 @@ async def contact(request: Request):
     return _templates(request).TemplateResponse(request, "marketing/contact.html")
 
 
-@router.get("/o/{slug}", include_in_schema=False)
-async def outreach_short_link(slug: str):
-    """Clean short link for cold-outreach emails. Resolves the slug to the
-    real UTM-tagged URL and 302s. Recipient sees 'www.reachng.ng/o/abc123'
-    in their inbox; the ugly querystring stays server-side."""
+@router.get("/hi/{slug}", include_in_schema=False)
+async def outreach_personal_link(slug: str):
+    """Personalised short link for cold-outreach emails.
+
+    `www.reachng.ng/hi/k3m` — the slug carries this recipient's profile
+    (business name, contact name, vertical). On click we set a signed
+    cookie `reachng_prospect` and 302 to the landing. The landing template
+    reads the cookie and personalises everything: hero banner, vertical
+    pre-select, form pre-fills.
+
+    Unknown slug -> 302 to '/' anyway so the click is still useful.
+    """
+    import json as _json
+    target = "/"
+    cookie_value: Optional[str] = None
     try:
-        from services.outreach_links import resolve
-        target = resolve(slug)
+        from services.outreach_links import resolve_full
+        doc = resolve_full(slug) or {}
+        target = doc.get("target_url") or "/"
+        profile = doc.get("prospect_profile") or {}
+        if profile:
+            cookie_payload = {
+                "business_name": (profile.get("business_name") or "")[:120],
+                "contact_name":  (profile.get("contact_name")  or "")[:120],
+                "first_name":    (profile.get("first_name")    or "")[:60],
+                "vertical":      (profile.get("vertical")      or "")[:32],
+                "category":      (profile.get("category")      or "")[:80],
+                "slug":          slug,
+            }
+            cookie_value = _json.dumps(cookie_payload, separators=(",", ":"))
     except Exception as e:
         log.warning("outreach_link_resolve_failed", slug=slug, error=str(e))
-        target = None
-    if not target:
-        # Slug not found → drop them on the landing rather than 404, so the
-        # click is still useful.
-        return RedirectResponse(url="/", status_code=302)
-    return RedirectResponse(url=target, status_code=302)
+
+    resp = RedirectResponse(url=target, status_code=302)
+    if cookie_value:
+        resp.set_cookie(
+            key="reachng_prospect",
+            value=cookie_value,
+            max_age=24 * 3600,          # 24h
+            httponly=False,             # JS reads it on the landing
+            samesite="lax",
+            secure=True,
+        )
+    return resp
+
+
+# Legacy /o/{slug} alias — older emails already pointed here. Forward to /hi.
+@router.get("/o/{slug}", include_in_schema=False)
+async def outreach_short_link_legacy(slug: str):
+    return RedirectResponse(url=f"/hi/{slug}", status_code=302)
 
 
 @router.get("/for/{slug}", response_class=HTMLResponse, include_in_schema=False)

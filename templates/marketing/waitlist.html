@@ -150,6 +150,34 @@
       const sel = form.querySelector('select[name="vertical"]');
       if (sel) sel.value = preselected;
     }
+
+    // Pre-fill from the reachng_prospect cookie set by /hi/{slug} clicks —
+    // friction-kill for prospects arriving via personalised cold outreach.
+    try {
+      const raw = (document.cookie.match(/(?:^|;\s*)reachng_prospect=([^;]+)/) || [])[1];
+      if (raw) {
+        const p = JSON.parse(decodeURIComponent(raw));
+        const set = (name, val) => {
+          if (!val) return;
+          const el = form.querySelector(`[name="${name}"]`);
+          if (el && !el.value) el.value = val;
+        };
+        set('name',          p.contact_name);
+        set('business_name', p.business_name);
+        if (p.vertical) {
+          const sel = form.querySelector('select[name="vertical"]');
+          if (sel) sel.value = p.vertical;
+        }
+        // Personalised header
+        const h = document.querySelector('.waitlist-h1, h1');
+        if (h && p.first_name) {
+          const banner = document.createElement('div');
+          banner.style.cssText = 'background:#fff3e6;border:1px solid #ffb380;border-radius:8px;padding:10px 14px;margin-bottom:18px;font-size:13px;color:#7a3013;';
+          banner.innerHTML = `👋 <strong>Hi ${p.first_name.replace(/[<>]/g,'')}</strong> — most of this is already filled in for ${(p.business_name||'').replace(/[<>]/g,'')}. Confirm and submit.`;
+          h.parentNode.insertBefore(banner, h);
+        }
+      }
+    } catch (e) { /* graceful */ }
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errEl.style.display = 'none';

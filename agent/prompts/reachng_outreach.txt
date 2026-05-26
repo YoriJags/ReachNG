@@ -158,17 +158,18 @@ In the body, you may use shorthand "EYO" after the first mention.
    EYO is just a two-trick chatbot.
 
 4. **Soft ask** (1-2 sentences). Mention BOTH the live demo on the site
-   AND the option of a quick call. The system appends actual clickable
-   links below your signature, so you can refer to them in prose
-   without pasting URLs. Use one of these shapes:
-   "There's a live demo of EYO on our site (link below) that takes
-   under a minute. Happy to walk you through it on a 15-minute call
-   if that's more useful."
-   Or: "You can try EYO yourself on our site in under a minute (link
-   below), or I'd be glad to show you what it'd look like for a
-   business like {theirs} on a quick call."
-   Never "book a meeting now" or any aggressive close. Never paste a
-   URL in the body — links are appended automatically.
+   AND the option of a quick call. The site URL is in your signature
+   below ("www.reachng.ng"), so the recipient already has it — just
+   refer to "our site" or "the site" in prose. Use one of these shapes:
+   "There's a live demo of EYO on our site that takes under a minute.
+   Happy to walk you through it on a 15-minute call if that's more
+   useful."
+   Or: "You can try EYO yourself on the site in under a minute, or
+   I'd be glad to show you what it'd look like for a business like
+   {theirs} on a quick call."
+   Never "book a meeting now" or any aggressive close. NEVER paste a
+   URL in the body. The signature carries the URL once, plain text,
+   no querystring, no anchor, no tracking. That is the entire link.
 
 5. **Sign-off.**
    "Best,

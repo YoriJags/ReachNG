@@ -59,49 +59,72 @@ def _new_slug() -> str:
 
 def mint(
     *,
-    target_url: str,
+    target_url: str = "/",
     vertical: Optional[str] = None,
     contact_id: Optional[str] = None,
     variant: str = "site",
+    prospect_profile: Optional[dict] = None,
 ) -> str:
-    """Returns a slug. Idempotent on (vertical, contact_id, variant) — the
-    same prospect always gets the same slug for the same link variant, so
-    a second call doesn't pollute the table with duplicates."""
-    if not target_url:
-        raise ValueError("target_url required")
+    """Mint a slug. Idempotent on (vertical, contact_id, variant).
 
+    `prospect_profile` is the personalisation payload the landing page reads
+    after the recipient taps the link. Schema:
+        {business_name, contact_name, first_name, vertical, category,
+         address, neighbourhood, sample_inbound}
+    All optional. The route handler picks fields that exist and sets a
+    signed cookie so the landing can greet the recipient by name, pre-fill
+    forms, and pre-select their vertical.
+    """
     if vertical and contact_id:
         existing = _col().find_one({
             "vertical":    vertical,
             "contact_id":  str(contact_id),
             "variant":     variant,
-        }, {"slug": 1, "target_url": 1})
+        }, {"slug": 1, "target_url": 1, "prospect_profile": 1})
         if existing:
-            # If the target URL changed (eg utm params shifted), update it
-            if existing.get("target_url") != target_url:
-                _col().update_one({"_id": existing["_id"]},
-                                   {"$set": {"target_url": target_url}})
+            patch: dict = {}
+            if target_url and existing.get("target_url") != target_url:
+                patch["target_url"] = target_url
+            if prospect_profile and existing.get("prospect_profile") != prospect_profile:
+                patch["prospect_profile"] = prospect_profile
+            if patch:
+                _col().update_one({"_id": existing["_id"]}, {"$set": patch})
             return existing["slug"]
 
-    # Mint a fresh slug, retry on collision
     for _ in range(5):
         slug = _new_slug()
         try:
             _col().insert_one({
-                "slug":         slug,
-                "target_url":   target_url,
-                "vertical":     vertical,
-                "contact_id":   str(contact_id) if contact_id else None,
-                "variant":      variant,
-                "created_at":   datetime.now(timezone.utc),
-                "first_click_at": None,
-                "last_click_at":  None,
-                "clicks":       0,
+                "slug":             slug,
+                "target_url":       target_url or "/",
+                "vertical":         vertical,
+                "contact_id":       str(contact_id) if contact_id else None,
+                "variant":          variant,
+                "prospect_profile": prospect_profile or None,
+                "created_at":       datetime.now(timezone.utc),
+                "first_click_at":   None,
+                "last_click_at":    None,
+                "clicks":           0,
             })
             return slug
         except Exception:
-            continue  # slug collision — try another
+            continue
     raise RuntimeError("could not mint a unique slug after 5 attempts")
+
+
+def resolve_full(slug: str) -> Optional[dict]:
+    """Resolve a slug and return the full doc (target_url + prospect_profile
+    + meta) for the route handler. Side-effect: bumps clicks."""
+    if not slug:
+        return None
+    doc = _col().find_one_and_update(
+        {"slug": slug},
+        {"$inc": {"clicks": 1},
+         "$set": {"last_click_at": datetime.now(timezone.utc)},
+         "$min": {"first_click_at": datetime.now(timezone.utc)}},
+        return_document=False,
+    )
+    return doc
 
 
 def resolve(slug: str) -> Optional[str]:
