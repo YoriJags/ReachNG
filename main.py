@@ -163,6 +163,8 @@ async def lifespan(app: FastAPI):
     _safe("spike_guard", ensure_spike_indexes)
     from services.prospect_interviews import ensure_interview_indexes
     _safe("prospect_interviews", ensure_interview_indexes)
+    from services.outreach_links import ensure_outreach_link_indexes
+    _safe("outreach_links", ensure_outreach_link_indexes)
     from services.sales_alerter import ensure_sales_alert_indexes
     _safe("sales_alert", ensure_sales_alert_indexes)
     from services.waitlist import ensure_waitlist_indexes

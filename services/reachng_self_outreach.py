@@ -202,9 +202,25 @@ def attach_landing_link(
     if contact_id:
         params["c"] = str(contact_id)
 
-    qs       = urlencode(params)
-    site_url = f"{_LANDING_BASE}{path}?{qs}"
-    try_url  = f"{_LANDING_BASE}/?{qs}#try"   # anchor onto the Try-EYO widget
+    qs            = urlencode(params)
+    full_site_url = f"{_LANDING_BASE}{path}?{qs}"
+    full_try_url  = f"{_LANDING_BASE}/?{qs}#try"   # anchor onto the Try-EYO widget
+
+    # Mint clean short slugs so the email never shows the raw UTM string.
+    # /o/{slug} resolves server-side to the real UTM-tagged URL.
+    try:
+        from services.outreach_links import mint as _mint_slug
+        site_slug = _mint_slug(target_url=full_site_url, vertical=vertical,
+                                contact_id=contact_id, variant="site")
+        try_slug  = _mint_slug(target_url=full_try_url,  vertical=vertical,
+                                contact_id=contact_id, variant="try")
+        site_url = f"{_LANDING_BASE}/o/{site_slug}"
+        try_url  = f"{_LANDING_BASE}/o/{try_slug}"
+    except Exception:
+        # If minting fails (Mongo down, etc), fall back to the long URLs so
+        # the email is still functional. Not ideal, but better than no link.
+        site_url = full_site_url
+        try_url  = full_try_url
 
     body = (message or "").rstrip()
     # Strip any URL the LLM tried to add despite the rule

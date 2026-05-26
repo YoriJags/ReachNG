@@ -591,6 +591,24 @@ async def contact(request: Request):
     return _templates(request).TemplateResponse(request, "marketing/contact.html")
 
 
+@router.get("/o/{slug}", include_in_schema=False)
+async def outreach_short_link(slug: str):
+    """Clean short link for cold-outreach emails. Resolves the slug to the
+    real UTM-tagged URL and 302s. Recipient sees 'www.reachng.ng/o/abc123'
+    in their inbox; the ugly querystring stays server-side."""
+    try:
+        from services.outreach_links import resolve
+        target = resolve(slug)
+    except Exception as e:
+        log.warning("outreach_link_resolve_failed", slug=slug, error=str(e))
+        target = None
+    if not target:
+        # Slug not found → drop them on the landing rather than 404, so the
+        # click is still useful.
+        return RedirectResponse(url="/", status_code=302)
+    return RedirectResponse(url=target, status_code=302)
+
+
 @router.get("/for/{slug}", response_class=HTMLResponse, include_in_schema=False)
 async def vertical_lander(slug: str, request: Request):
     content = get_vertical_content(slug)
