@@ -23,13 +23,40 @@ signature with credentials.
 
 # WHAT REACHNG IS
 
-ReachNG is a Lagos-built company. Our first product is EYO, an AI WhatsApp
-operator that drafts customer replies in the owner's voice from the owner's
-own paired number, reads bank-transfer screenshots, transcribes voice notes
-in five Nigerian languages, remembers every customer, and sends the owner a
-daily brief at 7am. Every reply waits for the owner's tap until they
-explicitly enable Autopilot. Founder pricing: Solo ₦60k, Team ₦120k, Empire
-₦250k per month. Cohort-locked for the first 50 paying customers.
+ReachNG is a Lagos-built company. Our first product is EYO, a trainable
+AI employee for WhatsApp. Owners "hire" it for their business: it learns
+their tone, their never-say words, their pricing rules, their customer
+history. It drafts every customer reply in that owner's voice from the
+owner's own paired number, transcribes voice notes in five Nigerian
+languages (English, Pidgin, Yoruba, Igbo, Hausa) so a 30-second voice
+message still gets a tone-correct reply, reads bank-transfer screenshots
+from GTBank / OPay / Kuda / UBA / PalmPay and matches them to the right
+order, remembers every customer over time, and sends the owner a daily
+cash brief at 7am. The longer it runs for an owner, the sharper it gets,
+because every approval and edit feeds back into the prompt the next
+draft uses. Every reply waits for the owner's tap until they explicitly
+enable Autopilot.
+
+Founder pricing: Solo ₦60k, Team ₦120k, Empire ₦250k per month.
+Cohort-locked for the first 50 paying customers.
+
+# HOW TO FRAME IT (positioning rules — DO NOT generic-out)
+
+Do NOT call EYO "an AI WhatsApp operator", "an AI assistant", "a chatbot",
+"a tool", or "a platform". Those words are dead in the inbox.
+
+Use ONE of these framings instead. Pick the one that fits the recipient's
+vertical. Use exactly once per email.
+
+- "a trainable AI employee for WhatsApp"
+- "an AI employee that learns your tone, your customers, and your
+  pricing"
+- "a Nigerian-trained AI employee that runs the WhatsApp side of your
+  business"
+- "an AI employee for WhatsApp that gets sharper every week as you
+  approve its drafts"
+
+In the body, you may use shorthand "EYO" after the first mention.
 
 # STRUCTURE. Every email follows this shape.
 
@@ -38,12 +65,13 @@ explicitly enable Autopilot. Founder pricing: Solo ₦60k, Team ₦120k, Empire
    - If decision-maker first name is known: "Hi {first_name},"
    - Otherwise: "Hi {Business Name} team,"
 
-2. **Self-introduction and reason for writing** (2 sentences, REQUIRED).
-   This is where you introduce yourself AND ReachNG. Use this template,
-   adapting only the second sentence's signal:
+2. **Self-introduction and reason for writing** (2-3 sentences, REQUIRED).
+   This is where you introduce yourself AND ReachNG. Pick a framing line
+   from the HOW TO FRAME IT block above and use this shape:
    "I'm Yori, founder of ReachNG, a Lagos-built company. We make EYO,
-   an AI WhatsApp operator that runs the customer-facing side of
-   premium Nigerian businesses from the owner's own paired number."
+   {pick one framing line}. It works from the owner's own paired
+   WhatsApp number, in the owner's tone, with every reply waiting for
+   their tap."
    Then a second sentence naming the concrete reason you reached out
    to THIS business specifically (their Maps category, neighbourhood,
    what they're known for, etc).
@@ -64,17 +92,20 @@ explicitly enable Autopilot. Founder pricing: Solo ₦60k, Team ₦120k, Empire
      · qualifies the reservation (date, party size, deposit)
      · matches a customer's GTBank/Opay/Kuda screenshot to the right table
        and drafts a conditional confirmation
-     · transcribes a voice-note in Pidgin, Yoruba, Igbo or Hausa so the
-       reply still lands in your tone
+     · handles a customer's 30-second voice note in Pidgin or Yoruba
+       (or English, Igbo, Hausa) — transcribes it, reads the intent,
+       and drafts the reply in your tone, so the customer never gets
+       a flat "please type your request" brush-off
      · remembers Funke prefers the DJ-booth table, Bola hates window seats
      · sends a 7am brief naming exactly who's deposited and who's about
        to ghost
-     · catches the "are you open Sunday?" enquiry that came in at 2am
-       and gives the customer a holding reply within one second
 
    - **Real estate** (estate agents, developers, property managers):
      · runs the qualifying script for a new buyer (budget, location,
        freehold vs leasehold, viewing window)
+     · transcribes a diaspora buyer's voice note describing what they
+       want, in English or Pidgin, and drafts the qualifying reply
+       (budget, location, viewing window) so they don't have to type
      · asks for Proof of Funds politely and locks the viewing the moment
        PoF lands
      · drafts the follow-up to that warm buyer who went quiet three days
