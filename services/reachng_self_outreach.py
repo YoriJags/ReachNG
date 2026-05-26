@@ -140,7 +140,35 @@ def draft_outreach_email(
     except Exception:
         pass
 
+    # Em-dash / en-dash scrub — these are the AI-smell tell. Replace with the
+    # right ASCII punctuation depending on context. Spaced ' — ' becomes ', '
+    # (parenthetical), bare '—' becomes ',', '–' (en-dash) used in ranges
+    # becomes '-', and '…' ellipsis collapses to '.'.
+    subject = _scrub_dashes(subject)
+    message = _scrub_dashes(message)
+
     return {"subject": subject, "message": message}
+
+
+def _scrub_dashes(text: str) -> str:
+    """Remove AI-smell punctuation. Numeric ranges (110–150) become hyphenated
+    (110-150); spaced em/en dashes become commas; lingering bare dashes become
+    commas; ellipses become periods."""
+    if not text:
+        return text
+    # Numeric range first: keep as ASCII hyphen, no spaces (e.g. 110–150 → 110-150)
+    text = re.sub(r"(\d)\s*[—–]\s*(\d)", r"\1-\2", text)
+    # Spaced em/en dash between words → comma + space
+    text = re.sub(r"\s+[—–]\s+", ", ", text)
+    # Any remaining bare em/en dash → comma
+    text = text.replace("—", ",").replace("–", ",")
+    # Collapse accidental double commas
+    text = re.sub(r",\s*,", ",", text)
+    # Ellipsis → period
+    text = text.replace("…", ".")
+    # Collapse multi-space artifacts
+    text = re.sub(r"[ \t]{2,}", " ", text)
+    return text
 
 
 def attach_landing_link(
