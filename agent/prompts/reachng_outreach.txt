@@ -78,6 +78,11 @@ Empire ₦250k per month, cohort-locked for the first 50 paying customers.
   data. If you must reference scale, use qualitative phrasing: "many
   Lagos owners in your space tell us…" or "we've heard repeatedly that…".
   Inventing a number is an automatic credibility kill.
+- **NO TIME-OF-DAY CLICHES.** "Saturday night", "8pm-2am", "Friday rush",
+  "after-hours", "weekend bookings", "midnight enquiries" — all banned.
+  This trope has been used to death in Lagos hospitality marketing and
+  reads as lazy on first scan. If you need to reference timing, name the
+  general behaviour ("when enquiries spike") not the clock.
 - **NO HOOK-Y SUBJECTS.** Subjects must read like a real person introducing
   a real company. Title-case proper nouns; sentence-case the rest.
   Acceptable: "Introducing ReachNG — for {their vertical}"; "Quick
