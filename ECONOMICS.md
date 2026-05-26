@@ -128,11 +128,11 @@ These don't attribute per-client, but they need to be paid by *somebody's* margi
 | Mongo Atlas M0 (free) | ~₦0 today | On free tier; switches to M10 (~₦91k) around 10-12 clients |
 | Resend Pro | ~₦32,000 ($20) | Shared (counted partially above) |
 | PostHog | 0 | Free tier sufficient until 1M events/mo |
-| Anthropic / OpenAI API minimums | 0 | Usage-based, no floor (separate from Claude Pro below) |
+| **OpenAI Whisper budget cap** | **~₦240,000 ($150)** | Pre-funded monthly ceiling for voice transcription. Bursts above this require operator approval. Sized for ~25k minutes of inbound audio/mo (covers a full Tier-0 + Tier-1 cohort with comfortable headroom). |
+| **Anthropic Claude API budget cap** | **~₦160,000 ($100)** | Pre-funded monthly ceiling for production drafts (Haiku 4.5 + occasional Vision OCR). Sized for ~3.5M tokens/mo at current per-token rates. Caller-side rate limits in `services/usage_meter.py` enforce the ceiling per client. |
 | **Claude Pro subscription (founder tooling)** | **~₦32,000 ($20)** | The Pro subscription Yori uses to build, draft, plan, debug. Powers everything Claude Code touches. Upgrades to Max 5× (~₦160k) likely once parallel sessions matter, Max 20× (~₦320k) once team grows. |
 | Domain + SSL | ~₦5,000/mo amortised | reachng.ng renewal |
-| Apify (our SDR funnel, not client cost) | ~₦8,000/mo | Marketing expense, not COGS |
-| **Platform fixed total (today)** | **~₦93,000/mo** | At 10 clients = ₦9,300/client. Jumps to ₦18,400/client at Mongo M10. |
+| **Platform fixed total (today)** | **~₦485,000/mo** | At 10 clients = ~₦48,500/client. At 25 clients = ~₦19,400/client. Jumps with Mongo M10 (~+₦91k) around 10-12 clients. |
 
 **Claude Pro → Max trajectory:**
 - 0-15 clients: Pro is fine (~₦32k/mo)
@@ -140,7 +140,34 @@ These don't attribute per-client, but they need to be paid by *somebody's* margi
 - 50+ clients: Max 20× (~₦320k/mo) — multiple ops team members on Claude
 - Even at Max 20× ÷ 100 clients = ₦3,200/client overhead. Negligible at scale.
 
+**API budget caps — why pre-fund vs metered:**
+- Predictable line items investors can underwrite. No "AI costs went 4× this month" surprises.
+- Hard ceilings on usage_meter.py protect runway during a viral spike or scrape attack.
+- If we routinely hit the ceiling, that's a *good* problem — raise the cap and reprice.
+
 Allocate platform fixed across active clients when computing true margin.
+
+---
+
+## 5.5 · Growth / marketing budget (separate from COGS)
+
+This is **not** cost-of-goods-sold. It's the acquisition spend that compounds into paying clients. Tracked separately so unit economics stay honest.
+
+| Line item | ₦/mo | Notes |
+|---|---:|---|
+| **Meta Ads (Facebook + Instagram)** | ~₦320,000 ($200) | Lagos-targeted lookalike + retargeting campaigns. Vertical-specific creative per SCENE_PACK. CAC target ≤ 30% of first month's MRR. |
+| **Google Ads** | ~₦240,000 ($150) | Branded + 5-6 high-intent terms ("WhatsApp AI assistant Lagos", "auto-reply customers Nigeria"). Mostly defensive once SEO ranks. |
+| **SEO tooling (Ahrefs / SEMrush starter)** | ~₦160,000 ($99) | Keyword tracking, backlink audit, competitor monitoring (johahq + any new Lagos rivals). |
+| **LinkedIn Sales Navigator (founder outreach)** | ~₦128,000 ($79) | For Yori's direct outreach to luxury RE / legal / clinic founders. |
+| **Content production (occasional freelance)** | ~₦200,000 | One case-study write-up or video edit per month once first paid client lands. |
+| **Apify (SDR funnel discovery)** | ~₦16,000 ($10) | Our own internal lead-discovery for the Prospect OS funnel. Was previously double-counted under platform fixed. |
+| **Marketing total (today)** | **~₦1,064,000/mo (~$665)** | Roughly $0.66k/mo at Year 1 ramp. Scales to $1.5-2k/mo by Month 6 if early signals are strong. |
+
+**Acquisition math at this spend:**
+- Target blended CAC ≤ ₦300,000 (~ 2× a Starter month) — every paid client recovers CAC inside 60 days.
+- At 5 net-new clients/mo, blended CAC = ₦213k. Within target.
+- At 2 net-new clients/mo, blended CAC = ₦532k. Outside target — pause Ads, lean into founder outreach + organic.
+- Re-evaluate spend split monthly. Cut what doesn't pay back; double the channel that does.
 
 ---
 
