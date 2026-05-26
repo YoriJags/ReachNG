@@ -5967,7 +5967,8 @@ async function refreshRoster() {
         <td style="color:#444;font-size:12px;">${lastRun}</td>
         <td>${portalUrl ? `<button class="copy-link-btn" onclick="navigator.clipboard.writeText('${portalUrl}').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',1500)})">Copy link</button>` : '<span style="color:#222;font-size:11px;">None</span>'}</td>
         <td style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn-approve" style="font-size:11px;padding:4px 10px;" onclick="quickRunCampaign('${c.name}','${c.vertical||'real_estate'}')">Run</button>
+          <button class="btn btn-approve" style="font-size:11px;padding:4px 10px;" onclick="quickRunCampaign('${c.name}','${c.vertical||'real_estate'}')" title="Dry-run: discover + draft, nothing sends">Run (dry)</button>
+          <button class="btn btn-approve" style="font-size:11px;padding:4px 10px;background:#3d0d0d;border:1px solid #c62828;color:#ffd4d4;" onclick="liveRunCampaign('${c.name}','${c.vertical||'real_estate'}')" title="LIVE run: discover + draft + queue every send to HITL approvals">Run LIVE (HITL)</button>
           <button class="btn" style="font-size:11px;padding:4px 10px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="openInvoice('${encodeURIComponent(c.name)}')">Invoice</button>
           ${portalToken ? `<button class="btn" style="font-size:11px;padding:4px 10px;background:#0e1a14;color:#00e5a0;border:1px solid #00e5a044;" onclick="openPortalEmbed('${portalToken}','${encodeURIComponent(c.name)}')">View Portal</button>` : ''}
           ${portalToken ? `<button class="btn" style="font-size:11px;padding:4px 10px;background:${c.onboarded_at ? '#1e2530' : '#2a1a0e'};color:${c.onboarded_at ? '#aaa' : '#ff7e30'};border:1px solid ${c.onboarded_at ? '#2a3340' : '#ff5c0044'};" onclick="window.open('/portal/${portalToken}/onboard','_blank','noopener')" title="${c.onboarded_at ? 'Onboarded — open the wizard to edit' : 'Not onboarded — launch the setup wizard'}">${c.onboarded_at ? '🧰 Setup' : '🧰 Onboard'}</button>` : ''}
@@ -5988,6 +5989,25 @@ async function quickRunCampaign(name, vertical) {
       vertical, max_contacts: 10, dry_run: true, client_name: name,
     });
     _qrRenderPanel(name, vertical, result);
+    refresh();
+  } catch(e) {
+    alert("Error: " + e.message);
+  }
+}
+
+async function liveRunCampaign(name, vertical) {
+  const n = parseInt(prompt(`LIVE run for ${name} (${vertical}).\n\nThis will discover real businesses, draft real emails, and queue every send to your HITL approvals queue.\n\nNo email actually sends until YOU approve each one. But Maps + Haiku quota is real spend.\n\nHow many contacts? (max 60)`, "10"));
+  if (!n || n < 1 || n > 60) { alert("Aborted — needs 1 to 60."); return; }
+  if (!confirm(`Confirm: discover and draft for ${n} ${vertical} businesses for ${name}, queue all to HITL.`)) return;
+  try {
+    const result = await postJSON("/api/v1/campaigns/run", {
+      vertical, max_contacts: n, dry_run: false, hitl_mode: true, client_name: name,
+    });
+    if (result.status === "started") {
+      alert(`Background campaign started for ${n} contacts. Drafts will appear in Recover -> Approvals over the next minute or two.`);
+    } else {
+      _qrRenderPanel(name, vertical, result);
+    }
     refresh();
   } catch(e) {
     alert("Error: " + e.message);

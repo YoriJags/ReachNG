@@ -124,3 +124,18 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     return Settings()
+
+
+def unipile_enabled() -> bool:
+    """True only when both Unipile DSN + API key are present.
+
+    Used to silently no-op Unipile-dependent code paths (WhatsApp pairing,
+    health loop, owner-alert WhatsApp pings, inbound media download, client
+    morning brief send) when the operator hasn't paid for Unipile yet.
+
+    Email outbound still works via Resend; WhatsApp outbound still works via
+    Meta Cloud API if its env vars are set. Only the Unipile-specific paths
+    short-circuit.
+    """
+    s = get_settings()
+    return bool(s.unipile_api_key and s.unipile_dsn)

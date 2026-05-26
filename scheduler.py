@@ -521,11 +521,16 @@ def setup_scheduler():
     # WhatsApp linked-device health check — every 6h. Silent QR expiry is the
     # one production failure mode that goes unnoticed by the client; this loop
     # detects it and alerts both owner (us) and client the moment it happens.
-    scheduler.add_job(
-        _wa_health_check,
-        CronTrigger(hour="0,6,12,18", minute=10, timezone="Africa/Lagos"),
-        id="wa_health_check", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=600,
-    )
+    # Gated on unipile_enabled so we don't spam errors when running on Resend-only.
+    from config import unipile_enabled as _unipile_enabled
+    if _unipile_enabled():
+        scheduler.add_job(
+            _wa_health_check,
+            CronTrigger(hour="0,6,12,18", minute=10, timezone="Africa/Lagos"),
+            id="wa_health_check", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=600,
+        )
+    else:
+        log.info("scheduler_wa_health_skipped", reason="unipile_not_configured")
 
     # Sequence tick — multi-touch follow-ups for BYO Leads. Runs hourly during
     # working hours so day-3/day-7 steps fire close to when the initial was sent.

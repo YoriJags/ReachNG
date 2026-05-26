@@ -68,6 +68,17 @@ async def portal_start_pairing(token: str, label: str = "primary"):
     if not client:
         raise HTTPException(404, "portal not found")
 
+    # Silent kill when Unipile isn't paid for — return a clear 503 so the
+    # portal can show "WhatsApp pairing is not yet enabled" rather than a
+    # generic 500.
+    from config import unipile_enabled
+    if not unipile_enabled():
+        raise HTTPException(
+            503,
+            "WhatsApp pairing is not yet enabled on this deployment. "
+            "Email channel via hello@reachng.ng is active.",
+        )
+
     # Label hygiene — alphanum + underscore, 1-24 chars
     lbl = (label or "primary").strip().lower()
     import re as _re

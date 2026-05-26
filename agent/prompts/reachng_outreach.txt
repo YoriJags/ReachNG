@@ -42,15 +42,73 @@ explicitly enable Autopilot. Founder pricing: Solo ₦60k, Team ₦120k, Empire
    {one specific concrete signal from the enrichment, such as Maps
    category, neighbourhood, what they're known for}."
 
-3. **What ReachNG does** (1 to 2 sentences). Plain English. No bullet
-   list. Mention 1 to 2 capabilities most relevant to their vertical:
-   Hospitality and events: reservations, voice-note transcription, brief.
-   Real estate: qualifying questions, PoF requests, follow-up.
-   Clinics: triage, appointment scheduling, payment confirmations.
-   Legal and advisory: matter triage, consultation booking, document
-   requests.
-   Fashion and retail: order taking, payment screenshot matching, repeat
-   customer memory.
+3. **What ReachNG does for THEM specifically** (2 sentences, REQUIRED).
+   Pick exactly ONE concrete capability from the vertical-keyed list
+   below and describe it in a single sentence that names a tangible
+   moment in their workflow. Then add a second sentence that names a
+   second capability. Be specific. "It drafts replies" is too generic.
+   "When a customer messages asking about a Saturday reservation, EYO
+   drafts the reply with the deposit ask and your bank line, ready for
+   your tap" is what we want.
+
+   Use this table. Pick the row matching their vertical. Pick 2 items
+   from the row. Write 1 sentence each. Reference a concrete moment.
+
+   - **Hospitality / events** (restaurants, hotels, lounges, event venues):
+     · qualifies the reservation (date, party size, deposit)
+     · matches a customer's GTBank/Opay/Kuda screenshot to the right table
+       and drafts a conditional confirmation
+     · transcribes a voice-note in Pidgin, Yoruba, Igbo or Hausa so the
+       reply still lands in your tone
+     · remembers Funke prefers the DJ-booth table, Bola hates window seats
+     · sends a 7am brief naming exactly who's deposited and who's about
+       to ghost
+     · catches the "are you open Sunday?" enquiry that came in at 2am
+       and gives the customer a holding reply within one second
+
+   - **Real estate** (estate agents, developers, property managers):
+     · runs the qualifying script for a new buyer (budget, location,
+       freehold vs leasehold, viewing window)
+     · asks for Proof of Funds politely and locks the viewing the moment
+       PoF lands
+     · drafts the follow-up to that warm buyer who went quiet three days
+       ago, citing what they actually asked about
+     · matches a deposit screenshot to the right unit and tags the file
+       as "soft-locked, awaiting your bank confirmation"
+
+   - **Clinics** (aesthetic, dental, primary care, specialist):
+     · triages a new enquiry (concern, urgency, repeat or new patient,
+       insurance)
+     · books the consultation slot the customer asked for and confirms
+       the deposit
+     · matches a payment screenshot to the right appointment and
+       drafts the conditional confirmation
+     · sends the post-visit follow-up to the patient who hasn't replied
+       in a week
+
+   - **Legal / advisory** (law firms, accountants, consultancies):
+     · triages a new matter (area of law, urgency, conflict-check
+       requirement, document needed)
+     · schedules the consultation and quotes the standard fee in your
+       tone, never freelancing on pricing
+     · drafts the document request to the client who hasn't sent the
+       PDF you asked for last Thursday
+
+   - **Fashion / retail** (ateliers, boutiques, e-commerce):
+     · takes the order over WhatsApp (style, size, colour, delivery
+       slot) and quotes correctly
+     · matches the customer's payment screenshot to the right order
+       and drafts the conditional confirmation
+     · remembers the customer ordered the same blouse in cream three
+       months ago and surfaces that when they message again
+
+   - **General / unknown vertical**: pick two capabilities from the
+     hospitality row, those are the broadest fit.
+
+   Do NOT bullet-list capabilities in the actual email. Write them as
+   prose. "EYO drafts the qualifying reply when someone DMs about a
+   viewing, and matches their deposit screenshot to the right unit
+   the moment it lands." That kind of shape.
 
 4. **Soft ask** (1 sentence). Either:
    "If it's useful, we have a 60-second live demo on the site, and I'm
@@ -82,7 +140,7 @@ explicitly enable Autopilot. Founder pricing: Solo ₦60k, Team ₦120k, Empire
 
 # HARD CONSTRAINTS
 
-- **Length: 110 to 150 words** in the body. Long enough to feel like a
+- **Length: 120 to 170 words** in the body. Long enough to feel like a
   real introduction. Short enough to read in 30 seconds.
 - **NO INVENTED NUMBERS.** Do not write "₦200k+ a week", "30% of
   bookings", "between 8pm to 2am" or any other specific figure you cannot
@@ -129,7 +187,7 @@ markdown fences. No commentary.
 
 {
   "subject": "<see subject rules above. no emoji. 8 words or fewer>",
-  "message": "<the email body. 110 to 150 words. no URL. no em-dashes.>"
+  "message": "<the email body. 120 to 170 words. names ONE concrete moment in their workflow + ONE second capability. no URL. no em-dashes.>"
 }
 
 The body must end with the four-line signature:
