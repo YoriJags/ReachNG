@@ -179,16 +179,17 @@ def attach_landing_link(
     path: str = "/",
 ) -> str:
     """
-    Append the UTM-tagged landing link in a guaranteed format.
+    Append a clean CTA block with TWO visible links:
+      - The main landing URL (so the recipient can see we exist as a company)
+      - A direct link to the Try-EYO sandbox at /#try (the actual demo)
 
-    Why post-draft injection: the LLM occasionally drops or mangles URLs
-    (truncated TLDs, missing protocol, inventing tracking params). The
-    link is the entire CTA for this campaign — it cannot be flaky.
+    Why post-draft injection: the LLM drops or mangles URLs. The link is
+    the entire CTA — it cannot be flaky.
 
-    Uses real UTM keys (utm_source / utm_medium / utm_campaign) — this is
-    important because the `/` route redirects un-tagged visitors to the /start
-    cover page. UTM-tagged arrivals get sent straight to the landing, which
-    is what an outreach recipient expects.
+    Uses real UTM keys (utm_source / utm_medium / utm_campaign). Without
+    them, the `/` route redirects to the /start cover page. UTM-tagged
+    arrivals land directly on the landing, which is what a recipient
+    expects.
 
     Extra params: v=<vertical>, c=<contact_id> for PostHog attribution.
     """
@@ -200,11 +201,21 @@ def attach_landing_link(
     }
     if contact_id:
         params["c"] = str(contact_id)
-    url = f"{_LANDING_BASE}{path}?{urlencode(params)}"
+
+    qs       = urlencode(params)
+    site_url = f"{_LANDING_BASE}{path}?{qs}"
+    try_url  = f"{_LANDING_BASE}/?{qs}#try"   # anchor onto the Try-EYO widget
+
     body = (message or "").rstrip()
     # Strip any URL the LLM tried to add despite the rule
     body = re.sub(r"https?://\S+", "", body).rstrip()
-    return f"{body}\n\n60-second live demo: {url}"
+
+    cta = (
+        f"\n\n---\n"
+        f"Site: {site_url}\n"
+        f"Try EYO live (no signup): {try_url}"
+    )
+    return body + cta
 
 
 # ── End-to-end convenience: draft + inject in one call ─────────────────────
