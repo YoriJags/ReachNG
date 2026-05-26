@@ -35,7 +35,7 @@ _ROOT = Path(__file__).resolve().parent.parent
 _PROMPT_PATH = _ROOT / "agent" / "prompts" / "reachng_outreach.txt"
 _NG_CTX_PATH = _ROOT / "agent" / "prompts" / "_nigerian_context.txt"
 
-_LANDING_BASE = "https://reachng.ng"
+_LANDING_BASE = "https://www.reachng.ng"
 
 
 def _load_system_prompt() -> str:

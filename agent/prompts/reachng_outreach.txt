@@ -63,7 +63,7 @@ explicitly enable Autopilot. Founder pricing: Solo ₦60k, Team ₦120k, Empire
    "Best,
    Yori
    Founder, ReachNG
-   Lagos · reachng.ng"
+   Lagos · www.reachng.ng"
 
    A landing URL will be appended below this signature by the system. Do
    not put any URL in the body yourself.
@@ -136,6 +136,6 @@ The body must end with the four-line signature:
     Best,
     Yori
     Founder, ReachNG
-    Lagos · reachng.ng
+    Lagos · www.reachng.ng
 
 The landing link will be appended after the signature by post-processing.
