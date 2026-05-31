@@ -199,6 +199,18 @@
     <h1>Tell us about <em>{{ client_name }}</em>.</h1>
     <p class="step-sub">The five-line snapshot. Used in every draft EYO writes for you.</p>
 
+    <details style="margin-bottom:24px;background:#0e1a16;border:1px solid #1d4533;border-radius:12px;">
+      <summary style="cursor:pointer;padding:16px 20px;font-size:14px;font-weight:600;color:#5dd28a;">✨ Prefer we set EYO up for you? (concierge)</summary>
+      <div style="padding:0 20px 20px;">
+        <p style="font-size:13px;color:var(--ink2);line-height:1.6;margin:0 0 12px;">Don't want to fill all this in? Paste your price list, FAQs, or a few past chats and we'll train EYO for you. You can still tweak everything later.</p>
+        <textarea id="concierge-materials" rows="5" maxlength="20000" placeholder="Paste price list, FAQs, common questions, or a few real customer chats…" style="width:100%;padding:12px;background:#0a140f;border:1px solid #1d4533;border-radius:8px;color:#e8e8e8;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;margin-bottom:10px;"></textarea>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button type="button" onclick="conciergeSubmit()" id="concierge-btn" style="background:#5dd28a;color:#06241a;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Send to EYO team</button>
+          <span id="concierge-status" style="font-size:12px;color:#6b8;"></span>
+        </div>
+      </div>
+    </details>
+
     <div class="field">
       <label>Business name (as customers know it)</label>
       <input type="text" id="f-trading-name" maxlength="120" placeholder="e.g. Altitude Lagos">
@@ -395,6 +407,14 @@
 
     <div class="check-list" id="checklist"></div>
 
+    <div id="first-win" style="display:none;margin-top:24px;background:linear-gradient(135deg,#10231a,#0c1a14);border:1px solid #1d4533;border-radius:14px;padding:22px;">
+      <div style="font-size:11px;font-weight:700;color:#5dd28a;text-transform:uppercase;letter-spacing:0.1em;">Your first 24 hours</div>
+      <div id="fw-headline" style="font-size:17px;color:#eafff3;margin:8px 0 16px;line-height:1.5;font-weight:600;"></div>
+      <div id="fw-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;"></div>
+      <div id="fw-sample" style="display:none;background:#0a140f;border:1px solid #1d4533;border-radius:10px;padding:14px;font-size:13px;color:#cfe;line-height:1.55;white-space:pre-wrap;"></div>
+      <div style="font-size:12px;color:#6b8;margin-top:14px;" id="fw-promise"></div>
+    </div>
+
     <div class="error-banner" id="complete-error"></div>
   </section>
 
@@ -472,7 +492,7 @@ function renderStep() {
   document.getElementById('rail-current').textContent = `Step ${currentStep}`;
   document.getElementById('btn-back').disabled = currentStep === 1;
   document.getElementById('btn-next').textContent = currentStep === TOTAL_STEPS ? 'Activate EYO →' : 'Save & continue →';
-  if (currentStep === 7) renderChecklist();
+  if (currentStep === 7) { renderChecklist(); loadFirstWin(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function prevStep() {
@@ -682,6 +702,54 @@ async function completeOnboarding() {
   } else {
     window.location.href = `/portal/${TOKEN}`;
   }
+}
+
+// ─── First 24 Hours Win (shown on the go-live step) ──────────────────────
+function escHtmlFW(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function loadFirstWin() {
+  try {
+    const r = await fetch(`/api/v1/portal/${TOKEN}/onboard/first-win`);
+    if (!r.ok) return;
+    const d = await r.json();
+    const box = document.getElementById('first-win');
+    if (!box || !d.ok) return;
+    const leads   = (d.leads_to_wake || {}).count || 0;
+    const chaseC  = (d.payment_chases || {}).count || 0;
+    const chaseN  = (d.payment_chases || {}).amount_ngn || 0;
+    // Only celebrate if there's something real to show.
+    if (!leads && !chaseC && !d.sample_draft) return;
+    box.style.display = 'block';
+    document.getElementById('fw-headline').textContent =
+      d.headline || "EYO is ready to start working your leads.";
+    document.getElementById('fw-stats').innerHTML =
+      `<div style="background:#0a140f;border:1px solid #1d4533;border-radius:10px;padding:12px;"><div style="font-size:22px;font-weight:700;color:#5dd28a;">${leads}</div><div style="font-size:12px;color:#9cb;">leads to wake up</div></div>` +
+      `<div style="background:#0a140f;border:1px solid #1d4533;border-radius:10px;padding:12px;"><div style="font-size:22px;font-weight:700;color:#5dd28a;">${chaseC}</div><div style="font-size:12px;color:#9cb;">payment chases${chaseN ? ` · ₦${Number(chaseN).toLocaleString()}` : ''}</div></div>`;
+    if (d.sample_draft) {
+      const s = document.getElementById('fw-sample');
+      s.style.display = 'block';
+      s.innerHTML = `<div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#6b8;margin-bottom:6px;">Sample reply EYO drafted</div>${escHtmlFW(d.sample_draft)}`;
+    }
+    document.getElementById('fw-promise').textContent = d.promise || '';
+  } catch (e) { /* silent */ }
+}
+
+// ─── Concierge setup submit ───────────────────────────────────────────────
+async function conciergeSubmit() {
+  const materials = document.getElementById('concierge-materials').value.trim();
+  const status = document.getElementById('concierge-status');
+  const btn = document.getElementById('concierge-btn');
+  if (!materials) { status.textContent = 'Paste something first.'; return; }
+  btn.disabled = true; status.textContent = 'Sending…';
+  try {
+    const r = await fetch(`/api/v1/portal/${TOKEN}/concierge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ materials }),
+    });
+    const d = await r.json();
+    status.textContent = r.ok ? (d.message || 'Got it — EYO is being trained.') : 'Could not send, try again.';
+  } catch (e) { status.textContent = 'Network error — try again.'; }
+  btn.disabled = false;
 }
 
 // ─── Boot ───────────────────────────────────────────────────────────────

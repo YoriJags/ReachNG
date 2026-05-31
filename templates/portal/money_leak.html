@@ -56,7 +56,7 @@
 
 <div class="wrap">
   <h1>Where your money is quietly dying</h1>
-  <p class="sub">{{ client_name }} · last {{ report.window_days }} days · EYO scanned every conversation.</p>
+  <p class="sub">{{ client_name }} · EYO scanned every connected conversation from the last {{ report.window_days }} days.</p>
 
   <div class="hero">
     <div class="big">₦{{ "{:,.0f}".format(report.total_ngn) }}</div>
@@ -68,8 +68,8 @@
   </div>
 
   {% if report.total_leak_count == 0 %}
-  <div class="card empty"><strong style="color:var(--ink);font-size:16px;display:block;margin-bottom:6px">Nothing leaking right now 🎉</strong>
-    Every enquiry has a reply and every promise is tracked. Connect more of your history (old chats, CSV) to scan further back.</div>
+  <div class="card empty"><strong style="color:var(--ink);font-size:16px;display:block;margin-bottom:6px">Nothing leaking in what's connected 🎉</strong>
+    Across the conversations EYO can see, every enquiry has a reply and every tracked promise is accounted for. Connect more history (old chats, CSV) to scan further back.</div>
   {% else %}
   <div class="cards">
     {% for c in report.categories %}{% if c.count > 0 %}

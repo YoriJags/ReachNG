@@ -6313,8 +6313,10 @@ function closeEdit() {
 async function submitEdit() {
   const msg = document.getElementById("edit-textarea").value.trim();
   if (!msg || !editTargetId) return;
-  await postJSON(`/api/v1/approvals/${editTargetId}/edit`, { new_message: msg });
+  const res = await postJSON(`/api/v1/approvals/${editTargetId}/edit`, { new_message: msg });
   closeEdit();
+  // Instant Learning Card — what EYO took away from this edit.
+  if (res && res.learned) showToast(`🧠 EYO learned: ${res.learned}`);
   refresh();
 }
 async function approveAll() {

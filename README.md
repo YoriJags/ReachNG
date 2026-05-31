@@ -80,6 +80,7 @@ Required:
 - `PAYSTACK_SECRET_KEY`
 - `META_APP_SECRET` (webhook signature validation)
 - `UNIPILE_WEBHOOK_SECRET`
+- `RESEND_WEBHOOK_SECRET` (Resend email-event webhook signature; rejected as unsigned in production)
 - `DASHBOARD_USER`, `DASHBOARD_PASS`
 - `APP_ENV=production` (enforces webhook signatures)
 

@@ -428,21 +428,14 @@ async def get_sales_copilot(token: str, days: int = 14):
     }
 
 
-# ─── Money Leak Report + Revenue Rescue (one engine, two moments) ────────────
-
-@router.get("/money-leak/{token}")
-async def get_money_leak(token: str, days: int = 30):
-    """Money Leak Report payload — 'You have ₦X sitting in dead chats.'
-
-    Composes confirmed-owed (ledgers) + asked-price-no-quote + ghosted
-    pay-promises + silent inbound into one ₦ figure with examples.
-    """
-    client = _get_client_by_token(token)
-    if not client:
-        raise HTTPException(404, "Portal not found or client inactive")
-    from services.money_leak import money_leak_report
-    return money_leak_report(client["name"], days=max(1, min(180, days)))
-
+# ─── Magic-potion feature endpoints ──────────────────────────────────────────
+# Route convention for these NEW features (so future UI work isn't confused):
+#   • HTML pages : GET /portal/{token}/<feature>        (matches /{token}/vault)
+#   • JSON data  : GET /portal/{token}/<feature>/data   (or /{token}/<feature>
+#                  when there is no page). All token-first.
+# (The older owner-brief/{token}, missed-opportunities/{token}, almost-lost/{token}
+#  data endpoints predate this and use /verb/{token}; left as-is to avoid breaking
+#  anything already pointing at them.)
 
 @router.get("/{token}/money-leak", response_class=HTMLResponse)
 async def money_leak_page(token: str, request: Request):
@@ -460,7 +453,21 @@ async def money_leak_page(token: str, request: Request):
     })
 
 
-@router.get("/revenue-rescue/{token}")
+@router.get("/{token}/money-leak/data")
+async def get_money_leak(token: str, days: int = 30):
+    """Money Leak Report payload — 'You have ₦X sitting in dead chats.'
+
+    Composes confirmed-owed (ledgers) + asked-price-no-quote + ghosted
+    pay-promises + silent inbound into one ₦ figure with examples.
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.money_leak import money_leak_report
+    return money_leak_report(client["name"], days=max(1, min(180, days)))
+
+
+@router.get("/{token}/revenue-rescue")
 async def get_revenue_rescue(token: str, days: int = 30):
     """'Find cash this week' — prioritised, de-duplicated follow-up targets
     plus the leak headline. The page's draft-all button reuses
@@ -469,18 +476,19 @@ async def get_revenue_rescue(token: str, days: int = 30):
     if not client:
         raise HTTPException(404, "Portal not found or client inactive")
     from services.money_leak import money_leak_report, rescue_targets
-    report = money_leak_report(client["name"], days=max(1, min(180, days)))
+    days = max(1, min(180, days))
+    report = money_leak_report(client["name"], days=days)
     return {
-        "client":       client["name"],
-        "headline":     report["headline"],
-        "total_ngn":    report["total_ngn"],
+        "client":        client["name"],
+        "headline":      report["headline"],
+        "total_ngn":     report["total_ngn"],
         "confirmed_ngn": report["confirmed_ngn"],
-        "pipeline_ngn": report["pipeline_ngn"],
-        "targets":      rescue_targets(client["name"], days=max(1, min(180, days))),
+        "pipeline_ngn":  report["pipeline_ngn"],
+        "targets":       rescue_targets(client["name"], days=days),
     }
 
 
-@router.get("/speed-watch/{token}")
+@router.get("/{token}/speed-watch")
 async def get_speed_watch(token: str, days: int = 30):
     """Competitor Speed Watch — your median response time vs your category."""
     client = _get_client_by_token(token)
@@ -490,7 +498,7 @@ async def get_speed_watch(token: str, days: int = 30):
     return response_speed_for(client["name"], days=days, vertical=client.get("vertical"))
 
 
-@router.get("/readiness/{token}")
+@router.get("/{token}/readiness")
 async def get_readiness(token: str):
     """Autopilot Readiness Score with the 4-dimension breakdown
     (tone / price / escalation / payment)."""

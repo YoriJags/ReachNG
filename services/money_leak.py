@@ -226,7 +226,7 @@ def rescue_targets(client_name: str, days: int = 30, limit: int = 25) -> list[di
             seen_phones.add(key)
             targets.append({
                 "reason":       cat["key"],
-                "reason_label": cat["label"],
+                "reason_label": cat.get("label", ""),
                 "contact_name": ex.get("contact_name") or "Unknown",
                 "phone":        phone,
                 "contact_id":   ex.get("contact_id"),

@@ -768,6 +768,19 @@
       </div>
     </div>
 
+    <!-- Money Leak + Speed Watch -->
+    <div class="section-label">Cash control room</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:24px;">
+      <a href="/portal/{{ token }}/money-leak" style="text-decoration:none;background:linear-gradient(135deg,#1a0f07,#111);border:1px solid #3a2608;border-radius:10px;padding:20px 22px;display:block;">
+        <div style="font-size:11px;font-weight:700;color:#ff9b66;text-transform:uppercase;letter-spacing:0.1em;">💸 Money Leak Report</div>
+        <div id="ml-headline" style="font-size:15px;color:#e8e8e8;margin-top:8px;line-height:1.5;">See where money is quietly dying →</div>
+      </a>
+      <div style="background:#0e1218;border:1px solid #1e2530;border-radius:10px;padding:20px 22px;">
+        <div style="font-size:11px;font-weight:700;color:#5dd28a;text-transform:uppercase;letter-spacing:0.1em;">⚡ Speed watch</div>
+        <div id="speed-headline" style="font-size:13.5px;color:#999;margin-top:8px;line-height:1.5;">Measuring your reply speed…</div>
+      </div>
+    </div>
+
     <!-- Missed Opportunity Radar -->
     <div class="section-label">Missed Opportunity Radar</div>
     <div id="radar-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
@@ -924,6 +937,7 @@
           <div style="font-size:12px;color:#d8eaf8;margin-top:4px;"><strong id="ap-rate">0%</strong> · <strong>70%</strong> needed</div>
         </div>
       </div>
+      <div id="ap-dimensions" style="display:none;border-top:1px solid #1e2530;margin-top:12px;padding-top:12px;"></div>
       <p id="ap-ready-msg" style="font-size:11px;color:#6b7280;margin:6px 0 0;line-height:1.55;">Autopilot is earned, not defaulted. Each draft you approve without editing teaches the agent your voice. The gate unlocks the moment both bars hit green.</p>
     </div>
 
@@ -1352,6 +1366,8 @@ async function load() {
     renderOwnerBrief(data.cash);
     loadRadar();
     loadCopilot();
+    loadCashRoom();
+    loadReadinessBreakdown();
 
     const s = data.stats || {};
     const contacted = s.contacted || 0;
@@ -1508,6 +1524,52 @@ async function loadAutopilotReadiness() {
       status.style.color = "#5dd28a";
       msg.textContent = "You've earned it. Flip the Autopilot toggle whenever you're ready to let EYO send safe replies directly.";
     }
+  } catch(e) { /* silent */ }
+}
+
+// ─── Cash control room: Money Leak headline + Speed Watch ──────────
+async function loadCashRoom() {
+  try {
+    const r = await fetch(`/portal/{{ token }}/revenue-rescue`);
+    if (r.ok) {
+      const d = await r.json();
+      if (d.total_ngn > 0 && d.headline) {
+        document.getElementById('ml-headline').textContent = d.headline + ' →';
+      }
+    }
+  } catch(e) { /* silent */ }
+  try {
+    const s = await fetch(`/portal/{{ token }}/speed-watch`);
+    if (s.ok) {
+      const d = await s.json();
+      document.getElementById('speed-headline').textContent =
+        d.headline || 'Not enough replies yet to measure speed.';
+    }
+  } catch(e) { /* silent */ }
+}
+
+// ─── Autopilot readiness: 4-dimension breakdown ────────────────────
+async function loadReadinessBreakdown() {
+  try {
+    const r = await fetch(`/portal/{{ token }}/readiness`);
+    if (!r.ok) return;
+    const d = await r.json();
+    const el = document.getElementById('ap-dimensions');
+    if (!el || !Array.isArray(d.dimensions)) return;
+    el.style.display = 'block';
+    const rows = d.dimensions.map(dim => {
+      const learning = (dim.score === null || dim.score === undefined);
+      const val = learning ? 'still learning' : dim.score + '%';
+      const w   = learning ? 0 : dim.score;
+      const col = learning ? '#555' : (dim.score >= 70 ? '#5dd28a' : (dim.score >= 50 ? '#ff9b66' : '#ff7a7a'));
+      return `<div style="margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#d8eaf8;margin-bottom:3px;">
+          <span>${dim.label}</span><span style="color:${col};font-weight:600;">${val}</span></div>
+        <div style="height:5px;background:#1e2530;border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${w}%;background:${col};transition:width .4s;"></div></div></div>`;
+    }).join('');
+    el.innerHTML =
+      `<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">EYO is ${d.overall_pct}% ready — by skill</div>` + rows;
   } catch(e) { /* silent */ }
 }
 
