@@ -67,12 +67,35 @@ async def edit_and_approve(approval_id: str, payload: EditPayload, background_ta
     Edit the message text and approve — sends the edited version.
     """
     _validate_id(approval_id)
+    # Capture the original BEFORE edit_draft mutates the doc, for the Learning Card.
+    original = ""
+    try:
+        from database import get_db
+        from bson import ObjectId
+        _pre = get_db()["pending_approvals"].find_one({"_id": ObjectId(approval_id)}, {"message": 1, "vertical": 1, "client_name": 1, "contact_name": 1})
+        original = (_pre or {}).get("message", "")
+    except Exception:
+        _pre = None
+
     draft = edit_draft(approval_id, payload.new_message)
     if not draft:
         raise HTTPException(404, "Approval not found")
 
     background_tasks.add_task(_send_approved, draft)
-    return {"success": True, "status": "edited_and_sent", "contact": draft["contact_name"]}
+
+    # Instant Learning Card — what EYO just learned from this edit.
+    learned = None
+    try:
+        from services.learning_card import instant_insight, record_card
+        learned = await instant_insight(original, payload.new_message, (draft.get("vertical") or (_pre or {}).get("vertical")))
+        if learned:
+            record_card(draft.get("client_name") or (_pre or {}).get("client_name", ""),
+                        learned, draft.get("contact_name", ""))
+    except Exception:
+        learned = None
+
+    return {"success": True, "status": "edited_and_sent",
+            "contact": draft["contact_name"], "learned": learned}
 
 
 @router.post("/{approval_id}/skip")

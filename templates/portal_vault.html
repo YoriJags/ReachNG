@@ -164,6 +164,7 @@
         <div class="stat"><div class="label">Facts</div><div class="val">${d.fact_count}</div></div>
         <div class="stat"><div class="label">First seen</div><div class="val">${FMT_DATE_FULL(d.first_seen_at)}</div></div>
       </div>
+      ${d.next_best_action ? `<div class="ladder">🎯 <strong>Likely next best action:</strong> ${escapeHtml(d.next_best_action)}</div>` : ''}
       ${groups.length ? groupsHtml : '<div class="placeholder">No facts yet</div>'}
     `;
   }

@@ -222,6 +222,126 @@ async def complete_onboarding(token: str):
     }
 
 
+# ─── Done-for-You Concierge Setup ────────────────────────────────────────────
+
+class ConciergePayload(BaseModel):
+    materials: str = Field(default="", max_length=20000)   # pasted price list / FAQs / sample chats
+    links:     list[str] = Field(default_factory=list)
+    note:      str = Field(default="", max_length=2000)
+
+
+@router.post("/api/v1/portal/{token}/concierge")
+async def concierge_setup(token: str, payload: ConciergePayload):
+    """'Send us your price list, FAQs, voice notes, old chats — we'll train EYO.'
+
+    Premium framing: setup is handled, not homework. We (1) ingest pasted
+    materials straight into the knowledge base so EYO can use them, (2) log a
+    concierge request for the operator, and (3) ping the operator to action it.
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "portal not found")
+    cid = _client_id(client)
+
+    ingested = 0
+    if payload.materials.strip():
+        try:
+            kb_add_document(
+                client_id=cid,
+                title="Concierge: owner-supplied materials",
+                raw_text=payload.materials.strip(),
+                tags=["concierge", "owner_supplied"],
+            )
+            ingested = 1
+        except Exception as e:
+            log.warning("concierge_kb_ingest_failed", error=str(e))
+
+    try:
+        get_db()["concierge_requests"].insert_one({
+            "client_id":   cid,
+            "client_name": client.get("name"),
+            "links":       [l[:300] for l in payload.links[:20]],
+            "note":        payload.note.strip(),
+            "has_materials": bool(payload.materials.strip()),
+            "status":      "new",
+            "created_at":  datetime.now(timezone.utc),
+        })
+    except Exception as e:
+        log.warning("concierge_request_log_failed", error=str(e))
+
+    # Best-effort operator ping
+    try:
+        from services.analytics import track
+        track("concierge_setup_requested", distinct_id=f"client:{client.get('name','')}",
+              has_materials=bool(payload.materials.strip()), links=len(payload.links))
+    except Exception:
+        pass
+
+    return {
+        "ok": True,
+        "ingested_documents": ingested,
+        "message": "Got it. EYO is being trained on what you sent — we'll handle the rest and confirm when it's ready.",
+    }
+
+
+# ─── First 24 Hours Win ──────────────────────────────────────────────────────
+
+@router.get("/api/v1/portal/{token}/onboard/first-win")
+async def first_win(token: str):
+    """Guaranteed useful output within a day — even before WhatsApp is fully
+    connected. Runs the money-leak engine on whatever the owner has already
+    imported (book, paste, old chats) and returns the dopamine pack:
+
+      • leads to wake up        (rescue targets)
+      • payment chases ready    (confirmed collectible)
+      • a sample drafted reply  (real draft on their top target)
+      • their first Owner Brief preview
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "portal not found")
+    name = client["name"]
+
+    from services.money_leak import money_leak_report, rescue_targets
+    from tools.morning_brief_client import compile_client_brief
+
+    report  = money_leak_report(name)
+    targets = rescue_targets(name, days=60, limit=10)
+
+    # One real sample draft on the top revivable conversation, if any.
+    sample_draft = ""
+    if targets:
+        try:
+            from agent.brain import generate_b2c_message
+            top = targets[0]
+            res = generate_b2c_message(
+                customer_name=top.get("contact_name") or "there",
+                channel="whatsapp",
+                vertical=client.get("vertical", "general"),
+                client_name=name,
+                notes=f"Follow up: {top.get('last_text') or top.get('reason_label')}",
+            )
+            sample_draft = res.get("message", "")
+        except Exception as e:
+            log.warning("first_win_sample_draft_failed", error=str(e))
+
+    confirmed = next((c for c in report["categories"] if c["key"] == "confirmed_owed"), {})
+
+    return {
+        "ok": True,
+        "client": name,
+        "headline": report["headline"],
+        "leads_to_wake": {"count": len(targets), "sample": targets},
+        "payment_chases": {
+            "count": confirmed.get("count", 0),
+            "amount_ngn": confirmed.get("amount_ngn", 0),
+        },
+        "sample_draft": sample_draft,
+        "brief_preview": compile_client_brief(name, portal_url=f"/portal/{token}"),
+        "promise": "By tomorrow morning you'll get this as your first Owner Brief on WhatsApp.",
+    }
+
+
 # ─── Status (for resume) ─────────────────────────────────────────────────────
 
 @router.get("/api/v1/portal/{token}/onboard/status")

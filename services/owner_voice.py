@@ -65,7 +65,7 @@ def match_owner(sender_phone: str, client_doc: dict) -> bool:
 # ─── Intent parsing ──────────────────────────────────────────────────────────
 
 _ALLOWED_ACTIONS = {
-    "status_check", "pause", "resume",
+    "status_check", "pause", "resume", "rescue_followup",
     "set_rule", "update_pricing", "bulk_approve",
     "none",
 }
@@ -73,11 +73,13 @@ _ALLOWED_ACTIONS = {
 _INTENT_SYSTEM = (
     "You parse a Lagos business owner's WhatsApp voice/text command to their "
     "AI operator (EYO). Output STRICT JSON only — no prose, no markdown.\n\n"
-    "Schema: {\"action\": one of [status_check, pause, resume, set_rule, "
-    "update_pricing, bulk_approve, none], \"params\": {object}, "
+    "Schema: {\"action\": one of [status_check, pause, resume, rescue_followup, "
+    "set_rule, update_pricing, bulk_approve, none], \"params\": {object}, "
     "\"confidence\": 0.0-1.0}\n\n"
     "Examples:\n"
     "  'How am I doing this week?' → {\"action\":\"status_check\",\"params\":{},\"confidence\":0.95}\n"
+    "  'Follow up everyone who asked price last week but didn't pay' → {\"action\":\"rescue_followup\",\"params\":{},\"confidence\":0.92}\n"
+    "  'Chase the dead leads / find cash this week / wake up old enquiries' → {\"action\":\"rescue_followup\",\"params\":{},\"confidence\":0.85}\n"
     "  'Hold all replies until tomorrow morning' → {\"action\":\"pause\",\"params\":{\"hours\":12},\"confidence\":0.9}\n"
     "  'Pause EYO for 2 hours' → {\"action\":\"pause\",\"params\":{\"hours\":2},\"confidence\":0.95}\n"
     "  'Resume / unpause / go back on' → {\"action\":\"resume\",\"params\":{},\"confidence\":0.95}\n"
@@ -198,6 +200,39 @@ def _do_status(client: dict) -> str:
     )
 
 
+def _do_rescue(client: dict) -> str:
+    """'Follow up everyone who asked price' — surface revivable conversations
+    and point to the one-tap Revenue Rescue draft-all button.
+
+    Deliberately does NOT auto-fire a draft campaign from a voice parse:
+    HITL stays in charge. EYO reports the find; the owner taps to draft.
+    """
+    from services.money_leak import rescue_targets
+    name = client.get("name", "")
+    targets = rescue_targets(name, days=30)
+    if not targets:
+        return "Good news — no dead conversations to revive right now. Your pipeline's clean. 💪"
+
+    n = len(targets)
+    high = sum(1 for t in targets if t.get("reason") in ("ghosted_promises", "asked_price_no_quote"))
+
+    token = client.get("portal_token")
+    link = ""
+    if token:
+        try:
+            base = (get_settings().app_base_url or "").rstrip("/")
+        except Exception:
+            base = ""
+        link = f"\nTap to review + draft all: {base}/portal/{token}/money-leak"
+
+    high_line = f" — {high} look high-intent" if high else ""
+    return (
+        f"Found {n} conversation{'s' if n != 1 else ''} where money went quiet{high_line}. "
+        f"I can draft a follow-up for each — they'll land in your approval queue, "
+        f"nothing sends till you tap approve.{link}"
+    )
+
+
 def _do_stub(action: str) -> str:
     pretty = {
         "set_rule":       "rule update",
@@ -235,6 +270,8 @@ async def handle_owner_command(
             confirmation = _do_resume(client_doc)
         elif action == "status_check":
             confirmation = _do_status(client_doc)
+        elif action == "rescue_followup":
+            confirmation = _do_rescue(client_doc)
         elif action in ("set_rule", "update_pricing", "bulk_approve"):
             confirmation = _do_stub(action)
         else:

@@ -128,6 +128,30 @@ def _capacity_line(cap: dict | None) -> str:
     return f"\n🟢 Tonight: {remaining} of {total} pax available — quiet night"
 
 
+def _what_you_missed(data: dict, cash: dict) -> str:
+    """The 'Without EYO you'd likely have missed' block — justifies the
+    subscription every single morning. Composed only from real overnight
+    activity, so it's never fabricated."""
+    items: list[str] = []
+    if data.get("auto_sent"):
+        n = data["auto_sent"]
+        items.append(f"• {n} repl{'y' if n == 1 else 'ies'} EYO answered while you slept")
+    if cash.get("hot_replies_overnight"):
+        n = cash["hot_replies_overnight"]
+        items.append(f"• {n} hot enquir{'y' if n == 1 else 'ies'} you'd have seen hours too late")
+    if cash.get("cash_received_overnight_ngn"):
+        items.append(f"• {_fmt_ngn(cash['cash_received_overnight_ngn'])} payment confirmation read + logged for you")
+    if cash.get("asked_price_no_quote"):
+        n = cash["asked_price_no_quote"]
+        items.append(f"• {n} price-asker{'s' if n != 1 else ''} flagged before they went cold")
+    if data.get("confirmed_bookings"):
+        n = data["confirmed_bookings"]
+        items.append(f"• {n} booking{'s' if n != 1 else ''} closed without you lifting a finger")
+    if not items:
+        return ""
+    return "🛡 *Without EYO you'd likely have missed:*\n" + "\n".join(items)
+
+
 def compile_client_brief(client_name: str, portal_url: str = "") -> str:
     """
     Build the per-client WhatsApp Owner Brief — cash-focused.
@@ -141,6 +165,8 @@ def compile_client_brief(client_name: str, portal_url: str = "") -> str:
     cash      = cash_signals_for(client_name)
 
     cap_line  = _capacity_line(data["capacity_today"])
+    missed_block   = _what_you_missed(data, cash)
+    missed_section = f"\n\n{missed_block}" if missed_block else ""
 
     # ── Cash headline (the killer interface) ────────────────────────────
     headline_lines: list[str] = []
@@ -250,7 +276,7 @@ def compile_client_brief(client_name: str, portal_url: str = "") -> str:
     brief = f"""🌅 *Good morning, {client_name.split()[0]}!*
 {day_str} — Owner Brief{cap_line}
 
-{headline_block}
+{headline_block}{missed_section}
 
 {approval_line}{health_line}
 

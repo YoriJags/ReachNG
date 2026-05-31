@@ -109,6 +109,42 @@ def list_customers(
     return out
 
 
+# ─── Next best action (deterministic — no LLM call on a list view) ─────────────
+
+_OCCASION_TOKENS = (
+    "birthday", "anniversary", "wedding", "christmas", "detty december",
+    "valentine", "graduation", "naming", "event", "party",
+)
+
+
+def next_best_action(facts_by_type: dict, lifetime_ngn: int, last_seen_at) -> str:
+    """A single 'likely next best action' line from what EYO already knows.
+    Cheap + deterministic so it can render on every Vault row."""
+    all_text = " ".join(
+        (f.get("fact_text") or "").lower()
+        for fl in facts_by_type.values() for f in fl
+    )
+    days_quiet = None
+    if last_seen_at:
+        try:
+            days_quiet = (datetime.now(timezone.utc) - last_seen_at).days
+        except Exception:
+            days_quiet = None
+
+    for tok in _OCCASION_TOKENS:
+        if tok in all_text:
+            return f"Send a tailored {tok} offer — they've shown interest before."
+    if lifetime_ngn >= 100_000 and (days_quiet or 0) >= 30:
+        return f"Re-engage: repeat buyer (~₦{lifetime_ngn:,.0f}) quiet {days_quiet} days — invite them back."
+    if any(t in all_text for t in ("price", "quote", "how much", "cost")):
+        return "Follow up on their pricing question with a clear quote + next step."
+    if any(t in all_text for t in ("complain", "refund", "angry", "disappointed")):
+        return "Check in warmly — past complaint on file; rebuild goodwill before selling."
+    if days_quiet is not None and days_quiet >= 45:
+        return f"Reach out — quiet {days_quiet} days. A simple 'we miss you' often reopens the door."
+    return "Keep warm — share what's new or a small returning-customer perk."
+
+
 # ─── Per-customer detail ──────────────────────────────────────────────────────
 
 def get_customer(client_id: str, contact_phone: str) -> dict:
@@ -154,6 +190,7 @@ def get_customer(client_id: str, contact_phone: str) -> dict:
         "first_seen_at":  rows[-1].get("created_at"),
         "last_seen_at":   rows[0].get("created_at"),
         "lifetime_ngn":   lifetime_ngn,
+        "next_best_action": next_best_action(facts_by_type, lifetime_ngn, rows[0].get("created_at")),
         "facts_by_type":  facts_by_type,
         # Flat list for clients that prefer chronological
         "facts": [{

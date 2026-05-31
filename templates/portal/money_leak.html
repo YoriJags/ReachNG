@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Money Leak Report · {{ client_name }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --bg:#0b0f14; --bg-2:#0e1218; --surface:#111720; --line:#1e2530;
+    --line-strong:#2a3340; --ink:#e8e8e8; --muted:#7b8896; --muted-strong:#a8b3c0;
+    --orange:#ff5500; --green:#5dd28a; --red:#ff6b6b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+  a{color:var(--orange);text-decoration:none}
+  .top{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:#0a0d12;border-bottom:1px solid var(--line)}
+  .top .logo{font-weight:700;font-size:18px}.top .logo span{color:var(--orange)}
+  .top .back{color:var(--muted-strong);font-size:12px;border:1px solid var(--line);padding:6px 12px;border-radius:6px}
+  .wrap{max-width:920px;margin:0 auto;padding:28px 24px 60px}
+  h1{font-family:Georgia,serif;font-size:30px;font-weight:600;letter-spacing:-0.5px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 22px}
+  .hero{background:linear-gradient(180deg,rgba(255,85,0,0.10),rgba(255,85,0,0.02));border:1px solid var(--line-strong);border-radius:16px;padding:28px;margin-bottom:22px;text-align:center}
+  .hero .big{font-family:Georgia,serif;font-size:clamp(40px,9vw,68px);font-weight:700;color:#fff;letter-spacing:-2px;line-height:1}
+  .hero .cap{font-size:14px;color:var(--muted-strong);margin-top:10px}
+  .split{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+  .chip{background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:10px 16px;min-width:160px}
+  .chip .l{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .chip .v{font-size:18px;font-weight:700;margin-top:3px}
+  .chip .v.green{color:var(--green)} .chip .v.orange{color:var(--orange)}
+  .cards{display:grid;gap:14px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .card .head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+  .card .label{font-weight:600;font-size:15px}
+  .card .amt{font-weight:700;font-size:16px;white-space:nowrap}
+  .card .amt.green{color:var(--green)} .card .amt.orange{color:var(--orange)}
+  .card .cnt{font-size:12px;color:var(--muted);margin-top:2px}
+  .ex{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+  .ex .row{padding:8px 0;border-bottom:1px dashed var(--line)}
+  .ex .row:last-child{border-bottom:0}
+  .ex .name{font-weight:600;font-size:13px}
+  .ex .txt{font-size:12.5px;color:var(--muted-strong);margin-top:2px;font-style:italic}
+  .ex .meta{font-size:11px;color:var(--muted);margin-top:3px}
+  .cta{margin-top:24px;text-align:center}
+  .btn{display:inline-block;background:var(--orange);color:#fff;font-weight:700;padding:15px 30px;border-radius:10px;font-size:15px;border:0;cursor:pointer}
+  .btn.ghost{background:transparent;border:1px solid var(--line-strong);color:var(--muted-strong);margin-left:10px}
+  .note{font-size:11.5px;color:var(--muted);margin-top:12px;line-height:1.6}
+  .empty{padding:50px 20px;text-align:center;color:var(--muted)}
+  #rescue-out{margin-top:16px;font-size:13px;color:var(--green);min-height:18px}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo">Reach<span>NG</span> · Money Leak</div>
+  <a class="back" href="/portal/{{ token }}">← Back to portal</a>
+</div>
+
+<div class="wrap">
+  <h1>Where your money is quietly dying</h1>
+  <p class="sub">{{ client_name }} · last {{ report.window_days }} days · EYO scanned every conversation.</p>
+
+  <div class="hero">
+    <div class="big">₦{{ "{:,.0f}".format(report.total_ngn) }}</div>
+    <div class="cap">across <strong>{{ report.total_leak_count }}</strong> conversations where money probably died</div>
+    <div class="split">
+      <div class="chip"><div class="l">Confirmed owed</div><div class="v green">₦{{ "{:,.0f}".format(report.confirmed_ngn) }}</div></div>
+      <div class="chip"><div class="l">Revivable pipeline (est.)</div><div class="v orange">₦{{ "{:,.0f}".format(report.pipeline_ngn) }}</div></div>
+    </div>
+  </div>
+
+  {% if report.total_leak_count == 0 %}
+  <div class="card empty"><strong style="color:var(--ink);font-size:16px;display:block;margin-bottom:6px">Nothing leaking right now 🎉</strong>
+    Every enquiry has a reply and every promise is tracked. Connect more of your history (old chats, CSV) to scan further back.</div>
+  {% else %}
+  <div class="cards">
+    {% for c in report.categories %}{% if c.count > 0 %}
+    <div class="card">
+      <div class="head">
+        <div>
+          <div class="label">{{ c.label }}</div>
+          <div class="cnt">{{ c.count }} {{ "conversation" if c.count == 1 else "conversations" }}</div>
+        </div>
+        <div class="amt {{ 'green' if c.kind == 'confirmed' else 'orange' }}">₦{{ "{:,.0f}".format(c.amount_ngn) }}{% if c.kind != 'confirmed' %}<span style="font-size:11px;color:var(--muted);font-weight:400"> est.</span>{% endif %}</div>
+      </div>
+      {% if c.examples %}
+      <div class="ex">
+        {% for e in c.examples %}
+        <div class="row">
+          <div class="name">{{ e.contact_name }}{% if e.phone %} · <span style="color:var(--muted);font-weight:400">{{ e.phone }}</span>{% endif %}</div>
+          {% if e.reply_text %}<div class="txt">“{{ e.reply_text }}”</div>{% endif %}
+          <div class="meta">
+            {%- if e.days_since is defined %}{{ e.days_since }} days ago
+            {%- elif e.hours_since is defined %}{{ e.hours_since }} hrs ago
+            {%- elif e.hours_silent is defined %}silent {{ e.hours_silent }} hrs{% endif -%}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}{% endfor %}
+  </div>
+
+  <div class="cta">
+    <button class="btn" onclick="rescue()">⚡ Wake this money up</button>
+    <a class="btn ghost" href="/portal/{{ token }}/book">+ Add more history to scan</a>
+    <div id="rescue-out"></div>
+    <p class="note">“Wake this money up” drafts a follow-up for each revivable conversation and drops them in your approval queue — nothing sends until you tap approve. Pipeline ₦ is an estimate at ₦{{ "{:,.0f}".format(report.avg_deal_ngn) }}/conversation; confirmed ₦ is real money owed on your ledgers.</p>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+async function rescue(){
+  const out = document.getElementById('rescue-out');
+  out.textContent = 'EYO is drafting follow-ups…';
+  try{
+    const r = await fetch('/portal/run-resurrection/{{ token }}', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({dry_run:false, max_contacts:50})
+    });
+    const j = await r.json();
+    out.textContent = r.ok
+      ? '✅ Drafts queued. Open Approvals to review and send.'
+      : ('Could not start: ' + (j.detail || 'try again'));
+  }catch(e){ out.textContent = 'Network error — try again.'; }
+}
+</script>
+</body>
+</html>

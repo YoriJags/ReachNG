@@ -428,6 +428,79 @@ async def get_sales_copilot(token: str, days: int = 14):
     }
 
 
+# ─── Money Leak Report + Revenue Rescue (one engine, two moments) ────────────
+
+@router.get("/money-leak/{token}")
+async def get_money_leak(token: str, days: int = 30):
+    """Money Leak Report payload — 'You have ₦X sitting in dead chats.'
+
+    Composes confirmed-owed (ledgers) + asked-price-no-quote + ghosted
+    pay-promises + silent inbound into one ₦ figure with examples.
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.money_leak import money_leak_report
+    return money_leak_report(client["name"], days=max(1, min(180, days)))
+
+
+@router.get("/{token}/money-leak", response_class=HTMLResponse)
+async def money_leak_page(token: str, request: Request):
+    """Renders the Money Leak Report. Pre-paywall hook: show the leak first,
+    ask for payment second."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.money_leak import money_leak_report
+    templates = request.app.state.templates
+    return templates.TemplateResponse(request, "portal/money_leak.html", {
+        "token":       token,
+        "client_name": client.get("name", "your business"),
+        "report":      money_leak_report(client["name"]),
+    })
+
+
+@router.get("/revenue-rescue/{token}")
+async def get_revenue_rescue(token: str, days: int = 30):
+    """'Find cash this week' — prioritised, de-duplicated follow-up targets
+    plus the leak headline. The page's draft-all button reuses
+    POST /run-resurrection/{token} (HITL-forced)."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.money_leak import money_leak_report, rescue_targets
+    report = money_leak_report(client["name"], days=max(1, min(180, days)))
+    return {
+        "client":       client["name"],
+        "headline":     report["headline"],
+        "total_ngn":    report["total_ngn"],
+        "confirmed_ngn": report["confirmed_ngn"],
+        "pipeline_ngn": report["pipeline_ngn"],
+        "targets":      rescue_targets(client["name"], days=max(1, min(180, days))),
+    }
+
+
+@router.get("/speed-watch/{token}")
+async def get_speed_watch(token: str, days: int = 30):
+    """Competitor Speed Watch — your median response time vs your category."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.speed_watch import response_speed_for
+    return response_speed_for(client["name"], days=days, vertical=client.get("vertical"))
+
+
+@router.get("/readiness/{token}")
+async def get_readiness(token: str):
+    """Autopilot Readiness Score with the 4-dimension breakdown
+    (tone / price / escalation / payment)."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.autopilot import readiness_breakdown
+    return readiness_breakdown(client["name"])
+
+
 # ─── Lead Resurrection (token-auth wrapper around /b2c upload + run) ─────────
 
 @router.get("/upload-leads/{token}", response_class=HTMLResponse)

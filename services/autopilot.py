@@ -98,6 +98,65 @@ def compute_readiness(client_name: str) -> Readiness:
     )
 
 
+_PRICE_TOKENS   = ("price", "quote", "cost", "fee", "₦", "naira", "ngn", "rate", "package")
+_PAYMENT_TOKENS = ("account", "transfer", "deposit", "paid", "payment", "balance",
+                   "gtb", "opay", "kuda", "uba", "moniepoint")
+_MIN_DIM_SAMPLE = 3   # below this we say "still learning" rather than fake a score
+
+
+def _dim_score(rows: list[dict], predicate) -> tuple[Optional[int], int]:
+    """Unedited rate (0–100) over the subset of approvals matching predicate.
+    Returns (score|None, sample_count). None when sample too thin to be honest."""
+    sub = [r for r in rows if predicate(r)]
+    if len(sub) < _MIN_DIM_SAMPLE:
+        return None, len(sub)
+    clean = sum(1 for r in sub if r.get("status") in ("approved", "auto_sent"))
+    return round(clean / len(sub) * 100), len(sub)
+
+
+def readiness_breakdown(client_name: str) -> dict:
+    """The 4-dimension Autopilot readiness card: tone / price / escalation /
+    payment. Each is the unedited-approval rate on the slice of drafts that
+    actually exercised that skill — honest 'still learning' when sparse."""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=LOOKBACK_DAYS)
+    rows = list(get_db()["approvals"].find(
+        {"client_name": client_name,
+         "status": {"$in": ["approved", "auto_sent", "edited"]},
+         "actioned_at": {"$gte": cutoff}},
+        {"status": 1, "message": 1, "classification": 1},
+    ))
+
+    def _has(tokens):
+        return lambda r: any(t in (r.get("message") or "").lower() for t in tokens)
+
+    def _is_escalation(r):
+        urg = (r.get("classification") or {}).get("urgency")
+        return str(urg).lower() in ("high", "urgent", "hot")
+
+    tone_score, tone_n = _dim_score(rows, lambda r: True)
+    price_score, price_n = _dim_score(rows, _has(_PRICE_TOKENS))
+    esc_score, esc_n     = _dim_score(rows, _is_escalation)
+    pay_score, pay_n     = _dim_score(rows, _has(_PAYMENT_TOKENS))
+
+    dims = [
+        {"key": "tone",       "label": "Tone match",         "score": tone_score,  "sample": tone_n},
+        {"key": "price",      "label": "Price accuracy",     "score": price_score, "sample": price_n},
+        {"key": "escalation", "label": "Escalation judgment","score": esc_score,   "sample": esc_n},
+        {"key": "payment",    "label": "Payment handling",   "score": pay_score,   "sample": pay_n},
+    ]
+    scored = [d["score"] for d in dims if d["score"] is not None]
+    overall = round(sum(scored) / len(scored)) if scored else 0
+    r = compute_readiness(client_name)
+    return {
+        "overall_pct":  overall,
+        "ready":        r.ready,
+        "approvals_count": r.approvals_count,
+        "threshold":    r.threshold,
+        "dimensions":   dims,
+        "headline":     f"EYO is {overall}% ready to handle replies on its own.",
+    }
+
+
 def assert_eligible(client_name: str) -> Readiness:
     """Raise AutopilotNotReadyError if the client hasn't earned Autopilot yet.
     Returns the Readiness on success."""
