@@ -14,12 +14,15 @@ Last updated: 2026-05-20 · Stage: Pre-revenue, live product, first paid client 
 |---|---|
 | **What we sell** | Monthly SaaS subscription. Owner pairs ReachNG to their existing WhatsApp number via Unipile QR. EYO operates from that number under HITL approval. |
 | **Who we sell to** | Premium SMEs in Lagos and Abuja: luxury hospitality, real estate agencies (Banana Island / Ikoyi / Maitama tier), clinics, commercial law, family offices, professional services. |
-| **Pricing (live)** | Starter ₦150k / Growth ₦300k / Scale ₦600k per month. 15% off annual prepay. |
+| **Pricing (live)** | 🌱 Solo ₦60k / ⭐ Team ₦120k / 👑 Empire ₦250k per month — founder pricing, first 50 clients. 15% off annual prepay. |
+| **Pricing (model basis)** | All projections in §3–§5 are run at **live founder pricing** — blended ARPC **₦103k/mo** (50% Solo / 40% Team / 10% Empire). This is deliberately conservative: the standard rack rate (₦80k / ₦150k / ₦300k → blended ₦130k) lifts every figure ~26%, and the premium-anchor target (₦150k / ₦300k / ₦600k) is a Year-2/3 lever, not assumed here. |
 | **Per-client gross margin** | 66 – 94% across all profile × tier combinations (see §3) |
 | **Stack** | Python 3.12 + FastAPI + Mongo Atlas + Anthropic Haiku 4.5 + OpenAI Whisper + Unipile + Resend + Paystack + PostHog. Railway deploy. |
 | **HQ** | Lagos, Nigeria |
 | **Founder** | Oluyori Ajagun — back-office and risk operator (WFunded, formerly). Built the product from inside the pain it solves. |
 | **Capital required for first 10 paying clients** | Negligible. Free tiers cover all infra. Cash positive in month 1 at first paid client. |
+
+> ✅ **Re-run at live pricing (2026-05-31).** §3–§5 are now computed at live founder pricing — blended ARPC **₦103k** (matching ACQUISITION.md), corrected Unipile cost (₦8.8k/client, per PRICING.md §1). Net margins land **52–62%** (vs the 78–84% the old ₦150/300/600 model claimed); gross margins **38–92%** per tier×profile. Numbers here are the conservative founder-pricing floor — standard rack (₦80/150/300, blended ₦130k) is ~26% upside on every line. The old ₦150/300/600 figures were PRICING.md's *superseded* Ladder B and have been removed.
 
 ---
 
@@ -64,126 +67,130 @@ The premium-SME version of "AI for business" tools is broken in Nigeria. Generic
 
 ### Cost floor per client per month (Unipile-paired, Mongo on free tier today)
 
+Corrected cost basis (matches [PRICING.md](./PRICING.md) §1): Unipile is ~₦8,800/client (first-10-accounts flat rate), not the ~₦24k earlier estimate. Per-client fixed = Unipile + Resend share = ₦12,000.
+
 | Profile | Per-call AI | Per-client fixed | Platform share (÷10) | **Total cost** |
 |---|---:|---:|---:|---:|
-| Light  | ₦2,520 | ₦25,600 | ₦6,100 | **₦34,200** |
-| Medium | ₦7,620 | ₦25,600 | ₦6,100 | **₦39,300** |
-| Heavy  | ₦18,840 | ₦25,600 | ₦6,100 | **₦50,500** |
+| Light  | ₦2,520 | ₦12,000 | ₦6,100 | **₦20,620** |
+| Medium | ₦7,620 | ₦12,000 | ₦6,100 | **₦25,720** |
+| Heavy  | ₦18,840 | ₦12,000 | ₦6,100 | **₦36,940** |
 
 Light = small restaurant / single agent. Medium = premium hospitality / mid clinic / established agency. Heavy = high-volume clinic / multi-location restaurant / busy agency.
 
-### Gross margin per tier × profile
+### Gross margin per tier × profile (at live founder pricing)
 
 | | Light client | Medium client | Heavy client |
 |---|---:|---:|---:|
-| **Starter ₦150k**  | 77% | 74% | 66% |
-| **Growth ₦300k**   | 89% | 87% | 83% |
-| **Scale ₦600k**    | 94% | 93% | 92% |
+| **🌱 Solo ₦60k**   | 66% | 57% | 38% |
+| **⭐ Team ₦120k**  | 83% | 79% | 69% |
+| **👑 Empire ₦250k**| 92% | 90% | 85% |
 
-**Worst case is 66% gross margin** (Heavy-usage client on Starter plan). Best case is 94%.
+**Worst case is 38% gross margin** (Heavy-usage client on the founder-priced Solo tier — accepted as a deliberate founder-cohort cost; Meta-fallback routing or a Team upgrade recovers it). Best case is 92%. At standard rack (₦80/150/300) the Solo floor rises to 43% Light / 16% Heavy → which is exactly why heavy Solo clients are auto-prompted to upgrade.
 
 ### What scales how
 
 - **Per-call costs** (Whisper, Haiku, Vision): scale linearly with usage. Buffered ~30-50% above raw vendor pricing in the ledger to absorb FX swings and retries.
-- **Per-client fixed:** Unipile per-account fee (~₦24k) is the dominant cost. Scales linearly with client count.
+- **Per-client fixed:** Unipile per-account fee (~₦8.8k) is the dominant per-client line. Scales linearly with client count; Meta-Cloud fallback removes it entirely where a client doesn't need their own number paired.
 - **Platform fixed:** Railway + Resend + PostHog + Mongo are roughly fixed regardless of client count, but Mongo upgrades from free to M10 (~₦91k/mo) at ~10-12 clients. Modelled below.
 
 ---
 
 ## 4 · Revenue projections — three scenarios
 
-All projections use Ladder B (₦150 / 300 / 600). Pilot pricing (33% off first 3 clients × 90 days) factored into year-1 numbers.
+All projections use **live founder pricing** — blended ARPC **₦103,000/mo**. No extra pilot discount is stacked: founder pricing *is* the discount. Cost lines are independent of price, so they carry over from the previous model unchanged.
 
 ### Mix assumption
 
-- Starter clients: ~50% of book (smaller premium SMEs)
-- Growth clients: ~40% of book (mid-size premium)
-- Scale clients: ~10% of book (luxury / multi-location)
+- Solo clients: ~50% of book (smaller premium SMEs)
+- Team clients: ~40% of book (mid-size premium)
+- Empire clients: ~10% of book (luxury / multi-location)
 
-This is the conservative weighting — Lagos/Abuja market data suggests Growth tier may end up ~50% as buyers self-select up.
+Blended ARPC = 0.5×₦60k + 0.4×₦120k + 0.1×₦250k = **₦103,000**. This is the conservative weighting — Lagos/Abuja market data suggests Team tier may end up ~50% as buyers self-select up, which raises the blend.
 
 ### Scenario A — Conservative (slow ramp)
 
 | Month | Clients | MRR | Monthly cost | Monthly profit | Margin |
 |---:|---:|---:|---:|---:|---:|
-| M3   | 3   | ₦450,000   | ₦170,000   | ₦280,000   | 62% (pilot pricing) |
-| M6   | 8   | ₦1,800,000 | ₦330,000   | ₦1,470,000 | 82% |
-| M12  | 20  | ₦5,250,000 | ₦830,000*  | ₦4,420,000 | 84% |
-| M24  | 50  | ₦13,125,000| ₦2,080,000 | ₦11,045,000| 84% |
+| M3   | 3   | ₦309,000   | ₦170,000   | ₦139,000   | 45% (fixed cost ÷ few clients) |
+| M6   | 8   | ₦824,000   | ₦330,000   | ₦494,000   | 60% |
+| M12  | 20  | ₦2,060,000 | ₦830,000*  | ₦1,230,000 | 60% |
+| M24  | 50  | ₦5,150,000 | ₦2,080,000 | ₦3,070,000 | 60% |
 
 \*Includes Mongo M10 transition around client 10.
 
-**Year-1 ARR exit: ₦63M.** Year-2 ARR exit: **₦157M.**
+**Year-1 ARR exit: ₦24.7M.** Year-2 ARR exit: **₦61.8M.**
 
 ### Scenario B — Base case
 
 | Month | Clients | MRR | Monthly cost | Monthly profit | Margin |
 |---:|---:|---:|---:|---:|---:|
-| M3   | 5   | ₦750,000   | ₦210,000   | ₦540,000   | 72% (pilot pricing) |
-| M6   | 15  | ₦3,375,000 | ₦620,000   | ₦2,755,000 | 82% |
-| M12  | 40  | ₦10,500,000| ₦1,720,000 | ₦8,780,000 | 84% |
-| M24  | 100 | ₦26,250,000| ₦4,170,000 | ₦22,080,000| 84% |
+| M3   | 5   | ₦515,000   | ₦210,000   | ₦305,000   | 59% |
+| M6   | 15  | ₦1,545,000 | ₦620,000   | ₦925,000   | 60% |
+| M12  | 40  | ₦4,120,000 | ₦1,720,000 | ₦2,400,000 | 58% |
+| M24  | 100 | ₦10,300,000| ₦4,170,000 | ₦6,130,000 | 60% |
 
-**Year-1 ARR exit: ₦126M.** Year-2 ARR exit: **₦315M.**
+**Year-1 ARR exit: ₦49.4M.** Year-2 ARR exit: **₦123.6M.**
 
 ### Scenario C — Aggressive (network effects + referral kick in)
 
 | Month | Clients | MRR | Monthly cost | Monthly profit | Margin |
 |---:|---:|---:|---:|---:|---:|
-| M3   | 8   | ₦1,200,000 | ₦330,000   | ₦870,000   | 73% (pilot pricing) |
-| M6   | 25  | ₦5,625,000 | ₦1,040,000 | ₦4,585,000 | 82% |
-| M12  | 75  | ₦19,687,500| ₦3,200,000 | ₦16,487,500| 84% |
-| M24  | 200 | ₦52,500,000| ₦8,340,000 | ₦44,160,000| 84% |
+| M3   | 8   | ₦824,000   | ₦330,000   | ₦494,000   | 60% |
+| M6   | 25  | ₦2,575,000 | ₦1,040,000 | ₦1,535,000 | 60% |
+| M12  | 75  | ₦7,725,000 | ₦3,200,000 | ₦4,525,000 | 59% |
+| M24  | 200 | ₦20,600,000| ₦8,340,000 | ₦12,260,000| 60% |
 
-**Year-1 ARR exit: ₦236M.** Year-2 ARR exit: **₦630M.**
+**Year-1 ARR exit: ₦92.7M.** Year-2 ARR exit: **₦247.2M.**
 
 ### Margin trajectory (all scenarios)
 
-Margins **expand with scale**, not contract:
-- Sub-10 clients: 66-89% (pilot pricing + lower volume)
-- 10-50 clients: 82-87% (Mongo M10 cost absorbed)
-- 50+ clients: 84-89% (per-client fixed share drops further)
+Net margin **stabilises around 60%** at founder pricing (vs ~84% the old inflated model claimed):
+- Sub-10 clients: 45-59% (platform fixed cost diluted across few clients)
+- 10-50 clients: ~60% (Mongo M10 cost absorbed)
+- 50+ clients: ~60% steady (per-client fixed share keeps dropping, offset by team hires)
 
-The Unipile per-account fee is the only line that scales linearly with clients. Everything else compounds in our favour.
+Two clean levers lift this without new product: (1) standard rack pricing ₦80/150/300 once past the founder cohort (+~26% to revenue, straight to margin), and (2) Meta-Cloud fallback on price-sensitive Solo clients (removes the ₦8.8k Unipile line). Everything else compounds in our favour.
 
 ---
 
 ## 4.5 · Road to 1,000 clients (the headline goal)
 
-1,000 paying clients ≈ 10-20% of the addressable premium SME beachhead in Lagos and Abuja. The path, broken into quarterly milestones, all on Ladder B pricing:
+1,000 paying clients ≈ 10-20% of the addressable premium SME beachhead in Lagos and Abuja. The path, broken into quarterly milestones, all at live founder pricing (blended ARPC ₦103k — conservative; standard rack lifts every line ~26%):
 
 ### Year 1 — Foundation (0 → 100)
 
 | Quarter | Target clients (cumulative) | Net adds | MRR at quarter-end | Notes |
 |---|---:|---:|---:|---|
-| Q1 (M1-3)  | 5    | +5   | ₦750,000   | Pilot batch, hand-onboarded, 33% pilot discount in effect |
-| Q2 (M4-6)  | 25   | +20  | ₦5,625,000 | Pricing live, founder-led sales, referrals start |
-| Q3 (M7-9)  | 60   | +35  | ₦13,500,000| Vertical case studies live, Twitter authority cadence |
-| Q4 (M10-12)| 100  | +40  | ₦22,500,000| First sales/CS hire mid-Q4 |
+| Q1 (M1-3)  | 5    | +5   | ₦515,000   | Founder batch, hand-onboarded, founder pricing in effect |
+| Q2 (M4-6)  | 25   | +20  | ₦2,575,000 | Pricing live, founder-led sales, referrals start |
+| Q3 (M7-9)  | 60   | +35  | ₦6,180,000 | Vertical case studies live, Twitter authority cadence |
+| Q4 (M10-12)| 100  | +40  | ₦10,300,000| First sales/CS hire mid-Q4 |
 
-**Year-1 exit:** 100 clients · ₦22.5M MRR · **₦270M ARR**
+**Year-1 exit:** 100 clients · ₦10.3M MRR · **₦123.6M ARR**
 
 ### Year 2 — Velocity (100 → 600)
 
 | Quarter | Target clients | Net adds | MRR | Notes |
 |---|---:|---:|---:|---|
-| Q5 (M13-15)| 175  | +75  | ₦39.4M | First SDR hire, paid acquisition unlocked |
-| Q6 (M16-18)| 275  | +100 | ₦61.9M | Agency partnership channel live |
-| Q7 (M19-21)| 425  | +150 | ₦95.6M | Conference + brand campaign, Abuja office |
-| Q8 (M22-24)| 600  | +175 | ₦135.0M| 2nd engineer hire |
+| Q5 (M13-15)| 175  | +75  | ₦18.0M | First SDR hire, paid acquisition unlocked |
+| Q6 (M16-18)| 275  | +100 | ₦28.3M | Agency partnership channel live |
+| Q7 (M19-21)| 425  | +150 | ₦43.8M | Conference + brand campaign, Abuja office |
+| Q8 (M22-24)| 600  | +175 | ₦61.8M | 2nd engineer hire |
 
-**Year-2 exit:** 600 clients · ₦135M MRR · **₦1.62B ARR**
+**Year-2 exit:** 600 clients · ₦61.8M MRR · **₦741.6M ARR**
+
+> Year-2/3 figures still assume founder pricing for *every* client — deeply conservative, since the founder rate is capped at the first 50. At standard rack (blended ₦130k) Year-2 exit is ₦78M MRR / ₦936M ARR; at the premium-anchor target (blended ₦255k) it reverts to the old ₦1.6B-class numbers. We model the floor on purpose.
 
 ### Year 3 — Compounding (600 → 1,000)
 
 | Quarter | Target clients | Net adds | MRR | Notes |
 |---|---:|---:|---:|---|
-| Q9 (M25-27) | 750   | +150 | ₦168.8M | Voice Operator (outbound) launches |
-| Q10 (M28-30)| 850   | +100 | ₦191.3M | National expansion (Port Harcourt, Ibadan) |
-| Q11 (M31-33)| 925   | +75  | ₦208.1M | Vertical SDK / API offering |
-| Q12 (M34-36)| **1,000** | +75 | **₦225.0M** | West Africa pilot (Accra, Nairobi) |
+| Q9 (M25-27) | 750   | +150 | ₦77.3M | Voice Operator (outbound) launches |
+| Q10 (M28-30)| 850   | +100 | ₦87.6M | National expansion (Port Harcourt, Ibadan) |
+| Q11 (M31-33)| 925   | +75  | ₦95.3M | Vertical SDK / API offering |
+| Q12 (M34-36)| **1,000** | +75 | **₦103.0M** | West Africa pilot (Accra, Nairobi) |
 
-**Year-3 exit at 1,000 clients:** ₦225M MRR · **₦2.7B ARR · ~85% blended margin · ~₦191M monthly net profit.**
+**Year-3 exit at 1,000 clients (founder pricing floor):** ₦103M MRR · **₦1.236B ARR · ~52% blended net margin · ~₦53.7M monthly net profit.** At standard rack pricing this is ₦130M MRR / ₦1.56B ARR.
 
 ### Cost at each milestone
 
@@ -191,13 +198,13 @@ Includes Claude Pro/Max operator-tooling cost in the founder-toolset line (Pro a
 
 | Clients | MRR | Direct cost | Team cost | Mongo tier | Operator tools | Total cost | Net margin |
 |---:|---:|---:|---:|---|---:|---:|---:|
-| 25    | ₦5.6M   | ₦820k    | Founder only            | Atlas free | Claude Max 5× ₦160k | ₦980k    | 83% |
-| 100   | ₦22.5M  | ₦3.5M    | +1 ops/CS               | M10 ₦91k   | Max 20× ₦320k       | ₦4.4M    | 80% |
-| 250   | ₦56.3M  | ₦8.5M    | +SDR + accountant       | M20 ₦232k  | Max 20× ₦320k       | ₦11.9M   | 79% |
-| 500   | ₦112.5M | ₦16.7M   | +2 engineers + CS       | M20        | 2× Max 20× ₦640k    | ₦24.7M   | 78% |
-| 1,000 | ₦225M   | ₦32M     | ~15-person org          | M30 ₦617k  | 4× Max 20× ₦1.28M   | ₦49.3M   | 78% |
+| 25    | ₦2.6M   | ₦820k    | Founder only            | Atlas free | Claude Max 5× ₦160k | ₦980k    | 62% |
+| 100   | ₦10.3M  | ₦3.5M    | +1 ops/CS               | M10 ₦91k   | Max 20× ₦320k       | ₦4.4M    | 57% |
+| 250   | ₦25.8M  | ₦8.5M    | +SDR + accountant       | M20 ₦232k  | Max 20× ₦320k       | ₦11.9M   | 54% |
+| 500   | ₦51.5M  | ₦16.7M   | +2 engineers + CS       | M20        | 2× Max 20× ₦640k    | ₦24.7M   | 52% |
+| 1,000 | ₦103M   | ₦32M     | ~15-person org          | M30 ₦617k  | 4× Max 20× ₦1.28M   | ₦49.3M   | 52% |
 
-**Read:** even at 1,000 clients with a 15-person Lagos team and full Claude Max for every operator, blended net margin sits at ~78%. The model is built for compounding profitability, not just compounding revenue.
+**Read:** even at 1,000 clients on the *founder-pricing floor*, with a 15-person Lagos team and full Claude Max for every operator, blended net margin holds at **~52%**. That is the conservative case — standard rack pricing pushes it back toward 60%+. The model is built for compounding profitability, not just compounding revenue.
 
 ### Hire plan along the curve
 
@@ -210,15 +217,15 @@ Includes Claude Pro/Max operator-tooling cost in the founder-toolset line (Pro a
 | 500 clients  | 2 more engineers + 2 more SDR + Head of Sales |
 | 1,000 clients| Country leads (Lagos / Abuja / PH), VP Eng, VP Customer Ops |
 
-Final-state org: ~15 people. Revenue per employee at 1,000 clients = ₦180M/year. Industry benchmark for high-margin SaaS is ₦40-80M/employee. We'd be top-quartile.
+Final-state org: ~15 people. Revenue per employee at 1,000 clients = ₦82M/year (founder-pricing floor; ₦104M at standard rack). Industry benchmark for high-margin SaaS is ₦40-80M/employee. We'd be at or above the top of the range.
 
 ### What the 1,000-client outcome looks like
 
-- **₦2.7B annualised revenue**
-- **₦2.3B annualised net profit**
+- **₦1.236B annualised revenue** (founder-pricing floor; ₦1.56B at standard rack)
+- **~₦642M annualised net profit** (~52% blended)
 - **15-person team across Lagos / Abuja / Port Harcourt**
 - **Default agentic-employee platform for the Nigerian premium SME tier**
-- **Optionality:** vertical SDKs (real estate, hospitality), API offering, regional expansion, acquisition target for global CRM consolidators (HubSpot, Salesforce) at 5-8× ARR multiple = ₦13-22B valuation
+- **Optionality:** vertical SDKs (real estate, hospitality), API offering, regional expansion, acquisition target for global CRM consolidators (HubSpot, Salesforce) at 5-8× ARR multiple = ₦6.2-9.9B valuation
 
 ---
 
@@ -239,17 +246,17 @@ Final-state org: ~15 people. Revenue per employee at 1,000 clients = ₦180M/yea
 ### LTV (conservative)
 
 - Average contract: 24 months (premium SaaS norm; switching cost is high once WhatsApp paired)
-- Blended ARPC: ₦250,000/mo (across Starter/Growth/Scale)
-- Gross margin: 84% blended
-- **LTV = 24 × 250,000 × 0.84 = ₦5,040,000 per client**
+- Blended ARPC: ₦103,000/mo (Solo/Team/Empire at live founder pricing)
+- Gross margin: ~75% blended (Light-Medium-skewed SME base)
+- **LTV = 24 × 103,000 × 0.75 = ₦1,854,000 per client** (≈ ₦2.34M at standard rack)
 
 ### LTV / CAC
 
-At ₦5,000 CAC and ₦5.04M LTV = **1,008× LTV/CAC ratio**. The benchmark anyone respects is >3×. This number won't hold once we run paid acquisition or hire SDRs, but the bootstrapped phase is exceptional.
+At ₦5,000 CAC and ₦1.85M LTV = **371× LTV/CAC ratio**. The benchmark anyone respects is >3×. This number won't hold once we run paid acquisition or hire SDRs, but the bootstrapped phase is exceptional.
 
 ### Paid CAC ceiling
 
-If LTV is ₦5M and we want to keep LTV/CAC > 5×, we can spend up to **₦1M acquiring a client** before economics break. Plenty of headroom for paid social, partnership commissions, conference sponsorships when the time comes.
+If LTV is ₦1.85M and we want to keep LTV/CAC > 5×, we can spend up to **₦370,000 acquiring a client** before economics break. Plenty of headroom for paid social, partnership commissions, conference sponsorships when the time comes.
 
 ---
 
@@ -338,7 +345,7 @@ Not raising on this doc, but plausible uses:
 - ✅ HITL queue + WhatsApp pairing flow shipped
 - ✅ Voice + Receipt + Morning Brief features shipped (T0.1, T0.2)
 - ✅ PostHog product analytics live
-- ✅ Pricing locked at Ladder B (₦150 / 300 / 600)
+- ✅ Pricing locked + live: 🌱 Solo ₦60k / ⭐ Team ₦120k / 👑 Empire ₦250k (founder, first 50)
 - 🟡 First paid client target: imminent
 - 🟡 Unipile session-expiry health loop: queued
 - 🟡 Phase 1.6 client book onboarding (vCard / WhatsApp share / paste): queued

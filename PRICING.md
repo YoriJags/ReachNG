@@ -1,18 +1,20 @@
 # ReachNG — Pricing Working Doc
 
 Locked premises (don't relitigate):
-- **Unipile 100%** for WhatsApp. No Meta Cloud API. Per-client fixed cost ~₦24k/mo + shared infra.
+- **Unipile is the PRIMARY WhatsApp transport.** Each client pairs their own number via QR; messages send from that number. Meta Cloud API is the secondary/fallback path (clients without Unipile pairing, or who need an official BSP). Per-client fixed cost ~₦8.8k/mo Unipile + shared infra.
 - **HITL non-negotiable.** Every outbound is human-approved unless owner explicitly flips Autopilot per reply-type.
 - **Lagos + Abuja pilot.** Premium SME positioning. Hand-onboarded, selective intake.
 - **First paid client target:** lock pricing today so signup + pricing page reflect reality before any paid signup.
 
-Last updated: 2026-05-20
+> **CANONICAL LIVE LADDER (locked 2026-05-31):** 🌱 Solo ₦60,000 / ⭐ Team ₦120,000 / 👑 Empire ₦250,000 per month — *founder pricing, first 50 clients.* Standard rack rate ₦80,000 / ₦150,000 / ₦300,000. Annual prepay 15% off. Empire multi-vertical bundle +₦125,000/mo per extra WhatsApp line. Internal code keys: `starter` / `growth` / `scale`. This is what the live `/pricing` page and signup charge. **The A/B/C ladders in §2 below are the post-founder pricing exploration — they are NOT live and must not be quoted as current.**
+
+Last updated: 2026-05-31
 
 ---
 
 ## 1 · Cost floor per client (Unipile-only, Mongo Atlas free tier)
 
-From [ECONOMICS.md](./ECONOMICS.md) §6, with Meta Cloud option removed, Unipile assumed, and Mongo on free tier (₦0 today):
+From [ECONOMICS.md](./ECONOMICS.md) §6, costed on Unipile (the primary transport; Meta Cloud fallback is cheaper but not the default), and Mongo on free tier (₦0 today):
 
 | Profile | Per-call AI | Per-client fixed (Unipile + Resend) | Platform share (÷10 clients) | **Total cost/mo** |
 |---|---:|---:|---:|---:|

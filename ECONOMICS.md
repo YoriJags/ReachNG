@@ -181,24 +181,28 @@ Combining sections 3 + 4 + 5 (allocating platform fixed across 10 clients):
 | Medium | 7,620 | 30,160 | 6,160 | 15,200 | **~₦52,980/mo** | **~₦28,980/mo** |
 | Heavy  | 18,840 | 33,160 | 9,160 | 15,200 | **~₦67,200/mo** | **~₦43,200/mo** |
 
-### Margin at proposed pricing (current PRODUCTS.md ladder)
+### Margin at standard rack pricing (₦80k / ₦150k / ₦300k = Solo / Team / Empire standard)
+
+> Prices below are the **standard rack** rate. Live **founder pricing** (first 50 clients) is lower — Solo ₦60k / Team ₦120k / Empire ₦250k — so founder-cohort margins run a tier tighter than this table. Tier names map: Starter→Solo, Growth→Team, Scale→Empire (code keys unchanged).
 
 | Plan | Price/mo | Light client (Unipile) | Light client (Meta) | Medium (Unipile) | Heavy (Unipile) |
 |---|---:|---:|---:|---:|---:|
-| Starter ₦80k | 80,000 | +₦32,120 (40%) | **+₦56,120 (70%)** | +₦27,020 (34%) | +₦12,800 (16%) |
-| Growth ₦150k | 150,000 | +₦102,120 (68%) | +₦126,120 (84%) | **+₦97,020 (65%)** | +₦82,800 (55%) |
-| Scale ₦300k | 300,000 | +₦252,120 (84%) | +₦276,120 (92%) | +₦247,020 (82%) | **+₦232,800 (78%)** |
+| Solo ₦80k | 80,000 | +₦32,120 (40%) | **+₦56,120 (70%)** | +₦27,020 (34%) | +₦12,800 (16%) |
+| Team ₦150k | 150,000 | +₦102,120 (68%) | +₦126,120 (84%) | **+₦97,020 (65%)** | +₦82,800 (55%) |
+| Empire ₦300k | 300,000 | +₦252,120 (84%) | +₦276,120 (92%) | +₦247,020 (82%) | **+₦232,800 (78%)** |
 
-Read: **Starter via Unipile on a light client = 40% margin. Tight.** Same plan via Meta direct = 70% margin. **This is why we have to route Starter clients through Meta Cloud direct, not Unipile.**
+Read: **Solo via Unipile on a light client = 40% margin. Tight.** Same plan via Meta direct = 70% margin — but the **product decision is Unipile-primary** (the client keeps their own number; Meta Cloud is the fallback only). The Solo-tier margin squeeze is accepted as a deliberate founder-pricing cost, recovered as clients trade up to Team/Empire and via the Meta fallback where a client doesn't need their own number paired.
 
 Growth and Scale absorb Unipile fine. Heavy clients on Starter are unprofitable to dangerous (16% margin doesn't cover surprise spikes).
 
 ### Decision matrix from this table
 
-- **Move Starter to Meta Cloud API only.** No Unipile pairing on Starter. Healthy 70% margin.
-- **Growth gets Unipile.** 65% margin on a medium client is the sweet spot.
-- **Scale gets Unipile + priority + Co-Pilot extras.** 78–82% margin on heavy. Real money per client.
-- **Cap Starter usage** to Light profile (~₦2,500/mo per-call). If a client trends Medium on Starter, auto-prompt upgrade ("you're using Growth-level volume, here's what changes").
+> **Channel decision (locked 2026-05-31): Unipile-primary across all tiers.** The margin math below favours Meta on Solo, but the product promise is "EYO on *your* WhatsApp number" — that needs Unipile pairing. Meta Cloud is the **fallback** (client doesn't need their own number paired, or wants an official BSP). So the routing rules are:
+
+- **Solo** — Unipile by default (accept the tighter founder-cohort margin). Offer Meta Cloud where the client is fine sending from a ReachNG/BSP number — that reclaims the 70% margin.
+- **Team** — Unipile. 65% margin on a medium client is the sweet spot.
+- **Empire** — Unipile + priority + Co-Pilot extras. 78–82% margin on heavy. Real money per client.
+- **Cap Solo usage** to Light profile (~₦2,500/mo per-call). If a client trends Medium on Solo, auto-prompt upgrade ("you're using Team-level volume, here's what changes").
 
 ---
 
@@ -259,9 +263,9 @@ When we sit down for pricing today, the only inputs you need to bring are:
 
 Everything else (cost per profile, margin at price, breakeven volume) is in this doc.
 
-**My recommendation as a starting point:**
-- **Starter ₦80k** → keep, route via Meta Cloud only. 70% margin on a light client. Healthy.
-- **Growth ₦150k** → keep. 65% margin on medium client via Unipile. Sweet spot.
-- **Scale ₦300k** → keep. 78%+ margin even on heavy clients.
+**Resolved (locked 2026-05-31)** — pricing session is done; this section is kept for the reasoning trail:
+- **Solo** → standard ₦80k, live founder ₦60k. Unipile-primary (Meta fallback reclaims margin where the client doesn't need their own number). Tighter founder-cohort margin accepted.
+- **Team** → standard ₦150k, live founder ₦120k. Unipile. 65% on a medium client — the sweet spot.
+- **Empire** → standard ₦300k, live founder ₦250k. Unipile + priority + Co-Pilot. 78%+ even on heavy.
 
-Then tune from there based on your reads.
+Live ladder and channel are now locked in [PRICING.md](./PRICING.md); do not relitigate here.

@@ -30,6 +30,8 @@ The agent is always the headline. The suite is the *and-also*.
 
 ## Live products (sold externally as "ReachNG")
 
+> **Pricing is unified, not per-vertical.** Every vertical below is sold on the one canonical ladder: 🌱 Solo ₦60k / ⭐ Team ₦120k / 👑 Empire ₦250k per month (founder pricing, first 50 clients; standard rack ₦80k / ₦150k / ₦300k). No setup fee. See the live `/pricing` page or [OPERATIONS.md](./OPERATIONS.md) §18. Vertical-specific extras (per-viewing fees, capacity tracking, Lawyer Bundle) are *included* in-tier or quoted as bespoke Empire add-ons — never a separate base price.
+
 ### 1. ReachNG Closer — Inbound Conversion Engine
 **Status:** In build — Phase 1 of 5 (see [PLAN.md](./PLAN.md))
 
@@ -40,23 +42,23 @@ The agent is always the headline. The suite is the *and-also*.
 **Hospitality — bars, rooftop lounges, beach clubs, restaurants**
 - Pain: Bookings lost at 11pm because no one replied. Birthday events not confirmed because the back-and-forth takes 10 messages. Raves and private hires lost to a competitor who responded first.
 - What the agent does: Handles every reservation/event enquiry on WhatsApp — qualifies group size, date, type of booking, budget. Reads live venue capacity before drafting so it never promises a full night. Confirms bookings, collects deposit instructions, adds to pipeline.
-- Pricing: ₦50K–₦150K/mo depending on volume. Venue capacity tracking included.
+- Pricing: standard Solo/Team/Empire ladder. Venue capacity tracking included in-tier.
 
 **Small Business — IG/TikTok merchants (fashion, food, beauty, decor, events)**
 - Pain: 20-50 DMs a day, half are tyre-kickers, sales lost overnight because the owner is asleep.
 - What the agent does: Replies instantly to "how much?" DMs, qualifies real buyers, closes toward order/payment/appointment. All from owner's WhatsApp. They approve every message.
-- Pricing: ₦30K–₦80K/mo. One-week free pilot on real DMs.
+- Pricing: standard Solo/Team/Empire ladder (most start on Solo). One-week free pilot on real DMs.
 
 **Real Estate — agents, developers, brokers**
 - Pain: Leads go cold between first ping and viewing. Saturdays burnt on unqualified viewings. Awkwardness around PoF chase.
 - What the agent does: Drafts qualifying questions, books viewings, handles PoF requests, nurtures warm-not-ready buyers. HITL-approved, sends from client's number.
 - Upsells: KYC vault, Neighborhood Scorecard, Lawyer Bundle, Rent Chase.
-- Pricing: ₦100K setup + ₦150K–₦400K/mo + ₦5K–₦15K per qualified viewing.
+- Pricing: standard Solo/Team/Empire ladder (agencies typically Team or Empire). Optional per-qualified-viewing fee quotable as a bespoke Empire add-on.
 
 **Events — concerts, raves, brand activations**
 - Pain: Ticket enquiries, VIP table requests, sponsorship DMs — all going unanswered or handled slowly by one overwhelmed person.
 - What the agent does: Handles DM enquiries, qualifies tier (GA/VIP/VVIP/sponsor), directs to payment link or confirms table, tracks against capacity.
-- Pricing: ₦80K–₦200K/mo or per-event pricing.
+- Pricing: standard Solo/Team/Empire ladder. High-volume one-off events quotable as a bespoke Empire add-on.
 
 **Any other vertical with WhatsApp inbound** — fitness, salons, schools, clinics, logistics — same product, different prompt.
 
@@ -83,7 +85,7 @@ The agent is always the headline. The suite is the *and-also*.
 - Offboarding checklist generator
 - Moonlighting + salary-erosion flags (retention risk)
 
-**Pricing:** ₦50K setup + ₦50K–₦200K/mo retainer, tiered by staff count.
+**Pricing:** standard Solo/Team/Empire ladder, tier chosen by staff count and module depth. No separate setup fee.
 
 **Internal codename:** TalentOS (use only in code, dashboard, docs — never in client-facing copy)
 

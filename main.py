@@ -634,4 +634,10 @@ if __name__ == "__main__":
         port=port,
         reload=settings.app_env == "development",
         log_level=settings.log_level.lower(),
+        # Railway terminates TLS at the edge and forwards plain HTTP with
+        # X-Forwarded-Proto/-For. Trust those so request.url.scheme is https
+        # (correct og:url + redirects) and request.client.host is the real
+        # client IP (correct per-IP rate limiting on /try-eyo).
+        proxy_headers=True,
+        forwarded_allow_ips="*",
     )

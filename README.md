@@ -89,15 +89,17 @@ Never hardcode — always via `config.get_settings()`. Never log PII.
 
 ---
 
-## Pricing (Cash Desk)
+## Pricing
 
-| Plan | Base | Variable | Best for |
-|------|------|----------|----------|
-| Cash Desk Starter | ₦80,000/mo | — | Solo operator, 1 channel |
-| Cash Desk Growth | ₦150,000/mo | + 2% recovered | 2–5 staff, multi-channel |
-| Cash Desk Scale | ₦300,000/mo | + 3% recovered | Priority operator, dedicated playbook tuning |
+Canonical ladder (matches the live `/pricing` page). Founder pricing for the first 50 clients; standard rack rate shown for reference. Internal code keys remain `starter` / `growth` / `scale`.
 
-Annual: 15% off. Self-serve signup at `/signup` with Paystack auto-provisioning.
+| Tier | Founder (live) | Standard | Best for |
+|------|----------------|----------|----------|
+| 🌱 Solo | ₦60,000/mo | ₦80,000/mo | Solo founders, single WhatsApp line |
+| ⭐ Team | ₦120,000/mo | ₦150,000/mo | Premium SMEs, multi-staff, a book worth reactivating |
+| 👑 Empire | ₦250,000/mo | ₦300,000/mo | Deepest tier (Proactive Intelligence, Co-Pilot, Voice), multi-location groups |
+
+Empire multi-vertical bundle: +₦125,000/mo per extra WhatsApp line. Annual: 15% off. Self-serve signup at `/signup` with Paystack auto-provisioning.
 
 ---
 

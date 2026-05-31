@@ -96,10 +96,17 @@ async def resend_webhook(request: Request):
     raw_body = await request.body()
     headers = {k.lower(): v for k, v in request.headers.items()}
 
+    is_prod = (getattr(settings, "app_env", "") or "").lower() == "production"
+
     if secret:
         if not (_verify_svix(raw_body, headers, secret) or _verify_simple(headers, secret)):
             log.warning("resend_webhook_signature_invalid")
             raise HTTPException(401, "bad signature")
+    elif is_prod:
+        # Fail closed in production: a missing RESEND_WEBHOOK_SECRET must not
+        # mean "accept everything". Set the secret in Railway to enable events.
+        log.error("resend_webhook_secret_unset_in_prod")
+        raise HTTPException(401, "webhook secret not configured")
 
     try:
         payload = json.loads(raw_body or b"{}")

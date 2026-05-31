@@ -638,10 +638,11 @@ async def outreach_personal_link(slug: str):
     """Personalised short link for cold-outreach emails.
 
     `www.reachng.ng/hi/k3m` — the slug carries this recipient's profile
-    (business name, contact name, vertical). On click we set a signed
-    cookie `reachng_prospect` and 302 to the landing. The landing template
-    reads the cookie and personalises everything: hero banner, vertical
-    pre-select, form pre-fills.
+    (business name, contact name, vertical). On click we set an unsigned
+    personalization cookie `reachng_prospect` (httponly=False so the landing
+    JS can read it; secure + samesite=lax) and 302 to the landing. The cookie
+    only drives cosmetic personalisation (hero banner, vertical pre-select,
+    form pre-fills) — it carries no auth or trust, so tampering is harmless.
 
     Unknown slug -> 302 to '/' anyway so the click is still useful.
     """

@@ -419,13 +419,15 @@ The nightly job runs at 10 PM automatically. You'll get a WhatsApp notification 
 
 ### Plans
 
-| Plan | Setup Fee | Monthly | Included |
-|---|---|---|---|
-| **Starter** | ₦50,000 | ₦50,000/mo (from month 2) | 300 messages/mo · 1 vertical · WhatsApp |
-| **Growth** | ₦120,000 | ₦120,000/mo | 1,000 messages/mo · 3 verticals · WhatsApp + Email + follow-ups |
-| **Agency** | ₦250,000 | ₦250,000/mo | Unlimited · All 6 verticals · Dedicated pipeline · ROI reporting |
+Canonical ladder — matches the live `/pricing` page. No setup fee. Founder pricing for the first 50 clients (standard rack rate shown for reference). Internal code keys remain `starter` / `growth` / `scale`.
 
-**Setup fee = first month free.** Client pays setup fee once, month 1 is complimentary, billing starts month 2.
+| Tier (code key) | Founder (live) | Standard | Included |
+|---|---|---|---|
+| 🌱 **Solo** (`starter`) | ₦60,000/mo | ₦80,000/mo | EYO on the client's WhatsApp (Unipile pairing) · drafts every reply · voice notes · receipt reader · Owner Brief |
+| ⭐ **Team** (`growth`) | ₦120,000/mo | ₦150,000/mo | Everything in Solo · re-engagement buckets · bring-your-book import · outcome learning · Missed Opportunity Radar · autopilot · ROI dashboard |
+| 👑 **Empire** (`scale`) | ₦250,000/mo | ₦300,000/mo | Everything in Team · Proactive Intelligence · Owner Co-Pilot · Voice Operator · multi-location · bespoke modules. Bundle: +₦125,000/mo per extra WhatsApp line |
+
+Annual prepay = 15% off. Billing is self-serve at `/signup` via Paystack auto-provisioning.
 
 ### Referral reward
 Any client who refers a paying client gets **1 month free** on their next billing cycle. Log via `POST /api/v1/referrals/`.

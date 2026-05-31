@@ -7,10 +7,14 @@ class Settings(BaseSettings):
     # Claude
     anthropic_api_key: str = Field(..., env="ANTHROPIC_API_KEY")
 
-    # Google Maps
-    google_maps_api_key: str = Field(..., env="GOOGLE_MAPS_API_KEY")
+    # Google Maps — internal Prospect OS (SDR funnel) ONLY. Optional: when unset,
+    # discovery paths skip Google Maps silently and the app still boots. Never
+    # billed to clients, so it must not be a hard startup requirement.
+    google_maps_api_key: str | None = Field(default=None, env="GOOGLE_MAPS_API_KEY")
 
-    # Meta Cloud API — WhatsApp Business (replaces Unipile for WhatsApp)
+    # Meta Cloud API — WhatsApp Business. Secondary/fallback channel. Unipile is
+    # the PRIMARY WhatsApp transport (per-client QR pairing); Meta Cloud is the
+    # fallback used where Unipile isn't paired or a client needs an official BSP.
     meta_phone_number_id: str | None = Field(default=None, env="META_PHONE_NUMBER_ID")
     meta_access_token: str | None = Field(default=None, env="META_ACCESS_TOKEN")
 
@@ -38,7 +42,10 @@ class Settings(BaseSettings):
     # and recipient inboxes. Override via env if you need a different window.
     email_cooldown_days: int = Field(default=14, env="EMAIL_COOLDOWN_DAYS")
 
-    # Unipile — kept optional for clients still using it in agency mode
+    # Unipile — PRIMARY WhatsApp + email transport. Each client pairs their own
+    # number via QR; messages send from the client's number. Meta Cloud (above)
+    # is the secondary/fallback path. Optional here only so the app boots before
+    # the operator has paid for Unipile.
     unipile_api_key: str | None = Field(default=None, env="UNIPILE_API_KEY")
     unipile_dsn: str | None = Field(default=None, env="UNIPILE_DSN")
     unipile_whatsapp_account_id: str | None = Field(default=None, env="UNIPILE_WHATSAPP_ACCOUNT_ID")
