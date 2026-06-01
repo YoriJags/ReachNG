@@ -2282,12 +2282,9 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 
 <!-- ── Control Tower ──────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-tower">
-  <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
-    <button class="tab-btn" id="csubnav-clients-t"   onclick="clientsNav('clients',this)"                              style="font-size:11px;padding:8px 14px;">Clients</button>
-    <button class="tab-btn" id="csubnav-briefs-t"    onclick="clientsNav('briefs',this);briefAdminLoadClients();"      style="font-size:11px;padding:8px 14px;">Briefs &amp; Legal</button>
-    <button class="tab-btn" id="csubnav-campaigns-t" onclick="clientsNav('campaigns',this)"                            style="font-size:11px;padding:8px 14px;">Campaigns</button>
-    <button class="tab-btn active" id="csubnav-tower-t" onclick="clientsNav('tower',this)"                             style="font-size:11px;padding:8px 14px;">Control Tower</button>
-  </div>
+  <!-- Control Tower is now its own top-level sidebar tab (decoupled from the Clients sub-nav). -->
+  <div style="font-size:18px;font-weight:700;color:#e8e8e8;margin-bottom:4px;">Control Tower</div>
+  <p style="color:#6a7280;font-size:12px;margin:0 0 20px;">Self-outreach, prospect interviews, agent learning, and pricing — your growth + tuning cockpit.</p>
 
   <div class="ct-header">
     <div>
@@ -3132,7 +3129,6 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <button class="tab-btn" id="csubnav-clients-ca"   onclick="clientsNav('clients',this)"                              style="font-size:11px;padding:8px 14px;">Clients</button>
     <button class="tab-btn" id="csubnav-briefs-ca"    onclick="clientsNav('briefs',this);briefAdminLoadClients();"      style="font-size:11px;padding:8px 14px;">Briefs &amp; Legal</button>
     <button class="tab-btn active" id="csubnav-campaigns-ca" onclick="clientsNav('campaigns',this)"                     style="font-size:11px;padding:8px 14px;">Campaigns</button>
-    <button class="tab-btn" id="csubnav-tower-ca"     onclick="clientsNav('tower',this);loadControlTower();"            style="font-size:11px;padding:8px 14px;">Control Tower</button>
   </div>
 
   <!-- Quick Launch — May 5 outreach start -->
@@ -3273,7 +3269,6 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <button class="tab-btn" id="csubnav-clients-b"   onclick="clientsNav('clients',this)"                              style="font-size:11px;padding:8px 14px;">Clients</button>
     <button class="tab-btn active" id="csubnav-briefs-b" onclick="clientsNav('briefs',this)"                           style="font-size:11px;padding:8px 14px;">Briefs &amp; Legal</button>
     <button class="tab-btn" id="csubnav-campaigns-b" onclick="clientsNav('campaigns',this)"                            style="font-size:11px;padding:8px 14px;">Campaigns</button>
-    <button class="tab-btn" id="csubnav-tower-b"     onclick="clientsNav('tower',this);loadControlTower();"            style="font-size:11px;padding:8px 14px;">Control Tower</button>
   </div>
   <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #ff5c00;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
     <div style="font-size:13px;font-weight:700;color:#ff5c00;margin-bottom:4px;">Business Briefs</div>
@@ -3366,7 +3361,6 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <button class="tab-btn active" id="csubnav-clients"  onclick="clientsNav('clients',this)"                             style="font-size:11px;padding:8px 14px;">Clients</button>
     <button class="tab-btn" id="csubnav-briefs"    onclick="clientsNav('briefs',this);briefAdminLoadClients();"           style="font-size:11px;padding:8px 14px;">Briefs &amp; Legal</button>
     <button class="tab-btn" id="csubnav-campaigns" onclick="clientsNav('campaigns',this)"                                style="font-size:11px;padding:8px 14px;">Campaigns</button>
-    <button class="tab-btn" id="csubnav-tower"     onclick="clientsNav('tower',this);loadControlTower();"                style="font-size:11px;padding:8px 14px;">Control Tower</button>
   </div>
 
   <!-- Demo Sandbox -->
