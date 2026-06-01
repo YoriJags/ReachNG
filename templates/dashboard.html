@@ -1805,13 +1805,13 @@ function copyDemoPortalLink(btn){
 
   <!-- Phase D: section sub-nav under active suite — replaces top tab strip -->
   <div class="sidebar-section" id="sidebar-outreach-sections">
-    <!-- Ordered by daily workflow: triage → act → revenue → clients → ops cockpit → infra -->
-    <div class="sidebar-section-item active" id="ssn-overview"  onclick="sidebarNav('overview', this)">
+    <!-- 8-tab command tower (DASHBOARD_IA.md), workflow order -->
+    <div class="sidebar-section-item active" id="ssn-overview"  onclick="sidebarNav('overview', this); loadNeedsAttention();">
       <span class="ssi-left"><span class="material-symbols-outlined">dashboard</span> Command Center</span>
-    </div>
-    <div class="sidebar-section-item" id="ssn-attention" onclick="sidebarNav('attention', this); loadNeedsAttention();">
-      <span class="ssi-left"><span class="material-symbols-outlined">priority_high</span> Needs Attention</span>
       <span class="tab-badge" id="tab-badge-attention-side"></span>
+    </div>
+    <div class="sidebar-section-item" id="ssn-clients"   onclick="sidebarNav('clients', this)">
+      <span class="ssi-left"><span class="material-symbols-outlined">groups</span> Clients</span>
     </div>
     <div class="sidebar-section-item" id="ssn-approvals" onclick="sidebarNav('approvals', this)">
       <span class="ssi-left"><span class="material-symbols-outlined">forum</span> Approvals</span>
@@ -1821,11 +1821,14 @@ function copyDemoPortalLink(btn){
       <span class="ssi-left"><span class="material-symbols-outlined">payments</span> Money Engine</span>
       <span class="tab-badge" id="tab-badge-activate-side"></span>
     </div>
-    <div class="sidebar-section-item" id="ssn-clients"   onclick="sidebarNav('clients', this)">
-      <span class="ssi-left"><span class="material-symbols-outlined">groups</span> Clients</span>
+    <div class="sidebar-section-item" id="ssn-growth"    onclick="sidebarNav('growth', this)">
+      <span class="ssi-left"><span class="material-symbols-outlined">trending_up</span> Growth · Prospect&nbsp;OS</span>
     </div>
-    <div class="sidebar-section-item" id="ssn-growth"    onclick="sidebarNav('tower', this)">
-      <span class="ssi-left"><span class="material-symbols-outlined">monitoring</span> Control Tower</span>
+    <div class="sidebar-section-item" id="ssn-ai"        onclick="sidebarNav('ai', this)">
+      <span class="ssi-left"><span class="material-symbols-outlined">neurology</span> AI · Learning</span>
+    </div>
+    <div class="sidebar-section-item" id="ssn-billing"   onclick="sidebarNav('billing', this)">
+      <span class="ssi-left"><span class="material-symbols-outlined">account_balance_wallet</span> Billing</span>
     </div>
     <div class="sidebar-section-item" id="ssn-tools"     onclick="sidebarNav('tools', this)">
       <span class="ssi-left"><span class="material-symbols-outlined">terminal</span> System</span>
@@ -1961,12 +1964,13 @@ function copyDemoPortalLink(btn){
     <button onclick="switchTabByName('attention')" style="background:transparent;color:#7a8590;border:0;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-right:4px;cursor:pointer;padding:0;">Needs attention →</button>
     <button onclick="switchTabByName('approvals')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📝 Approvals</button>
     <button onclick="switchTabByName('clients')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">👥 Clients</button>
-    <button onclick="sidebarNav('tower', document.getElementById('ssn-growth'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📡 Control Tower</button>
+    <button onclick="sidebarNav('growth', document.getElementById('ssn-growth'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📡 Growth</button>
     <button onclick="sidebarNav('tools', document.getElementById('ssn-tools'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">⚙ System</button>
     <a href="/health" target="_blank" style="background:#15171a;color:#5dd28a;border:1px solid #123522;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;text-decoration:none;">🟢 Health</a>
     <span style="flex:1;"></span>
     <span style="font-size:11px;color:#6a7280;">Money moving, queues, and health — start here.</span>
   </section>
+  <div id="overview-reflow-body"></div>
 
   <!-- KPI Hero Ribbon — Bloomberg-tier headline cards (Phase C) -->
   <section class="kpi-hero" id="kpi-hero">
@@ -2200,7 +2204,7 @@ function copyDemoPortalLink(btn){
     <button onclick="loadNeedsAttention()" style="background:#15171a;color:#9aa5b1;border:1px solid #2a3340;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">↻ Refresh</button>
   </div>
   <p style="color:#6a7280;font-size:12px;margin:0 0 16px;">What's broken and who needs help, right now. Pending drafts older than 12h, expired WhatsApp sessions, clients below the margin floor, and failed jobs.</p>
-  <div id="na-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
+  <div id="na-grid" data-reflow="overview" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
     <div style="color:#556;padding:14px;">Loading…</div>
   </div>
 </div>
@@ -2281,6 +2285,32 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 </div>
 
 <!-- ── Control Tower ──────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-growth">
+  <div style="font-size:18px;font-weight:700;color:#e8e8e8;margin-bottom:4px;">Growth · Prospect OS</div>
+  <p style="color:#6a7280;font-size:12px;margin:0 0 16px;">Internal only — how ReachNG finds its own customers. Not a client-facing service.</p>
+  <div id="growth-reflow-body"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px;">
+    <div style="background:#0e1318;border:1px dashed #2a3340;border-radius:10px;padding:16px;color:#6a7280;font-size:12px;"><div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7a6a3f;margin-bottom:6px;">Coming soon</div>Lead quality scoring</div>
+    <div style="background:#0e1318;border:1px dashed #2a3340;border-radius:10px;padding:16px;color:#6a7280;font-size:12px;"><div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7a6a3f;margin-bottom:6px;">Coming soon</div>Nurture sequences</div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-ai">
+  <div style="font-size:18px;font-weight:700;color:#e8e8e8;margin-bottom:4px;">AI · Learning</div>
+  <p style="color:#6a7280;font-size:12px;margin:0 0 16px;">How the agent performs and improves — outcomes, owner edits, autopilot readiness.</p>
+  <div id="ai-reflow-body"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px;">
+    <div style="background:#0e1318;border:1px dashed #2a3340;border-radius:10px;padding:16px;color:#6a7280;font-size:12px;"><div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7a6a3f;margin-bottom:6px;">Coming soon</div>Model cost by feature</div>
+    <div style="background:#0e1318;border:1px dashed #2a3340;border-radius:10px;padding:16px;color:#6a7280;font-size:12px;"><div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7a6a3f;margin-bottom:6px;">Coming soon</div>Tone / voice drift</div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-billing">
+  <div style="font-size:18px;font-weight:700;color:#e8e8e8;margin-bottom:4px;">Billing</div>
+  <p style="color:#6a7280;font-size:12px;margin:0 0 16px;">Are we profitable per client? Subscription status, AI cost, gross margin, overdue.</p>
+  <div id="billing-reflow-body"></div>
+</div>
+
 <div class="tab-panel" id="tab-tower">
   <!-- Control Tower is now its own top-level sidebar tab (decoupled from the Clients sub-nav). -->
   <div style="font-size:18px;font-weight:700;color:#e8e8e8;margin-bottom:4px;">Control Tower</div>
@@ -2301,7 +2331,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </div>
 
   <!-- Revenue KPIs -->
-  <div class="ct-section">
+  <div class="ct-section" data-reflow="overview>
     <div class="ct-section-title">Revenue</div>
     <div class="ct-kpi-row">
       <div class="ct-kpi green">
@@ -2336,7 +2366,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </div>
 
   <!-- Self-Outreach Dry-Run Preview (Client #0 founder-voice copy) -->
-  <div class="ct-section">
+  <div class="ct-section" data-reflow="growth>
     <div class="ct-section-title">Self-Outreach — dry-run copy preview</div>
     <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Generate the actual cold-outreach drafts Client #0 will send. Nothing sends, nothing queues — pure copy preview so you can grade the tone before any real campaign fires. Cost ≈ ₦4 per draft.</p>
 
@@ -2459,7 +2489,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- Outreach Analytics (open / click / convert funnel) -->
-  <div class="ct-section">
+  <div class="ct-section" data-reflow="growth>
     <div class="ct-section-title">Outreach Analytics — open rate, click rate, conversion</div>
     <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Live funnel for ReachNG Self-Outreach (Client #0). Opens + clicks come from Resend webhooks; conversions from waitlist signups attributed back via the /hi/{slug} link.</p>
 
@@ -2570,7 +2600,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- Prospect Interviews (Phase A validation capture) -->
-  <div class="ct-section">
+  <div class="ct-section" data-reflow="growth>
     <div class="ct-section-title">Prospect Interviews — real conversations from outreach replies</div>
     <p style="color:#666;font-size:11px;margin:-4px 0 12px;">When a cold-outreach reply turns into a real DM/call, capture it here. The strongest <em>killer quotes</em> later land on the landing page as anonymous social proof.</p>
 
@@ -2734,7 +2764,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- Agent Learning (T0.4 close-out) -->
-  <div class="ct-section">
+  <div class="ct-section" data-reflow="ai>
     <div class="ct-section-title">Agent Learning — outcomes engine (last 30 days)</div>
     <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Per-client wins / misses from the Outcome Loop. Active addendum = the prompt patch the weekly distil wrote into the agent. Click a row to open the per-client detail.</p>
     <div id="agent-learning-list" style="font-size:12px;">
@@ -2827,7 +2857,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- Pricing Settings (live, no deploy) -->
-  <div class="ct-section">
+  <div class="ct-section" data-reflow="billing>
     <div class="ct-section-title">Pricing — live, no deploy needed</div>
     <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Edit any tier and Save. Takes effect immediately for new signups + the /pricing public page.</p>
     <div id="pricing-editor" style="display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:12px;">
@@ -2909,7 +2939,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- Billing — per-client API cost vs revenue (T0.2.5) -->
-  <div class="ct-section">
+  <div class="ct-section" data-reflow="billing>
     <div class="ct-section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
       <span>Billing — API cost vs revenue (last 30 days)</span>
       <button onclick="loadBilling()" style="background:transparent;border:1px solid #2a3340;color:#9aa0a8;font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;">Refresh</button>
@@ -3009,7 +3039,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- MRR by Product Line -->
-  <div class="ct-section">
+  <div class="ct-section" data-reflow="billing>
     <div class="ct-section-title">MRR by Product Line</div>
     <div class="ct-kpi-row">
       <div class="ct-kpi" style="border-color:#f5c842;">
@@ -3031,7 +3061,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </div>
 
   <!-- Quick-add pilot client -->
-  <div class="ct-section" id="pilot-add-section">
+  <div class="ct-section" id="pilot-add-section" data-reflow="clients">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <div class="ct-section-title" style="margin-bottom:0;">Add Pilot Client</div>
       <span style="font-size:11px;color:#444;">Warm lead or referral — skips brief gate, portal live immediately</span>
@@ -3095,7 +3125,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </div>
 
   <!-- Plan Packages -->
-  <div class="ct-section">
+  <div class="ct-section" data-reflow="billing">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <div class="ct-section-title" style="margin-bottom:0;">Plan Packages</div>
       <button class="ct-btn" onclick="openAddPlanModal()">+ New Plan</button>
@@ -3355,6 +3385,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 
 <!-- ── Clients ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-clients">
+  <div id="clients-reflow-body"></div>
 
   <!-- Clients sub-nav -->
   <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
@@ -5249,8 +5280,9 @@ function switchTab(name, btn) {
 
   // Auto-load data for tabs that need it
   if (name === "attention")   loadNeedsAttention();
+  if (name === "overview")    loadNeedsAttention();
   if (name === "activate")    loadActivateTab();
-  if (name === "tower")       loadControlTower();
+  if (name === "tower" || name === "growth" || name === "ai" || name === "billing") loadControlTower();
   if (name === "sf_students") sfLoadStudentsTable();
   if (name === "sf_claims")   sfLoadClaims();
   if (name === "da_overview") daLoadOverview();
@@ -10996,5 +11028,17 @@ function escHtml(str) {
   });
 </script>
 
+
+<script>
+// 8-tab IA: relocate tagged Control Tower sections into their proper panes on load.
+function reflowDashboard(){
+  document.querySelectorAll('[data-reflow]').forEach(function(el){
+    var t = document.getElementById(el.getAttribute('data-reflow') + '-reflow-body');
+    if (t && el.parentNode !== t) t.appendChild(el);
+  });
+}
+if (document.readyState !== 'loading') reflowDashboard();
+else document.addEventListener('DOMContentLoaded', reflowDashboard);
+</script>
 </body>
 </html>
