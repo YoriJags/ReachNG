@@ -509,6 +509,59 @@ async def get_readiness(token: str):
     return readiness_breakdown(client["name"])
 
 
+@router.get("/{token}/payments")
+async def get_payments(token: str, days: int = 30):
+    """Payments & receipts feed — confirmed receipts + Paystack charges."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.portal_feeds import payments_for
+    return payments_for(client["name"], str(client["_id"]), days=max(1, min(180, days)))
+
+
+@router.get("/{token}/bookings")
+async def get_bookings(token: str, days: int = 30):
+    """Bookings/deals the client marked closed."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.portal_feeds import bookings_for
+    return bookings_for(client["name"], days=max(1, min(180, days)))
+
+
+@router.get("/{token}/savings")
+async def get_savings(token: str, days: int = 30):
+    """Estimated hours + ₦ saved from messages EYO handled."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.portal_feeds import savings_for
+    return savings_for(client["name"], days=max(1, min(180, days)))
+
+
+@router.get("/{token}/brief-history")
+async def get_brief_history(token: str):
+    """Owner Brief send history + current streak."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.portal_feeds import brief_history_for
+    return brief_history_for(client["name"])
+
+
+@router.get("/{token}/report.pdf")
+async def get_report_pdf(token: str, days: int = 30):
+    """One-page PDF results report."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from fastapi import Response
+    from services.portal_feeds import report_pdf_bytes
+    pdf = report_pdf_bytes(client["name"], str(client["_id"]), days=max(1, min(180, days)))
+    return Response(content=pdf, media_type="application/pdf",
+                    headers={"Content-Disposition": "inline; filename=reachng-report.pdf"})
+
+
 # ─── Lead Resurrection (token-auth wrapper around /b2c upload + run) ─────────
 
 @router.get("/upload-leads/{token}", response_class=HTMLResponse)

@@ -967,9 +967,18 @@
     <section class="tabpanel" data-tab="money">
 
     <div class="cust-grid" style="margin-bottom:20px;">
-      <div class="coming-soon"><div class="cs-tag">Coming soon</div>Payments &amp; receipts feed — every transfer EYO reads, matched to a customer.</div>
-      <div class="coming-soon"><div class="cs-tag">Coming soon</div>Bookings &amp; deals closed — confirmed outcomes with their value.</div>
-      <div class="coming-soon"><div class="cs-tag">Coming soon</div>Hours &amp; cost saved — EYO's work converted to time + naira.</div>
+      <div class="cust-card" style="cursor:default;">
+        <div class="cc-title">💳 Payments &amp; receipts</div>
+        <div id="feed-payments" class="cc-sub">Loading…</div>
+      </div>
+      <div class="cust-card" style="cursor:default;">
+        <div class="cc-title">🤝 Bookings closed</div>
+        <div id="feed-bookings" class="cc-sub">Loading…</div>
+      </div>
+      <div class="cust-card" style="cursor:default;">
+        <div class="cc-title">⏱ Hours saved <span style="font-size:10px;color:var(--muted2);">(est.)</span></div>
+        <div id="feed-savings" class="cc-sub">Loading…</div>
+      </div>
     </div>
 
     <!-- Stats -->
@@ -1232,7 +1241,14 @@ discount only today"></textarea>
         <div class="cc-title">📈 Shareable ROI card</div>
         <div class="cc-sub">A 1200×630 image of your live results — open, screenshot, post.</div>
       </a>
-      <div class="coming-soon"><div class="cs-tag">Coming soon</div>Owner Brief history + weekly PDF export.</div>
+      <a class="cust-card" href="/portal/{{ token }}/report.pdf" target="_blank">
+        <div class="cc-title">📄 Download PDF report</div>
+        <div class="cc-sub">One-page summary: cash, deposits, bookings, hours saved, brief streak.</div>
+      </a>
+      <div class="cust-card" style="cursor:default;">
+        <div class="cc-title">🗓 Owner Brief history</div>
+        <div id="feed-brief-history" class="cc-sub">Loading…</div>
+      </div>
     </div>
 
     <!-- Outreach activity table -->
@@ -1906,10 +1922,41 @@ function switchTab(name, scroll) {
   document.querySelectorAll('.tabpanel').forEach(p => p.classList.toggle('active', p.dataset.tab === name));
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
   try { history.replaceState(null, '', '#' + name); } catch(e) {}
+  if (name === 'money')   loadMoneyFeeds();
+  if (name === 'reports') loadReportsFeeds();
   if (scroll !== false) {
     const c = document.querySelector('.content');
     if (c) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+}
+
+// ── Money + Reports tab feeds (lazy, once) ──────────────────────────────────
+const __feedsDone = {};
+function fmtNgnShort(n){ n = Number(n||0); if(n>=1e6) return '₦'+(n/1e6).toFixed(1)+'M'; if(n>=1e3) return '₦'+Math.round(n/1e3)+'k'; return '₦'+Math.round(n); }
+async function loadMoneyFeeds(){
+  if (__feedsDone.money) return; __feedsDone.money = true;
+  const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+  try {
+    const p = await fetch(`/portal/{{ token }}/payments`).then(r => r.json());
+    set('feed-payments', p.count ? `<strong style="color:var(--green);">${fmtNgnShort(p.total_ngn)}</strong> across ${p.count} payment${p.count===1?'':'s'} (last ${p.window_days}d).` : 'No payments logged in the last 30 days.');
+  } catch(e) { set('feed-payments', 'Couldn’t load right now.'); __feedsDone.money = false; }
+  try {
+    const b = await fetch(`/portal/{{ token }}/bookings`).then(r => r.json());
+    set('feed-bookings', b.count ? `<strong>${b.count}</strong> closed${b.total_ngn ? ` · ${fmtNgnShort(b.total_ngn)}` : ''}.` : 'No bookings marked closed yet.');
+  } catch(e) { set('feed-bookings', 'Couldn’t load right now.'); }
+  try {
+    const s = await fetch(`/portal/{{ token }}/savings`).then(r => r.json());
+    set('feed-savings', s.messages_handled ? `EYO handled <strong>${s.messages_handled}</strong> messages ≈ <strong>${s.hours_saved} hrs</strong> (${fmtNgnShort(s.cost_saved_ngn)}).` : 'No handled messages yet.');
+  } catch(e) { set('feed-savings', 'Couldn’t load right now.'); }
+}
+async function loadReportsFeeds(){
+  if (__feedsDone.reports) return; __feedsDone.reports = true;
+  const el = document.getElementById('feed-brief-history');
+  if (!el) return;
+  try {
+    const h = await fetch(`/portal/{{ token }}/brief-history`).then(r => r.json());
+    el.innerHTML = h.count ? `${h.count} brief${h.count===1?'':'s'} sent · 🔥 ${h.streak_days}-day streak. Latest: ${(h.items[0] && h.items[0].day) || '—'}.` : 'No briefs sent yet — they begin once you go live.';
+  } catch(e) { el.textContent = 'Couldn’t load right now.'; __feedsDone.reports = false; }
 }
 
 function setWaPill(connected) {
