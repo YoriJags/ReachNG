@@ -4,20 +4,44 @@
 
 PLAN.md = active phases. SPRINT.md = active sprints. BACKLOG.md = queued. Promote items, don't duplicate them.
 
-Last updated: 2026-05-25 (full sweep — closed 30+ stale items, archived Year-2 aspirational batch, dropped duplicates)
+Last updated: 2026-06-01 (reconciled after magic-potion + alignment pass)
+
+---
+
+## ✅ Shipped since last sweep (2026-06-01 — magic-potion + alignment pass)
+
+Commits `301c369` (pricing/channel alignment), `8261422` (features), `49c26db` (UI wiring + polish).
+
+**New "cash control room" surfaces — the wedge:**
+- **Money Leak Report** — `services/money_leak.py` + `/portal/{token}/money-leak`. Composes confirmed-owed + asked-price-no-quote + ghosted "I'll pay" promises + silent inbound into one ₦ figure. Reframes EYO from "AI replies" → "cash recovery / control room."
+- **Revenue Rescue Mode** — `/portal/{token}/revenue-rescue` + portal card; "wake this money up" reuses the HITL-forced `/run-resurrection`.
+- **Competitor Speed Watch** — `services/speed_watch.py` + `/portal/{token}/speed-watch` + portal card. Real median first-response time vs category benchmark (percentile labelled estimate).
+
+**Enhancements to already-shipped engines:**
+- **Instant Learning Card** — edit-approve returns "EYO learned: …"; toasts in the dashboard (`services/learning_card.py`).
+- **Autopilot Readiness breakdown** — 4 dimensions (tone / price / escalation / payment) in the portal readiness card; "still learning" when sample thin.
+- **Vault next-best-action** — per-customer NBA line in the dossier.
+- **Owner Voice `rescue_followup`** — "follow up everyone who asked price" surfaces targets + links to Revenue Rescue (no auto-send; HITL preserved).
+- **"What you'd have missed" brief** — counterfactual section in the morning Owner Brief.
+- **First-24h-Win** — onboarding go-live reward panel (`/onboard/first-win`).
+- **Concierge intake** — paste-materials box on onboarding step 1 (`/concierge` → KB).
+
+**Repo hygiene:** one canonical pricing ladder (Solo/Team/Empire ₦60/120/250) across README/OPERATIONS/PRODUCTS/PRICING/signup; Unipile-primary channel decision; INVESTOR.md re-run at live pricing; `GOOGLE_MAPS_API_KEY` made optional; Resend webhook fail-closed in prod; og:url forced https; `tests/test_magic_features.py` added (bad-token isolation, empty-data, composition math, rescue dedup, resurrection-stays-HITL). Full suite: 18 passed.
 
 ---
 
 ## P0 — Actionable now (top of queue)
 
+> Re-ranked 2026-06-01: the Money Leak wedge now ships, so the next moves are (a) cheap close-outs, then (b) the proactive moat. The single biggest structural moat remains **A6 Open Banking** (P1) — gated on first paid client + Mono/Okra approval.
+
 Pull these into PLAN.md or SPRINT.md one at a time. Ordered by ship-value.
 
-- [ ] **Sentry + BetterStack + Slack webhook tail** *(½ day, blocked on SENTRY_DSN env var)* — Error tracking, uptime per integration (Unipile / Paystack / Anthropic), webhook-failure tail. Sprint 3 item; ships the moment Yori sets the DSN.
-- [ ] **T0.5 Proactive Intelligence — 5 starter behaviours** *(~4 days)* — The "agent acts without being asked" moat. Stale-lead revival (already shipped via `services/closer/revival.py` — fold in), festival timing (Detty December / Sallah / Owambe), birthday nudges (reads `client_memory` date facts), capacity nudges, booking reminders. Each behaviour is a scheduler job that drafts to HITL. New `services/proactive/` package.
+- [ ] **T0.4 close-out — Admin per-client wins/misses dashboard** *(~½ day, cheapest win)* — JSON endpoint already shipped (`/api/v1/agent-learning/{client_id}`); needs an admin UI tab to render wins/misses with the active `prompt_addendum` per client. Pairs naturally with the new instant Learning Card (toast already live in approvals).
+- [ ] **Sentry + BetterStack + Slack webhook tail** *(½ day, blocked on SENTRY_DSN env var)* — Error tracking, uptime per integration (Unipile / Paystack / Anthropic / Resend), webhook-failure tail. Ships the moment Yori sets the DSN. More urgent now that paid-client surfaces (Money Leak / Revenue Rescue) are live.
+- [ ] **T0.5 Proactive Intelligence — starter behaviours** *(~3 days now)* — The "agent acts without being asked" moat. **Stale-lead revival is now effectively shipped** (Revenue Rescue / `rescue_targets` + `/run-resurrection`) — drop it from scope. Remaining: festival timing (Detty December / Sallah / Owambe), birthday nudges (reads `client_memory` date facts), capacity nudges, booking reminders. Each = a scheduler job that drafts to HITL. New `services/proactive/` package.
 - [x] ~~**T0.2.6 Custom-named Engine**~~ — confirmed already shipped during sweep (api/clients.py + api/portal.py POST /agent-name + portal Settings UI with live preview + agent/brain.py::_agent_identity_block prompt injection + services/closer/brain.py wired). Marked done 2026-05-25.
 - [x] ~~**HITL bulk-approve + draft regeneration**~~ — shipped 2026-05-25. `POST /api/v1/approvals/approve-all` and `/skip-all` now accept `client` + `confidence` query params (filter to a single tenant or only high-confidence drafts). New `POST /api/v1/approvals/{id}/regenerate?style=shorter|warmer|firmer|more_specific` does a single Haiku rewrite in-place (~₦2/call, recomputes risk against new text). Dashboard renders per-draft `↺ shorter / ↺ warmer / ↺ firmer` buttons + "✓ Approve safe only" bulk button on the approve-all bar.
 - [x] ~~**HITL draft confidence score**~~ — shipped 2026-05-25. Deterministic rule-based scorer in `services/draft_risk.py::score_draft()` — no LLM call, ~0ms latency, ₦0 cost. Persists `{confidence: high|medium|low, score: 0-100, tags: [str]}` on each `pending_approvals` doc via `tools/hitl.queue_draft`. Dashboard renders color-coded badge (green/amber/red) above each approval card with score + top 3 tags. Tags include `placeholder_leak`, `escalated`, `angry_on_fire`, `refund_topic`, `legal_mentioned`, `money_quoted`, `over_apologetic`, etc.
-- [ ] **T0.4 close-out — Admin per-client wins/misses dashboard** *(~half day)* — JSON endpoint already shipped (`/api/v1/agent-learning/{client_id}`); needs an admin UI tab to render wins/misses with the active `prompt_addendum` per client.
 
 ---
 
@@ -34,7 +58,7 @@ Pull these into PLAN.md or SPRINT.md one at a time. Ordered by ship-value.
 Things that aren't features but matter when first 5 pilots want to go live.
 
 - [x] ~~**Auto-enforce WhatsApp warmup ramp at code level**~~ — shipped 2026-05-25. `tools/account_guard.WARMUP_SCHEDULE` tightened to the conservative Meta-recommended 10/25/50 over weeks 1/2/3 (was 50/100). `api/clients.py` now seeds `outreach_started_at` at client creation in `$setOnInsert` so the ramp ticks from pairing day, not first send.
-- [ ] **Onboarding wizard** *(~2-3 days, deferred until 5 pilots inform what to ask)* — Codex-spec'd: Business Basics → Voice & Tone → Offer & Pricing → Lead Qualification → Approval Rules → Test EYO → Go-Live Checklist. Lives at `/portal/{token}/onboard`.
+- [x] ~~**Onboarding wizard**~~ — shipped (`api/onboarding.py` + `templates/portal/onboard.html`): 7 steps Business Basics → Voice & Tone → Offer & Pricing → Lead Qualification → Approval Rules → Test EYO → Go-Live, at `/portal/{token}/onboard`. 2026-06-01 additions: First-24h-Win reward panel on go-live (`/onboard/first-win`) + concierge paste-materials box on step 1 (`/onboard`/`/concierge`).
 - [ ] **Pass-2 guided demo: per-vertical** *(~3 hrs, build when demand signal arrives)* — `/portal/demo/real_estate` (Victoria Island PoF storyline) + `/portal/demo/professional_services` (Greenview Fri-6pm storyline). Education + clinics + small_business deferred until signups arrive.
 - [ ] **Portal token rotation** *(½ day)* — `client.portal_token_rotated_at` + "regenerate token" button. Use case: client leaves a partner who had the URL.
 - [ ] **Audit log for client_doc edits** *(½ day)* — Every `clients` collection update writes to `client_audit_log` with who/what/when.
@@ -100,7 +124,7 @@ Survivors of the Emergent 22-idea triage. See `memory/project_reachng_emergent_t
 
 - [ ] **T0.2.5 Usage Quota & Tiered Billing System** *(~3 days)* — Per-plan monthly caps, real-time anti-runaway rate limits, owner-opt-in overage billing, 80% warning WhatsApp, admin Billing dashboard with per-client margin %. Required before any meaningful scaling. Defer until 5 pilots produce real cost data.
 - [ ] **T0.2.7 Feature Menu / A La Carte Pricing** *(~4-5 days)* — Modular menu instead of fixed tiers. Configurator at `/pricing`. Per-client `enabled_features` flags gating each cost-incurring call. Final pricing schedule needs T0.2.5 cost data first.
-- [ ] **T0.3 Predictive co-pilot — chat with your agent** *(~2 days)* — Owner types into a chatbox: "Who hasn't replied in 5 days?" / "Summarise this week" / "Draft a follow-up to that Victoria Island buyer". Haiku planner → deterministic Mongo queries → narrate.
+- [x] ~~**T0.3 Predictive co-pilot — chat with your agent**~~ — shipped (`services/copilot.py` + `api/copilot.py` + dashboard floating bubble/chat panel with 5 tools). Owner asks "Who hasn't replied in 5 days?" / "Summarise this week" → Haiku planner → deterministic Mongo queries → narrate.
 
 ---
 
@@ -108,7 +132,7 @@ Survivors of the Emergent 22-idea triage. See `memory/project_reachng_emergent_t
 
 - [ ] **Split `agent/brain.py`** — File is 770+ lines. Extract into `agent/drafters/` package: outreach, b2c, social, invoice, auto_reply, classifier.
 - [ ] **Mobile-first review of client portal** — Verify portal.html renders cleanly at 375px. Most Lagos clients view on phone.
-- [x] ~~**"Almost lost" widget on client portal**~~ — endpoint shipped 2026-05-25 (`GET /portal/almost-lost/{token}`). Returns expired-but-never-approved drafts + inbounds older than 4h with no outbound reply. Portal-page surface deferred (data queryable today).
+- [x] ~~**"Almost lost" widget on client portal**~~ — endpoint shipped 2026-05-25 (`GET /portal/almost-lost/{token}`). Portal surface now live too (2026-06-01): the Money Leak Report's "silent inbound" category surfaces messaged-but-never-replied conversations on `/portal/{token}/money-leak`.
 - [x] ~~**ROI screenshot generator**~~ — shipped 2026-05-25. `services/roi_card.py::render_roi_card()` returns 1200×630 PNG; `GET /portal/share-card/{token}` serves it inline. Pulls live numbers from `services/scorecard.compute_scorecard`. Pillow-only, no new deps.
 - [ ] **Integration test suite expansion** — At first paying client, expand beyond `tests/test_smoke.py`: HITL gate, webhook routes, holding reply dedupe, autopilot toggle, portal token auth.
 - [ ] **Lead-signal-injection rules** — Each vertical prompt mandates referencing concrete signals from enrichment payload (Maps rating, decision_maker, place categories, IG handle).
