@@ -120,6 +120,11 @@ class Settings(BaseSettings):
     posthog_api_key: str | None = Field(default=None, env="POSTHOG_API_KEY")
     posthog_host: str = Field(default="https://us.i.posthog.com", env="POSTHOG_HOST")
 
+    # Sentry error tracking — no-op until SENTRY_DSN is set. PII is scrubbed
+    # before send (phone/email) since we never ship customer PII off-box.
+    sentry_dsn: str | None = Field(default=None, env="SENTRY_DSN")
+    sentry_traces_sample_rate: float = Field(default=0.0, env="SENTRY_TRACES_SAMPLE_RATE")
+
     # App
     app_env: str = Field(default="development", env="APP_ENV")
     app_port: int = Field(default=8000, env="PORT")

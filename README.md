@@ -86,6 +86,8 @@ Required:
 
 Optional discovery: `GOOGLE_MAPS_API_KEY`, `APOLLO_API_KEY`.
 
+Optional observability: `SENTRY_DSN` (error tracking — no-op until set; PII scrubbed before send), `SENTRY_TRACES_SAMPLE_RATE`.
+
 Never hardcode — always via `config.get_settings()`. Never log PII.
 
 ---

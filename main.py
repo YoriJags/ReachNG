@@ -41,6 +41,14 @@ from config import get_settings
 
 log = structlog.get_logger()
 
+# Error tracking — no-op unless SENTRY_DSN is set. Init as early as possible so
+# boot/import errors are captured too.
+try:
+    from tools.observability import init_sentry
+    init_sentry()
+except Exception:
+    pass
+
 _posthog: Posthog | None = None
 
 

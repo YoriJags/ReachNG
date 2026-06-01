@@ -42,6 +42,15 @@ log = structlog.get_logger()
 router = APIRouter(prefix="/api/v1/webhooks", tags=["ResendWebhook"])
 
 
+def _tail(reason: str) -> None:
+    """Send a webhook-failure breadcrumb to Sentry (no-op until SENTRY_DSN set)."""
+    try:
+        from tools.observability import capture_message
+        capture_message(f"webhook_failure: {reason}", level="warning", integration="resend")
+    except Exception:
+        pass
+
+
 # Resend ships either a Svix-style signature or a simple secret-header
 # depending on the dashboard config. We accept both.
 SVIX_HEADER          = "svix-signature"
@@ -101,11 +110,13 @@ async def resend_webhook(request: Request):
     if secret:
         if not (_verify_svix(raw_body, headers, secret) or _verify_simple(headers, secret)):
             log.warning("resend_webhook_signature_invalid")
+            _tail("resend signature invalid")
             raise HTTPException(401, "bad signature")
     elif is_prod:
         # Fail closed in production: a missing RESEND_WEBHOOK_SECRET must not
         # mean "accept everything". Set the secret in Railway to enable events.
         log.error("resend_webhook_secret_unset_in_prod")
+        _tail("resend secret unset in prod")
         raise HTTPException(401, "webhook secret not configured")
 
     try:

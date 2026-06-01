@@ -160,3 +160,20 @@ def test_render_festival_message():
     # No name / placeholder names don't leak into the greeting
     no_name = render_festival_message(fest, "there", "")
     assert "there" not in no_name and ", " not in no_name.split("!")[0]
+
+
+# ─── Observability: PII scrub + no-op when Sentry off ─────────────────────────
+
+def test_sentry_scrub_redacts_pii():
+    from tools.observability import _scrub
+    out = _scrub("call +2348012345678 or mail funke@altitude.ng now")
+    assert "[phone]" in out and "[email]" in out
+    assert "2348012345678" not in out and "funke@altitude.ng" not in out
+
+
+def test_sentry_noop_without_dsn():
+    # No SENTRY_DSN in the test env → init returns False and capture is a no-op.
+    from tools.observability import init_sentry, capture_message, capture_exception
+    assert init_sentry() is False
+    capture_message("should not raise", level="warning", integration="test")  # no-op
+    capture_exception(ValueError("x"))  # no-op
