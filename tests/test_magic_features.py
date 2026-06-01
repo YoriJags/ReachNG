@@ -130,3 +130,33 @@ def test_resurrection_forces_hitl(client, monkeypatch):
     assert r.status_code == 200
     assert captured.get("hitl_mode") is True, "resurrection must force HITL mode"
     assert captured.get("client_name") == "Test Co"
+
+
+# ─── T0.5 Proactive Intelligence — festival window logic (no DB) ──────────────
+
+from datetime import datetime, timezone
+
+
+@pytest.mark.parametrize("date,expected", [
+    (datetime(2026, 2, 10, tzinfo=timezone.utc), "valentine"),
+    (datetime(2026, 12, 15, tzinfo=timezone.utc), "detty_december"),
+    (datetime(2026, 12, 30, tzinfo=timezone.utc), "new_year"),     # wraps year-end
+    (datetime(2027, 1, 1, tzinfo=timezone.utc),  "new_year"),      # other side of wrap
+    (datetime(2026, 9, 30, tzinfo=timezone.utc), "independence"),
+    (datetime(2026, 3, 15, tzinfo=timezone.utc), None),            # no festival
+    (datetime(2026, 7, 4, tzinfo=timezone.utc),  None),
+])
+def test_active_festival(date, expected):
+    from services.proactive.festivals import active_festival
+    f = active_festival(date)
+    assert (f or {}).get("key") == expected if expected else f is None
+
+
+def test_render_festival_message():
+    from services.proactive.festivals import active_festival, render_festival_message
+    fest = active_festival(datetime(2026, 12, 15, tzinfo=timezone.utc))
+    with_name = render_festival_message(fest, "Funke Adebayo", "Altitude Lagos")
+    assert "Funke" in with_name and "Altitude Lagos" in with_name
+    # No name / placeholder names don't leak into the greeting
+    no_name = render_festival_message(fest, "there", "")
+    assert "there" not in no_name and ", " not in no_name.split("!")[0]

@@ -350,6 +350,16 @@ async def _milestone_sweep():
         log.error("milestone_sweep_crashed", error=str(e))
 
 
+async def _proactive_sweep():
+    """Daily: proactive intelligence — festive-window re-engagement to HITL."""
+    try:
+        from services.proactive import run_proactive_sweep
+        result = run_proactive_sweep()
+        log.info("proactive_sweep_result", **result)
+    except Exception as e:
+        log.error("proactive_sweep_crashed", error=str(e))
+
+
 async def _weekly_digest():
     """Monday 7am Lagos: WhatsApp weekly digest to each client owner."""
     try:
@@ -485,6 +495,13 @@ def setup_scheduler():
         _milestone_sweep,
         CronTrigger(hour=4, minute=30, timezone="Africa/Lagos"),
         id="milestone_sweep", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=900,
+    )
+
+    # Proactive intelligence — daily 06:30 Africa/Lagos (festive-window nudges)
+    scheduler.add_job(
+        _proactive_sweep,
+        CronTrigger(hour=6, minute=30, timezone="Africa/Lagos"),
+        id="proactive_sweep", replace_existing=True, coalesce=True, max_instances=1, misfire_grace_time=900,
     )
 
     # Weekly owner digest — Mondays 07:00 Africa/Lagos
