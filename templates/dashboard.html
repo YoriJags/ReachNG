@@ -1805,6 +1805,7 @@ function copyDemoPortalLink(btn){
 
   <!-- Phase D: section sub-nav under active suite — replaces top tab strip -->
   <div class="sidebar-section" id="sidebar-outreach-sections">
+    <!-- Ordered by daily workflow: triage → act → revenue → clients → ops cockpit → infra -->
     <div class="sidebar-section-item active" id="ssn-overview"  onclick="sidebarNav('overview', this)">
       <span class="ssi-left"><span class="material-symbols-outlined">dashboard</span> Command Center</span>
     </div>
@@ -1812,19 +1813,19 @@ function copyDemoPortalLink(btn){
       <span class="ssi-left"><span class="material-symbols-outlined">priority_high</span> Needs Attention</span>
       <span class="tab-badge" id="tab-badge-attention-side"></span>
     </div>
-    <div class="sidebar-section-item" id="ssn-activate"  onclick="sidebarNav('activate', this); loadActivateTab();">
-      <span class="ssi-left"><span class="material-symbols-outlined">payments</span> Money Engine</span>
-      <span class="tab-badge" id="tab-badge-activate-side"></span>
-    </div>
     <div class="sidebar-section-item" id="ssn-approvals" onclick="sidebarNav('approvals', this)">
       <span class="ssi-left"><span class="material-symbols-outlined">forum</span> Approvals</span>
       <span class="tab-badge" id="tab-badge-approvals-side"></span>
+    </div>
+    <div class="sidebar-section-item" id="ssn-activate"  onclick="sidebarNav('activate', this); loadActivateTab();">
+      <span class="ssi-left"><span class="material-symbols-outlined">payments</span> Money Engine</span>
+      <span class="tab-badge" id="tab-badge-activate-side"></span>
     </div>
     <div class="sidebar-section-item" id="ssn-clients"   onclick="sidebarNav('clients', this)">
       <span class="ssi-left"><span class="material-symbols-outlined">groups</span> Clients</span>
     </div>
     <div class="sidebar-section-item" id="ssn-growth"    onclick="sidebarNav('tower', this)">
-      <span class="ssi-left"><span class="material-symbols-outlined">trending_up</span> Growth · Prospect&nbsp;OS</span>
+      <span class="ssi-left"><span class="material-symbols-outlined">monitoring</span> Control Tower</span>
     </div>
     <div class="sidebar-section-item" id="ssn-tools"     onclick="sidebarNav('tools', this)">
       <span class="ssi-left"><span class="material-symbols-outlined">terminal</span> System</span>
@@ -1898,47 +1899,16 @@ function copyDemoPortalLink(btn){
 </nav>
 
 <!-- ── LegalOS Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="legal_os" style="display:none;">
-  <span class="tab-section-label">Digital Associates</span>
-  <button class="tab-btn active" onclick="switchTab('da_overview', this)">Overview</button>
-  <button class="tab-btn" onclick="switchTab('da_reviews', this)">Reviews</button>
-  <button class="tab-btn" onclick="switchTab('da_upload', this)">Upload Contract</button>
-</nav>
+
 
 <!-- ── LendOS Tab Nav (Loan Officer + Market Credit + FX Lock) ── -->
-<nav class="tab-nav product-tabs" data-product="lend_os" style="display:none;">
-  <span class="tab-section-label">Loan Officer</span>
-  <button class="tab-btn active" onclick="switchTab('lo_queue', this)">Queue</button>
-  <button class="tab-btn" onclick="switchTab('lo_stats', this)">Stats</button>
-  <div class="tab-divider"></div>
-  <span class="tab-section-label">Market Credit</span>
-  <button class="tab-btn" onclick="switchTab('mc_queue', this)">Queue</button>
-  <button class="tab-btn" onclick="switchTab('mc_profiles', this)">Profiles</button>
-  <button class="tab-btn" onclick="switchTab('mc_submit', this)">New Application</button>
-  <div class="tab-divider"></div>
-  <span class="tab-section-label">FX Lock</span>
-  <button class="tab-btn" onclick="switchTab('fxl_monitor', this)">Rate Monitor</button>
-  <button class="tab-btn" onclick="switchTab('fxl_quotes', this)">Quotes</button>
-  <button class="tab-btn" onclick="switchTab('fxl_settings', this)">Alert Settings</button>
-</nav>
+
 
 <!-- ── SchoolOS Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="school_os" style="display:none;">
-  <button class="tab-btn active" onclick="switchTab('sf_overview', this)">Overview</button>
-  <button class="tab-btn" onclick="switchTab('sf_schools', this)">Schools</button>
-  <button class="tab-btn" onclick="switchTab('sf_students', this)">Students</button>
-  <button class="tab-btn" onclick="switchTab('sf_payments', this)">Payments</button>
-  <button class="tab-btn" onclick="switchTab('sf_reminders', this)">Reminders</button>
-  <button class="tab-btn" id="sf-claims-tab-btn" onclick="switchTab('sf_claims', this)">Claims <span id="sf-claims-badge" style="background:#ff5c00;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-left:4px;display:none;">0</span></button>
-</nav>
+
 
 <!-- ── BizOS Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="biz_os" style="display:none;">
-  <span class="tab-section-label">Debt Collector</span>
-  <button class="tab-btn active" onclick="switchTab('dc_overview', this)">Overview</button>
-  <button class="tab-btn" onclick="switchTab('dc_cases', this)">Active Cases</button>
-  <button class="tab-btn" onclick="switchTab('dc_add', this)">Add Case</button>
-</nav>
+
 
 
 <!-- ── HR Suite Tab Nav ── -->
@@ -1974,39 +1944,14 @@ function copyDemoPortalLink(btn){
 
 
 <!-- ── TrustOS Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="trust_os" style="display:none;">
-  <span class="tab-section-label">Product Auth</span>
-  <button class="tab-btn active" onclick="switchTab('pa_scan', this)">New Scan</button>
-  <button class="tab-btn" onclick="switchTab('pa_history', this)">Scan History</button>
-  <button class="tab-btn" onclick="switchTab('pa_flagged', this)">Flagged Products</button>
-</nav>
+
 
 <!-- ── BuildOS Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="build_os" style="display:none;">
-  <span class="tab-section-label">Material Check</span>
-  <button class="tab-btn active" onclick="switchTab('mch_submit', this)">New Check</button>
-  <button class="tab-btn" onclick="switchTab('mch_results', this)">Results</button>
-  <button class="tab-btn" onclick="switchTab('mch_blacklist', this)">Supplier Blacklist</button>
-</nav>
+
 
 
 <!-- ── FleetOS Tab Nav (Dispatcher + Fuel Reprice + Float Optimizer) ── -->
-<nav class="tab-nav product-tabs" data-product="fleet_os" style="display:none;">
-  <span class="tab-section-label">Dispatcher</span>
-  <button class="tab-btn active" onclick="switchTab('fd_incidents', this); fdLoadIncidents();">Incidents</button>
-  <button class="tab-btn" onclick="switchTab('fd_log', this)">Log Breakdown</button>
-  <button class="tab-btn" onclick="switchTab('fd_trucks', this); fdLoadTrucks();">Trucks</button>
-  <div class="tab-divider"></div>
-  <span class="tab-section-label">Fuel Reprice</span>
-  <button class="tab-btn" onclick="switchTab('fr_routes', this)">Routes</button>
-  <button class="tab-btn" onclick="switchTab('fr_alerts', this)">Alerts</button>
-  <button class="tab-btn" onclick="switchTab('fr_letters', this)">Letters</button>
-  <div class="tab-divider"></div>
-  <span class="tab-section-label">Float Optimizer</span>
-  <button class="tab-btn" onclick="switchTab('fo_dashboard', this)">Dashboard</button>
-  <button class="tab-btn" onclick="switchTab('fo_agents', this)">Agents</button>
-  <button class="tab-btn" onclick="switchTab('fo_recommendations', this)">Recommendations</button>
-</nav>
+
 
 <!-- ── Overview ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel active" id="tab-overview">
@@ -2016,7 +1961,7 @@ function copyDemoPortalLink(btn){
     <button onclick="switchTabByName('attention')" style="background:transparent;color:#7a8590;border:0;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-right:4px;cursor:pointer;padding:0;">Needs attention →</button>
     <button onclick="switchTabByName('approvals')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📝 Approvals</button>
     <button onclick="switchTabByName('clients')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">👥 Clients</button>
-    <button onclick="sidebarNav('tower', document.getElementById('ssn-growth'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📈 Growth</button>
+    <button onclick="sidebarNav('tower', document.getElementById('ssn-growth'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📡 Control Tower</button>
     <button onclick="sidebarNav('tools', document.getElementById('ssn-tools'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">⚙ System</button>
     <a href="/health" target="_blank" style="background:#15171a;color:#5dd28a;border:1px solid #123522;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;text-decoration:none;">🟢 Health</a>
     <span style="flex:1;"></span>
@@ -3929,501 +3874,58 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 
 <!-- ── SF Overview ─────────────────────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-sf_overview" style="display:none;">
-  <div class="summary-bar">
-    <div class="stat-card blue"><div class="label">Active Schools</div><div class="value" id="sf-stat-schools">—</div></div>
-    <div class="stat-card green"><div class="label">Paid Students</div><div class="value" id="sf-stat-paid">—</div></div>
-    <div class="stat-card amber"><div class="label">Outstanding</div><div class="value" id="sf-stat-outstanding">—</div></div>
-    <div class="stat-card fire"><div class="label">Total Collected</div><div class="value" id="sf-stat-collected">—</div></div>
-  </div>
 
-  <p class="section-title" style="margin-top:28px;">Collection Rate</p>
-  <div style="background:#111;border:1px solid #1e1e1e;border-radius:8px;padding:16px 20px;max-width:480px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <span style="font-size:13px;color:#aaa;">Platform-wide</span>
-      <span style="font-size:20px;font-weight:700;color:#f0f0f0;" id="sf-collection-rate">—%</span>
-    </div>
-    <div style="background:#1a1a1a;border-radius:4px;height:6px;overflow:hidden;">
-      <div id="sf-collection-bar" style="height:100%;background:#00e5a0;border-radius:4px;width:0%;transition:width 0.5s;"></div>
-    </div>
-  </div>
-
-  <p class="section-title" style="margin-top:28px;">Quick Actions</p>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;">
-    <button class="btn btn-approve" onclick="sfSwitchTab('sf_schools')">+ Add School</button>
-    <button class="btn btn-approve" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;" onclick="sfSwitchTab('sf_reminders')">Send Reminders</button>
-    <button class="btn btn-approve" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;" onclick="sfSwitchTab('sf_payments')">View Payments</button>
-  </div>
-</div>
 
 <!-- ── SF Schools ──────────────────────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-sf_schools" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Register School</p>
-  <div class="form-card">
-    <div class="row">
-      <input id="sf-school-name" placeholder="School name e.g. Greenfield Int'l School" style="flex:2;" />
-      <input id="sf-school-city" placeholder="City" value="Lagos" />
-    </div>
-    <div class="row">
-      <input id="sf-school-contact" placeholder="Bursar / Contact name" />
-      <input id="sf-school-phone" placeholder="Bursar WhatsApp (+234...)" />
-      <input id="sf-school-email" placeholder="Email (optional)" />
-    </div>
-    <div class="row" style="align-items:center;gap:16px;">
-      <span style="font-size:12px;color:#666;">WhatsApp sender:</span>
-      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#aaa;cursor:pointer;">
-        <input type="radio" name="sf-wa-provider" value="unipile" checked onchange="sfToggleProvider(this.value)" style="width:auto;" /> Unipile (default)
-      </label>
-      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#aaa;cursor:pointer;">
-        <input type="radio" name="sf-wa-provider" value="meta" onchange="sfToggleProvider(this.value)" style="width:auto;" /> Meta (school's own number)
-      </label>
-    </div>
-    <div id="sf-meta-fields" style="display:none;">
-      <div class="row">
-        <input id="sf-meta-phone-id" placeholder="Meta Phone Number ID" style="flex:1;" />
-        <input id="sf-meta-token" placeholder="Meta System User Access Token" style="flex:2;" />
-      </div>
-      <p class="form-hint">From Meta Business Manager → WhatsApp → Phone Numbers. Messages will send from the school's own WhatsApp Business number.</p>
-    </div>
-    <div class="row">
-      <button class="btn btn-approve" onclick="sfCreateSchool()">Save School</button>
-    </div>
-    <p class="form-hint" id="sf-school-msg"></p>
-  </div>
 
-  <p class="section-title" style="margin-top:28px;">All Schools</p>
-  <table class="contact-table">
-    <thead><tr><th>School</th><th>City</th><th>Contact</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead>
-    <tbody id="sf-schools-tbody">
-      <tr><td colspan="6" class="empty">Loading…</td></tr>
-    </tbody>
-  </table>
-</div>
 
 <!-- ── SF Payments ─────────────────────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-sf_payments" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Record Manual Payment</p>
-  <div class="form-card">
-    <div class="row">
-      <select id="sf-pay-school" onchange="sfLoadStudentsForPayment()">
-        <option value="">Select School…</option>
-      </select>
-      <select id="sf-pay-student">
-        <option value="">Select Student…</option>
-      </select>
-    </div>
-    <div class="row">
-      <input id="sf-pay-amount" type="number" placeholder="Amount paid (₦)" />
-      <select id="sf-pay-method">
-        <option value="transfer">Bank Transfer</option>
-        <option value="cash">Cash</option>
-        <option value="paystack">Paystack</option>
-      </select>
-      <input id="sf-pay-ref" placeholder="Reference / receipt # (optional)" />
-    </div>
-    <div class="row">
-      <button class="btn btn-approve" onclick="sfRecordPayment()">Record Payment</button>
-    </div>
-    <p class="form-hint" id="sf-pay-msg"></p>
-  </div>
 
-  <p class="section-title" style="margin-top:28px;">Recent Payments</p>
-  <table class="contact-table">
-    <thead><tr><th>Student</th><th>School</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead>
-    <tbody id="sf-payments-tbody">
-      <tr><td colspan="6" class="empty">Select a school to view payments</td></tr>
-    </tbody>
-  </table>
-</div>
 
 <!-- ── SF Reminders ────────────────────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-sf_reminders" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Send Fee Reminders</p>
-  <div class="form-card">
-    <div class="row">
-      <select id="sf-rem-school">
-        <option value="">Select School…</option>
-      </select>
-      <label style="display:flex;align-items:center;gap:8px;color:#aaa;font-size:12px;cursor:pointer;">
-        <input type="checkbox" id="sf-rem-dryrun" checked style="width:auto;" />
-        Dry run (preview only)
-      </label>
-    </div>
-    <div class="row">
-      <button class="btn btn-approve" onclick="sfSendReminders()">Send Reminders</button>
-    </div>
-    <p class="form-hint" id="sf-rem-msg"></p>
-  </div>
 
-  <div id="sf-reminder-results" style="margin-top:20px;"></div>
-</div>
 
 <!-- ── Payment Claims ──────────────────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-sf_students" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Student Debtors</p>
-  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
-    <select id="sf-stu-school" onchange="sfLoadStudentsTable()" style="max-width:280px;">
-      <option value="">All Schools</option>
-    </select>
-    <select id="sf-stu-filter" onchange="sfLoadStudentsTable()" style="max-width:160px;">
-      <option value="">All</option>
-      <option value="unpaid">Unpaid</option>
-      <option value="paid">Paid</option>
-      <option value="claimed">Claims Pending</option>
-    </select>
-    <span style="color:#888;font-size:12px;margin-left:auto;">Click any deadline to edit it inline.</span>
-  </div>
-  <table class="table" id="sf-stu-table">
-    <thead><tr>
-      <th>Student</th><th>Parent</th><th>Phone</th><th>Fee</th><th>Paid</th><th>Balance</th><th>Deadline</th><th>Status</th>
-    </tr></thead>
-    <tbody id="sf-stu-tbody">
-      <tr><td colspan="8" class="empty">Select a school to view students.</td></tr>
-    </tbody>
-  </table>
-</div>
 
-<div class="tab-panel" id="tab-sf_claims" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Payment Claims — Awaiting Confirmation</p>
-  <p style="color:#888;font-size:12px;margin-bottom:16px;">Parents who replied "I paid" — confirm once you see their receipt/transfer, or reject to resume reminders.</p>
-  <div style="margin-bottom:12px;">
-    <select id="sf-claims-school" onchange="sfLoadClaims()" style="max-width:280px;">
-      <option value="">All Schools</option>
-    </select>
-  </div>
-  <table class="table" id="sf-claims-table">
-    <thead><tr>
-      <th>Student</th><th>Parent</th><th>Phone</th><th>Balance</th><th>Claimed At</th><th>Action</th>
-    </tr></thead>
-    <tbody id="sf-claims-tbody">
-      <tr><td colspan="6" class="empty">Loading…</td></tr>
-    </tbody>
-  </table>
-</div>
+
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <!-- DIGITAL ASSOCIATES PANELS                                                -->
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 
 <!-- ── DA Overview ─────────────────────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-da_overview" style="display:none;">
-  <div class="summary-bar">
-    <div class="stat-card blue" style="border-top-color:#a78bfa;">
-      <div class="label">Total Reviews</div>
-      <div class="value" id="da-stat-total" style="color:#a78bfa;">—</div>
-    </div>
-    <div class="stat-card fire">
-      <div class="label">High / Critical</div>
-      <div class="value" id="da-stat-risky">—</div>
-    </div>
-    <div class="stat-card green">
-      <div class="label">This Week</div>
-      <div class="value" id="da-stat-week">—</div>
-    </div>
-    <div class="stat-card amber">
-      <div class="label">Firms Served</div>
-      <div class="value" id="da-stat-firms">—</div>
-    </div>
-  </div>
 
-  <p class="section-title" style="margin-top:28px;">Recent Reviews</p>
-  <table class="table" id="da-recent-table">
-    <thead><tr>
-      <th>Firm</th><th>Document</th><th>Risk</th><th>Date</th><th></th>
-    </tr></thead>
-    <tbody id="da-recent-tbody">
-      <tr><td colspan="5" class="empty">Loading…</td></tr>
-    </tbody>
-  </table>
-
-  <p class="section-title" style="margin-top:28px;">Quick Actions</p>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;">
-    <button class="btn btn-approve" style="background:#a78bfa;border-color:#a78bfa;" onclick="daSwitchTab('da_upload')">+ Upload Contract</button>
-    <button class="btn btn-approve" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;" onclick="daSwitchTab('da_reviews')">View All Reviews</button>
-    <a href="/legal/portal" target="_blank" class="btn btn-approve" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;text-decoration:none;display:inline-flex;align-items:center;">↗ Public Portal</a>
-  </div>
-</div>
 
 <!-- ── DA Reviews ───────────────────────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-da_reviews" style="display:none;">
-  <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
-    <input id="da-filter-firm" placeholder="Filter by firm name…"
-      style="background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:9px 14px;color:#e8e8e8;font-size:13px;font-family:inherit;width:260px;outline:none;"
-      oninput="daLoadReviews()" />
-    <button class="btn btn-approve" style="background:#a78bfa;border-color:#a78bfa;" onclick="daSwitchTab('da_upload')">+ New Review</button>
-  </div>
 
-  <table class="table" id="da-reviews-table">
-    <thead><tr>
-      <th>Firm</th><th>Document</th><th>Risk</th><th>Red Flags</th><th>Date</th><th></th>
-    </tr></thead>
-    <tbody id="da-reviews-tbody">
-      <tr><td colspan="6" class="empty">Loading…</td></tr>
-    </tbody>
-  </table>
-
-  <!-- Memo drawer -->
-  <div id="da-memo-drawer" style="display:none;margin-top:24px;background:#0e1218;border:1px solid #2a2a3a;border-radius:12px;padding:24px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <span style="font-size:13px;font-weight:600;color:#a78bfa;letter-spacing:0.5px;">REVIEW MEMO</span>
-      <div style="display:flex;gap:8px;">
-        <button onclick="daCopyMemo()" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;">📋 Copy</button>
-        <button onclick="daDownloadMemo()" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;">⬇ Download</button>
-        <button onclick="document.getElementById('da-memo-drawer').style.display='none'" style="background:none;border:none;color:#555;cursor:pointer;font-size:16px;padding:0 4px;">✕</button>
-      </div>
-    </div>
-    <pre id="da-memo-content" style="white-space:pre-wrap;font-family:'Georgia',serif;font-size:13px;line-height:1.8;color:#d0d8e8;max-height:520px;overflow-y:auto;"></pre>
-  </div>
-</div>
 
 <!-- ── DA Upload ─────────────────────────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-da_upload" style="display:none;">
-  <div style="max-width:640px;">
-    <p class="section-title" style="margin-top:0;">Upload Contract PDF</p>
 
-    <div class="form-card" style="background:#0e1218;border:1px solid #1e2530;border-radius:12px;padding:28px;">
-      <div style="margin-bottom:16px;">
-        <label style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:6px;">Firm Name</label>
-        <input id="da-upload-firm" placeholder="e.g. Banwo & Ighodalo" style="width:100%;background:#0a0c10;border:1px solid #1e2530;border-radius:8px;padding:10px 14px;color:#e8e8e8;font-size:14px;font-family:inherit;outline:none;" />
-      </div>
-
-      <div style="margin-bottom:20px;">
-        <label style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:6px;">Contract PDF</label>
-        <div id="da-drop-area"
-          style="border:2px dashed #2a3a4a;border-radius:10px;padding:36px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:#080c10;"
-          onclick="document.getElementById('da-file-input').click()"
-          ondragover="event.preventDefault();this.style.borderColor='#a78bfa';this.style.background='#130d1a';"
-          ondragleave="this.style.borderColor='#2a3a4a';this.style.background='#080c10';"
-          ondrop="daHandleDrop(event)">
-          <div style="font-size:32px;margin-bottom:10px;">📄</div>
-          <div style="font-size:14px;color:#6080a0;"><strong style="color:#a0b0c0;">Click to upload</strong> or drag and drop</div>
-          <div style="font-size:11px;color:#3a4a5a;margin-top:4px;">PDF only · Max 20MB</div>
-          <div id="da-file-name" style="display:none;font-size:13px;color:#a78bfa;font-weight:600;margin-top:8px;"></div>
-        </div>
-        <input type="file" id="da-file-input" accept=".pdf" style="display:none;" onchange="daHandleFileSelect(this)" />
-      </div>
-
-      <button id="da-submit-btn" class="btn btn-approve" style="width:100%;background:#a78bfa;border-color:#a78bfa;padding:13px;font-size:14px;" onclick="daSubmitUpload()" disabled>
-        Review Contract →
-      </button>
-
-      <div id="da-upload-progress" style="display:none;text-align:center;padding:20px 0;">
-        <div style="width:36px;height:36px;border:3px solid #1e2530;border-top-color:#a78bfa;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
-        <div id="da-progress-text" style="font-size:13px;color:#6080a0;">Extracting clauses…</div>
-      </div>
-
-      <div id="da-upload-error" style="display:none;background:#1a0808;border:1px solid #3a1010;border-radius:8px;padding:12px 16px;color:#ff6b6b;font-size:13px;margin-top:12px;"></div>
-    </div>
-
-    <!-- Upload result -->
-    <div id="da-upload-result" style="display:none;margin-top:20px;">
-      <div id="da-result-banner" style="border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
-        <span id="da-result-emoji" style="font-size:22px;"></span>
-        <div>
-          <div id="da-result-label" style="font-size:14px;font-weight:600;"></div>
-          <div id="da-result-summary" style="font-size:12px;color:#888;margin-top:2px;"></div>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-        <div style="flex:1;background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:12px 16px;min-width:100px;text-align:center;">
-          <div id="da-r-clauses" style="font-size:22px;font-weight:700;color:#a78bfa;">—</div>
-          <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Clauses</div>
-        </div>
-        <div style="flex:1;background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:12px 16px;min-width:100px;text-align:center;">
-          <div id="da-r-flags" style="font-size:22px;font-weight:700;color:#ff5c00;">—</div>
-          <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Red Flags</div>
-        </div>
-        <div style="flex:1;background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:12px 16px;min-width:100px;text-align:center;">
-          <div style="font-size:22px;font-weight:700;color:#00e5a0;">&lt;60s</div>
-          <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Review Time</div>
-        </div>
-      </div>
-      <p style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Review Memo</p>
-      <pre id="da-result-memo" style="background:#0a0c10;border:1px solid #1e2530;border-radius:10px;padding:20px;white-space:pre-wrap;font-family:'Georgia',serif;font-size:13px;line-height:1.8;color:#c8d8e8;max-height:480px;overflow-y:auto;"></pre>
-      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-        <button onclick="daCopyUploadMemo()" style="flex:1;background:#1a1a2a;color:#c0c8e8;border:1px solid #2a2a4a;border-radius:8px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📋 Copy Memo</button>
-        <button onclick="daDownloadUploadMemo()" style="flex:1;background:#1a1a2a;color:#c0c8e8;border:1px solid #2a2a4a;border-radius:8px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">⬇ Download .txt</button>
-        <button onclick="daResetUpload()" style="flex:1;background:#1a1a2a;color:#c0c8e8;border:1px solid #2a2a4a;border-radius:8px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">← New Upload</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ── AI Loan Officer: Application Queue ─────────────────────────────────── -->
-<div class="tab-panel" id="tab-lo_queue" style="display:none;">
-  <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
-    <select id="lo-filter-decision"
-      style="background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:9px 14px;color:#e8e8e8;font-size:13px;font-family:inherit;outline:none;"
-      onchange="loLoadQueue()">
-      <option value="">All Decisions</option>
-      <option value="Approve">Approve</option>
-      <option value="Refer">Refer</option>
-      <option value="Decline">Decline</option>
-    </select>
-    <select id="lo-filter-status"
-      style="background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:9px 14px;color:#e8e8e8;font-size:13px;font-family:inherit;outline:none;"
-      onchange="loLoadQueue()">
-      <option value="">All Statuses</option>
-      <option value="approved">Approved</option>
-      <option value="pending_review">Pending Review</option>
-      <option value="declined">Declined</option>
-      <option value="disbursed">Disbursed</option>
-    </select>
-    <button class="btn btn-approve" style="background:#16a34a;border-color:#16a34a;" onclick="window.open('/loan/portal','_blank')">+ New Application</button>
-    <a href="/loan/portal" target="_blank" class="btn btn-approve" style="background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;text-decoration:none;display:inline-flex;align-items:center;">↗ Applicant Portal</a>
-  </div>
 
-  <!-- Stats strip -->
-  <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;" id="lo-stats-strip">
-    <div style="flex:1;min-width:100px;background:#0e1218;border:1px solid #1e2530;border-radius:8px;padding:12px 16px;text-align:center;">
-      <div id="lo-count-total" style="font-size:22px;font-weight:700;color:#e8e8e8;">—</div>
-      <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Total</div>
-    </div>
-    <div style="flex:1;min-width:100px;background:#0e1218;border:1px solid #16a34a33;border-radius:8px;padding:12px 16px;text-align:center;">
-      <div id="lo-count-approve" style="font-size:22px;font-weight:700;color:#16a34a;">—</div>
-      <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Approve</div>
-    </div>
-    <div style="flex:1;min-width:100px;background:#0e1218;border:1px solid #d9770633;border-radius:8px;padding:12px 16px;text-align:center;">
-      <div id="lo-count-refer" style="font-size:22px;font-weight:700;color:#d97706;">—</div>
-      <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Refer</div>
-    </div>
-    <div style="flex:1;min-width:100px;background:#0e1218;border:1px solid #dc262633;border-radius:8px;padding:12px 16px;text-align:center;">
-      <div id="lo-count-decline" style="font-size:22px;font-weight:700;color:#dc2626;">—</div>
-      <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Decline</div>
-    </div>
-    <div style="flex:1;min-width:100px;background:#0e1218;border:1px solid #2563eb33;border-radius:8px;padding:12px 16px;text-align:center;">
-      <div id="lo-count-pending" style="font-size:22px;font-weight:700;color:#2563eb;">—</div>
-      <div style="font-size:10px;color:#5080a0;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;">Pending Review</div>
-    </div>
-  </div>
-
-  <table class="table" id="lo-queue-table">
-    <thead>
-      <tr>
-        <th>Applicant</th><th>Amount</th><th>Band</th><th>Decision</th><th>DTI</th><th>Status</th><th>Date</th><th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="lo-queue-body">
-      <tr><td colspan="8" style="text-align:center;color:#333;padding:24px;">Loading…</td></tr>
-    </tbody>
-  </table>
-
-  <!-- Override modal -->
-  <div id="lo-override-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;">
-    <div style="background:#0e1218;border:1px solid #1e2530;border-radius:12px;padding:28px;width:420px;max-width:90vw;">
-      <div style="font-size:15px;font-weight:600;color:#e8e8e8;margin-bottom:16px;">Officer Override</div>
-      <input type="hidden" id="lo-override-id">
-      <div style="margin-bottom:12px;">
-        <label style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">New Decision</label>
-        <select id="lo-override-decision" style="width:100%;background:#080c10;border:1px solid #1e2530;border-radius:8px;padding:10px 14px;color:#e8e8e8;font-size:14px;font-family:inherit;outline:none;">
-          <option value="Approve">Approve</option>
-          <option value="Refer">Refer</option>
-          <option value="Decline">Decline</option>
-        </select>
-      </div>
-      <div style="margin-bottom:12px;">
-        <label style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">Officer Name</label>
-        <input id="lo-override-officer" placeholder="Your name" style="width:100%;background:#080c10;border:1px solid #1e2530;border-radius:8px;padding:10px 14px;color:#e8e8e8;font-size:14px;font-family:inherit;outline:none;">
-      </div>
-      <div style="margin-bottom:20px;">
-        <label style="font-size:11px;color:#5080a0;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">Reason for Override</label>
-        <textarea id="lo-override-reason" rows="3" style="width:100%;background:#080c10;border:1px solid #1e2530;border-radius:8px;padding:10px 14px;color:#e8e8e8;font-size:14px;font-family:inherit;outline:none;resize:vertical;"></textarea>
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="loSubmitOverride()" style="flex:1;background:#16a34a;color:white;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Confirm Override</button>
-        <button onclick="document.getElementById('lo-override-modal').style.display='none'" style="flex:1;background:#1a1a1a;color:#888;border:1px solid #2a2a2a;border-radius:8px;padding:11px;font-size:14px;cursor:pointer;font-family:inherit;">Cancel</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ── AI Loan Officer: Stats ──────────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-lo_stats" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Loan Officer Stats</p>
-  <div id="lo-stats-body" style="color:#5080a0;font-size:13px;">Loading…</div>
-</div>
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      DEBT COLLECTOR PANELS
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-dc_overview" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Debt Recovery Overview</p>
-  <div id="dc-kpi-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="dc-kpi-active">—</div><div class="ct-kpi-lbl">Active Cases</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="dc-kpi-overdue" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Total Overdue (₦)</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="dc-kpi-legal" style="color:#f59e0b;">—</div><div class="ct-kpi-lbl">At Legal Stage</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="dc-kpi-recovered" style="color:#16a34a;">—</div><div class="ct-kpi-lbl">Recovered This Month</div></div>
-  </div>
-  <div id="dc-overview-body" style="color:#555;font-size:13px;">Loading…</div>
-</div>
 
-<div class="tab-panel" id="tab-dc_cases" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Active Debt Cases</p>
-  <div style="overflow-x:auto;"><table class="data-table" id="dc-cases-table">
-    <thead><tr><th>Debtor</th><th>Business</th><th>Amount (₦)</th><th>Days Overdue</th><th>Stage</th><th>Actions</th></tr></thead>
-    <tbody id="dc-cases-body"><tr><td colspan="6" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
-  </table></div>
-</div>
 
-<div class="tab-panel" id="tab-dc_add" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Add Debt Case</p>
-  <div style="max-width:520px;">
-    <div style="display:grid;gap:12px;">
-      <input class="form-input" id="dc-add-client" placeholder="Your business name (creditor)">
-      <input class="form-input" id="dc-add-debtor-name" placeholder="Debtor name">
-      <input class="form-input" id="dc-add-debtor-biz" placeholder="Debtor business">
-      <input class="form-input" id="dc-add-debtor-phone" placeholder="Debtor WhatsApp number (+234...)">
-      <input class="form-input" id="dc-add-amount" type="number" placeholder="Amount owed (₦)">
-      <input class="form-input" id="dc-add-desc" placeholder="What the debt is for (e.g. Jan 2026 supply invoice)">
-      <input class="form-input" id="dc-add-due-date" type="date" placeholder="Original due date">
-      <textarea class="form-input" id="dc-add-context" rows="2" placeholder="Relationship context (optional — e.g. 'regular supplier for 2 years')"></textarea>
-      <button class="btn btn-approve" onclick="dcAddCase()">Add Case & Start Recovery</button>
-      <div id="dc-add-result" style="font-size:12px;color:#555;"></div>
-    </div>
-  </div>
-</div>
+
+
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      FX LOCK PANELS
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-fxl_monitor" style="display:none;">
-  <p class="section-title" style="margin-top:0;">FX Rate Monitor</p>
-  <div id="fxl-kpi-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxl-kpi-rate" style="color:#f59e0b;">—</div><div class="ct-kpi-lbl">USD/NGN (Parallel)</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxl-kpi-change">—</div><div class="ct-kpi-lbl">24h Change (%)</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxl-kpi-locked" style="color:#16a34a;">—</div><div class="ct-kpi-lbl">Quotes Locked Today</div></div>
-  </div>
-  <div id="fxl-rate-history" style="color:#555;font-size:13px;">Loading rate history…</div>
-</div>
 
-<div class="tab-panel" id="tab-fxl_quotes" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Protected Quotes</p>
-  <p style="color:#555;font-size:12px;margin-bottom:12px;">Quotes locked at a specific exchange rate. System alerts you if the rate moves beyond your threshold before the quote expires.</p>
-  <div style="display:grid;gap:12px;max-width:520px;margin-bottom:20px;">
-    <input class="form-input" id="fxl-client-name" placeholder="Your business name">
-    <input class="form-input" id="fxl-quote-desc" placeholder="Quote description (e.g. March equipment order)">
-    <input class="form-input" id="fxl-quote-usd" type="number" placeholder="Quote value in USD">
-    <input class="form-input" id="fxl-threshold" type="number" placeholder="Alert if rate moves by (%) e.g. 3">
-    <input class="form-input" id="fxl-expiry" type="date" placeholder="Quote expiry date">
-    <button class="btn btn-approve" onclick="fxlLockQuote()">Lock This Quote</button>
-    <div id="fxl-lock-result" style="font-size:12px;color:#555;"></div>
-  </div>
-  <div style="overflow-x:auto;"><table class="data-table" id="fxl-quotes-table">
-    <thead><tr><th>Description</th><th>USD Value</th><th>Locked Rate</th><th>NGN Value</th><th>Expiry</th><th>Status</th></tr></thead>
-    <tbody id="fxl-quotes-body"><tr><td colspan="6" style="color:#444;text-align:center;">No locked quotes yet</td></tr></tbody>
-  </table></div>
-</div>
 
-<div class="tab-panel" id="tab-fxl_settings" style="display:none;">
-  <p class="section-title" style="margin-top:0;">FX Alert Settings</p>
-  <div style="max-width:400px;display:grid;gap:12px;">
-    <input class="form-input" id="fxl-settings-client" placeholder="Business name">
-    <input class="form-input" id="fxl-settings-phone" placeholder="WhatsApp number for alerts (+234...)">
-    <input class="form-input" id="fxl-settings-threshold" type="number" placeholder="Alert threshold (%) — e.g. 3 = alert when rate moves 3%">
-    <button class="btn btn-approve" onclick="fxlSaveSettings()">Save Settings</button>
-    <div id="fxl-settings-result" style="font-size:12px;color:#555;"></div>
-  </div>
-</div>
+
+
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      HR SUITE PANELS
@@ -4730,41 +4232,11 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 </div>
 
 <!-- SALARY EROSION PANELS (old - kept for backward compat IDs) -->
-<div class="tab-panel" id="tab-se_dashboard" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Salary Erosion Tracker</p>
-  <p style="color:#555;font-size:12px;margin-bottom:16px;">Shows real purchasing power of each staff salary vs. the month they were hired, adjusted for Nigeria CPI inflation.</p>
-  <div id="se-kpi-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="se-kpi-staff">—</div><div class="ct-kpi-lbl">Staff Tracked</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="se-kpi-avg-erosion" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Avg Real Value Lost (%)</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="se-kpi-at-risk" style="color:#f59e0b;">—</div><div class="ct-kpi-lbl">Staff at Churn Risk</div></div>
-  </div>
-  <div style="overflow-x:auto;"><table class="data-table" id="se-staff-table">
-    <thead><tr><th>Name</th><th>Role</th><th>Hired</th><th>Salary (₦)</th><th>Real Value Today</th><th>Erosion %</th><th>Risk</th></tr></thead>
-    <tbody id="se-staff-body"><tr><td colspan="7" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
-  </table></div>
-</div>
 
-<div class="tab-panel" id="tab-se_staff" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Add Staff Member</p>
-  <div style="max-width:520px;display:grid;gap:12px;">
-    <input class="form-input" id="se-company" placeholder="Company name">
-    <input class="form-input" id="se-staff-name" placeholder="Staff name">
-    <input class="form-input" id="se-staff-role" placeholder="Role / job title">
-    <input class="form-input" id="se-staff-salary" type="number" placeholder="Current monthly salary (₦)">
-    <input class="form-input" id="se-staff-hired" type="date" placeholder="Date hired">
-    <button class="btn btn-approve" onclick="seAddStaff()">Add Staff</button>
-    <div id="se-staff-result" style="font-size:12px;color:#555;"></div>
-  </div>
-</div>
 
-<div class="tab-panel" id="tab-se_report" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Monthly Erosion Report</p>
-  <div style="max-width:400px;display:grid;gap:12px;">
-    <input class="form-input" id="se-report-company" placeholder="Company name">
-    <button class="btn btn-approve" onclick="seGenerateReport()">Generate Report</button>
-  </div>
-  <div id="se-report-output" style="margin-top:16px;font-size:13px;color:#aaa;white-space:pre-wrap;"></div>
-</div>
+
+
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      ESTATEOS PANELS
@@ -5116,318 +4588,74 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 <!-- ══════════════════════════════════════════════════════════════════════════
      MARKET CREDIT PANELS
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-mc_queue" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Market Trader Credit Queue</p>
-  <div style="overflow-x:auto;"><table class="data-table" id="mc-queue-table">
-    <thead><tr><th>Trader Name</th><th>Market</th><th>Requested (₦)</th><th>Score</th><th>Decision</th><th>MFB</th><th>Date</th></tr></thead>
-    <tbody id="mc-queue-body"><tr><td colspan="7" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
-  </table></div>
-</div>
 
-<div class="tab-panel" id="tab-mc_profiles" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Scored Trader Profiles</p>
-  <div id="mc-profiles-body" style="color:#555;font-size:13px;">Loading…</div>
-</div>
 
-<div class="tab-panel" id="tab-mc_submit" style="display:none;">
-  <p class="section-title" style="margin-top:0;">New Market Trader Application</p>
-  <div style="max-width:520px;display:grid;gap:12px;">
-    <input class="form-input" id="mc-mfb" placeholder="MFB / Lender name">
-    <input class="form-input" id="mc-trader-name" placeholder="Trader name">
-    <input class="form-input" id="mc-market" placeholder="Market (e.g. Balogun, Alaba, Mile 12)">
-    <input class="form-input" id="mc-goods" placeholder="Type of goods sold">
-    <input class="form-input" id="mc-years" type="number" placeholder="Years trading at this market">
-    <input class="form-input" id="mc-daily-sales" type="number" placeholder="Estimated daily sales (₦)">
-    <input class="form-input" id="mc-assoc" placeholder="Market association membership (yes/no + name)">
-    <input class="form-input" id="mc-phone" placeholder="Trader WhatsApp (+234...)">
-    <input class="form-input" id="mc-loan-amount" type="number" placeholder="Loan amount requested (₦)">
-    <textarea class="form-input" id="mc-references" rows="2" placeholder="Peer references (names of 2 traders who can vouch)"></textarea>
-    <button class="btn btn-approve" onclick="mcSubmitApplication()">Score This Trader</button>
-    <div id="mc-submit-result" style="font-size:12px;color:#555;"></div>
-  </div>
-</div>
+
+
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      MOONLIGHTING PANELS
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-ml_overview" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Moonlighting Detector</p>
-  <div id="ml-kpi-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="ml-kpi-staff">—</div><div class="ct-kpi-lbl">Staff Monitored</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="ml-kpi-flagged" style="color:#d97706;">—</div><div class="ct-kpi-lbl">Flagged This Month</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="ml-kpi-confirmed" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Confirmed Cases</div></div>
-  </div>
-  <div id="ml-overview-body" style="color:#555;font-size:13px;">Loading…</div>
-</div>
 
-<div class="tab-panel" id="tab-ml_staff" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Staff Attendance Patterns</p>
-  <div style="margin-bottom:16px;display:grid;gap:10px;max-width:480px;">
-    <input class="form-input" id="ml-company" placeholder="Company name">
-    <input class="form-input" id="ml-staff-name" placeholder="Staff name">
-    <input class="form-input" id="ml-staff-role" placeholder="Role">
-    <textarea class="form-input" id="ml-attendance-log" rows="4" placeholder="Paste attendance log (date, time-in, time-out, output/tasks completed — one per line)"></textarea>
-    <button class="btn btn-approve" onclick="mlAnalyseStaff()">Analyse Patterns</button>
-    <div id="ml-staff-result" style="font-size:12px;color:#555;white-space:pre-wrap;"></div>
-  </div>
-</div>
 
-<div class="tab-panel" id="tab-ml_alerts" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Moonlighting Alerts</p>
-  <div style="overflow-x:auto;"><table class="data-table" id="ml-alerts-table">
-    <thead><tr><th>Staff Name</th><th>Company</th><th>Signal</th><th>Confidence</th><th>Flagged</th><th>Status</th></tr></thead>
-    <tbody id="ml-alerts-body"><tr><td colspan="6" style="color:#444;text-align:center;">No alerts yet</td></tr></tbody>
-  </table></div>
-</div>
+
+
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      PRODUCT AUTH PANELS
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-pa_scan" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Product Authentication Scan</p>
-  <p style="color:#555;font-size:12px;margin-bottom:16px;">Describe a product in detail — NAFDAC number, packaging markers, hologram — and the AI will cross-check against known authenticity indicators to assess whether it's genuine or counterfeit.</p>
-  <div style="max-width:520px;display:grid;gap:12px;">
-    <input class="form-input" id="pa-business" placeholder="Your business name">
-    <input class="form-input" id="pa-product-name" placeholder="Product name (e.g. Paracetamol 500mg, Samsung Galaxy S24)">
-    <input class="form-input" id="pa-brand" placeholder="Brand / manufacturer">
-    <input class="form-input" id="pa-nafdac" placeholder="NAFDAC number on pack (if applicable)">
-    <input class="form-input" id="pa-batch" placeholder="Batch number">
-    <input class="form-input" id="pa-supplier" placeholder="Supplier name / location">
-    <textarea class="form-input" id="pa-description" rows="3" placeholder="Describe the packaging: colours, font, seal, hologram, smell, texture — anything unusual compared to known genuine product"></textarea>
-    <button class="btn btn-approve" onclick="paRunScan()">Run Authentication Check</button>
-    <div id="pa-scan-result" style="font-size:13px;color:#aaa;white-space:pre-wrap;margin-top:8px;"></div>
-  </div>
-</div>
 
-<div class="tab-panel" id="tab-pa_history" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Scan History</p>
-  <div style="overflow-x:auto;"><table class="data-table" id="pa-history-table">
-    <thead><tr><th>Product</th><th>Brand</th><th>Supplier</th><th>Result</th><th>Confidence</th><th>Date</th></tr></thead>
-    <tbody id="pa-history-body"><tr><td colspan="6" style="color:#444;text-align:center;">No scans yet</td></tr></tbody>
-  </table></div>
-</div>
 
-<div class="tab-panel" id="tab-pa_flagged" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Flagged Products</p>
-  <div id="pa-flagged-body" style="color:#555;font-size:13px;">Loading flagged products…</div>
-</div>
+
+
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      MATERIAL CHECK PANELS
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-mch_submit" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Construction Material Check</p>
-  <p style="color:#555;font-size:12px;margin-bottom:16px;">Submit a material batch for adulteration analysis. AI compares stated specs against typical adulteration patterns for that material type in Nigeria.</p>
-  <div style="max-width:520px;display:grid;gap:12px;">
-    <input class="form-input" id="mch-company" placeholder="Construction company / contractor">
-    <input class="form-input" id="mch-material" placeholder="Material type (e.g. Dangote Cement, 12mm iron rod, Dulux paint)">
-    <input class="form-input" id="mch-supplier" placeholder="Supplier name + location">
-    <input class="form-input" id="mch-quantity" placeholder="Quantity delivered (e.g. 500 bags, 5 tonnes)">
-    <input class="form-input" id="mch-price" type="number" placeholder="Price paid per unit (₦)">
-    <textarea class="form-input" id="mch-observations" rows="3" placeholder="Your observations: weight, colour, texture, consistency, any abnormalities compared to previous batches"></textarea>
-    <textarea class="form-input" id="mch-spec" rows="2" placeholder="Stated specifications from supplier (e.g. 42.5N grade, 500MPa yield strength)"></textarea>
-    <button class="btn btn-approve" onclick="mchSubmitCheck()">Run Material Check</button>
-    <div id="mch-submit-result" style="font-size:13px;color:#aaa;white-space:pre-wrap;margin-top:8px;"></div>
-  </div>
-</div>
 
-<div class="tab-panel" id="tab-mch_results" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Material Check Results</p>
-  <div style="overflow-x:auto;"><table class="data-table" id="mch-results-table">
-    <thead><tr><th>Material</th><th>Supplier</th><th>Verdict</th><th>Risk Level</th><th>Date</th><th>Actions</th></tr></thead>
-    <tbody id="mch-results-body"><tr><td colspan="6" style="color:#444;text-align:center;">No checks yet</td></tr></tbody>
-  </table></div>
-</div>
 
-<div class="tab-panel" id="tab-mch_blacklist" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Supplier Blacklist</p>
-  <div id="mch-blacklist-body" style="color:#555;font-size:13px;">Loading supplier blacklist…</div>
-</div>
+
+
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      FX SALARY PANELS
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-fxs_dashboard" style="display:none;">
-  <p class="section-title" style="margin-top:0;">FX Salary Parity Dashboard</p>
-  <p style="color:#555;font-size:12px;margin-bottom:16px;">For companies paying dollar-benchmarked salaries in naira. Shows each staff member's current naira equivalent at parallel market rate.</p>
-  <div id="fxs-kpi-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxs-kpi-rate" style="color:#06b6d4;">—</div><div class="ct-kpi-lbl">USD/NGN Today</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxs-kpi-total-usd">—</div><div class="ct-kpi-lbl">Total Payroll (USD)</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fxs-kpi-total-ngn">—</div><div class="ct-kpi-lbl">Total Payroll (NGN)</div></div>
-  </div>
-  <div style="overflow-x:auto;"><table class="data-table" id="fxs-staff-table">
-    <thead><tr><th>Name</th><th>Role</th><th>Salary (USD)</th><th>This Month (NGN)</th><th>Last Month (NGN)</th><th>Change</th></tr></thead>
-    <tbody id="fxs-staff-body"><tr><td colspan="6" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
-  </table></div>
-</div>
 
-<div class="tab-panel" id="tab-fxs_staff" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Add Staff (USD Salary)</p>
-  <div style="max-width:480px;display:grid;gap:12px;">
-    <input class="form-input" id="fxs-company" placeholder="Company name">
-    <input class="form-input" id="fxs-name" placeholder="Staff name">
-    <input class="form-input" id="fxs-role" placeholder="Role / job title">
-    <input class="form-input" id="fxs-salary-usd" type="number" placeholder="Monthly salary in USD">
-    <input class="form-input" id="fxs-phone" placeholder="WhatsApp for payslip (+234...)">
-    <button class="btn btn-approve" onclick="fxsAddStaff()">Add Staff Member</button>
-    <div id="fxs-staff-result" style="font-size:12px;color:#555;"></div>
-  </div>
-</div>
 
-<div class="tab-panel" id="tab-fxs_history" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Rate History</p>
-  <div id="fxs-history-body" style="color:#555;font-size:13px;">Loading rate history…</div>
-</div>
+
+
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      FUEL REPRICE PANELS
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-fr_routes" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Route Profitability</p>
-  <div id="fr-kpi-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fr-kpi-pump" style="color:#84cc16;">—</div><div class="ct-kpi-lbl">Pump Price (₦/litre)</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fr-kpi-loss-routes" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Loss-Making Routes</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fr-kpi-repriced">—</div><div class="ct-kpi-lbl">Letters Generated</div></div>
-  </div>
-  <div style="overflow-x:auto;"><table class="data-table" id="fr-routes-table">
-    <thead><tr><th>Route</th><th>Client</th><th>Agreed Rate (₦)</th><th>Cost at Current Fuel</th><th>Margin</th><th>Status</th></tr></thead>
-    <tbody id="fr-routes-body"><tr><td colspan="6" style="color:#444;text-align:center;">Loading routes…</td></tr></tbody>
-  </table></div>
-</div>
 
-<div class="tab-panel" id="tab-fr_alerts" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Add Route</p>
-  <div style="max-width:520px;display:grid;gap:12px;">
-    <input class="form-input" id="fr-company" placeholder="Logistics company name">
-    <input class="form-input" id="fr-route-name" placeholder="Route (e.g. Lagos–Abuja)">
-    <input class="form-input" id="fr-client-name" placeholder="Client name">
-    <input class="form-input" id="fr-agreed-rate" type="number" placeholder="Agreed rate per trip (₦)">
-    <input class="form-input" id="fr-distance-km" type="number" placeholder="Distance (km)">
-    <input class="form-input" id="fr-fuel-consumption" type="number" placeholder="Litres per 100km">
-    <input class="form-input" id="fr-contract-date" type="date" placeholder="Contract signed date">
-    <input class="form-input" id="fr-fuel-price-at-signing" type="number" placeholder="Fuel price at contract signing (₦/litre)">
-    <button class="btn btn-approve" onclick="frAddRoute()">Add Route</button>
-    <div id="fr-alerts-result" style="font-size:12px;color:#555;"></div>
-  </div>
-</div>
 
-<div class="tab-panel" id="tab-fr_letters" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Repricing Letters</p>
-  <div id="fr-letters-body" style="color:#555;font-size:13px;">Select a loss-making route from the Routes tab to generate a repricing letter for that client.</div>
-</div>
+
+
+
 
 <!-- ══════════════════════════════════════════════════════════════════════════
      FLOAT OPTIMIZER PANELS
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="tab-fo_dashboard" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Float Optimizer Dashboard</p>
-  <p style="color:#555;font-size:12px;margin-bottom:16px;">OPay/PalmPay/Moniepoint agent float management. Tracks utilization per agent and recommends optimal float levels to prevent liquidity shortfalls.</p>
-  <div id="fo-kpi-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fo-kpi-agents">—</div><div class="ct-kpi-lbl">Agents Tracked</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fo-kpi-total-float" style="color:#10b981;">—</div><div class="ct-kpi-lbl">Total Float (₦)</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fo-kpi-shortfalls" style="color:#ef4444;">—</div><div class="ct-kpi-lbl">Shortfalls Today</div></div>
-    <div class="ct-kpi-box"><div class="ct-kpi-val" id="fo-kpi-utilization">—</div><div class="ct-kpi-lbl">Avg Utilization (%)</div></div>
-  </div>
-  <div style="overflow-x:auto;"><table class="data-table" id="fo-agent-table">
-    <thead><tr><th>Agent</th><th>Platform</th><th>Current Float (₦)</th><th>Recommended Float (₦)</th><th>Utilization</th><th>Risk</th></tr></thead>
-    <tbody id="fo-agent-body"><tr><td colspan="6" style="color:#444;text-align:center;">Loading…</td></tr></tbody>
-  </table></div>
-</div>
 
-<div class="tab-panel" id="tab-fo_agents" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Add Agent</p>
-  <div style="max-width:480px;display:grid;gap:12px;">
-    <input class="form-input" id="fo-aggregator" placeholder="Aggregator / Super-agent name">
-    <input class="form-input" id="fo-agent-name" placeholder="Agent name">
-    <select class="form-input" id="fo-platform">
-      <option value="">Platform</option>
-      <option value="opay">OPay</option>
-      <option value="palmpay">PalmPay</option>
-      <option value="moniepoint">Moniepoint</option>
-      <option value="gtworld">GTWorld</option>
-      <option value="other">Other</option>
-    </select>
-    <input class="form-input" id="fo-agent-phone" placeholder="Agent WhatsApp (+234...)">
-    <input class="form-input" id="fo-current-float" type="number" placeholder="Current float balance (₦)">
-    <input class="form-input" id="fo-daily-volume" type="number" placeholder="Average daily transaction volume (₦)">
-    <input class="form-input" id="fo-peak-days" placeholder="Peak days (e.g. Monday, Friday, salary days)">
-    <button class="btn btn-approve" onclick="foAddAgent()">Add Agent</button>
-    <div id="fo-agent-result" style="font-size:12px;color:#555;"></div>
-  </div>
-</div>
 
-<div class="tab-panel" id="tab-fo_recommendations" style="display:none;">
-  <p class="section-title" style="margin-top:0;">Float Recommendations</p>
-  <div id="fo-recommendations-body" style="color:#555;font-size:13px;">Loading recommendations…</div>
-</div>
+
+
+
 
 <!-- ── Fleet Dispatcher: Incidents ────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-fd_incidents" style="display:none;">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-    <p class="section-title" style="margin:0;">Active Breakdown Incidents</p>
-    <button class="btn btn-approve" style="background:#84cc16;border-color:#84cc16;font-size:12px;padding:7px 14px;" onclick="fdLoadIncidents()">Refresh</button>
-  </div>
-  <div id="fd-incidents-list" style="color:#555;font-size:13px;">Loading…</div>
-</div>
+
 
 <!-- ── Fleet Dispatcher: Log Breakdown ────────────────────────────────────── -->
-<div class="tab-panel" id="tab-fd_log" style="display:none;">
-  <div class="sop-box">
-    <div class="sop-title">Log a Breakdown — Claude analyses in under 3 seconds</div>
-    <div class="sop-body">Enter the driver's message and Claude will assess the request, recommend an approval amount, and draft the WhatsApp replies to driver and client.</div>
-  </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-    <div>
-      <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Truck Plate</label>
-      <input id="fd-plate" placeholder="e.g. LAG-432-GH" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:9px;font-size:13px;">
-    </div>
-    <div>
-      <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Driver Name</label>
-      <input id="fd-driver" placeholder="e.g. Emeka" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:9px;font-size:13px;">
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-    <div>
-      <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Location</label>
-      <input id="fd-location" placeholder="e.g. Sagamu, Ogun State" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:9px;font-size:13px;">
-    </div>
-    <div>
-      <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Amount Requested (₦)</label>
-      <input id="fd-amount" type="number" placeholder="e.g. 50000" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:9px;font-size:13px;">
-    </div>
-  </div>
-  <div style="margin-bottom:14px;">
-    <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Driver's Message (paste from WhatsApp)</label>
-    <textarea id="fd-message" rows="4" placeholder="Oga the truck broke down in Sagamu. Engine stopped. We need ₦50k for the mechanic..." style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:9px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
-  </div>
-
-  <button id="fd-analyse-btn" class="btn btn-approve" style="background:#84cc16;border-color:#84cc16;padding:10px 24px;font-size:13px;" onclick="fdAnalyseBreakdown()">Analyse Breakdown →</button>
-
-  <div id="fd-result" style="display:none;margin-top:20px;"></div>
-</div>
 
 <!-- ── Fleet Dispatcher: Trucks ────────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-fd_trucks" style="display:none;">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-    <p class="section-title" style="margin:0;">Fleet Registry</p>
-    <button class="btn btn-approve" style="background:#84cc16;border-color:#84cc16;font-size:12px;padding:7px 14px;" onclick="fdShowAddTruck()">+ Add Truck</button>
-  </div>
-  <div id="fd-add-truck" style="display:none;background:#080d14;border:1px solid #0e1a26;border-radius:8px;padding:16px;margin-bottom:16px;">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
-      <input id="fd-t-plate" placeholder="Plate (e.g. ABJ-241-GH)" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
-      <input id="fd-t-driver" placeholder="Driver Name" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
-      <input id="fd-t-client" placeholder="Client / Route" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
-      <input id="fd-t-make" placeholder="Make (e.g. Scania)" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
-      <input id="fd-t-model" placeholder="Model" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
-      <input id="fd-t-km" type="number" placeholder="Current KM" style="background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
-    </div>
-    <button class="btn btn-approve" style="background:#84cc16;border-color:#84cc16;font-size:12px;" onclick="fdRegisterTruck()">Save Truck</button>
-  </div>
-  <div id="fd-trucks-list" style="color:#555;font-size:13px;">Loading fleet…</div>
-</div>
+
 
 <!-- ── Setup Wizard Modal ── -->
 <div class="wizard-overlay" id="wizard-overlay">
