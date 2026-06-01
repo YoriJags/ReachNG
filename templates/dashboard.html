@@ -1808,6 +1808,10 @@ function copyDemoPortalLink(btn){
     <div class="sidebar-section-item active" id="ssn-overview"  onclick="sidebarNav('overview', this)">
       <span class="ssi-left"><span class="material-symbols-outlined">dashboard</span> Command Center</span>
     </div>
+    <div class="sidebar-section-item" id="ssn-attention" onclick="sidebarNav('attention', this); loadNeedsAttention();">
+      <span class="ssi-left"><span class="material-symbols-outlined">priority_high</span> Needs Attention</span>
+      <span class="tab-badge" id="tab-badge-attention-side"></span>
+    </div>
     <div class="sidebar-section-item" id="ssn-activate"  onclick="sidebarNav('activate', this); loadActivateTab();">
       <span class="ssi-left"><span class="material-symbols-outlined">payments</span> Money Engine</span>
       <span class="tab-badge" id="tab-badge-activate-side"></span>
@@ -2009,7 +2013,7 @@ function copyDemoPortalLink(btn){
 
   <!-- Command Center — needs-attention launcher (what's broken / what do I do next) -->
   <section style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;padding:11px 14px;background:#0e1318;border:1px solid #1e2530;border-radius:10px;">
-    <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#7a8590;margin-right:4px;">Needs attention</span>
+    <button onclick="switchTabByName('attention')" style="background:transparent;color:#7a8590;border:0;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-right:4px;cursor:pointer;padding:0;">Needs attention →</button>
     <button onclick="switchTabByName('approvals')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📝 Approvals</button>
     <button onclick="switchTabByName('clients')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">👥 Clients</button>
     <button onclick="sidebarNav('tower', document.getElementById('ssn-growth'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📈 Growth</button>
@@ -2245,6 +2249,65 @@ function copyDemoPortalLink(btn){
 </div>
 
 <!-- ── Activate Tab ───────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-attention">
+  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:6px;">
+    <h2 style="font-size:18px;font-weight:700;color:#e8e8e8;margin:0;">Needs attention</h2>
+    <button onclick="loadNeedsAttention()" style="background:#15171a;color:#9aa5b1;border:1px solid #2a3340;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">↻ Refresh</button>
+  </div>
+  <p style="color:#6a7280;font-size:12px;margin:0 0 16px;">What's broken and who needs help, right now. Pending drafts older than 12h, expired WhatsApp sessions, clients below the margin floor, and failed jobs.</p>
+  <div id="na-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
+    <div style="color:#556;padding:14px;">Loading…</div>
+  </div>
+</div>
+
+<script>
+async function loadNeedsAttention() {
+  const grid = document.getElementById('na-grid');
+  const sideBadge = document.getElementById('tab-badge-attention-side');
+  if (!grid) return;
+  try {
+    const hdrs = (typeof authHeaders === 'function') ? authHeaders() : {};
+    const r = await fetch('/api/v1/admin/needs-attention', { headers: hdrs, credentials: 'include' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+
+    if (sideBadge) {
+      if (d.total > 0) { sideBadge.textContent = d.total; sideBadge.classList.add('show'); }
+      else { sideBadge.textContent = ''; sideBadge.classList.remove('show'); }
+    }
+
+    const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const card = (title, accent, count, bodyHtml) => `
+      <div style="background:#0e1318;border:1px solid #1e2530;border-left:3px solid ${accent};border-radius:10px;padding:16px 18px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px;">
+          <span style="font-size:13px;font-weight:700;color:#e8e8e8;">${title}</span>
+          <span style="font-size:20px;font-weight:800;color:${count > 0 ? accent : '#5dd28a'};">${count}</span>
+        </div>${bodyHtml}</div>`;
+    const rowsOrClear = (items, render, clearMsg) =>
+      items && items.length
+        ? items.map(render).join('')
+        : `<div style="font-size:12px;color:#5dd28a;padding:4px 0;">✓ ${clearMsg}</div>`;
+    const line = (l, r2) => `<div style="display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#9aa5b1;padding:4px 0;border-top:1px solid #161b21;"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l}</span><span style="color:#cdd6df;white-space:nowrap;">${r2}</span></div>`;
+
+    const aging = d.aging_approvals || {}, wa = d.wa_disconnected || {}, risk = d.at_risk_margin || {}, jobs = d.failed_jobs || {};
+    grid.innerHTML =
+      card('Aging approvals', '#ff8a8a', aging.count || 0,
+        rowsOrClear(aging.items, i => line(esc(i.client) + ' · ' + esc(i.contact), i.hours + 'h'), 'Queue is fresh — nothing aging.')) +
+      card('WhatsApp disconnected', '#ffb84d', wa.count || 0,
+        rowsOrClear(wa.clients, c => line(esc(c.name), 'expired'), 'All sessions connected.')) +
+      card('At-risk margin', '#ff7a7a', risk.count || 0,
+        rowsOrClear(risk.clients, c => line(esc(c.name) + (c.plan ? ' · ' + esc(c.plan) : ''), (c.margin_pct != null ? c.margin_pct + '%' : '—')), 'Every client above the margin floor.')) +
+      card('Failed jobs', '#ff6b6b', jobs.count || 0,
+        rowsOrClear(jobs.items, j => line(esc(j.event), esc(j.ts || '')), 'No recent job failures.'));
+  } catch (e) {
+    grid.innerHTML = `<div style="color:#ef4444;font-size:12px;padding:8px 0;">Could not load: ${e.message}</div>`;
+  }
+}
+// Lazy-load on dashboard render so the sidebar badge populates without opening the tab.
+if (document.readyState !== 'loading') loadNeedsAttention();
+else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
+</script>
+
 <div class="tab-panel" id="tab-activate">
 
   <!-- Cash KPI strip -->
@@ -5963,6 +6026,7 @@ function switchTab(name, btn) {
   if (btn) btn.classList.add("active");
 
   // Auto-load data for tabs that need it
+  if (name === "attention")   loadNeedsAttention();
   if (name === "activate")    loadActivateTab();
   if (name === "tower")       loadControlTower();
   if (name === "sf_students") sfLoadStudentsTable();

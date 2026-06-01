@@ -171,6 +171,12 @@ def test_sentry_scrub_redacts_pii():
     assert "2348012345678" not in out and "funke@altitude.ng" not in out
 
 
+def test_needs_attention_requires_auth(client):
+    # Admin triage feed must reject anonymous traffic.
+    r = client.get("/api/v1/admin/needs-attention")
+    assert r.status_code in (401, 403)
+
+
 def test_sentry_noop_without_dsn():
     # No SENTRY_DSN in the test env → init returns False and capture is a no-op.
     from tools.observability import init_sentry, capture_message, capture_exception

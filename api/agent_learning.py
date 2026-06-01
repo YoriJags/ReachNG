@@ -101,6 +101,14 @@ async def admin_agent_learning(client_id: str):
     return _build_payload(client, include_recent=True)
 
 
+@router.get("/admin/needs-attention", dependencies=[Depends(require_auth)])
+async def admin_needs_attention():
+    """Founder triage feed: aging approvals, WA-disconnected clients, at-risk
+    margin, failed jobs. Powers the admin 'Needs Attention' tab."""
+    from services.admin_attention import needs_attention
+    return needs_attention()
+
+
 @router.get("/admin/agent-learning", dependencies=[Depends(require_auth)])
 async def admin_agent_learning_summary():
     """Cross-client wins/misses summary for the Control Tower dashboard tab.
