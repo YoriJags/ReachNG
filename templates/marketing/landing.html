@@ -10,13 +10,13 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="hero">
   {% if prospect %}
-  <!-- Personalised arrival banner — set when the recipient tapped /hi/{slug}
+  <!-- Personalised arrival banner, set when the recipient tapped /hi/{slug}
        from a cold-outreach email. Surfaces their name + business so the
        landing feels like it was prepared for them. -->
   <div style="background: linear-gradient(90deg, #1f160a 0%, #2a1a0e 100%); border-bottom: 1px solid #ff5c00; padding: 12px 24px; text-align: center; color: #ffd2a8; font-size: 13.5px; letter-spacing: 0.2px;">
     <span style="font-size: 16px; margin-right: 6px;">👋</span>
     <strong style="color: #fff;">Hi{% if prospect.first_name %} {{ prospect.first_name }}{% endif %}{% if not prospect.first_name and prospect.business_name %} team at {{ prospect.business_name }}{% endif %}</strong>
-    <span style="color: #ffd2a8; opacity: 0.85;"> — Yori sent you this.{% if prospect.business_name %} Here's what EYO would look like for <strong style="color:#fff;">{{ prospect.business_name }}</strong>.{% endif %}</span>
+    <span style="color: #ffd2a8; opacity: 0.85;">, Yori sent you this.{% if prospect.business_name %} Here's what EYO would look like for <strong style="color:#fff;">{{ prospect.business_name }}</strong>.{% endif %}</span>
   </div>
   <script>
     // Surface to client-side scripts (Try-EYO widget, forms) so they can
@@ -30,76 +30,32 @@
     })();
   </script>
   {% endif %}
-  <!-- 'Showing for X · change industry' — bold, impossible-to-miss vertical switcher.
+  <!-- 'Showing for X · change industry', bold, impossible-to-miss vertical switcher.
        Clicking 'Change' routes to /start (cover) where the new pick sets the cookie
        and lands back on this page with refreshed scenes. -->
   <div class="vertical-strip">
-    <div class="vertical-strip-left">
-      <span class="vertical-strip-pulse"></span>
-      <span class="vertical-strip-label">You're seeing the</span>
-      <span class="vertical-strip-tag">{{ active_vertical_label|default('🍽 Restaurants &amp; venues') }}</span>
-      <span class="vertical-strip-label">version.</span>
-    </div>
-    <a href="/start" data-ph="hero_change_vertical" class="vertical-strip-change">
-      Switch industry <span class="vertical-strip-arrow">↻</span>
-    </a>
+    <span class="vertical-strip-label">Showing the</span>
+    <span class="vertical-strip-tag">{{ active_vertical_label|default('Restaurants &amp; venues') }}</span>
+    <span class="vertical-strip-label">build.</span>
+    <a href="/start" data-ph="hero_change_vertical" class="vertical-strip-change">Switch industry &rarr;</a>
   </div>
 
   <style>
+    /* Quiet, editorial industry switcher, no glow box, no pill-in-pill. */
     .vertical-strip {
-      display: flex; justify-content: center; align-items: center;
-      gap: 14px; margin: 0 auto 32px; flex-wrap: wrap;
-      max-width: 720px;
-      padding: 12px 18px;
-      background: linear-gradient(135deg, rgba(255,85,0,0.10) 0%, rgba(255,85,0,0.04) 100%);
-      border: 1.5px solid rgba(255,85,0,0.35);
-      border-radius: 14px;
-      box-shadow: 0 6px 20px rgba(255,85,0,0.10);
+      display: flex; justify-content: center; align-items: baseline;
+      gap: 7px; margin: 0 auto 30px; flex-wrap: wrap;
+      font-size: 13px;
     }
-    .vertical-strip-left {
-      display: inline-flex; align-items: center; gap: 10px;
-      font-size: 14px; color: var(--text-strong); font-weight: 600;
-    }
-    .vertical-strip-pulse {
-      width: 9px; height: 9px; border-radius: 50%;
-      background: #5dd28a; box-shadow: 0 0 12px #5dd28a;
-      animation: vsDot 1.4s ease-in-out infinite;
-    }
-    .vertical-strip-label {
-      font-size: 13px; color: var(--muted-strong); letter-spacing: 0.02em;
-    }
-    .vertical-strip-tag {
-      font-size: 14px; font-weight: 800; color: var(--orange);
-      background: #fff; padding: 4px 12px; border-radius: 100px;
-      border: 1px solid rgba(255,85,0,0.35);
-      letter-spacing: 0.01em;
-    }
+    .vertical-strip-label { color: var(--muted); }
+    .vertical-strip-tag { color: var(--text-strong); font-weight: 700; }
     .vertical-strip-change {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 13px; color: var(--text-strong); font-weight: 600;
-      text-decoration: none;
-      background: var(--orange); color: #fff;
-      padding: 8px 16px; border-radius: 100px;
-      box-shadow: 0 6px 16px rgba(255,85,0,0.30);
-      transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+      color: var(--orange); font-weight: 600; text-decoration: none;
+      margin-left: 6px; border-bottom: 1px solid transparent;
+      transition: border-color 0.15s;
     }
-    .vertical-strip-change:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.08);
-      box-shadow: 0 10px 22px rgba(255,85,0,0.42);
-    }
-    .vertical-strip-change strong { font-weight: 800; }
-    .vertical-strip-arrow { display: inline-block; transition: transform 0.4s; }
-    .vertical-strip-change:hover .vertical-strip-arrow { transform: rotate(180deg); }
-
-    @keyframes vsDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.9); } }
-    @media (prefers-reduced-motion: reduce) {
-      .vertical-strip-pulse, .vertical-strip-change, .vertical-strip-arrow { animation: none !important; transition: none !important; }
-    }
-    @media (max-width: 540px) {
-      .vertical-strip { flex-direction: column; padding: 14px 16px; gap: 12px; }
-      .vertical-strip-left { flex-wrap: wrap; justify-content: center; }
-    }
+    .vertical-strip-change:hover { border-bottom-color: var(--orange); }
+    @media (max-width: 540px) { .vertical-strip { font-size: 12.5px; } }
   </style>
   <div class="eyebrow">The WhatsApp employee for Lagos &amp; Abuja businesses</div>
   <h1>One WhatsApp employee. <em>Never sleeps.</em> Never takes a break. Replies in your voice.</h1>
@@ -139,7 +95,7 @@
         <h2 style="font-family: Georgia, 'Times New Roman', serif; font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.8px; color: #fff; margin: 0 0 14px; line-height: 1.12;">An agentic employee that runs your WhatsApp.</h2>
         <p style="font-size: 16px; line-height: 1.7; color: #d4c8b3; margin: 0 0 28px; max-width: 640px;">Reads every inbound. Drafts every reply in your voice. Parses bank screenshots. Speaks five Nigerian languages. Remembers every customer. Briefs you every morning. <strong style="color:#fff;">You only tap to approve.</strong></p>
 
-        <!-- 8 capability cards — each = icon + title + one-line proof -->
+        <!-- 8 capability cards, each = icon + title + one-line proof -->
         <div class="eyo-cap-grid">
           <div class="eyo-cap">
             <div class="eyo-cap-icon">🎤</div>
@@ -185,7 +141,7 @@
       </div>
     </div>
 
-    <!-- Capability strip — what EYO covers, no time-of-day cliche, no invented numbers -->
+    <!-- Capability strip, what EYO covers, no time-of-day cliche, no invented numbers -->
     <div class="eyo-pulse-strip">
       <div class="eyo-pulse-label">
         <span class="eyo-pulse-dot"></span>
@@ -203,7 +159,7 @@
 </section>
 
 <style>
-  /* ── Meet EYO badge — breathing glow + 4 orbiting capability pills ── */
+  /* ── Meet EYO badge, breathing glow + 4 orbiting capability pills ── */
   .eyo-orbit-wrap {
     position: relative; width: 220px; height: 220px; margin: 0 auto;
   }
@@ -314,10 +270,10 @@
 <section class="hero" style="padding-top: 0;">
   <!-- Live-looking HITL approval mock. EYO is named here visually, as a label on the orange pill, so cold visitors meet the operator instead of the name. -->
   <div style="margin-top: 56px; max-width: 920px; margin-left: auto; margin-right: auto; position: relative;">
-    <!-- Caption below the mock disclaims sample data — no top label needed. -->
+    <!-- Caption below the mock disclaims sample data, no top label needed. -->
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; text-align: left;" class="mock-grid">
 
-      {# Hero HITL mock — content driven by scene pack (cookie reachng_vertical → SCENE_PACKS). Default = hospitality. #}
+      {# Hero HITL mock, content driven by scene pack (cookie reachng_vertical → SCENE_PACKS). Default = hospitality. #}
       {% set s = scene or {} %}
       <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; box-shadow: 0 8px 24px rgba(0,0,0,0.04);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
@@ -365,7 +321,7 @@
     @media (max-width: 720px) {
       .mock-grid { grid-template-columns: 1fr !important; }
     }
-    /* ≤380px (iPhone SE) — tighten padding + font sizes so WhatsApp scene cards don't overflow */
+    /* ≤380px (iPhone SE), tighten padding + font sizes so WhatsApp scene cards don't overflow */
     @media (max-width: 380px) {
       .hero h1 { font-size: 30px !important; line-height: 1.18 !important; letter-spacing: -0.5px !important; }
       .hero .sub { font-size: 14px !important; }
@@ -380,7 +336,7 @@
   </style>
 
   <script>
-    /* Hero HITL mock — animated reveal. Fires once when scrolled into view.
+    /* Hero HITL mock, animated reveal. Fires once when scrolled into view.
        Stages: typewriter transcript → classify badge flip → typewriter draft → action buttons glow. */
     (function () {
       const mock = document.getElementById('hero-draft-card');
@@ -453,7 +409,7 @@
         }, { threshold: 0.35 });
         io.observe(mock);
       } else {
-        // No IO support — just play immediately
+        // No IO support, just play immediately
         play();
       }
     })();
@@ -472,7 +428,7 @@
         if (!r.ok) return;
         const d = await r.json();
         // Only show the social-proof line once we have meaningful volume.
-        // Showing "2 businesses on the list" actively hurts — looks pre-launch.
+        // Showing "2 businesses on the list" actively hurts, looks pre-launch.
         if (d.total && d.total >= 10) {
           document.getElementById('wl-count').textContent = d.total.toLocaleString();
           document.getElementById('wl-counter').style.display = 'block';
@@ -484,7 +440,7 @@
 
 
 <!-- ─────────────────────────────────────────────────────────────────────────
-     1.6 TRUST BAND  (claims already true elsewhere in product — say them here)
+     1.6 TRUST BAND  (claims already true elsewhere in product, say them here)
      ───────────────────────────────────────────────────────────────────── -->
 <section style="background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 22px 24px;">
   <div class="inner" style="max-width: 1040px; padding: 0;">
@@ -511,10 +467,10 @@
 
 
 <!-- ─────────────────────────────────────────────────────────────────────────
-     1.7 TRY-EYO  (live sandbox — type a customer message, see EYO draft)
+     1.7 TRY-EYO  (live sandbox, type a customer message, see EYO draft)
      ───────────────────────────────────────────────────────────────────── -->
 <section id="try" style="background: var(--bg); border-bottom: 1px solid var(--border); position: relative; overflow: hidden;">
-  <!-- Ambient orange glow under the widget — sells the "alive" feeling without a heavy image -->
+  <!-- Ambient orange glow under the widget, sells the "alive" feeling without a heavy image -->
   <div aria-hidden="true" style="position: absolute; left: 50%; top: 55%; transform: translate(-50%, -50%); width: 720px; height: 720px; background: radial-gradient(circle, rgba(255,85,0,0.10) 0%, rgba(255,85,0,0.02) 45%, transparent 70%); filter: blur(40px); pointer-events: none; animation: tryGlow 8s ease-in-out infinite;"></div>
 
   <div class="inner" style="max-width: 920px; position: relative; z-index: 1;">
@@ -545,15 +501,15 @@
       </div>
 
       <!-- Textarea -->
-      <label class="try-label" for="try-input">Your customer just messaged you — what did they say?</label>
+      <label class="try-label" for="try-input">Your customer just messaged you, what did they say?</label>
       <div class="try-input-wrap">
         <textarea id="try-input" rows="3" maxlength="600"
-                  placeholder="{{ scene.input_placeholder|default('Paste a customer WhatsApp message your business actually receives — voice, text, or screenshot caption.') }}"></textarea>
+                  placeholder="{{ scene.input_placeholder|default('Paste a customer WhatsApp message your business actually receives, voice, text, or screenshot caption.') }}"></textarea>
       </div>
 
-      <!-- Example chips — quick-fill, server-rendered from the active scene-pack -->
+      <!-- Example chips, quick-fill, server-rendered from the active scene-pack -->
       <div class="try-examples" id="try-examples">
-        {% for ex in (scene.examples if scene and scene.examples else ["Table for 6 Saturday 9pm — birthday", "Bottle service for 4, this Friday", "Brunch for 8 Sunday — any garden tables?"]) %}
+        {% for ex in (scene.examples if scene and scene.examples else ["Table for 6 Saturday 9pm, birthday", "Bottle service for 4, this Friday", "Brunch for 8 Sunday, any garden tables?"]) %}
         <button type="button" class="try-example" data-fill="{{ ex|e }}">{{ ex }}</button>
         {% endfor %}
       </div>
@@ -580,7 +536,7 @@
             <a href="/waitlist" data-ph="try_eyo_to_waitlist" class="try-mini-btn try-mini-btn-primary">Approve in real life →</a>
           </div>
           <p class="try-output-note">
-            ⚡ <strong>This is the same engine your portal uses.</strong> On day one you teach EYO your tone, prices, never-say list — drafts get sharper each week.
+            ⚡ <strong>This is the same engine your portal uses.</strong> On day one you teach EYO your tone, prices, never-say list, drafts get sharper each week.
           </p>
         </div>
       </div>
@@ -623,7 +579,7 @@
       inset 0 -1px 0 rgba(0,0,0,0.30);
   }
   .try-card::before {
-    /* Glossy top sheen — warm highlight reflecting the orange CTA */
+    /* Glossy top sheen, warm highlight reflecting the orange CTA */
     content: ''; position: absolute; inset: 0;
     border-radius: inherit; pointer-events: none;
     background: linear-gradient(135deg, rgba(255,140,80,0.12) 0%, transparent 38%);
@@ -689,7 +645,7 @@
     margin-bottom: 8px;
   }
 
-  /* Textarea — dark glass */
+  /* Textarea, dark glass */
   .try-input-wrap {
     position: relative;
     border-radius: 12px;
@@ -858,7 +814,7 @@
     const examples = document.getElementById('try-examples');
     const countEl  = document.getElementById('try-count');
 
-    /* Example chips are server-rendered — just wire click-to-fill */
+    /* Example chips are server-rendered, just wire click-to-fill */
     if (examples && input) {
       examples.querySelectorAll('.try-example').forEach(b => {
         b.addEventListener('click', () => {
@@ -964,10 +920,10 @@
     <div style="text-align: center;">
       <div style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ff9b66; font-weight: 700; margin-bottom: 14px;">Behind the tap</div>
       <h2 style="font-family: Georgia, 'Times New Roman', serif; font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.8px; color: #fff; margin: 0 0 14px; line-height: 1.15;">There's a whole <em style="color: #ff9b66; font-style: italic;">Control Room</em> running this.</h2>
-      <p style="font-size: 16px; line-height: 1.7; color: #d4c8b3; margin: 0 auto 36px; max-width: 680px;">Every reply that lands in your customer's WhatsApp came from a queue you can see, a customer EYO remembers, a brief that landed at 7am, and a scorecard you can show your CFO. Walk through a live one — no signup.</p>
+      <p style="font-size: 16px; line-height: 1.7; color: #d4c8b3; margin: 0 auto 36px; max-width: 680px;">Every reply that lands in your customer's WhatsApp came from a queue you can see, a customer EYO remembers, a brief that landed at 7am, and a scorecard you can show your CFO. Walk through a live one, no signup.</p>
     </div>
 
-    <!-- 4 panel preview cards — what's inside the dashboard -->
+    <!-- 4 panel preview cards, what's inside the dashboard -->
     <div class="cr-panels">
       <a href="/portal/demo" data-ph="cr_panel_queue" class="cr-panel">
         <div class="cr-panel-icon">📥</div>
@@ -978,7 +934,7 @@
       <a href="/portal/demo" data-ph="cr_panel_vault" class="cr-panel">
         <div class="cr-panel-icon">🧠</div>
         <div class="cr-panel-title">Customer Vault</div>
-        <div class="cr-panel-body">Per-customer dossier — preferences, lifetime spend, last 3 deposits, why they last cancelled. The CRM you didn't have to build.</div>
+        <div class="cr-panel-body">Per-customer dossier, preferences, lifetime spend, last 3 deposits, why they last cancelled. The CRM you didn't have to build.</div>
         <div class="cr-panel-cta">Open the vault →</div>
       </a>
       <a href="/portal/demo" data-ph="cr_panel_brief" class="cr-panel">
@@ -990,7 +946,7 @@
       <a href="/portal/demo" data-ph="cr_panel_scorecard" class="cr-panel">
         <div class="cr-panel-icon">📊</div>
         <div class="cr-panel-title">Scorecard</div>
-        <div class="cr-panel-body">Real numbers — ₦ closed, bookings caught, median reply time before vs after, hours saved. Renewal becomes a number.</div>
+        <div class="cr-panel-body">Real numbers, ₦ closed, bookings caught, median reply time before vs after, hours saved. Renewal becomes a number.</div>
         <div class="cr-panel-cta">See the math →</div>
       </a>
     </div>
@@ -1049,16 +1005,16 @@
   <div class="inner" style="max-width: 980px;">
     <div class="section-label" style="color: var(--orange);">The problem</div>
     <h2 class="section-h2">The deal you lost last weekend? <em>Someone replied faster.</em></h2>
-    <p class="section-sub" style="max-width: 760px;">It's never one big leak. It's a hundred small ones — the enquiries, the transfers, the "I'll pay tomorrow"s that quietly slip through while you're busy running the actual business.</p>
+    <p class="section-sub" style="max-width: 760px;">It's never one big leak. It's a hundred small ones, the enquiries, the transfers, the "I'll pay tomorrow"s that quietly slip through while you're busy running the actual business.</p>
 
-    <!-- Where the money actually leaks — specific moments, not generic claims -->
+    <!-- Where the money actually leaks, specific moments, not generic claims -->
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; margin-top:34px;">
       <div style="background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--orange); border-radius:10px; padding:16px 18px;">
-        <div style="font-weight:700; color:var(--text-strong); font-size:14.5px; margin-bottom:5px;">9:47pm — “Is it still available?”</div>
+        <div style="font-weight:700; color:var(--text-strong); font-size:14.5px; margin-bottom:5px;">9:47pm, “Is it still available?”</div>
         <div style="color:var(--muted-strong); font-size:13.5px; line-height:1.6;">You see it at 7am. By then they've messaged two of your competitors and booked one.</div>
       </div>
       <div style="background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--orange); border-radius:10px; padding:16px 18px;">
-        <div style="font-weight:700; color:var(--text-strong); font-size:14.5px; margin-bottom:5px;">“How much?” — forty times a day</div>
+        <div style="font-weight:700; color:var(--text-strong); font-size:14.5px; margin-bottom:5px;">“How much?”, forty times a day</div>
         <div style="color:var(--muted-strong); font-size:13.5px; line-height:1.6;">You answer fifteen. The rest go cold before lunch. You never even knew their names.</div>
       </div>
       <div style="background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--orange); border-radius:10px; padding:16px 18px;">
@@ -1067,7 +1023,7 @@
       </div>
       <div style="background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--orange); border-radius:10px; padding:16px 18px;">
         <div style="font-weight:700; color:var(--text-strong); font-size:14.5px; margin-bottom:5px;">The receipt buried in the chat</div>
-        <div style="color:var(--muted-strong); font-size:13.5px; line-height:1.6;">They paid. You didn't confirm. Now they're asking again — or worse, you double-booked the slot.</div>
+        <div style="color:var(--muted-strong); font-size:13.5px; line-height:1.6;">They paid. You didn't confirm. Now they're asking again, or worse, you double-booked the slot.</div>
       </div>
       <div style="background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--orange); border-radius:10px; padding:16px 18px;">
         <div style="font-weight:700; color:var(--text-strong); font-size:14.5px; margin-bottom:5px;">Bought twice, then vanished</div>
@@ -1083,7 +1039,7 @@
       <strong style="color:var(--text-strong);">It's measurable, not vibes.</strong> Harvard Business Review studied 1.25 million leads: replying within 5 minutes makes you <strong style="color:var(--text-strong);">100× more likely to reach the lead</strong> and <strong style="color:var(--text-strong);">9× more likely to close</strong>. Every hour you're offline, that multiplier works against you.
     </div>
 
-    <p style="margin-top:22px; max-width:760px; font-size:15.5px; line-height:1.7; color:var(--text-strong); font-weight:600;">We call these your <em style="color:var(--orange); font-style:normal;">money leaks</em>. ReachNG finds them sitting in your chats — and wakes them back up.</p>
+    <p style="margin-top:22px; max-width:760px; font-size:15.5px; line-height:1.7; color:var(--text-strong); font-weight:600;">We call these your <em style="color:var(--orange); font-style:normal;">money leaks</em>. ReachNG finds them sitting in your chats, and wakes them back up.</p>
   </div>
 </section>
 
@@ -1097,11 +1053,11 @@
     <h2 class="section-h2">Three jobs ReachNG carries, so your team handles the <em>judgment</em>.</h2>
     <p class="section-sub" style="max-width: 720px;">Here's what changes the moment ReachNG goes live for your business. Every output routes through your tap. Nothing sends without you, unless you switch on <strong style="color:var(--text-strong);">Autopilot</strong> for reply types you've come to trust.</p>
 
-    <!-- Three-jobs map — gives the reader the structure before the detailed scenes -->
+    <!-- Three-jobs map, gives the reader the structure before the detailed scenes -->
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:28px;">
       <div style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px;">
         <span style="font-family:Georgia,serif; font-size:22px; font-weight:600; color:var(--orange); line-height:1;">01</span>
-        <div><div style="font-weight:700; color:var(--text-strong); font-size:14px;">Replies in your voice</div><div style="font-size:12.5px; color:var(--muted-strong); line-height:1.55; margin-top:3px;">Every enquiry answered in seconds, in your house tone — you just tap send.</div></div>
+        <div><div style="font-weight:700; color:var(--text-strong); font-size:14px;">Replies in your voice</div><div style="font-size:12.5px; color:var(--muted-strong); line-height:1.55; margin-top:3px;">Every enquiry answered in seconds, in your house tone, you just tap send.</div></div>
       </div>
       <div style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px;">
         <span style="font-family:Georgia,serif; font-size:22px; font-weight:600; color:var(--orange); line-height:1;">02</span>
@@ -1114,14 +1070,14 @@
     </div>
 
     <!-- ────────────────────────────────────────────────────────────────────
-         Scene 1 of 3 · Replies in your voice  (slim — single mock, no straw-man)
+         Scene 1 of 3 · Replies in your voice  (slim, single mock, no straw-man)
          ──────────────────────────────────────────────────────────────── -->
     <div style="margin-top: 56px;">
       <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px; flex-wrap: wrap;">
         <span style="font-family: Georgia, serif; font-size: 32px; font-weight: 600; color: var(--orange); letter-spacing: -1px;">01</span>
         <h3 style="font-size: clamp(22px, 3.2vw, 28px); font-weight: 700; color: var(--text-strong); letter-spacing: -0.4px; margin: 0;">Replies in your voice, not in generic AI.</h3>
       </div>
-      <p style="color: var(--muted-strong); font-size: 15px; line-height: 1.7; max-width: 720px; margin: 0 0 28px;">No "Thank you for contacting us, we will revert shortly." EYO drafts in your house voice — references your menu, your prices, your booth name — and waits for your tap.</p>
+      <p style="color: var(--muted-strong); font-size: 15px; line-height: 1.7; max-width: 720px; margin: 0 0 28px;">No "Thank you for contacting us, we will revert shortly." EYO drafts in your house voice, references your menu, your prices, your booth name, and waits for your tap.</p>
 
       <div style="max-width: 480px; margin: 0 auto;">
         <div style="background: var(--surface); border: 1px solid var(--orange); border-radius: 18px; padding: 22px 22px 18px 22px; box-shadow: 0 12px 36px rgba(255,85,0,0.14);">
@@ -1311,7 +1267,7 @@
       </div>
 
       <p style="margin-top: 28px; text-align: center; font-size: 14px; color: var(--muted-strong); max-width: 680px; margin-left: auto; margin-right: auto; line-height: 1.7;">
-        <strong style="color: var(--text-strong);">Five minutes.</strong> Your money, your hottest leads, where revenue almost slipped. The brief lands from <strong style="color:var(--muted-strong);">ReachNG's own WhatsApp line</strong> — your customer threads stay clean.
+        <strong style="color: var(--text-strong);">Five minutes.</strong> Your money, your hottest leads, where revenue almost slipped. The brief lands from <strong style="color:var(--muted-strong);">ReachNG's own WhatsApp line</strong>, your customer threads stay clean.
       </p>
     </div>
 

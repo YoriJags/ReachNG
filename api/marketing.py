@@ -477,7 +477,7 @@ async def landing(request: Request):
             "scene": scene,
             "active_vertical": scene.get("label", "Restaurants & venues"),
             "active_vertical_slug": scene.get("slug", "hospitality"),
-            "active_vertical_label": scene.get("label_emoji", "🍽 Restaurants & venues"),
+            "active_vertical_label": scene.get("label", "Restaurants & venues"),
             "prospect": prospect_profile,
         },
     )
