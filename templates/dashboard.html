@@ -1806,18 +1806,21 @@ function copyDemoPortalLink(btn){
   <!-- Phase D: section sub-nav under active suite — replaces top tab strip -->
   <div class="sidebar-section" id="sidebar-outreach-sections">
     <div class="sidebar-section-item active" id="ssn-overview"  onclick="sidebarNav('overview', this)">
-      <span class="ssi-left"><span class="material-symbols-outlined">today</span> Today</span>
+      <span class="ssi-left"><span class="material-symbols-outlined">dashboard</span> Command Center</span>
     </div>
     <div class="sidebar-section-item" id="ssn-activate"  onclick="sidebarNav('activate', this); loadActivateTab();">
-      <span class="ssi-left"><span class="material-symbols-outlined">bolt</span> Activate</span>
+      <span class="ssi-left"><span class="material-symbols-outlined">payments</span> Money Engine</span>
       <span class="tab-badge" id="tab-badge-activate-side"></span>
     </div>
     <div class="sidebar-section-item" id="ssn-approvals" onclick="sidebarNav('approvals', this)">
-      <span class="ssi-left"><span class="material-symbols-outlined">forum</span> Recover</span>
+      <span class="ssi-left"><span class="material-symbols-outlined">forum</span> Approvals</span>
       <span class="tab-badge" id="tab-badge-approvals-side"></span>
     </div>
     <div class="sidebar-section-item" id="ssn-clients"   onclick="sidebarNav('clients', this)">
       <span class="ssi-left"><span class="material-symbols-outlined">groups</span> Clients</span>
+    </div>
+    <div class="sidebar-section-item" id="ssn-growth"    onclick="sidebarNav('tower', this)">
+      <span class="ssi-left"><span class="material-symbols-outlined">trending_up</span> Growth · Prospect&nbsp;OS</span>
     </div>
     <div class="sidebar-section-item" id="ssn-tools"     onclick="sidebarNav('tools', this)">
       <span class="ssi-left"><span class="material-symbols-outlined">terminal</span> System</span>
@@ -2003,6 +2006,18 @@ function copyDemoPortalLink(btn){
 
 <!-- ── Overview ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel active" id="tab-overview">
+
+  <!-- Command Center — needs-attention launcher (what's broken / what do I do next) -->
+  <section style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;padding:11px 14px;background:#0e1318;border:1px solid #1e2530;border-radius:10px;">
+    <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#7a8590;margin-right:4px;">Needs attention</span>
+    <button onclick="switchTabByName('approvals')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📝 Approvals</button>
+    <button onclick="switchTabByName('clients')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">👥 Clients</button>
+    <button onclick="sidebarNav('tower', document.getElementById('ssn-growth'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📈 Growth</button>
+    <button onclick="sidebarNav('tools', document.getElementById('ssn-tools'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">⚙ System</button>
+    <a href="/health" target="_blank" style="background:#15171a;color:#5dd28a;border:1px solid #123522;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;text-decoration:none;">🟢 Health</a>
+    <span style="flex:1;"></span>
+    <span style="font-size:11px;color:#6a7280;">Money moving, queues, and health — start here.</span>
+  </section>
 
   <!-- KPI Hero Ribbon — Bloomberg-tier headline cards (Phase C) -->
   <section class="kpi-hero" id="kpi-hero">

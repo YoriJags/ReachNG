@@ -8,18 +8,43 @@
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
   :root {
-    --bg: #050505;
-    --surface: #0d0d0d;
-    --border: #1a1a1a;
-    --border-subtle: #111;
-    --orange: #ff5c00;
-    --green: #00e5a0;
-    --gold: #f5c842;
-    --blue: #4488ff;
-    --white: #f2f2f2;
-    --muted: #555;
-    --dim: #333;
+    /* Warm premium control-room palette (from portal_control_room.html) */
+    --bg: #FAF6EE;
+    --bg2: #F5EFE0;
+    --surface: #ffffff;
+    --paper-soft: #FBF8F1;
+    --border: #E8DEC8;
+    --border-subtle: #F1E8D4;
+    --orange: #B85C38;          /* terracotta accent */
+    --orange-bright: #ff5c00;
+    --green: #2e7d32;
+    --gold: #d3a52e;
+    --blue: #2f6db0;
+    --white: #1a1a1a;           /* repurposed as primary ink so var()-based text stays readable on cream */
+    --ink: #1a1a1a;
+    --ink2: #3d3a33;
+    --muted: #7a6a3f;
+    --muted2: #9a8e6e;
+    --dim: #b9ad90;
   }
+  /* ── Warm re-theme: normalize the hardcoded dark inline styles inherited from
+     the old dark portal. Dark backgrounds -> paper, dark lines -> warm line,
+     light text -> ink/muted. New chrome (tabs, CTA, Today, Customers) is
+     authored warm natively below. Best-effort token mapping; not every nested
+     accent pill is remapped. ───────────────────────────────────────────────── */
+  body { background: var(--bg) !important; color: var(--ink); }
+  [style*="#111"], [style*="#0d0d0d"], [style*="#0a0a0a"], [style*="#0f0f0f"],
+  [style*="#141414"], [style*="#181818"], [style*="#151515"],
+  [style*="#0e1218"], [style*="#0e1419"], [style*="#1e2530"], [style*="#1f2731"]
+    { background-color: var(--surface) !important; }
+  [style*="#1e2530"], [style*="#2a3340"], [style*="#1f2731"], [style*="#1f160a"]
+    { border-color: var(--border) !important; }
+  [style*="#e8e8e8"], [style*="#d8eaf8"], [style*="#f2f2f2"], [style*="#eafff3"]
+    { color: var(--ink) !important; }
+  [style*="#9aa5b1"], [style*="#7a8590"], [style*="color:#999"], [style*="color:#888"],
+  [style*="#6a7280"], [style*="#6b7280"], [style*="color:#777"], [style*="color:#555"],
+  [style*="color:#666"]
+    { color: var(--muted) !important; }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -510,6 +535,71 @@
     .roi-strip { flex-direction: column; gap: 16px; }
     .roi-divider { display: none; }
   }
+
+  /* ── Control-room chrome (warm, native) ──────────────────────────────────── */
+  .section-label { color: var(--ink2); }
+  .cta-bar {
+    position: sticky; top: 0; z-index: 30;
+    background: rgba(250,246,238,0.92); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .cta-bar .cta-context { font-size: 13px; color: var(--muted); }
+  .cta-bar .cta-context strong { color: var(--ink); font-weight: 700; }
+  .cta-btn {
+    background: var(--orange); color: #fff; border: 0; border-radius: 10px;
+    padding: 12px 22px; font-size: 14px; font-weight: 700; cursor: pointer;
+    text-decoration: none; white-space: nowrap; letter-spacing: 0.2px;
+    box-shadow: 0 6px 18px rgba(184,92,56,0.25); transition: transform .15s;
+  }
+  .cta-btn:hover { transform: translateY(-1px); }
+  .tabbar {
+    display: flex; gap: 4px; overflow-x: auto; padding: 10px 32px 0;
+    border-bottom: 1px solid var(--border); background: var(--bg);
+    position: sticky; top: 61px; z-index: 25; -webkit-overflow-scrolling: touch;
+  }
+  .tabbar::-webkit-scrollbar { display: none; }
+  .tab {
+    appearance: none; background: transparent; border: 0; cursor: pointer;
+    padding: 10px 16px 13px; font-size: 13.5px; font-weight: 600; white-space: nowrap;
+    color: var(--muted); border-bottom: 2px solid transparent; font-family: inherit;
+  }
+  .tab:hover { color: var(--ink2); }
+  .tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+  .tab .tab-count {
+    display: inline-block; min-width: 18px; padding: 1px 6px; margin-left: 6px;
+    border-radius: 999px; background: var(--orange); color: #fff; font-size: 11px; font-weight: 700;
+  }
+  .tabpanel { display: none; }
+  .tabpanel.active { display: block; }
+  .wa-pill {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+    padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border);
+  }
+  .wa-pill .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .wa-pill.ok  { color: #1b7a3d; background: rgba(46,125,50,0.10); } .wa-pill.ok .dot  { background: #25D366; }
+  .wa-pill.off { color: #b23b3b; background: rgba(198,40,40,0.08);  } .wa-pill.off .dot { background: #c62828; }
+  .coming-soon {
+    background: var(--paper-soft); border: 1px dashed var(--border); border-radius: 12px;
+    padding: 18px 20px; color: var(--muted);
+  }
+  .coming-soon .cs-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 6px;
+  }
+  .cust-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 14px; }
+  .cust-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 22px; text-decoration: none; display: block; color: var(--ink);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .cust-card:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+  .cust-card .cc-title { font-weight: 700; font-size: 15px; }
+  .cust-card .cc-sub { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+  @media (max-width: 640px) {
+    .cta-bar { padding: 12px 20px; flex-wrap: wrap; }
+    .tabbar { padding-left: 20px; padding-right: 20px; top: 57px; }
+  }
 </style>
 </head>
 <body>
@@ -571,7 +661,50 @@
 </div>
 
 <div id="content">
+
+  <!-- Primary action bar — one obvious next tap (chosen in JS by selectPrimaryCta) -->
+  <div class="cta-bar" id="cta-bar">
+    <div class="cta-context" id="cta-context">Loading your control room…</div>
+    <a class="cta-btn" id="cta-btn" href="#today" onclick="switchTab('today')">Open today's brief</a>
+  </div>
+
+  <!-- Tabs -->
+  <nav class="tabbar" id="tabbar">
+    <button class="tab active" data-tab="today"     onclick="switchTab('today')">Today</button>
+    <button class="tab"        data-tab="money"     onclick="switchTab('money')">Money</button>
+    <button class="tab"        data-tab="approvals" onclick="switchTab('approvals')">Approvals<span class="tab-count" id="tabcount-approvals" style="display:none;">0</span></button>
+    <button class="tab"        data-tab="customers" onclick="switchTab('customers')">Customers</button>
+    <button class="tab"        data-tab="settings"  onclick="switchTab('settings')">EYO&nbsp;Settings</button>
+    <button class="tab"        data-tab="reports"   onclick="switchTab('reports')">Reports</button>
+  </nav>
+
   <div class="content">
+
+    <!-- TODAY · status header (WhatsApp + what needs you) -->
+    <section class="tabpanel active" data-tab="today">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;">
+        <span class="wa-pill off" id="wa-pill"><span class="dot"></span><span id="wa-pill-text">WhatsApp: checking…</span></span>
+        <a href="#approvals" onclick="switchTab('approvals')" id="today-threads" style="font-size:13px;color:var(--muted);text-decoration:none;display:none;"></a>
+      </div>
+    </section>
+
+    <!-- CUSTOMERS -->
+    <section class="tabpanel" data-tab="customers">
+      <div class="section-label">Your customers</div>
+      <div class="cust-grid">
+        <a class="cust-card" href="/portal/{{ token }}/vault">
+          <div class="cc-title">🧠 The Vault</div>
+          <div class="cc-sub">Everything EYO remembers about each customer — lifetime spend, preferences, and the likely next best action.</div>
+        </a>
+        <a class="cust-card" href="/portal/{{ token }}/book">
+          <div class="cc-title">📇 Customer Book</div>
+          <div class="cc-sub">Import your contacts (WhatsApp share-contact, vCard, paste or CSV) so EYO can work your existing relationships.</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- REPORTS (scorecard + agent learning) -->
+    <section class="tabpanel" data-tab="reports">
 
     <!-- ── Outcomes Scorecard — last 30 days ─────────────────────────────── -->
     <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -742,6 +875,11 @@
       })();
     </script>
 
+    </section>
+
+    <!-- TODAY · Owner Brief + cash control room -->
+    <section class="tabpanel active" data-tab="today">
+
     <!-- Owner Brief — cash headline -->
     <div class="section-label">Owner Brief — today</div>
     <div id="owner-brief-card" style="background:linear-gradient(135deg,#181818 0%,#111 100%);border:1px solid #2a3340;border-radius:12px;padding:24px;margin-bottom:24px;">
@@ -781,6 +919,11 @@
       </div>
     </div>
 
+    </section>
+
+    <!-- MONEY · radar -->
+    <section class="tabpanel" data-tab="money">
+
     <!-- Missed Opportunity Radar -->
     <div class="section-label">Missed Opportunity Radar</div>
     <div id="radar-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
@@ -795,8 +938,14 @@
       <div id="radar-empty" style="display:none;font-size:13px;color:#5dd28a;padding:8px 0;">✅ No missed opportunities — every price-asker has been followed up.</div>
     </div>
 
+    </section>
+
+    <!-- APPROVALS · drafts + threads needing a move -->
+    <section class="tabpanel" data-tab="approvals">
+
     <!-- WhatsApp Sales Copilot -->
-    <div class="section-label">WhatsApp Sales Copilot</div>
+    <div class="section-label">Drafts &amp; threads waiting for you</div>
+    <p style="font-size:12px;color:var(--muted);margin:-4px 0 12px;">Nothing sends until you approve — unless you've switched a reply type to Autopilot in EYO Settings.</p>
     <div id="copilot-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap;">
         <div>
@@ -810,6 +959,17 @@
       </div>
       <div id="copilot-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;"></div>
       <div id="copilot-empty" style="display:none;font-size:13px;color:#5dd28a;padding:8px 0;">✅ No inbound threads need action right now.</div>
+    </div>
+
+    </section>
+
+    <!-- MONEY · stats + activity + coming-soon -->
+    <section class="tabpanel" data-tab="money">
+
+    <div class="cust-grid" style="margin-bottom:20px;">
+      <div class="coming-soon"><div class="cs-tag">Coming soon</div>Payments &amp; receipts feed — every transfer EYO reads, matched to a customer.</div>
+      <div class="coming-soon"><div class="cs-tag">Coming soon</div>Bookings &amp; deals closed — confirmed outcomes with their value.</div>
+      <div class="coming-soon"><div class="cs-tag">Coming soon</div>Hours &amp; cost saved — EYO's work converted to time + naira.</div>
     </div>
 
     <!-- Stats -->
@@ -844,6 +1004,11 @@
         <span class="activity-text">Loading activity…</span>
       </div>
     </div>
+
+    </section>
+
+    <!-- EYO SETTINGS · identity, autopilot, brief, holding reply -->
+    <section class="tabpanel" data-tab="settings">
 
     <!-- Agent identity (name + payment rail) -->
     <div class="section-label">Your AI Employee</div>
@@ -1057,6 +1222,19 @@ discount only today"></textarea>
       </div>
     </div>
 
+    </section>
+
+    <!-- REPORTS · outreach activity + ROI card -->
+    <section class="tabpanel" data-tab="reports">
+
+    <div class="cust-grid" style="margin-bottom:20px;">
+      <a class="cust-card" href="/portal/share-card/{{ token }}" target="_blank">
+        <div class="cc-title">📈 Shareable ROI card</div>
+        <div class="cc-sub">A 1200×630 image of your live results — open, screenshot, post.</div>
+      </a>
+      <div class="coming-soon"><div class="cs-tag">Coming soon</div>Owner Brief history + weekly PDF export.</div>
+    </div>
+
     <!-- Outreach activity table -->
     <div class="section-label">Outreach Activity</div>
     <div class="leads-table-wrap">
@@ -1075,6 +1253,8 @@ discount only today"></textarea>
         </tbody>
       </table>
     </div>
+
+    </section>
 
   </div>
 
@@ -1368,6 +1548,7 @@ async function load() {
     loadCopilot();
     loadCashRoom();
     loadReadinessBreakdown();
+    initTabsAndCta();
 
     const s = data.stats || {};
     const contacted = s.contacted || 0;
@@ -1718,6 +1899,84 @@ async function portalSaveHolding() {
   } catch(e) {
     alert("Could not save holding reply: " + e.message);
   }
+}
+
+// ── Tabs + primary-CTA control room ─────────────────────────────────────────
+function switchTab(name, scroll) {
+  document.querySelectorAll('.tabpanel').forEach(p => p.classList.toggle('active', p.dataset.tab === name));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  try { history.replaceState(null, '', '#' + name); } catch(e) {}
+  if (scroll !== false) {
+    const c = document.querySelector('.content');
+    if (c) window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function setWaPill(connected) {
+  const pill = document.getElementById('wa-pill');
+  const txt = document.getElementById('wa-pill-text');
+  if (!pill || !txt) return;
+  pill.classList.toggle('ok', !!connected);
+  pill.classList.toggle('off', !connected);
+  txt.textContent = connected ? 'WhatsApp connected' : 'WhatsApp not connected';
+}
+
+function setPrimaryCta(label, tab, href) {
+  const btn = document.getElementById('cta-btn');
+  if (!btn) return;
+  btn.textContent = label;
+  if (href) { btn.setAttribute('href', href); btn.onclick = null; }
+  else { btn.setAttribute('href', '#' + tab); btn.onclick = (e) => { e.preventDefault(); switchTab(tab); }; }
+}
+
+async function selectPrimaryCta() {
+  const ctx = document.getElementById('cta-context');
+  let onb = {}, leak = {}, pending = 0, hot = 0;
+  try { onb  = await fetch(`/api/v1/portal/{{ token }}/onboard/status`).then(r => r.json()); } catch(e) {}
+  try { leak = await fetch(`/portal/{{ token }}/revenue-rescue`).then(r => r.json()); } catch(e) {}
+  try {
+    const c = await fetch(`/portal/sales-copilot/{{ token }}`).then(r => r.json());
+    pending = (c.summary && c.summary.drafts) || 0;
+    hot     = (c.summary && c.summary.hot) || 0;
+  } catch(e) {}
+
+  const waConnected = !!(onb && onb.wa_connected);
+  setWaPill(waConnected);
+
+  const badge = document.getElementById('tabcount-approvals');
+  if (badge) { if (pending > 0) { badge.textContent = pending; badge.style.display = ''; } else badge.style.display = 'none'; }
+  const threads = document.getElementById('today-threads');
+  if (threads) {
+    const n = pending + hot;
+    if (n > 0) { threads.textContent = `${n} ${n === 1 ? 'thread needs' : 'threads need'} your attention →`; threads.style.display = ''; }
+    else threads.style.display = 'none';
+  }
+
+  if (!ctx) return;
+  const onboardingDone = !!(onb && (onb.onboarded_at || (onb.current_step || 1) >= 8));
+  if (!onboardingDone) {
+    ctx.innerHTML = "Your setup isn't finished yet.";
+    setPrimaryCta('Finish setup', null, `/portal/{{ token }}/onboard`);
+  } else if (!waConnected) {
+    ctx.innerHTML = "EYO can't send until WhatsApp is connected.";
+    setPrimaryCta('Reconnect WhatsApp', null, `/portal/{{ token }}/connect-whatsapp`);
+  } else if (pending > 0) {
+    ctx.innerHTML = `<strong>${pending}</strong> draft${pending === 1 ? '' : 's'} waiting for your approval.`;
+    setPrimaryCta('Review drafts', 'approvals');
+  } else if (leak && leak.total_ngn > 0) {
+    ctx.innerHTML = `EYO found <strong>₦${Number(leak.total_ngn).toLocaleString()}</strong> in conversations worth reviving.`;
+    setPrimaryCta('Wake this money up', null, `/portal/{{ token }}/money-leak`);
+  } else {
+    ctx.innerHTML = "You're all caught up. Here's today.";
+    setPrimaryCta("Open today's brief", 'today');
+  }
+}
+
+function initTabsAndCta() {
+  const hash = (location.hash || '').replace('#', '');
+  const valid = ['today', 'money', 'approvals', 'customers', 'settings', 'reports'];
+  switchTab(valid.includes(hash) ? hash : 'today', false);
+  selectPrimaryCta();
 }
 
 load();
