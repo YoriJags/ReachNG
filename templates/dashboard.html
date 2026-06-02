@@ -3481,26 +3481,26 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <button class="tab-btn" id="csubnav-campaigns" onclick="clientsNav('campaigns',this)"                                style="font-size:11px;padding:8px 14px;">Campaigns</button>
   </div>
 
-  <!-- Demo Sandbox -->
-  <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #ff5c00;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
-    <div style="font-size:13px;font-weight:700;color:#ff5c00;margin-bottom:4px;">Demo Sandbox</div>
-    <div style="font-size:11px;color:#556;margin-bottom:14px;">Seed realistic demo data so you can show clients a live portal in seconds. Idempotent — safe to run multiple times.</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
-      <button class="btn btn-approve" style="font-size:12px;" onclick="seedDemo('estate')">Seed EstateOS Demo</button>
-      <button class="btn btn-approve" style="font-size:12px;background:#00a37a;border-color:#00a37a;" onclick="seedDemo('talent')">Seed TalentOS Demo</button>
-      <button class="btn btn-approve" style="font-size:12px;background:#7c3aed;border-color:#7c3aed;" onclick="seedDemo('all')">Seed Both (recommended)</button>
-      <button class="btn" style="font-size:12px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="backfillTokens()">Backfill Missing Tokens</button>
+  <!-- Demo Sandbox. Phase 2 migration: card + toolbar + btn primitives. -->
+  <div class="card" style="border-left:3px solid var(--accent);margin-bottom:20px;">
+    <div class="section-title" style="color:var(--accent);margin:0 0 4px;">Demo Sandbox</div>
+    <div style="font-size:11px;color:var(--text-mid);margin-bottom:14px;">Seed realistic demo data so you can show clients a live portal in seconds. Idempotent, safe to run multiple times.</div>
+    <div class="toolbar" style="margin-bottom:14px;">
+      <button class="btn btn--primary btn--sm" onclick="seedDemo('all')">Seed Both (recommended)</button>
+      <button class="btn btn--ghost btn--sm" onclick="seedDemo('estate')">Seed EstateOS Demo</button>
+      <button class="btn btn--ghost btn--sm" onclick="seedDemo('talent')">Seed TalentOS Demo</button>
+      <button class="btn btn--ghost btn--sm" onclick="backfillTokens()">Backfill Missing Tokens</button>
     </div>
-    <div id="demo-seed-result" style="display:none;background:#080c10;border:1px solid #1e2530;border-radius:6px;padding:12px;font-size:12px;color:#ccc;line-height:1.8;"></div>
+    <div id="demo-seed-result" style="display:none;background:var(--bg-base);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;font-size:12px;color:var(--text-mid);line-height:1.8;"></div>
   </div>
 
-  <!-- Unipile WhatsApp Setup — critical workflow -->
-  <div style="background:#0d1a0d;border:1px solid #1a3a1a;border-left:4px solid #00e5a0;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+  <!-- Unipile WhatsApp Setup. Phase 2 migration: card primitive (green accent kept). -->
+  <div class="card" style="border-left:3px solid var(--green);margin-bottom:20px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
       <span style="font-size:16px;">📱</span>
       <div>
-        <div style="font-size:13px;font-weight:700;color:#00e5a0;">Unipile WhatsApp Setup — Do This For Every Client</div>
-        <div style="font-size:11px;color:#2a5a2a;margin-top:2px;">Without this, all messages send from YOUR number. Each client must have their own.</div>
+        <div class="section-title" style="color:var(--green);margin:0;">Unipile WhatsApp Setup — Do This For Every Client</div>
+        <div style="font-size:11px;color:var(--text-mid);margin-top:2px;">Without this, all messages send from YOUR number. Each client must have their own.</div>
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:10px;">
