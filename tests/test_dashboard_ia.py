@@ -120,7 +120,7 @@ def test_design_primitives_defined(primitive):
 # Regression budget: these counts may only trend DOWN as screens migrate to the
 # primitives. Bump the ceiling DOWN (never up) after each migration phase.
 INLINE_BUTTON_CEILING = 147
-ADHOC_CARD_CEILING = 189
+ADHOC_CARD_CEILING = 187
 
 
 def test_inline_styling_does_not_regrow():

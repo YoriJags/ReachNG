@@ -51,6 +51,9 @@
     border-radius: var(--r-md); padding: var(--s4);
   }
   .card--flush { padding: 0; overflow: hidden; }
+  .card--placeholder { border-style: dashed; color: var(--text-mid); font-size: 12px; }
+  .soon-tag { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+              text-transform: uppercase; color: var(--amber); margin-bottom: 6px; }
 
   .panel-title {
     font-size: 13px; font-weight: 700; color: var(--text-hi);
@@ -60,6 +63,9 @@
     font-size: 10px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.12em; color: var(--text-mid); margin: 0;
   }
+  /* Tab-level intro header (title + subtitle) shared by Growth / AI / Billing. */
+  .tab-intro-title { font-size: 18px; font-weight: 700; color: var(--text-hi); margin-bottom: 4px; }
+  .tab-intro-sub   { color: var(--text-mid); font-size: 12px; margin: 0 0 16px; }
 
   .toolbar { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
   .toolbar--divided {
@@ -2371,12 +2377,12 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 
 <!-- ── Control Tower ──────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-growth">
-  <div style="font-size:18px;font-weight:700;color:#e8e8e8;margin-bottom:4px;">Growth · Prospect OS</div>
-  <p style="color:#6a7280;font-size:12px;margin:0 0 16px;">Internal only — how ReachNG finds its own customers. Not a client-facing service.</p>
+  <div class="tab-intro-title">Growth · Prospect OS</div>
+  <p class="tab-intro-sub">Internal only — how ReachNG finds its own customers. Not a client-facing service.</p>
   <div id="growth-reflow-body"></div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px;">
-    <div style="background:#0e1318;border:1px dashed #2a3340;border-radius:10px;padding:16px;color:#6a7280;font-size:12px;"><div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7a6a3f;margin-bottom:6px;">Coming soon</div>Lead quality scoring</div>
-    <div style="background:#0e1318;border:1px dashed #2a3340;border-radius:10px;padding:16px;color:#6a7280;font-size:12px;"><div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7a6a3f;margin-bottom:6px;">Coming soon</div>Nurture sequences</div>
+    <div class="card card--placeholder"><span class="soon-tag">Coming soon</span>Lead quality scoring</div>
+    <div class="card card--placeholder"><span class="soon-tag">Coming soon</span>Nurture sequences</div>
   </div>
 </div>
 
