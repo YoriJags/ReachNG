@@ -834,7 +834,7 @@
       <span>Agent Learning — how EYO is getting sharper</span>
       <span id="al-updated" style="font-size:11px;color:#777;font-weight:400;">—</span>
     </div>
-    <div id="agent-learning-card" style="background:linear-gradient(135deg,#181818 0%,#111 100%);border:1px solid #2a3340;border-radius:12px;padding:22px 24px;margin-bottom:24px;">
+    <div id="agent-learning-card" class="card" style="margin-bottom:24px;">
       <div id="al-empty" style="display:none;font-size:13px;color:#888;line-height:1.6;">
         🧠 EYO needs at least 5 resolved drafts (wins or misses) before the first weekly addendum. Keep approving — the loop tightens itself every Sunday night.
       </div>
@@ -842,24 +842,24 @@
       <div id="al-body" style="display:none;">
         <!-- Three KPIs across the top -->
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;">
-          <div style="background:#0e1419;border:1px solid #1f2731;border-radius:9px;padding:12px 14px;">
-            <div style="font-size:10px;color:#7a8590;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:4px;">Wins (30d)</div>
-            <div id="al-wins" style="font-size:22px;font-weight:800;color:#5dd28a;font-family:'JetBrains Mono',monospace;">—</div>
+          <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:12px 14px;">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:4px;">Wins (30d)</div>
+            <div id="al-wins" style="font-size:22px;font-weight:800;color:var(--green);font-family:'JetBrains Mono',monospace;">—</div>
           </div>
-          <div style="background:#0e1419;border:1px solid #1f2731;border-radius:9px;padding:12px 14px;">
-            <div style="font-size:10px;color:#7a8590;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:4px;">Misses (30d)</div>
-            <div id="al-misses" style="font-size:22px;font-weight:800;color:#ff6b6b;font-family:'JetBrains Mono',monospace;">—</div>
+          <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:12px 14px;">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:4px;">Misses (30d)</div>
+            <div id="al-misses" style="font-size:22px;font-weight:800;color:var(--red);font-family:'JetBrains Mono',monospace;">—</div>
           </div>
-          <div style="background:#0e1419;border:1px solid #1f2731;border-radius:9px;padding:12px 14px;">
-            <div style="font-size:10px;color:#7a8590;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:4px;">Win rate</div>
-            <div id="al-winrate" style="font-size:22px;font-weight:800;color:#ff5500;font-family:'JetBrains Mono',monospace;">—</div>
+          <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:12px 14px;">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:4px;">Win rate</div>
+            <div id="al-winrate" style="font-size:22px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;">—</div>
           </div>
         </div>
 
         <!-- Addendum — Claude's distilled coaching from last week -->
-        <div id="al-addendum-wrap" style="display:none;background:rgba(255,85,0,0.06);border:1px solid rgba(255,85,0,0.30);border-left:3px solid #ff5500;border-radius:9px;padding:14px 16px;margin-bottom:14px;">
-          <div style="font-size:10px;color:#ff5500;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:8px;">📚 This week's coaching (auto-applied to every draft)</div>
-          <pre id="al-addendum" style="margin:0;font-size:13px;line-height:1.6;color:#e0e0e0;white-space:pre-wrap;font-family:inherit;"></pre>
+        <div id="al-addendum-wrap" style="display:none;background:rgba(184,92,56,0.07);border:1px solid rgba(184,92,56,0.30);border-left:3px solid var(--accent);border-radius:9px;padding:14px 16px;margin-bottom:14px;">
+          <div style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:8px;">📚 This week's coaching (auto-applied to every draft)</div>
+          <pre id="al-addendum" style="margin:0;font-size:13px;line-height:1.6;color:var(--ink);white-space:pre-wrap;font-family:inherit;"></pre>
         </div>
 
         <!-- Last 15 resolved outcomes -->
@@ -907,7 +907,7 @@
             const dot   = isWin ? '#5dd28a' : '#ff6b6b';
             const label = isWin ? 'WIN'      : 'MISS';
             const sig   = o.signal ? (' · ' + o.signal) : '';
-            return `<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 10px;background:#0e1419;border:1px solid #1f2731;border-radius:7px;font-size:12px;">
+            return `<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 10px;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;font-size:12px;">
               <span style="background:${dot};color:#0a0a0a;font-weight:800;font-size:9px;letter-spacing:0.08em;padding:2px 6px;border-radius:3px;flex-shrink:0;">${label}</span>
               <div style="flex:1;min-width:0;">
                 <div style="color:#9aa5b1;font-size:10.5px;margin-bottom:3px;">${o.source || '·'}${sig}</div>
@@ -928,13 +928,13 @@
 
     <!-- Owner Brief — cash headline -->
     <div class="section-label">Owner Brief — today</div>
-    <div id="owner-brief-card" style="background:linear-gradient(135deg,#181818 0%,#111 100%);border:1px solid #2a3340;border-radius:12px;padding:24px;margin-bottom:24px;">
+    <div id="owner-brief-card" class="card" style="margin-bottom:24px;">
       <div id="ob-empty" style="display:none;font-size:13px;color:#777;">📭 No cash signals this morning — quiet pipeline.</div>
 
       <div id="ob-headline" style="display:none;">
         <div style="font-size:11px;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Likely collectible</div>
         <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px;">
-          <div id="ob-collectible" style="font-size:36px;font-weight:700;color:#ff5500;letter-spacing:-1px;">₦0</div>
+          <div id="ob-collectible" style="font-size:36px;font-weight:700;color:var(--accent);letter-spacing:-1px;">₦0</div>
           <div id="ob-count" style="font-size:13px;color:#999;">across 0 accounts</div>
         </div>
         <div id="ob-breakdown" style="font-size:12px;color:#777;margin-bottom:18px;"></div>
@@ -946,22 +946,22 @@
         <div id="ob-priceasked"   style="display:none;font-size:13px;color:#ff7a7a;">⚠️ <span id="ob-priceasked-cnt">0</span> asked for price, no quote sent yet</div>
       </div>
 
-      <div style="margin-top:18px;padding-top:14px;border-top:1px solid #1e2530;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-        <div style="font-size:11px;color:#555;">Numbers refresh every load. The 8am WhatsApp brief uses the same signals.</div>
-        <a href="/portal/upload-leads/{{ token }}" style="background:#ff5500;color:#fff;text-decoration:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;">⚡ Lead Resurrection — upload old leads</a>
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="font-size:11px;color:var(--muted);">Numbers refresh every load. The 8am WhatsApp brief uses the same signals.</div>
+        <a href="/portal/upload-leads/{{ token }}" class="btn btn--primary btn--sm" style="white-space:nowrap;">⚡ Lead Resurrection — upload old leads</a>
       </div>
     </div>
 
     <!-- Money Leak + Speed Watch -->
     <div class="section-label">Cash control room</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:24px;">
-      <a href="/portal/{{ token }}/money-leak" style="text-decoration:none;background:linear-gradient(135deg,#1a0f07,#111);border:1px solid #3a2608;border-radius:10px;padding:20px 22px;display:block;">
-        <div style="font-size:11px;font-weight:700;color:#ff9b66;text-transform:uppercase;letter-spacing:0.1em;">💸 Money Leak Report</div>
-        <div id="ml-headline" style="font-size:15px;color:#e8e8e8;margin-top:8px;line-height:1.5;">See where money is quietly dying →</div>
+      <a href="/portal/{{ token }}/money-leak" class="card" style="text-decoration:none;display:block;border-left:3px solid var(--accent);">
+        <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;">💸 Money Leak Report</div>
+        <div id="ml-headline" style="font-size:15px;color:var(--ink);margin-top:8px;line-height:1.5;">See where money is quietly dying →</div>
       </a>
-      <div style="background:#0e1218;border:1px solid #1e2530;border-radius:10px;padding:20px 22px;">
-        <div style="font-size:11px;font-weight:700;color:#5dd28a;text-transform:uppercase;letter-spacing:0.1em;">⚡ Speed watch</div>
-        <div id="speed-headline" style="font-size:13.5px;color:#999;margin-top:8px;line-height:1.5;">Measuring your reply speed…</div>
+      <div class="card" style="border-left:3px solid var(--green);">
+        <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.1em;">⚡ Speed watch</div>
+        <div id="speed-headline" style="font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.5;">Measuring your reply speed…</div>
       </div>
     </div>
 
@@ -972,7 +972,7 @@
 
     <!-- Missed Opportunity Radar -->
     <div class="section-label">Missed Opportunity Radar</div>
-    <div id="radar-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
+    <div id="radar-card" class="card" style="margin-bottom:24px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap;">
         <div>
           <div style="font-size:14px;font-weight:600;color:#e8e8e8;">Asked for price · no quote sent</div>
@@ -992,15 +992,15 @@
     <!-- WhatsApp Sales Copilot -->
     <div class="section-label">Drafts &amp; threads waiting for you</div>
     <p style="font-size:12px;color:var(--muted);margin:-4px 0 12px;">Nothing sends until you approve — unless you've switched a reply type to Autopilot in EYO Settings.</p>
-    <div id="copilot-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
+    <div id="copilot-card" class="card" style="margin-bottom:24px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap;">
         <div>
           <div style="font-size:14px;font-weight:600;color:#e8e8e8;">Inbound threads that need a next move</div>
           <div style="font-size:12px;color:#555;margin-top:2px;">Hot replies, pending AI drafts, and warm questions from the last 14 days.</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <span id="copilot-hot" style="font-size:11px;color:#ffb84d;background:#1a1204;border:1px solid #3a2608;border-radius:999px;padding:5px 9px;">— hot</span>
-          <span id="copilot-drafts" style="font-size:11px;color:#5dd28a;background:#07160f;border:1px solid #123522;border-radius:999px;padding:5px 9px;">— drafts</span>
+          <span id="copilot-hot" class="badge badge--warn">— hot</span>
+          <span id="copilot-drafts" class="badge badge--ok">— drafts</span>
         </div>
       </div>
       <div id="copilot-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;"></div>
@@ -1067,14 +1067,14 @@
 
     <!-- Agent identity (name + payment rail) -->
     <div class="section-label">Your AI Employee</div>
-    <div id="agent-identity-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
+    <div id="agent-identity-card" class="card" style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
         <div style="flex:1;min-width:240px;">
           <label style="font-size:11px;color:#6a7280;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;display:block;margin-bottom:6px;">Agent name (signed off in every message)</label>
           <div style="display:flex;gap:8px;align-items:center;">
             <input id="agent-name-input" type="text" maxlength="20" placeholder="EYO"
-                   style="flex:1;background:#0a0a0a;border:1px solid #2a3340;border-radius:6px;color:#e8e8e8;font-size:14px;padding:9px 12px;font-family:inherit;">
-            <button onclick="saveAgentName()" style="background:#ff5500;color:#fff;border:none;border-radius:6px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;">Save</button>
+                   style="flex:1;background:var(--surface);border:1px solid var(--line);border-radius:6px;color:var(--ink);font-size:14px;padding:9px 12px;font-family:inherit;">
+            <button onclick="saveAgentName()" class="btn btn--primary btn--sm">Save</button>
           </div>
           <div id="agent-name-status" style="font-size:11px;color:#6a7280;margin-top:6px;">1-20 characters. Defaults to <strong style="color:#e8e8e8;">EYO</strong> — your AI employee's name.</div>
         </div>
@@ -1121,7 +1121,7 @@
 
     <!-- Autopilot toggle + readiness gate -->
     <div class="section-label">AI Settings</div>
-    <div id="autopilot-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;">
+    <div id="autopilot-card" class="card" style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;">
       <div>
         <div style="font-size:14px;font-weight:600;color:#e8e8e8;">Autopilot Mode</div>
         <div style="font-size:12px;color:#555;margin-top:4px;" id="ap-portal-desc">
@@ -1132,15 +1132,15 @@
         <span id="ap-portal-status" style="font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.08em;">HITL</span>
         <label style="position:relative;display:inline-block;width:44px;height:24px;">
           <input type="checkbox" id="ap-portal-toggle" style="opacity:0;width:0;height:0;" onchange="portalToggleAutopilot(this.checked)">
-          <span id="ap-portal-slider" style="position:absolute;cursor:pointer;inset:0;background:#1e2530;border-radius:24px;transition:.2s;border:1px solid #2a3340;">
-            <span id="ap-portal-knob" style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#555;border-radius:50%;transition:.2s;"></span>
+          <span id="ap-portal-slider" style="position:absolute;cursor:pointer;inset:0;background:var(--surface-2);border-radius:24px;transition:.2s;border:1px solid var(--line);">
+            <span id="ap-portal-knob" style="position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:var(--muted);border-radius:50%;transition:.2s;"></span>
           </span>
         </label>
       </div>
     </div>
 
     <!-- Tone-fit confidence meter (gates Autopilot per locked rule: earned, not defaulted) -->
-    <div id="ap-readiness-card" style="display:none;background:#0e1218;border:1px solid #1e2530;border-radius:10px;padding:18px 24px;margin-bottom:24px;">
+    <div id="ap-readiness-card" class="card" style="display:none;margin-bottom:24px;">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
         <div style="font-size:13px;font-weight:600;color:#d8eaf8;">Autopilot readiness</div>
         <div id="ap-ready-status" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#ff9b66;">Earning trust…</div>
@@ -1148,12 +1148,12 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px;">
         <div>
           <div style="font-size:11px;color:#6b7280;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:4px;">Approvals (30d)</div>
-          <div style="height:6px;background:#1e2530;border-radius:3px;overflow:hidden;"><div id="ap-bar-approvals" style="height:100%;background:linear-gradient(90deg,#ff5500,#ff9b66);width:0%;transition:width .4s;"></div></div>
+          <div style="height:6px;background:#1e2530;border-radius:3px;overflow:hidden;"><div id="ap-bar-approvals" style="height:100%;background:linear-gradient(90deg,var(--accent),#d98b5f);width:0%;transition:width .4s;"></div></div>
           <div style="font-size:12px;color:#d8eaf8;margin-top:4px;"><strong id="ap-count">0</strong> / <strong>20</strong> needed</div>
         </div>
         <div>
           <div style="font-size:11px;color:#6b7280;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:4px;">Unedited tone match</div>
-          <div style="height:6px;background:#1e2530;border-radius:3px;overflow:hidden;"><div id="ap-bar-rate" style="height:100%;background:linear-gradient(90deg,#ff5500,#ff9b66);width:0%;transition:width .4s;"></div></div>
+          <div style="height:6px;background:#1e2530;border-radius:3px;overflow:hidden;"><div id="ap-bar-rate" style="height:100%;background:linear-gradient(90deg,var(--accent),#d98b5f);width:0%;transition:width .4s;"></div></div>
           <div style="font-size:12px;color:#d8eaf8;margin-top:4px;"><strong id="ap-rate">0%</strong> · <strong>70%</strong> needed</div>
         </div>
       </div>
@@ -1163,7 +1163,7 @@
 
     <!-- Business Brief -->
     <div class="section-label">Business Brief</div>
-    <div id="brief-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:24px;margin-bottom:24px;">
+    <div id="brief-card" class="card" style="margin-bottom:24px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:20px;flex-wrap:wrap;">
         <div style="flex:1;min-width:240px;">
           <div style="font-size:14px;font-weight:600;color:#e8e8e8;">Teach the agent your business</div>
@@ -1171,24 +1171,24 @@
         </div>
         <div style="text-align:right;">
           <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Brief health</div>
-          <div id="brief-health-pct" style="font-size:24px;font-weight:700;color:#ff5500;">—</div>
+          <div id="brief-health-pct" style="font-size:24px;font-weight:700;color:var(--accent);">—</div>
         </div>
       </div>
 
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
-        <button onclick="briefShowIntake()" style="background:#1e2530;color:#e8e8e8;border:1px solid #2a3340;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">✨ AI-assisted intake</button>
-        <button onclick="briefSave()" id="brief-save-btn" style="background:#ff5500;color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Save brief</button>
+        <button onclick="briefShowIntake()" class="btn btn--ghost btn--sm">✨ AI-assisted intake</button>
+        <button onclick="briefSave()" id="brief-save-btn" class="btn btn--primary btn--sm">Save brief</button>
         <span id="brief-save-status" style="font-size:11px;color:#555;align-self:center;"></span>
       </div>
 
       <!-- AI intake modal (hidden by default) -->
-      <div id="brief-intake-panel" style="display:none;background:#0a0a0a;border:1px solid #1e2530;border-radius:8px;padding:16px;margin-bottom:16px;">
-        <div style="font-size:13px;font-weight:600;color:#e8e8e8;margin-bottom:8px;">Paste a website URL or free text — the agent will structure it.</div>
-        <input type="text" id="brief-intake-url" placeholder="https://yourwebsite.com (optional)" style="width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid #1e2530;border-radius:6px;color:#e8e8e8;font-size:13px;font-family:inherit;margin-bottom:8px;box-sizing:border-box;">
-        <textarea id="brief-intake-text" rows="4" placeholder="Or just describe your business in your own words. What you sell, who you sell to, your pricing, your tone, what you'd never say." style="width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid #1e2530;border-radius:6px;color:#e8e8e8;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+      <div id="brief-intake-panel" style="display:none;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px;">Paste a website URL or free text — the agent will structure it.</div>
+        <input type="text" id="brief-intake-url" placeholder="https://yourwebsite.com (optional)" style="width:100%;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:6px;color:var(--ink);font-size:13px;font-family:inherit;margin-bottom:8px;box-sizing:border-box;">
+        <textarea id="brief-intake-text" rows="4" placeholder="Or just describe your business in your own words. What you sell, who you sell to, your pricing, your tone, what you'd never say." style="width:100%;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:6px;color:var(--ink);font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
         <div style="margin-top:10px;display:flex;gap:8px;">
-          <button onclick="briefRunIntake()" id="brief-intake-btn" style="background:#ff5500;color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Run intake</button>
-          <button onclick="briefHideIntake()" style="background:transparent;color:#555;border:1px solid #1e2530;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>
+          <button onclick="briefRunIntake()" id="brief-intake-btn" class="btn btn--primary btn--sm">Run intake</button>
+          <button onclick="briefHideIntake()" class="btn btn--ghost btn--sm">Cancel</button>
           <span id="brief-intake-status" style="font-size:11px;color:#555;align-self:center;"></span>
         </div>
       </div>
@@ -1265,15 +1265,15 @@ discount only today"></textarea>
     </div>
 
     <!-- Holding Reply -->
-    <div id="holding-card" style="background:#111;border:1px solid #1e2530;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
+    <div id="holding-card" class="card" style="margin-bottom:24px;">
       <div style="margin-bottom:12px;">
         <div style="font-size:14px;font-weight:600;color:#e8e8e8;">Holding Reply</div>
         <div style="font-size:12px;color:#555;margin-top:4px;">Auto-fires when a customer messages, while we prepare the real reply. Sent only while Autopilot is OFF, max once per contact per 24h.</div>
       </div>
-      <textarea id="holding-msg" maxlength="800" placeholder="e.g. Hi! Thanks for reaching out — we'll be right with you with full details." style="width:100%;min-height:90px;background:#0a0a0a;border:1px solid #1e2530;border-radius:8px;padding:12px;font-family:inherit;font-size:13px;color:#e8e8e8;resize:vertical;box-sizing:border-box;"></textarea>
+      <textarea id="holding-msg" maxlength="800" placeholder="e.g. Hi! Thanks for reaching out — we'll be right with you with full details." style="width:100%;min-height:90px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;font-family:inherit;font-size:13px;color:var(--ink);resize:vertical;box-sizing:border-box;"></textarea>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
         <span style="font-size:11px;color:#555;" id="holding-count">0 / 800</span>
-        <button onclick="portalSaveHolding()" style="background:#ff5500;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Save</button>
+        <button onclick="portalSaveHolding()" class="btn btn--primary btn--sm">Save</button>
       </div>
     </div>
 
@@ -1481,13 +1481,13 @@ async function loadRadar() {
       const phone = m.phone || "";
       const waLink = phone ? `https://wa.me/${phone.replace(/[^0-9]/g, "")}` : "";
       return `
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:12px;background:#0a0a0a;border:1px solid #1e2530;border-radius:8px;">
+        <div class="card" style="padding:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
           <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:600;color:#e8e8e8;">${m.contact_name || phone || "Unknown contact"}</div>
-            <div style="font-size:12px;color:#999;margin-top:3px;font-style:italic;">"${safeText.slice(0, 140)}${safeText.length > 140 ? "…" : ""}"</div>
-            <div style="font-size:11px;color:#555;margin-top:4px;">${ago}${m.channel ? " · " + m.channel : ""}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--ink);">${m.contact_name || phone || "Unknown contact"}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;font-style:italic;">"${safeText.slice(0, 140)}${safeText.length > 140 ? "…" : ""}"</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px;">${ago}${m.channel ? " · " + m.channel : ""}</div>
           </div>
-          ${waLink ? `<a href="${waLink}" target="_blank" style="background:#1e2530;color:#5dd28a;text-decoration:none;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;align-self:center;">Send quote →</a>` : ""}
+          ${waLink ? `<a href="${waLink}" target="_blank" class="btn btn--ghost btn--sm" style="white-space:nowrap;align-self:center;">Send quote →</a>` : ""}
         </div>`;
     }).join("");
   } catch (e) {
@@ -1502,15 +1502,11 @@ function esc(s) {
 }
 
 function copilotBadge(priority, intent) {
-  const color = priority === "hot" ? "#ffb84d"
-    : priority === "warm" ? "#5dd28a"
-    : priority === "closed" ? "#ff7a7a"
-    : "#777";
-  const bg = priority === "hot" ? "#1a1204"
-    : priority === "warm" ? "#07160f"
-    : priority === "closed" ? "#1c0909"
-    : "#151515";
-  return `<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:${color};background:${bg};border:1px solid ${color}33;border-radius:999px;padding:4px 8px;">${esc(intent || priority)}</span>`;
+  const cls = priority === "hot" ? "badge--warn"
+    : priority === "warm" ? "badge--ok"
+    : priority === "closed" ? "badge--danger"
+    : "badge--neutral";
+  return `<span class="badge ${cls}">${esc(intent || priority)}</span>`;
 }
 
 async function loadCopilot() {
@@ -1539,14 +1535,14 @@ async function loadCopilot() {
       const waLink = phone ? `https://wa.me/${phone.replace(/[^0-9]/g, "")}` : "";
       const ago = t.received_at ? relTime(t.received_at) : "";
       const draft = t.draft_preview
-        ? `<div style="margin-top:10px;background:#07120d;border:1px solid #123522;border-radius:8px;padding:10px;font-size:12px;color:#a9e9c4;line-height:1.45;">${esc(t.draft_preview)}</div>`
+        ? `<div style="margin-top:10px;background:var(--green-soft);border:1px solid rgba(46,125,50,0.25);border-radius:8px;padding:10px;font-size:12px;color:var(--ink2);line-height:1.45;">${esc(t.draft_preview)}</div>`
         : "";
       const approve = t.approval_id
-        ? `<button onclick="copilotApprove('${t.approval_id}', this)" style="background:#00a86b;color:#03140d;border:none;border-radius:6px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer;">Approve draft</button>
-           <button onclick="copilotSkip('${t.approval_id}', this)" style="background:#1e2530;color:#999;border:1px solid #2a3340;border-radius:6px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer;">Skip</button>`
+        ? `<button onclick="copilotApprove('${t.approval_id}', this)" class="btn btn--ok btn--sm">Approve draft</button>
+           <button onclick="copilotSkip('${t.approval_id}', this)" class="btn btn--ghost btn--sm">Skip</button>`
         : "";
       return `
-        <div style="background:#0a0a0a;border:1px solid #1e2530;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+        <div class="card" style="padding:14px;display:flex;flex-direction:column;gap:10px;">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
             <div style="min-width:0;">
               <div style="font-size:13px;font-weight:700;color:#e8e8e8;">${esc(t.contact_name)}</div>
@@ -1555,11 +1551,11 @@ async function loadCopilot() {
             ${copilotBadge(t.priority, t.intent)}
           </div>
           <div style="font-size:12px;color:#999;line-height:1.45;font-style:italic;">"${esc(t.reply_text || t.summary || "No message text captured.").slice(0, 220)}"</div>
-          <div style="font-size:12px;color:#fff;line-height:1.45;"><span style="color:#ff5500;font-weight:700;">Next:</span> ${esc(t.suggested_action)}</div>
+          <div style="font-size:12px;color:var(--ink);line-height:1.45;"><span style="color:var(--accent);font-weight:700;">Next:</span> ${esc(t.suggested_action)}</div>
           ${draft}
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;">
             ${approve}
-            ${waLink ? `<a href="${waLink}" target="_blank" style="background:#1e2530;color:#5dd28a;text-decoration:none;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:700;">Open WhatsApp →</a>` : ""}
+            ${waLink ? `<a href="${waLink}" target="_blank" class="btn btn--ghost btn--sm">Open WhatsApp →</a>` : ""}
           </div>
         </div>`;
     }).join("");
@@ -1704,12 +1700,12 @@ function _setApState(enabled) {
   const desc   = document.getElementById("ap-portal-desc");
   if (!toggle) return;
   toggle.checked = enabled;
-  slider.style.background = enabled ? "#ff5500" : "#1e2530";
-  slider.style.borderColor = enabled ? "#ff5500" : "#2a3340";
+  slider.style.background = enabled ? "var(--accent)" : "var(--surface-2)";
+  slider.style.borderColor = enabled ? "var(--accent)" : "var(--line)";
   knob.style.transform = enabled ? "translateX(20px)" : "none";
-  knob.style.background = enabled ? "#fff" : "#555";
+  knob.style.background = enabled ? "#fff" : "var(--muted)";
   status.textContent = enabled ? "AUTO" : "HITL";
-  status.style.color = enabled ? "#ff5500" : "#555";
+  status.style.color = enabled ? "var(--accent)" : "var(--muted)";
   desc.textContent = enabled
     ? "Autopilot ON — AI sends safe messages directly. Complaints and disputes still come to you."
     : "Autopilot OFF — every AI draft waits for your approval before sending.";
@@ -1864,7 +1860,7 @@ async function briefLoad() {
     const health = data.health || {};
     const pct = Math.round((health.completeness || 0) * 100);
     document.getElementById("brief-health-pct").textContent = pct + "%";
-    document.getElementById("brief-health-pct").style.color = pct >= 70 ? "#16a34a" : pct >= 40 ? "#ff5500" : "#777";
+    document.getElementById("brief-health-pct").style.color = pct >= 70 ? "var(--green)" : pct >= 40 ? "var(--accent)" : "var(--muted)";
   } catch(e) { console.warn("brief load failed", e); }
 }
 
@@ -1956,8 +1952,8 @@ async function portalSaveHolding() {
     });
     if (!resp.ok) throw new Error(await resp.text());
     btn.textContent = "Saved ✓";
-    btn.style.background = "#16a34a";
-    setTimeout(() => { btn.textContent = orig; btn.style.background = "#ff5500"; }, 1500);
+    btn.style.background = "var(--green)";
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ""; }, 1500);
   } catch(e) {
     alert("Could not save holding reply: " + e.message);
   }

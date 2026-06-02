@@ -46,14 +46,19 @@ accent and the marketing-site brand colour). `#ff5500` is migrated away per phas
 1. ✅ **Phase 1** — tokens + primitives; **Command Center** (`#tab-overview`) launcher + Demo Sandbox.
 2. ✅ **Phase 2** — **Clients** (Demo Sandbox + Unipile cards), **Approvals** (approve-all bar + `.btn--ok/--danger`), **Money Engine** (copilot controls + empty-states).
 3. ✅ **Phase 3** — **Growth** + **AI** ("Coming soon" cards → `.card--placeholder`+`.soon-tag`), **Billing** (intro header), **System** (sub-nav action buttons, fixed stray `#ff5500`). Shared `.tab-intro-title/.tab-intro-sub` for tab headers.
-4. 🔶 **Phase 4a (done)** — `portal.html`: warm-valued primitives added (`.card`,
-   `.btn`+modifiers, `.badge`, `.toolbar`, `.panel-title`, `.empty-state`) mapping
-   the shared vocabulary onto the cream control-room palette (`--accent: var(--orange)`).
-   Fixed dark-on-cream CSS-rule bugs (topbar, `.sc-kpi`, `.brief-input`,
-   `.activity-item`, `.leads-table`, status badges, `.score-badge`) and remapped
-   low-contrast mint/amber accent text. Guarded by `tests/test_portal_design.py`.
-   **Phase 4b (todo)** — migrate the portal's remaining inline cards/buttons
-   (35 / 8) to `.card`/`.btn--*` per tab; lower the portal ceilings as they go.
+4. ✅ **Phase 4 (done)** — `portal.html` warm control room.
+   - **4a:** warm-valued primitives (`.card`, `.btn`+modifiers, `.badge`, `.toolbar`,
+     `.panel-title`, `.empty-state`) on the cream palette (`--accent: var(--orange)`);
+     fixed dark-on-cream CSS-rule bugs (topbar, `.sc-kpi`, `.brief-input`,
+     `.activity-item`, `.leads-table`, status badges, `.score-badge`).
+   - **4b:** migrated card wrappers + buttons (static **and** JS-rendered: copilot,
+     radar, badges) to primitives; fixed the 3 dark-gradient hero cards
+     (owner-brief, agent-learning, money-leak) the override couldn't reach; routed
+     **every** `#ff5500` through `--accent`; tokenised remaining inline form
+     inputs/tiles. Counts: inline buttons **8→0**, ad-hoc cards **35→11** (the 11 are
+     warm form inputs/tiles, no dark hex), `#ff5500` **→0**. Ceilings 0 / 11.
+   - Guarded by `tests/test_portal_design.py` (no dark rules, no dark inline, no
+     raw `#ff5500`, regression budget).
 
 ## Rules
 

@@ -46,9 +46,18 @@ def test_portal_no_dark_card_rules():
     assert not bugs, f"dark CSS-rule background/border on the warm portal: {bugs[:5]}"
 
 
-# Regression budget (portal). Lower as inline cards/buttons migrate to .card/.btn.
-PORTAL_INLINE_BUTTON_CEILING = 8
-PORTAL_ADHOC_CARD_CEILING = 35
+# Regression budget (portal). Phase 4b migrated card wrappers/buttons to primitives;
+# the 11 remaining are warm-tokenized form inputs/tiles (no dark hex).
+PORTAL_INLINE_BUTTON_CEILING = 0
+PORTAL_ADHOC_CARD_CEILING = 11
+
+
+def test_portal_no_dark_inline_or_ff5500():
+    """Phase 4b routed every #ff5500 through --accent and tokenised inline darks.
+    No dark #0xxxxx backgrounds/borders and no raw #ff5500 should remain anywhere."""
+    assert "#ff5500" not in HTML.lower(), "raw #ff5500 must route through var(--accent)"
+    darkbg = re.findall(r'(?:background[^;:]*|border[^;:]*):\s*#0[0-9a-f]{3,5}\b', HTML)
+    assert not darkbg, f"dark inline background/border on warm portal: {set(darkbg[:5])}"
 
 
 def test_portal_inline_does_not_regrow():
