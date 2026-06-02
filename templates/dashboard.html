@@ -419,8 +419,11 @@
   .ct-client-row {
     background:#0e1218; border:1px solid #1e2530; border-radius:10px;
     padding:14px 18px; display:grid;
-    grid-template-columns: 200px 90px 90px 1fr 120px 140px 100px;
-    align-items:center; gap:12px;
+    /* 6 data columns on row 1; the action toolbar drops to its own full-width
+       row below (see .ct-actions grid-column:1/-1) so 13 buttons never stack
+       into a tall narrow column. */
+    grid-template-columns: minmax(180px,1.6fr) 90px 100px minmax(200px,2fr) 130px 90px;
+    align-items:center; column-gap:12px; row-gap:12px;
     transition:border-color 0.15s;
   }
   .ct-client-row:hover { border-color:#2a3a4a; }
@@ -445,7 +448,11 @@
   .ct-usage-fill.safe { background:#00e5a0; }
   .ct-usage-fill.warn { background:#f5c842; }
 
-  .ct-actions { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .ct-actions {
+    grid-column: 1 / -1;            /* full-width toolbar on its own row */
+    display:flex; gap:6px; flex-wrap:wrap; align-items:center;
+    margin-top:12px; padding-top:12px; border-top:1px solid #161c24;
+  }
   .ct-btn { font-size:10px; font-weight:600; padding:5px 10px; border:1px solid #2a3340; background:#111; color:#aaa; border-radius:6px; cursor:pointer; white-space:nowrap; transition:all 0.15s; }
   .ct-btn:hover { background:#1e2530; color:#e8e8e8; }
   .ct-btn.primary { background:#ff5500; border-color:#ff5500; color:#fff; }
@@ -3121,15 +3128,15 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   <div class="ct-section" data-reflow="clients">
     <div class="ct-section-title">Client Roster</div>
 
-    <!-- Column headers -->
-    <div style="display:grid;grid-template-columns:200px 90px 90px 1fr 120px 140px 100px;gap:12px;padding:0 18px 8px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#444;font-weight:600;">
+    <!-- Column headers — match .ct-client-row's 6 data columns (actions sit in a
+         full-width toolbar under each row, so no Actions header here). -->
+    <div style="display:grid;grid-template-columns:minmax(180px,1.6fr) 90px 100px minmax(200px,2fr) 130px 90px;column-gap:12px;padding:0 18px 8px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#444;font-weight:600;">
       <span>Client</span>
       <span>Plan</span>
       <span>Status</span>
       <span>Pipeline</span>
       <span>Usage</span>
       <span>Deals Closed</span>
-      <span>Actions</span>
     </div>
 
     <div class="ct-client-grid" id="ct-client-grid">
