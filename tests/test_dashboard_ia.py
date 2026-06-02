@@ -70,3 +70,35 @@ def test_authheaders_is_defined():
     """~120 loaders call authHeaders(); without a global definition every one
     throws ReferenceError and its panel never loads (e.g. Outreach Analytics)."""
     assert "function authHeaders(" in HTML, "global authHeaders() helper missing"
+
+
+@pytest.mark.parametrize("dead_nav", [
+    "switchTabByName('tower')",
+    "switchTabByName('attention')",
+    'clientsNav("tower"',
+])
+def test_no_dead_nav_to_retired_panes(dead_nav):
+    """#tab-tower and #tab-attention are reflow-source shells only. Nothing should
+    navigate to them or the operator lands on a blank pane."""
+    assert dead_nav not in HTML, f"dead nav to a retired pane still present: {dead_nav}"
+
+
+def test_retired_panes_are_hidden_reflow_sources():
+    """Both source shells must be display:none so they can never show as a tab."""
+    for pane in ("tab-tower", "tab-attention"):
+        m = re.search(rf'id="{pane}"[^>]*', HTML)
+        assert m and "display:none" in m.group(0), f"#{pane} must be display:none"
+
+
+def test_old_simpler_roster_removed():
+    """The Clients tab should have ONE roster (the rich operator view that reflows
+    in). The older roster-table/roster-tbody must be gone."""
+    assert 'id="roster-table"' not in HTML, "old simpler roster-table still present"
+    assert 'id="roster-tbody"' not in HTML, "old roster-tbody still present"
+
+
+def test_rich_roster_reflows_into_clients():
+    """The rich operator roster (#ct-client-grid) must carry data-reflow='clients'
+    so it lands in the Clients tab (its container is the source shell)."""
+    block = HTML[HTML.index("Client Roster") - 200: HTML.index("Client Roster") + 200]
+    assert 'data-reflow="clients"' in block, "rich roster not tagged to reflow into Clients"

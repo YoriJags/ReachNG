@@ -53,10 +53,31 @@ The current `#tab-tower` ("Control Tower") is a grab-bag — it gets split apart
 | tower → MRR by Product Line | **Billing** |
 | tower → Plan Packages | **Billing** |
 | `#tab-tools` (health, logs, flow) | **System** |
+| tower → Client Roster (rich operator view) | **Clients** (now the primary roster) |
+| tower → System Health strip | **System** (`#tools-reflow-body`) |
 | Needs-Attention "failed jobs" card | **System** (jobs) + surfaced in Command Center |
 
 After this, `#tab-tower` is retired (its sections redistributed). Deferred-suite
 panes were already stripped.
+
+### 2026-06-02 cleanup (junk removal)
+
+Three things were still stranded after the original split and have now been resolved:
+
+- **Rich operator Client Roster** (Run / Invoice / Status / Autopilot / Signal /
+  Pair-WA / Onboard / Offboard, usage bars, funnel, deals-won) had no reflow tag,
+  so it was stuck in the hidden `#tab-tower`. It now `data-reflow="clients"` and is
+  the single roster in **Clients**; the older simpler `roster-table` was removed
+  (`refreshRoster()` kept only as the headline client-count feeder).
+- **System Health** strip now `data-reflow="tools"` → **System** (`#tools-reflow-body`).
+- **Dead nav severed:** `_TAB_REMAP.tower`, the `_subNavSwitch`/`switchTab` `tower`
+  branches, the ⚡ quick-menu "Control Tower" button, and the Command Center
+  "Needs attention →" button (its grid is already inline in Command Center) all
+  removed. `#tab-tower` and `#tab-attention` are now `display:none` **reflow-source
+  shells only** — never navigated to. `loadControlTower()` now also fires on the
+  Clients tab + initial `fullRefresh()` so the relocated roster populates.
+- Stale copy fixed: "Control Tower tab" SOP refs → Billing/Clients; plan labels
+  aligned to the locked Solo ₦60k / Team ₦120k / Empire ₦250k ladder.
 
 ---
 

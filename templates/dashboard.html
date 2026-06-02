@@ -1969,7 +1969,7 @@ function copyDemoPortalLink(btn){
 
   <!-- Command Center — needs-attention launcher (what's broken / what do I do next) -->
   <section style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;padding:11px 14px;background:#0e1318;border:1px solid #1e2530;border-radius:10px;">
-    <button onclick="switchTabByName('attention')" style="background:transparent;color:#7a8590;border:0;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-right:4px;cursor:pointer;padding:0;">Needs attention →</button>
+    <span style="color:#7a8590;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-right:4px;">Jump to</span>
     <button onclick="switchTabByName('approvals')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📝 Approvals</button>
     <button onclick="switchTabByName('clients')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">👥 Clients</button>
     <button onclick="sidebarNav('growth', document.getElementById('ssn-growth'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📡 Growth</button>
@@ -2206,7 +2206,9 @@ function copyDemoPortalLink(btn){
 </div>
 
 <!-- ── Activate Tab ───────────────────────────────────────────────────────────── -->
-<div class="tab-panel" id="tab-attention">
+<!-- Reflow source only: the Needs-Attention grid below reflows into Command Center.
+     This pane is never shown as a tab (no nav points here). -->
+<div class="tab-panel" id="tab-attention" style="display:none;">
   <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:6px;">
     <h2 style="font-size:18px;font-weight:700;color:#e8e8e8;margin:0;">Needs attention</h2>
     <button onclick="loadNeedsAttention()" style="background:#15171a;color:#9aa5b1;border:1px solid #2a3340;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">↻ Refresh</button>
@@ -2319,8 +2321,11 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   <div id="billing-reflow-body"></div>
 </div>
 
-<div class="tab-panel" id="tab-tower">
-  <!-- Control Tower is now its own top-level sidebar tab (decoupled from the Clients sub-nav). -->
+<!-- Reflow SOURCE ONLY — retired tab. Every section below carries a data-reflow tag
+     and is moved into its real tab (Command Center / Clients / Growth / AI / Billing /
+     System) on load. This pane is never navigated to; it just holds the source markup. -->
+<div class="tab-panel" id="tab-tower" style="display:none;">
+  <!-- Control Tower was split across the 8 tabs; this shell only seeds the reflow. -->
   <div style="font-size:18px;font-weight:700;color:#e8e8e8;margin-bottom:4px;">Control Tower</div>
   <p style="color:#6a7280;font-size:12px;margin:0 0 20px;">Self-outreach, prospect interviews, agent learning, and pricing — your growth + tuning cockpit.</p>
 
@@ -3112,8 +3117,8 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <div id="pilot-result" style="margin-top:12px;display:none;"></div>
   </div>
 
-  <!-- Client roster -->
-  <div class="ct-section">
+  <!-- Client roster — rich operator view (relocated into the Clients tab) -->
+  <div class="ct-section" data-reflow="clients">
     <div class="ct-section-title">Client Roster</div>
 
     <!-- Column headers -->
@@ -3143,8 +3148,8 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     </div>
   </div>
 
-  <!-- System health strip -->
-  <div class="ct-section">
+  <!-- System health strip — relocated into the System tab -->
+  <div class="ct-section" data-reflow="tools">
     <div class="ct-section-title">System Health <span id="ct-sweep-time" style="color:#333;font-weight:400;text-transform:none;letter-spacing:0;"></span></div>
     <div class="ct-kpi-row" id="ct-health-grid">
       <div class="ct-kpi muted"><div class="ct-kpi-val" id="ct-h-mongodb">—</div><div class="ct-kpi-lbl">MongoDB</div></div>
@@ -3459,35 +3464,16 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <div class="sop-title">Client Onboarding SOP — From "Yes" to First Send</div>
     <div class="sop-step"><span class="sop-num">0</span><span><b>They said yes — collect intake info</b> — ask via WhatsApp: (1) business name &amp; sector, (2) target customer description, (3) city / cities, (4) preferred tone (formal or casual), (5) which number to send from. This takes 5 minutes.</span></div>
     <div class="sop-step"><span class="sop-num">1</span><span><b>Unipile QR scan</b> — Client opens WhatsApp on their business phone → go to Unipile dashboard → Accounts → Add Account → WhatsApp → client scans QR. Takes 30 seconds. Copy the <b>Account ID</b> (looks like <code>acc_xxxxxxxx</code>) — you'll need it in Step 3.</span></div>
-    <div class="sop-step"><span class="sop-num">2</span><span><b>Set their plan &amp; billing</b> — choose Starter (₦50k/mo · 200 msgs), Growth (₦120k/mo · 500 msgs), or Agency (₦250k/mo · unlimited). Enter their monthly fee in the form. Payment status starts as <b>Trial</b> — flip to <b>Active</b> once they pay. Track in Control Tower tab.</span></div>
+    <div class="sop-step"><span class="sop-num">2</span><span><b>Set their plan &amp; billing</b> — choose Solo (₦60k/mo), Team (₦120k/mo), or Empire (₦250k/mo). Enter their monthly fee in the form. Payment status starts as <b>Trial</b> — flip to <b>Active</b> once they pay. Track in the Billing tab.</span></div>
     <div class="sop-step"><span class="sop-num">3</span><span><b>Create client record</b> — fill all fields: name, vertical, city, plan, monthly fee, Unipile Account ID. <b>Brief is the most important field</b> — who they are, what they sell, their tone, their target customer. The more detail, the better the AI-generated messages.</span></div>
     <div class="sop-step"><span class="sop-num">4</span><span><b>Generate portal link</b> → send to client on WhatsApp. Say: <i>"Here's your live dashboard — you can see every contact we reach out to, all replies, and your ROI in real time."</i></span></div>
     <div class="sop-step"><span class="sop-num">5</span><span><b>Pick their suites</b> — which of the 12 revenue products do they need? Invoice Chaser and Debt Collector are the default starters (every Lagos &amp; Abuja SME has overdue money on the street). Layer Fleet Dispatcher, School Fees, or MarketOS where it fits their business.</span></div>
     <div class="sop-step"><span class="sop-num">6</span><span><b>Load their data</b> — upload outstanding invoices, debt cases, trucks, or student roster via the suite tabs. The schedulers take over: invoice chase at 9am, debt collector at 9:30am, fleet escalation hourly, market alerts 3× daily. All drafts land in <b>Message Queue</b> for your tap-to-send.</span></div>
-    <div class="sop-step"><span class="sop-num">7</span><span><b>Month-end billing</b> — Control Tower tab → find client → click <b>Invoice</b> → select month → Open Invoice → Print to PDF → send to client. Update payment status to Active once paid, Overdue if 7+ days late.</span></div>
+    <div class="sop-step"><span class="sop-num">7</span><span><b>Month-end billing</b> — Clients tab roster → find client → click <b>Invoice</b> → select month → Open Invoice → Print to PDF → send to client. Update payment status to Active once paid, Overdue if 7+ days late.</span></div>
   </div>
 
-  <p class="section-title">Client Roster <span id="roster-count" style="color:#555;font-size:11px;margin-left:6px;"></span></p>
-  <div class="form-card" style="padding:0;overflow:hidden;overflow-x:auto;">
-    <table class="roster-table" id="roster-table">
-      <thead>
-        <tr>
-          <th>Client</th>
-          <th>Vertical</th>
-          <th>Territory</th>
-          <th>Plan</th>
-          <th>WhatsApp</th>
-          <th>Status</th>
-          <th>Last Campaign</th>
-          <th>Portal</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="roster-tbody">
-        <tr><td colspan="9" class="empty">Loading clients…</td></tr>
-      </tbody>
-    </table>
-  </div>
+  <!-- Old simpler roster retired — the rich operator roster (Run/Invoice/Status/
+       Autopilot/Signal/Pair-WA/Onboard/Offboard) now reflows in at the top of this tab. -->
 
   <p class="section-title" style="margin-top:32px;">Client Onboarding <span style="color:#ff5c00;font-size:10px;margin-left:6px;">3-Step Setup</span></p>
   <div class="form-card">
@@ -3521,9 +3507,9 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <div class="row">
       <select id="ob-plan" style="flex:1;">
         <option value="">Select Plan</option>
-        <option value="starter">Starter — ₦50k setup + ₦50k/mo · 300 msgs · 1 vertical</option>
-        <option value="growth">Growth — ₦120k setup + ₦120k/mo · 1,000 msgs · 3 verticals</option>
-        <option value="agency">Agency — ₦250k setup + ₦250k/mo · Unlimited · All verticals</option>
+        <option value="starter">Solo — ₦60k/mo · 1 vertical</option>
+        <option value="growth">Team — ₦120k/mo · 3 verticals</option>
+        <option value="agency">Empire — ₦250k/mo · Unlimited · All verticals</option>
         <option value="national">National — ₦200k/mo · Multi-state · All verticals</option>
         <option value="international">International — Custom · Cross-border campaigns</option>
       </select>
@@ -3813,6 +3799,9 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <a href="/dashboard/flow" target="_blank" style="background:#111;color:#aaa;border:1px solid #2a3340;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;margin-left:4px;">Flow ↗</a>
     <a href="/dashboard/copilot" target="_blank" style="background:#ff5500;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;text-decoration:none;display:flex;align-items:center;margin-left:4px;">Copilot ↗</a>
   </div>
+
+  <!-- System Health strip reflows in here (relocated from the retired Control Tower pane) -->
+  <div id="tools-reflow-body"></div>
 
   <div class="sop-box">
     <div class="sop-title">Tools SOP</div>
@@ -4780,7 +4769,6 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <button class="quick-action-btn" onclick="switchTabByName('replies')"><span class="q-dot" style="background:#ff5c00;box-shadow:0 0 6px #ff5c0060;"></span> Check Hot Leads</button>
     <button class="quick-action-btn" onclick="switchTabByName('campaigns')"><span class="q-dot" style="background:#c084fc;box-shadow:0 0 6px #c084fc60;"></span> Run Campaign</button>
     <button class="quick-action-btn" onclick="switchTabByName('approvals')"><span class="q-dot" style="background:#f5c842;box-shadow:0 0 6px #f5c84260;"></span> Message Queue</button>
-    <button class="quick-action-btn" onclick="switchTabByName('tower')"><span class="q-dot" style="background:#ff5500;box-shadow:0 0 6px #ff550060;"></span> Control Tower</button>
     <button class="quick-action-btn" onclick="switchTabByName('clients')"><span class="q-dot" style="background:#4488ff;box-shadow:0 0 6px #4488ff60;"></span> Onboard Client</button>
     <button class="quick-action-btn" onclick="switchTabByName('invoices')"><span class="q-dot" style="background:#ff7a30;"></span> Send Invoice</button>
     <button class="quick-action-btn" onclick="quickExportAll()"><span class="q-dot" style="background:#5599ff;"></span> Export Contacts</button>
@@ -5290,7 +5278,7 @@ function switchTab(name, btn) {
   if (name === "attention")   loadNeedsAttention();
   if (name === "overview")    loadNeedsAttention();
   if (name === "activate")    loadActivateTab();
-  if (name === "tower" || name === "growth" || name === "ai" || name === "billing") loadControlTower();
+  if (name === "growth" || name === "ai" || name === "billing" || name === "clients") loadControlTower();
   if (name === "sf_students") sfLoadStudentsTable();
   if (name === "sf_claims")   sfLoadClaims();
   if (name === "da_overview") daLoadOverview();
@@ -5371,9 +5359,11 @@ async function refreshHealth() {
 async function refreshRoster() {
   try {
     const clients = await fetchJSON("/api/v1/clients/");
+    // Old roster table was retired; this loader now only feeds the headline client
+    // counts. The full roster (with actions) is rendered by loadControlTower().
     const tbody = document.getElementById("roster-tbody");
     if (!clients || !clients.length) {
-      tbody.innerHTML = '<tr><td colspan="9" class="empty">No clients yet. Add one in Client Onboarding below.</td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="empty">No clients yet. Add one in Client Onboarding below.</td></tr>';
       document.getElementById("s-clients").textContent = "0";
       const heroClients = document.getElementById("kpi-clients-hero");
       if (heroClients) heroClients.textContent = "0";
@@ -5383,6 +5373,7 @@ async function refreshRoster() {
     document.getElementById("s-clients").textContent = activeClients;
     const heroClients = document.getElementById("kpi-clients-hero");
     if (heroClients) heroClients.textContent = activeClients;
+    if (!tbody) return;  // roster table retired — counts above are the only side-effect now
     tbody.innerHTML = clients.map(c => {
       const plan = c.plan || "";
       const planClass = plan ? `plan-${plan}` : "plan-starter";
@@ -5991,7 +5982,7 @@ async function loadControlTower() {
         const dealsWon = leads.closed_won || 0;
 
         const payClass = { trial:"pay-trial", active:"pay-active", overdue:"pay-overdue", churned:"pay-churned" }[payStatus] || "pay-trial";
-        const planLabel = { starter:"Starter", growth:"Growth", agency:"Agency" }[plan] || plan;
+        const planLabel = { starter:"Solo", growth:"Team", agency:"Empire" }[plan] || plan;
 
         const ctProdColors = {reachng:"#ff5c00",digital_associates:"#6366f1",loan_officer:"#00c47a"};
         const ctProdLabels = {reachng:"ReachNG",digital_associates:"Digital Assoc.",loan_officer:"Loan Officer"};
@@ -7022,7 +7013,6 @@ function toggleQuickMenu() {
 const _TAB_REMAP = {
   campaigns:    () => clientsNav("campaigns", null),
   briefs:       () => { clientsNav("briefs", null); briefAdminLoadClients(); },
-  tower:        () => { clientsNav("tower", null);  loadControlTower(); },
   replies:      () => recoverNav("replies", null),
   closer:       () => { recoverNav("closer", null); closerAdminLoadClients(); },
   invoices:     () => recoverNav("invoices", null),
@@ -7047,7 +7037,7 @@ function _subNavSwitch(panelName) {
   const panel = document.getElementById("tab-" + panelName);
   if (panel) { panel.style.display = "block"; panel.classList.add("active"); }
   // Auto-load
-  if (panelName === "tower")       loadControlTower();
+  if (panelName === "clients")     loadControlTower();
   if (panelName === "pipeline")    loadPipeline();
   if (panelName === "activate")    loadActivateTab();
 }
@@ -7147,6 +7137,7 @@ async function loadDiscoveryHealth() {
 
 async function fullRefresh() {
   await Promise.all([refresh(), refreshRoster()]);
+  loadControlTower();  // populates the rich operator roster (now in the Clients tab) + revenue KPIs
   // Build Today's Work after data is loaded
   try {
     const [approvals, replies, pipeline, invoices] = await Promise.all([
@@ -10637,9 +10628,9 @@ async function actSkip(id, btn) {
       <div>
         <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Plan</label>
         <select id="ob-plan" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
-          <option value="starter">Starter</option>
-          <option value="growth">Growth</option>
-          <option value="agency">Agency</option>
+          <option value="starter">Solo — ₦60k/mo</option>
+          <option value="growth">Team — ₦120k/mo</option>
+          <option value="agency">Empire — ₦250k/mo</option>
         </select>
       </div>
       <div>
