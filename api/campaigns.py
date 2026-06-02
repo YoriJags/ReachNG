@@ -19,6 +19,7 @@ class RunCampaignRequest(BaseModel):
     cities: list[str] = Field(default=[], max_length=10, description="Run discovery across multiple cities. e.g. ['Lagos', 'Abuja', 'Port Harcourt']")
     target_sectors: list[str] = Field(default=[], description="agency_sales only: limit discovery to these sectors e.g. ['real_estate','recruitment']")
     min_rating: Optional[float] = Field(default=None, ge=1.0, le=5.0, description="Only contact businesses with Google rating >= this value")
+    min_reviews: Optional[int] = Field(default=None, ge=0, le=100000, description="Only contact businesses with at least this many Google reviews. b2b_saas defaults to 30 when omitted.")
 
 
 class RunAllRequest(BaseModel):
@@ -47,6 +48,7 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
             cities=body.cities or None,
             target_sectors=body.target_sectors or None,
             min_rating=body.min_rating,
+            min_reviews=body.min_reviews,
         )
         return {
             "status": "started",
@@ -64,6 +66,7 @@ async def run_campaign(body: RunCampaignRequest, background_tasks: BackgroundTas
         cities=body.cities or None,
         target_sectors=body.target_sectors or None,
         min_rating=body.min_rating,
+        min_reviews=body.min_reviews,
     )
     return result
 

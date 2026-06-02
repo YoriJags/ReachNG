@@ -116,3 +116,68 @@ switchers for **EstateOS** + **TalentOS**.
 > in the sidebar (LendOS, FleetOS, SchoolOS, LegalOS, debt-collector, float-optimizer,
 > fx-lock, fuel-reprice, market-credit, material-check, product-auth, etc.). They're
 > mostly unreachable but bloat the page. See the dead-UI audit / cleanup task.
+
+---
+
+## Pre-launch premium outreach (internal Prospect OS)
+
+Founder-led, early-access outreach for **ReachNG itself** — not client lead-gen.
+Discovers premium, owner-led Lagos/Abuja SMEs that live on WhatsApp and drafts a
+personal founder email for each. Reuses the existing discovery → score → HITL
+pipeline; the campaign vertical is **`b2b_saas`**.
+
+**Positioning guardrails (baked into the drafter):** never claim the product has
+launched; never promise leads or guaranteed revenue; no "Dear sir/ma"; no hype;
+mention their category/city; never mention Maps/scraping. Position EYO as a
+trainable AI employee for WhatsApp that replies faster, catches payment/customer
+signals, and briefs the owner daily — every reply waits for the owner's tap.
+
+### 1. Dry-run discovery (safe, nothing sends)
+Dashboard → **Growth · Prospect OS → Run Campaign**:
+- Vertical: **⭐ ReachNG Pre-launch (Premium SMEs · founder voice)**
+- City: Lagos or Abuja · keep **Dry run** ticked · **Review before send** is forced on
+- Run. You'll see drafted emails + each lead's variant (A/B/C), rating, review count, verdict.
+
+Or via API (admin Basic Auth):
+```
+POST /api/v1/campaigns/run
+{ "vertical":"b2b_saas", "cities":["Lagos"], "max_contacts":15,
+  "dry_run":true, "hitl_mode":true }
+```
+`min_rating` defaults to **4.3** and `min_reviews` to **30** for `b2b_saas` (override either in the body).
+
+### 2. Queue real drafts for review (still no auto-send)
+Same control, untick **Dry run** but leave **Review before send** on (forced for this
+vertical). Drafts land in **Approvals** — nothing leaves until you approve. Each
+contact is recorded with its A/B/C angle at queue time.
+
+### 3. Review + send approved messages
+**Approvals** tab → read each draft → Approve (sends) / Edit / Skip. Edits feed the
+learning loop. Sending is capped by `DAILY_SEND_LIMIT` (default 50/day).
+
+### 4. Check results
+- **Growth → Outreach Analytics** — opens / clicks / waitlist conversions (Resend + `/hi/{slug}`).
+- A/B/C reply rates: `GET /api/v1/ab/stats?vertical=b2b_saas` (winner across the 3 angles).
+
+### Variants (A/B/C, auto-assigned per contact)
+- **A · Founder/direct** — early-access invitation from the founder.
+- **B · Money-leak** — money dying in WhatsApp chats (missed enquiries, unpaid follow-ups).
+- **C · Owner-relief** — EYO watches WhatsApp, drafts in your voice, daily brief.
+
+### Lead scoring (who gets contacted)
+`tools/lead_scorer.py` ranks Hot/Warm/Cold. Premium signals: rating ≥ 4.3, reviews
+≥ 30, WhatsApp-heavy category (restaurants/hotels/lounges/clinics/gyms/real-estate/
+auto/schools/logistics/etc.), premium keyword in name, premium neighbourhood. Cold
+leads are dropped from the campaign automatically.
+
+### Env vars
+- `GOOGLE_MAPS_API_KEY` — discovery (missing → discovery returns nothing + logs `maps_discovery_skipped_no_key`; the rest of the run still works).
+- `ANTHROPIC_API_KEY` — founder-voice drafts (Haiku, ~₦4 each).
+- `RESEND_API_KEY` — email send from `hello@reachng.ng`.
+- `MONGODB_URI` — contacts / dedup / A/B store.
+- Optional: `DAILY_SEND_LIMIT` (default 50), `DEFAULT_CITY` (default Lagos).
+
+### Safety defaults
+Dry-run + HITL on by default; **WhatsApp is not used** for ReachNG's own prospecting
+(email only — no Unipile cost/spam risk); cross-run dedup via `place_id` (90-day
+refresh); per-business one contact; daily send cap. Never auto-send the first campaign.

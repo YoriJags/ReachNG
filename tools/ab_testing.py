@@ -1,11 +1,20 @@
 """
-A/B message testing — tracks which message variant was sent per contact
-and compares reply rates between variants A and B.
+A/B/C message testing — tracks which message variant was sent per contact
+and compares reply rates across variants.
+
+Variants are A/B/C. For the ReachNG pre-launch founder outreach they map to
+three angles (see services/reachng_self_outreach.VARIANT_STYLES):
+    A → founder/direct    B → money-leak    C → owner-relief
+Older 2-variant campaigns that only ever produced A/B still work unchanged.
 """
 import random
 from datetime import datetime, timezone, timedelta
 from database import get_db
 from pymongo import ASCENDING, DESCENDING
+
+# The full variant set. Kept in one place so the drafter, the runner, and the
+# stats reader never drift out of sync.
+VARIANTS = ("A", "B", "C")
 
 
 def get_ab_collection():
@@ -21,8 +30,8 @@ def ensure_ab_indexes():
 
 
 def assign_variant() -> str:
-    """Randomly assign A or B with equal probability."""
-    return random.choice(["A", "B"])
+    """Randomly assign one variant with equal probability across A/B/C."""
+    return random.choice(VARIANTS)
 
 
 def record_ab_send(
@@ -75,7 +84,7 @@ def get_ab_stats(vertical: str | None = None, days: int = 30) -> dict:
     rows = {r["_id"]: r for r in col.aggregate(pipeline)}
 
     result = {}
-    for variant in ("A", "B"):
+    for variant in VARIANTS:
         r = rows.get(variant, {"sent": 0, "replied": 0})
         sent    = r["sent"]
         replied = r["replied"]
@@ -85,15 +94,15 @@ def get_ab_stats(vertical: str | None = None, days: int = 30) -> dict:
             "reply_rate": round((replied / sent) * 100, 1) if sent else 0,
         }
 
-    # Winner
-    ra = result["A"]["reply_rate"]
-    rb = result["B"]["reply_rate"]
-    if ra > rb:
-        result["winner"] = "A"
-    elif rb > ra:
-        result["winner"] = "B"
-    else:
+    # Winner = highest reply rate among variants that actually sent. Ties (incl.
+    # the all-zero cold start) report "tie" so we never crown a phantom winner.
+    contenders = [(v, result[v]["reply_rate"]) for v in VARIANTS if result[v]["sent"] > 0]
+    if not contenders:
         result["winner"] = "tie"
+    else:
+        best_rate = max(rate for _, rate in contenders)
+        leaders = [v for v, rate in contenders if rate == best_rate]
+        result["winner"] = leaders[0] if len(leaders) == 1 else "tie"
 
     result["period_days"] = days
     return result

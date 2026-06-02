@@ -3207,6 +3207,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   <div class="form-card">
     <div class="row">
       <select id="rc-vertical" title="Tier 1 = inbound-driven, agent-close pitch lands hard. Tier 2 = workload removal, longer cycle — better with warm intros.">
+        <option value="b2b_saas">⭐ ReachNG Pre-launch (Premium SMEs · founder voice)</option>
         <option value="agency_sales">⭐ Find ReachNG Clients (All Verticals)</option>
         <optgroup label="Tier 1 — Inbound closer (cold-outreach friendly)">
           <option value="real_estate">Real Estate Agencies</option>
@@ -5815,6 +5816,14 @@ async function runCampaign() {
     ...(cities.length  ? { cities } : {}),
     ...(minRating ? { min_rating: parseFloat(minRating) } : {}),
   };
+
+  // ReachNG pre-launch (b2b_saas): founder-led, never auto-send. Force HITL on
+  // and default to dry-run on the first click so nothing leaves without review.
+  // The premium-fit gate (rating>=4.3, reviews>=30) is applied server-side.
+  if (vertical === "b2b_saas") {
+    payload.hitl_mode = true;
+    if (!hitlMode && !dryRun) { payload.dry_run = true; }  // safety: no live send unless HITL was deliberately chosen
+  }
 
   if (vertical === "agency_sales") {
     const sectors = [...document.querySelectorAll('#sector-checkboxes input:checked')].map(el => el.value);

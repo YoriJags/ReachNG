@@ -303,6 +303,13 @@ async def discover_businesses(
     """
     settings = get_settings()
     api_key = settings.google_maps_api_key
+    # Fail gracefully (and loudly in the log) when the key is missing, instead of
+    # firing keyless requests that Places rejects one-by-one. Callers get [] and
+    # the campaign summary stays clean.
+    if not api_key:
+        log.warning("maps_discovery_skipped_no_key",
+                    hint="Set GOOGLE_MAPS_API_KEY to enable Google Maps discovery")
+        return []
     city = city_override or settings.default_city.split(",")[0].strip()  # e.g. "Lagos"
 
     if query_override:
@@ -375,6 +382,7 @@ async def discover_businesses(
                 "website": details.get("website"),
                 "address": details.get("formatted_address") or place.get("formatted_address"),
                 "rating": details.get("rating") or place.get("rating"),
+                "review_count": user_ratings,  # user_ratings_total — feeds premium lead scoring
                 "category": _extract_category(place),
                 "lead_temperature": temp,
                 "temperature_reason": temp_reason,

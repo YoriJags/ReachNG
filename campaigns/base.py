@@ -58,6 +58,7 @@ class BaseCampaign:
         cities: Optional[list] = None,
         target_sectors: Optional[list] = None,
         min_rating: Optional[float] = None,
+        min_reviews: Optional[int] = None,
     ) -> dict:
         """
         Full campaign run:
@@ -72,7 +73,20 @@ class BaseCampaign:
         # Deprecated agency-mode compatibility. Prospect OS callers should leave
         # client_name empty; client-facing routes must not use this runner.
         self.client_name = client_name
-        log.info("campaign_start", vertical=self.vertical, dry_run=dry_run, hitl_mode=hitl_mode, client=client_name)
+
+        # ReachNG pre-launch premium campaign (b2b_saas / Client #0): apply the
+        # premium-fit defaults unless the operator overrode them. rating>=4.3 and
+        # reviews>=30 are the founder's bar for "premium, established, worth a
+        # personal note." Other verticals keep whatever was passed (usually None).
+        if self.vertical == "b2b_saas":
+            if min_rating is None:
+                min_rating = 4.3
+            if min_reviews is None:
+                min_reviews = 30
+
+        log.info("campaign_start", vertical=self.vertical, dry_run=dry_run,
+                 hitl_mode=hitl_mode, client=client_name,
+                 min_rating=min_rating, min_reviews=min_reviews)
 
         # Deprecated agency mode: retained for old ops scripts only. New client
         # work belongs in Closer/HITL/client-book paths, not this discovery runner.
@@ -246,6 +260,9 @@ class BaseCampaign:
                 stub = {
                     "vertical":   self.vertical,
                     "rating":     b.get("rating"),
+                    "review_count": b.get("review_count"),
+                    "name":       b.get("name"),
+                    "address":    b.get("address"),
                     "phone":      b.get("phone"),
                     "email":      b.get("email"),
                     "website":    b.get("website"),
@@ -305,6 +322,15 @@ class BaseCampaign:
                     skipped_no_channel += 1
                     continue
 
+            # Step 3.6: Review-count floor — premium campaigns want an established
+            # track record. Unknown counts (older sources) pass, so we don't drop
+            # otherwise-strong leads on missing data.
+            if min_reviews is not None:
+                biz_reviews = biz.get("review_count")
+                if biz_reviews is not None and biz_reviews < min_reviews:
+                    skipped_no_channel += 1
+                    continue
+
             # Step 4: Quality filter
             if not should_contact(
                 business_name=biz["name"],
@@ -355,28 +381,27 @@ class BaseCampaign:
             if biz.get("email"):
                 channel = self._pick_channel(biz) or channel
 
-            # Step 6: Generate message — social leads get post-aware opener
+            # Step 6: Generate message.
+            # ReachNG self-outreach (b2b_saas): ALWAYS use the founder-voice
+            # drafter — whether or not Client #0 is attached — and pick one of the
+            # three A/B/C angles (founder / money-leak / owner-relief) so reply
+            # rates per angle can be compared later. Checked first so even a
+            # b2b_saas lead that arrived via social still gets the founder voice.
+            _is_self_outreach = (
+                self.vertical == "b2b_saas"
+                or (_client_doc and (_client_doc.get("vertical") or "").lower() == "b2b_saas")
+            )
             try:
-                if biz.get("source") == "social" and biz.get("post_text"):
-                    generated = generate_social_outreach_message(
-                        vertical=self.vertical,
-                        business_name=biz["name"],
-                        channel=channel,
-                        platform=biz.get("platform", "social"),
-                        post_text=biz["post_text"],
-                        profile_url=biz.get("profile_url", ""),
-                        address=biz.get("address"),
-                    )
-                elif _client_doc and (_client_doc.get("vertical") or "").lower() == "b2b_saas":
-                    # ReachNG self-outreach (Client #0 path): bypass the standard
-                    # vertical drafter and use the founder-voice prompt.
+                if _is_self_outreach:
                     from services.reachng_self_outreach import draft_with_link
+                    _ab_variant = assign_variant()  # A | B | C
                     _reviews_excerpt = (biz.get("reviews_excerpt")
                                          or biz.get("review_excerpt")
                                          or (biz.get("reviews") or [{}])[0].get("text") if isinstance(biz.get("reviews"), list) else None)
                     generated = draft_with_link(
                         business_name=biz["name"],
                         vertical=biz.get("vertical") or "general",
+                        variant=_ab_variant,
                         address=biz.get("address"),
                         category=biz.get("category"),
                         rating=biz.get("rating"),
@@ -385,6 +410,16 @@ class BaseCampaign:
                         contact_title=biz.get("contact_title"),
                         website=biz.get("website"),
                         contact_id=str(biz.get("_id") or biz.get("id") or ""),
+                    )
+                elif biz.get("source") == "social" and biz.get("post_text"):
+                    generated = generate_social_outreach_message(
+                        vertical=self.vertical,
+                        business_name=biz["name"],
+                        channel=channel,
+                        platform=biz.get("platform", "social"),
+                        post_text=biz["post_text"],
+                        profile_url=biz.get("profile_url", ""),
+                        address=biz.get("address"),
                     )
                 elif client_brief:
                     generated = generate_outreach_message_for_client(
@@ -431,6 +466,12 @@ class BaseCampaign:
                     "source": biz.get("source"),
                     "message": generated.get("message") or generated.get("body"),
                     "subject": generated.get("subject"),
+                    "variant": generated.get("variant"),
+                    "variant_style": generated.get("variant_style"),
+                    "quality_verdict": biz.get("quality_verdict"),
+                    "quality_score": biz.get("quality_score"),
+                    "rating": biz.get("rating"),
+                    "review_count": biz.get("review_count"),
                 })
                 sent += 1
                 continue
@@ -453,6 +494,7 @@ class BaseCampaign:
                 temperature_reason=biz.get("temperature_reason"),
                 contact_name=biz.get("contact_name"),
                 contact_title=biz.get("contact_title"),
+                review_count=biz.get("review_count"),
             )
 
             # Step 7a: HITL mode — queue for human approval instead of sending
@@ -505,6 +547,23 @@ class BaseCampaign:
                         profile_url=biz.get("profile_url"),
                     )
                     queued += 1
+
+                # Record the A/B/C variant at QUEUE time. Sends in HITL mode happen
+                # later (on approval) and never hit the direct-send A/B recorder, so
+                # without this the variant attribution would be blind. Recorded once
+                # per contact, against the variant the founder drafter actually used.
+                _variant = generated.get("variant")
+                if _variant:
+                    try:
+                        record_ab_send(
+                            contact_id=contact_id,
+                            vertical=self.vertical,
+                            channel=channels_to_queue[0],
+                            variant=_variant,
+                            message=generated.get("message", ""),
+                        )
+                    except Exception as _e:
+                        log.warning("ab_record_at_queue_failed", error=str(_e))
                 continue
 
             # Step 7b: Send directly — routed via client's provider (Meta or Unipile)
@@ -526,7 +585,9 @@ class BaseCampaign:
 
             # Step 8: Record + ROI + A/B
             message_text = generated.get("message", str(generated))
-            variant = assign_variant()
+            # Reuse the founder-voice angle if one was already assigned (b2b_saas);
+            # otherwise assign now for legacy single-message campaigns.
+            variant = generated.get("variant") or assign_variant()
             record_outreach(
                 contact_id=contact_id,
                 channel=channel,

@@ -67,6 +67,7 @@ def upsert_contact(
     temperature_reason: Optional[str] = None,
     contact_name: Optional[str] = None,
     contact_title: Optional[str] = None,
+    review_count: Optional[int] = None,
 ) -> str:
     """Insert or update a contact. Returns the contact _id as string."""
     contacts = get_contacts()
@@ -92,7 +93,8 @@ def upsert_contact(
         stub = {
             "vertical": vertical, "rating": rating, "phone": phone, "email": email,
             "website": website, "category": category, "contact_name": contact_name,
-            "contact_title": contact_title,
+            "contact_title": contact_title, "review_count": review_count,
+            "name": name, "address": address,
         }
         ls = score_lead(stub)
         quality_verdict = ls.verdict
@@ -127,6 +129,8 @@ def upsert_contact(
         doc["website"] = website
     if rating is not None:
         doc["rating"] = rating
+    if review_count is not None:
+        doc["review_count"] = review_count
     if category:
         doc["category"] = category
     if state:

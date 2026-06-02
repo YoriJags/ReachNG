@@ -38,6 +38,58 @@ _NG_CTX_PATH = _ROOT / "agent" / "prompts" / "_nigerian_context.txt"
 _LANDING_BASE = "https://www.reachng.ng"
 
 
+# ── A/B/C variant angles ─────────────────────────────────────────────────────
+# Three angles on the SAME founder intro email (same hard constraints, length,
+# signature, no-false-claims rules). The directive only steers which pain the
+# email leads with. Letters map to tools.ab_testing.VARIANTS so the runner can
+# record which angle each prospect got and compare reply rates later.
+VARIANT_STYLES: dict[str, str] = {
+    "A": "founder",
+    "B": "money_leak",
+    "C": "owner_relief",
+}
+
+_STYLE_DIRECTIVES: dict[str, str] = {
+    "founder": (
+        "VARIANT ANGLE: FOUNDER / DIRECT.\n"
+        "Lead as the founder making a genuine early-access invitation. The reason-"
+        "for-writing sentence should make clear you're inviting a few premium "
+        "businesses in their city to try the early version before launch. Tone: "
+        "respectful peer-to-peer, not a pitch. Seed tone (do NOT copy verbatim, "
+        "rewrite as a proper email): \"I'm building ReachNG, an AI employee for "
+        "WhatsApp. I'm inviting a few premium {vertical} businesses in {city} to "
+        "try the early version. Worth showing you a 2-minute demo?\""
+    ),
+    "money_leak": (
+        "VARIANT ANGLE: MONEY-LEAK.\n"
+        "Lead with money quietly dying in WhatsApp chats: missed price enquiries, "
+        "unpaid follow-ups, slow replies, unconfirmed transfer receipts. Frame the "
+        "two capabilities you pick around catching those leaks. Do NOT invent "
+        "figures or promise recovered revenue. Seed tone (rewrite, don't copy): "
+        "\"I'm building ReachNG to help businesses spot money dying in WhatsApp "
+        "chats, missed enquiries, unpaid follow-ups, slow replies. I'm testing it "
+        "with a few premium {vertical} businesses before launch.\""
+    ),
+    "owner_relief": (
+        "VARIANT ANGLE: OWNER-RELIEF.\n"
+        "Lead with relief for a busy owner: EYO watches WhatsApp, drafts replies in "
+        "their voice, and sends a daily brief of what needs attention, every reply "
+        "still waiting for their tap. Frame it as taking weight off the owner. Seed "
+        "tone (rewrite, don't copy): \"ReachNG is an AI operator that watches "
+        "WhatsApp, drafts replies in your voice, and sends the owner a daily brief. "
+        "Built for busy Nigerian SMEs. Onboarding a few early partners before launch.\""
+    ),
+}
+
+
+def _style_directive(variant: Optional[str]) -> str:
+    """Resolve a variant letter (A/B/C) to its angle directive. Unknown/none → ''."""
+    if not variant:
+        return ""
+    style = VARIANT_STYLES.get(variant.upper())
+    return _STYLE_DIRECTIVES.get(style or "", "")
+
+
 def _load_system_prompt() -> str:
     base = _PROMPT_PATH.read_text(encoding="utf-8") if _PROMPT_PATH.exists() else ""
     ctx  = _NG_CTX_PATH.read_text(encoding="utf-8") if _NG_CTX_PATH.exists() else ""
@@ -82,12 +134,15 @@ def draft_outreach_email(
     contact_name: Optional[str] = None,
     contact_title: Optional[str] = None,
     website: Optional[str] = None,
+    variant: Optional[str] = None,
 ) -> dict:
     """
     Returns {"subject": str, "message": str} for the cold first-touch email.
 
-    Throws if the model produces unparseable output — the caller should skip
-    this prospect and log, never send the broken draft.
+    `variant` (A/B/C) selects the angle the email leads with (see VARIANT_STYLES);
+    None falls back to the neutral founder intro. Throws if the model produces
+    unparseable output — the caller should skip this prospect and log, never
+    send the broken draft.
     """
     settings = get_settings()
     if not settings.anthropic_api_key:
@@ -102,6 +157,9 @@ def draft_outreach_email(
         contact_name=contact_name, contact_title=contact_title,
         website=website,
     )
+    directive = _style_directive(variant)
+    if directive:
+        user_block = f"{directive}\n\n{user_block}"
 
     resp = client.messages.create(
         model="claude-haiku-4-5-20251001",
@@ -222,6 +280,7 @@ def draft_with_link(
     business_name: str,
     contact_id: Optional[str] = None,
     vertical: str = "general",
+    variant: Optional[str] = None,
     **fields,
 ) -> dict:
     """Single entry-point used by the campaign runner.
@@ -229,8 +288,12 @@ def draft_with_link(
     Builds the prospect_profile that backs the /hi/{slug} personalisation
     from the enrichment fields we already have, so the landing page can
     pre-fill the recipient's business name, vertical, and forms.
+
+    `variant` (A/B/C) picks the angle; it's echoed back on the result so the
+    runner can record it for A/B/C reply-rate tracking.
     """
-    out = draft_outreach_email(business_name=business_name, vertical=vertical, **fields)
+    out = draft_outreach_email(business_name=business_name, vertical=vertical,
+                               variant=variant, **fields)
 
     contact_name = fields.get("contact_name") or ""
     first_name   = contact_name.strip().split()[0] if contact_name else ""
@@ -251,4 +314,7 @@ def draft_with_link(
         contact_id=contact_id,
         prospect_profile=prospect_profile,
     )
+    if variant:
+        out["variant"] = variant.upper()
+        out["variant_style"] = VARIANT_STYLES.get(variant.upper())
     return out

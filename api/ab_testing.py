@@ -7,7 +7,7 @@ router = APIRouter(prefix="/ab", tags=["A/B Testing"])
 
 @router.get("/stats")
 async def ab_stats(vertical: Optional[str] = None, days: int = 30):
-    """Compare reply rates for variant A vs B."""
+    """Compare reply rates across variants A/B/C (winner = highest reply rate)."""
     return get_ab_stats(vertical=vertical, days=days)
 
 

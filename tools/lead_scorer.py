@@ -137,6 +137,105 @@ def _activity_signals(contact: dict) -> tuple[int, list[str]]:
     return bonus, reasons
 
 
+# ─── Premium pre-launch fit (ReachNG self-outreach / b2b_saas) ───────────────
+# Premium owner-led SMEs that live on WhatsApp and lose money on slow replies.
+# These signals rank the high-fit businesses for the founder's pre-launch
+# campaign. They're additive — they only fire when the signal is present, so
+# scoring other verticals is unaffected.
+
+# Categories where customers routinely buy / book over WhatsApp and a slow
+# reply costs a real sale. Matched loosely (substring) against Maps category
+# and the business name.
+_WHATSAPP_HEAVY_FIT = {
+    "restaurant", "cafe", "bar", "lounge", "night club", "nightclub", "club",
+    "hotel", "lodging", "guest house", "shortlet", "apartment", "resort",
+    "event", "venue", "catering", "wedding",
+    "spa", "beauty", "aesthetic", "medspa", "med spa", "skin", "salon",
+    "dental", "dentist", "clinic", "hospital", "medical", "wellness",
+    "gym", "fitness", "studio", "pilates", "yoga",
+    "real estate", "estate", "property", "realtor",
+    "car dealer", "auto", "automotive", "dealership",
+    "school", "academy", "training", "tutor", "lesson",
+    "logistics", "courier", "delivery", "haulage", "freight",
+    "boutique", "fashion", "atelier", "tailor", "jewel",
+    "law", "legal", "accounting", "consult",
+}
+
+# Words that signal an upmarket, owner-led operation (higher willingness to pay,
+# higher pain from a missed enquiry).
+_PREMIUM_KEYWORDS = {
+    "premium", "luxury", "luxe", "exclusive", "boutique", "bespoke", "private",
+    "signature", "fine", "gourmet", "rooftop", "concierge", "members", "suites",
+    "aesthetic", "medspa", "high-end", "prestige", "elite",
+}
+
+# Lagos/Abuja neighbourhoods that correlate with premium clientele.
+_PREMIUM_LOCATIONS = {
+    "victoria island", "ikoyi", "banana island", "lekki", "vi", "oniru",
+    "eko atlantic", "maitama", "asokoro", "wuse", "guzape", "jabi", "gwarinpa",
+}
+
+
+def _premium_fit_signals(contact: dict) -> tuple[int, list[str], list[str]]:
+    """Reward premium, WhatsApp-heavy, owner-led fit. Returns (bonus, reasons, negatives)."""
+    bonus = 0
+    reasons: list[str] = []
+    negatives: list[str] = []
+
+    name = (contact.get("name") or contact.get("business_name") or "").lower()
+    category = (contact.get("category") or "").lower()
+    address = (contact.get("address") or "").lower()
+    haystack = f"{name} {category}"
+
+    # Strong rating (your premium bar is 4.3)
+    rating = contact.get("rating")
+    if rating is not None and rating >= 4.3:
+        bonus += 8
+        reasons.append(f"strong rating {rating} (>=4.3)")
+
+    # Established by review volume (your bar is 30)
+    reviews = contact.get("review_count")
+    if reviews is not None:
+        if reviews >= 30:
+            bonus += 8
+            reasons.append(f"{reviews} reviews (established)")
+        elif reviews < 10:
+            bonus -= 4
+            negatives.append(f"only {reviews} reviews (thin track record)")
+
+    # WhatsApp-heavy, high-fit category
+    if any(k in haystack for k in _WHATSAPP_HEAVY_FIT):
+        bonus += 10
+        reasons.append("WhatsApp-heavy category (inbound enquiries)")
+
+    # Premium keyword in name/category
+    hit = next((k for k in _PREMIUM_KEYWORDS if k in haystack), None)
+    if hit:
+        bonus += 6
+        reasons.append(f"premium signal: '{hit}'")
+
+    # Premium neighbourhood
+    loc = next((l for l in _PREMIUM_LOCATIONS if l in address), None)
+    if loc:
+        bonus += 4
+        reasons.append(f"premium location: {loc.title()}")
+
+    return bonus, reasons, negatives
+
+
+def premium_fit(contact: dict) -> bool:
+    """Hard gate for the pre-launch premium campaign: rating>=4.3 AND reviews>=30.
+    When review_count is unknown (older docs), fall back to rating only so we
+    don't drop otherwise-strong leads. Used by the campaign's min_reviews filter."""
+    rating = contact.get("rating")
+    reviews = contact.get("review_count")
+    if rating is None or rating < 4.3:
+        return False
+    if reviews is not None and reviews < 30:
+        return False
+    return True
+
+
 def _anti_signals(contact: dict) -> tuple[int, list[str]]:
     """Penalties — things that strongly correlate with wasted spend."""
     penalty = 0
@@ -219,6 +318,11 @@ def score_lead(contact: dict, enrichment: Optional[dict] = None) -> LeadScore:
     act_bonus, act_reasons = _activity_signals(contact)
     score += act_bonus
     reasons.extend(act_reasons)
+
+    prem_bonus, prem_reasons, prem_negs = _premium_fit_signals(contact)
+    score += prem_bonus
+    reasons.extend(prem_reasons)
+    negatives.extend(prem_negs)
 
     pen, pen_negs = _anti_signals(contact)
     score += pen
