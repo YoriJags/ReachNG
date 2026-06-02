@@ -2353,19 +2353,19 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </div>
 
   <!-- Missed Opp Radar -->
-  <p class="section-title" style="margin-top:0;">Missed Opp Radar <span style="color:#ff4444;font-size:10px;margin-left:6px;">Price asked · no quote sent · across all clients</span></p>
-  <div id="act-radar-body"><div style="color:#555;font-size:13px;padding:14px 0;">Loading radar…</div></div>
+  <p class="section-title" style="margin-top:0;">Missed Opp Radar <span style="color:var(--red);font-size:10px;margin-left:6px;">Price asked · no quote sent · across all clients</span></p>
+  <div id="act-radar-body"><div class="empty-state">Loading radar…</div></div>
 
   <!-- Operator Sales Copilot inline -->
-  <p class="section-title" style="margin-top:28px;">Sales Copilot — All Clients <span style="color:#555;font-size:10px;margin-left:6px;">Hot replies · drafts ready to approve · next action per thread</span></p>
-  <div class="controls" style="margin-bottom:16px;">
-    <label for="act-days" style="font-size:11px;color:var(--muted,#777);text-transform:uppercase;letter-spacing:.1em;">Window (days)</label>
-    <input type="number" id="act-days" min="1" max="60" value="14" style="background:#0a0a0a;border:1px solid #1e2530;border-radius:6px;color:#e8e8e8;padding:6px 10px;font-size:13px;width:70px;">
-    <label for="act-limit" style="font-size:11px;color:var(--muted,#777);text-transform:uppercase;letter-spacing:.1em;margin-left:8px;">Per client</label>
-    <input type="number" id="act-limit" min="1" max="20" value="8" style="background:#0a0a0a;border:1px solid #1e2530;border-radius:6px;color:#e8e8e8;padding:6px 10px;font-size:13px;width:60px;">
-    <button onclick="loadActivateTab()" style="background:#ff5c00;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;margin-left:4px;">Refresh</button>
+  <p class="section-title" style="margin-top:28px;">Sales Copilot — All Clients <span style="color:var(--text-lo);font-size:10px;margin-left:6px;">Hot replies · drafts ready to approve · next action per thread</span></p>
+  <div class="controls toolbar" style="margin-bottom:16px;">
+    <label for="act-days" style="font-size:11px;color:var(--text-mid);text-transform:uppercase;letter-spacing:.1em;">Window (days)</label>
+    <input type="number" id="act-days" min="1" max="60" value="14" style="background:var(--bg-base);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--text-hi);padding:6px 10px;font-size:13px;width:70px;">
+    <label for="act-limit" style="font-size:11px;color:var(--text-mid);text-transform:uppercase;letter-spacing:.1em;margin-left:8px;">Per client</label>
+    <input type="number" id="act-limit" min="1" max="20" value="8" style="background:var(--bg-base);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--text-hi);padding:6px 10px;font-size:13px;width:60px;">
+    <button class="btn btn--primary btn--sm" onclick="loadActivateTab()">Refresh</button>
   </div>
-  <div id="act-copilot-body"><div style="color:#555;font-size:13px;padding:14px 0;">Loading copilot…</div></div>
+  <div id="act-copilot-body"><div class="empty-state">Loading copilot…</div></div>
 
 </div>
 
