@@ -73,6 +73,8 @@
     border: 1px solid var(--border-bright);
   }
   .btn--ghost:hover { opacity: 1; background: #1e2530; border-color: #2a3a4a; }
+  .btn--ok     { background: var(--green-soft); color: var(--green); border: 1px solid rgba(0,229,160,0.3); }
+  .btn--danger { background: var(--red-soft);   color: var(--red);   border: 1px solid rgba(255,92,92,0.3); }
   .btn--sm { padding: 6px 11px; }
   .btn--icon { padding: 6px 8px; }
 
@@ -3677,9 +3679,9 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </div>
 
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
-    <p class="section-title" style="margin:0;">Pending Approvals <span id="approval-count-badge" style="color:#ff5c00;margin-left:8px;"></span></p>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.06em;">Sort:</span>
+    <p class="section-title" style="margin:0;">Pending Approvals <span id="approval-count-badge" style="color:var(--accent);margin-left:8px;"></span></p>
+    <div class="toolbar">
+      <span style="font-size:11px;color:var(--text-lo);text-transform:uppercase;letter-spacing:.06em;">Sort:</span>
       <button id="asort-newest" class="sort-btn sort-active" onclick="setApprovalSort('newest')">Newest</button>
       <button id="asort-oldest" class="sort-btn" onclick="setApprovalSort('oldest')">Oldest</button>
       <button id="asort-client" class="sort-btn" onclick="setApprovalSort('client')">By Client</button>
@@ -3688,9 +3690,9 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </div>
   <div class="approve-all-bar" id="approve-all-bar" style="display:none;">
     <button class="btn btn-approve" onclick="approveAll()" title="Send every draft in the queue now">Approve All</button>
-    <button class="btn btn-approve" style="background:#0d2d1a;border-color:#1e6a3d;color:#5dd28a;" onclick="approveAllByConfidence('high')" title="Send only drafts the risk scorer flagged as low-risk (green badge)">✓ Approve safe only</button>
-    <button class="btn btn-skip" onclick="rejectAll()" style="background:#3a1a1a;border-color:#7a2020;color:#f87171;" title="Discard every pending draft — none will be sent">Reject All</button>
-    <span class="approve-count" id="approve-all-label" style="color:#6a8aaa;font-size:12px;"></span>
+    <button class="btn btn--ok" onclick="approveAllByConfidence('high')" title="Send only drafts the risk scorer flagged as low-risk (green badge)">✓ Approve safe only</button>
+    <button class="btn btn--danger" onclick="rejectAll()" title="Discard every pending draft — none will be sent">Reject All</button>
+    <span class="approve-count" id="approve-all-label" style="color:var(--text-mid);font-size:12px;"></span>
   </div>
   <div class="approvals-list" id="approvals-list">
     <div class="approvals-empty">Loading…</div>
