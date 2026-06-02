@@ -71,6 +71,8 @@
   .toolbar--divided {
     margin-top: var(--s3); padding-top: var(--s3); border-top: 1px solid var(--line);
   }
+  /* Back control for deep subsection panes — returns to the previous Tower state. */
+  .tower-back { margin-bottom: var(--s3); }
 
   /* Button modifiers layer on the existing .btn base (do NOT restyle .btn itself). */
   .btn--primary { background: var(--accent); color: #fff; }
@@ -3249,6 +3251,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 
 <!-- ── Campaigns ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-campaigns">
+  <button class="btn btn--ghost btn--sm tower-back" onclick="towerBack()">← Back</button>
   <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
     <button class="tab-btn" id="csubnav-clients-ca"   onclick="clientsNav('clients',this)"                              style="font-size:11px;padding:8px 14px;">Clients</button>
     <button class="tab-btn" id="csubnav-briefs-ca"    onclick="clientsNav('briefs',this);briefAdminLoadClients();"      style="font-size:11px;padding:8px 14px;">Briefs &amp; Legal</button>
@@ -3390,6 +3393,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 
 <!-- ── Briefs (admin) ────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-briefs">
+  <button class="btn btn--ghost btn--sm tower-back" onclick="towerBack()">← Back</button>
   <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
     <button class="tab-btn" id="csubnav-clients-b"   onclick="clientsNav('clients',this)"                              style="font-size:11px;padding:8px 14px;">Clients</button>
     <button class="tab-btn active" id="csubnav-briefs-b" onclick="clientsNav('briefs',this)"                           style="font-size:11px;padding:8px 14px;">Briefs &amp; Legal</button>
@@ -3444,6 +3448,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 
 <!-- ── Closer (admin) ────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-closer">
+  <button class="btn btn--ghost btn--sm tower-back" onclick="towerBack()">← Back</button>
   <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
     <button class="tab-btn" id="rsubnav-approvals-c" onclick="recoverNav('approvals',this)" style="font-size:11px;padding:8px 14px;">Message Queue</button>
     <button class="tab-btn" id="rsubnav-replies-c"   onclick="recoverNav('replies',this)"   style="font-size:11px;padding:8px 14px;">Replies</button>
@@ -3707,6 +3712,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 
 <!-- ── Signal Leads ─────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-signal_leads">
+  <button class="btn btn--ghost btn--sm tower-back" onclick="towerBack()">← Back</button>
   <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
     <button class="tab-btn" id="ssubnav-tools-sl"    onclick="systemNav('tools',this)"                                  style="font-size:11px;padding:8px 14px;">Tools &amp; Health</button>
     <button class="tab-btn active" id="ssubnav-signals-sl" onclick="systemNav('signal_leads',this)"                     style="font-size:11px;padding:8px 14px;">Signal Leads</button>
@@ -3737,6 +3743,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 
 <!-- ── Replies ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-replies">
+  <button class="btn btn--ghost btn--sm tower-back" onclick="towerBack()">← Back</button>
   <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
     <button class="tab-btn" id="rsubnav-approvals-r" onclick="recoverNav('approvals',this)" style="font-size:11px;padding:8px 14px;">Message Queue</button>
     <button class="tab-btn active" id="rsubnav-replies-r" onclick="recoverNav('replies',this)" style="font-size:11px;padding:8px 14px;">Replies</button>
@@ -3779,6 +3786,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 
 <!-- ── Pipeline ──────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-pipeline">
+  <button class="btn btn--ghost btn--sm tower-back" onclick="towerBack()">← Back</button>
   <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
     <button class="tab-btn" id="ssubnav-tools-pl"    onclick="systemNav('tools',this)"                                  style="font-size:11px;padding:8px 14px;">Tools &amp; Health</button>
     <button class="tab-btn" id="ssubnav-signals-pl"  onclick="systemNav('signal_leads',this);loadSignalLeads();"        style="font-size:11px;padding:8px 14px;">Signal Leads</button>
@@ -3798,6 +3806,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
 
 <!-- ── Invoices ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-invoices">
+  <button class="btn btn--ghost btn--sm tower-back" onclick="towerBack()">← Back</button>
   <div style="display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid #1a1a1a;">
     <button class="tab-btn" id="rsubnav-approvals-i" onclick="recoverNav('approvals',this)" style="font-size:11px;padding:8px 14px;">Message Queue</button>
     <button class="tab-btn" id="rsubnav-replies-i"   onclick="recoverNav('replies',this)"   style="font-size:11px;padding:8px 14px;">Replies</button>
@@ -5367,6 +5376,8 @@ function switchTab(name, btn) {
   if (name === "da_reviews")  daLoadReviews();
   if (name === "lo_queue")    loLoadQueue();
   if (name === "pipeline")    loadPipeline();
+
+  if (typeof towerRecord === "function") towerRecord(name);
 }
 
 function sfSwitchTab(name) {
@@ -7181,6 +7192,53 @@ function switchTabByName(name) {
   document.getElementById("quick-fab").textContent = "⚡";
 }
 
+// ── Tower back-navigation (lightweight, no router) ───────────────────────────
+// A small client-side nav stack so operators can return from a deep subsection
+// to where they came from — NOT browser history. State = the active Tower pane
+// name; the URL hash mirrors it so a tab/subsection can be bookmarked/shared.
+const _TOWER_MAIN = ["overview","clients","approvals","activate","growth","ai","billing","tools"];
+const _TOWER_STATES = new Set([..._TOWER_MAIN,
+  "briefs","campaigns","replies","closer","invoices","signal_leads","pipeline"]);
+let _towerStack = [];
+let _towerCurrent = "overview";   // default active tab on load
+let _towerSuppress = false;       // true while navigating Back (don't re-push)
+
+// Recorded by switchTab + _subNavSwitch (the two functions that actually show a pane).
+function towerRecord(state) {
+  if (!_TOWER_STATES.has(state)) return;        // ignore suite panes (est_/hr_/sf_/…)
+  if (state === _towerCurrent) return;
+  if (!_towerSuppress && _towerCurrent !== null) {
+    _towerStack.push(_towerCurrent);
+    if (_towerStack.length > 50) _towerStack.shift();
+  }
+  _towerCurrent = state;
+  try { history.replaceState(null, "", "#" + state); } catch (e) {}
+}
+
+// Navigate to a Tower state via the EXISTING entry points (preserves all behavior):
+// main tabs go through sidebarNav (handles all 8 + sidebar highlight), subsections
+// through switchTabByName (its _TAB_REMAP knows briefs/campaigns/replies/closer/…).
+function towerGo(state) {
+  if (_TOWER_MAIN.includes(state)) {
+    sidebarNav(state, document.getElementById("ssn-" + state));
+  } else {
+    switchTabByName(state);
+  }
+}
+
+function towerBack() {
+  const prev = _towerStack.pop() || "overview";   // fallback: Command Center
+  _towerSuppress = true;
+  try { towerGo(prev); } finally { _towerSuppress = false; }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Bookmark/share: honour a #state hash on load (Tower states only; overview is default).
+document.addEventListener("DOMContentLoaded", function () {
+  const h = (location.hash || "").replace(/^#/, "");
+  if (h && _TOWER_STATES.has(h) && h !== "overview") towerGo(h);
+});
+
 // ── Group sub-navs (Recover · Clients · System) ──────────────────────────────
 function _subNavSwitch(panelName) {
   // Show the target panel without changing the outer 5-tab active state
@@ -7191,6 +7249,8 @@ function _subNavSwitch(panelName) {
   if (panelName === "clients")     loadControlTower();
   if (panelName === "pipeline")    loadPipeline();
   if (panelName === "activate")    loadActivateTab();
+
+  if (typeof towerRecord === "function") towerRecord(panelName);
 }
 
 function recoverNav(name, btn) {

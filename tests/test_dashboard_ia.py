@@ -135,6 +135,31 @@ def test_inline_styling_does_not_regrow():
         "use .card instead of inline background+border+radius")
 
 
+def test_tower_back_control_present():
+    """Deep subsection panes carry a Back control built on the shared primitives."""
+    style = HTML.split("</style>")[0]
+    assert ".tower-back" in style, ".tower-back style not defined"
+    backs = HTML.count('class="btn btn--ghost btn--sm tower-back"')
+    assert backs == 7, f"expected 7 Back controls on subsection panes, found {backs}"
+    assert 'onclick="towerBack()"' in HTML
+
+
+def test_tower_nav_state_and_hash():
+    """Nav stack + hash mirroring exist and both pane-showing functions record state."""
+    for fn in ("function towerRecord(", "function towerBack(", "function towerGo("):
+        assert fn in HTML, f"{fn} missing"
+    assert 'history.replaceState(null, "", "#" + state)' in HTML, "hash not mirrored from state"
+    assert "towerRecord(name)" in HTML, "switchTab does not record tower state"
+    assert "towerRecord(panelName)" in HTML, "_subNavSwitch does not record tower state"
+    # bookmark/share: a valid #state hash is honoured on load
+    assert "_TOWER_STATES.has(h)" in HTML, "hash-on-load navigation missing"
+
+
+def test_tower_back_fallback_is_command_center():
+    """With an empty stack, Back returns to Command Center (overview)."""
+    assert '_towerStack.pop() || "overview"' in HTML
+
+
 def test_no_duplicate_static_ids():
     """Duplicate element IDs silently break getElementById (returns the first in
     DOM order). Ignore dynamic template-literal IDs like id="apf-${id}" — only
