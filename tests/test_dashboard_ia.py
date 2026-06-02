@@ -110,7 +110,8 @@ def test_canonical_orange_is_ff5c00():
 
 @pytest.mark.parametrize("primitive", [
     ".card {", ".panel-title {", ".toolbar {", ".badge {", ".kpi {",
-    ".btn--primary {", ".btn--ghost {",
+    ".btn--primary {", ".btn--ghost {", ".btn--ok ", ".btn--danger ",
+    ".card--placeholder {", ".soon-tag {", ".tab-intro-title {",
 ])
 def test_design_primitives_defined(primitive):
     style = HTML.split("</style>")[0]
@@ -119,8 +120,8 @@ def test_design_primitives_defined(primitive):
 
 # Regression budget: these counts may only trend DOWN as screens migrate to the
 # primitives. Bump the ceiling DOWN (never up) after each migration phase.
-INLINE_BUTTON_CEILING = 147
-ADHOC_CARD_CEILING = 185
+INLINE_BUTTON_CEILING = 145
+ADHOC_CARD_CEILING = 183
 
 
 def test_inline_styling_does_not_regrow():

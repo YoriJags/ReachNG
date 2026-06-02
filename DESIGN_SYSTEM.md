@@ -5,10 +5,11 @@ hand-rolled cards, 4 competing button systems and 8 rounding values. We're
 migrating it to shared primitives **one screen at a time** — additively, never
 breaking IDs / JS hooks / fetch calls / tab logic.
 
-Status: **Phase 2 complete** — Command Center, Clients, Approvals, Money Engine migrated.
+Status: **Phase 3 complete** — all 8 tabs migrated (Command Center, Clients,
+Approvals, Money Engine, Growth, AI, Billing, System).
 
-Counts (dashboard.html): inline-styled buttons **161 → 147**, ad-hoc cards
-**199 → 189**, inline `style=` **1587 → 1569**. Regression ceilings: 147 / 189.
+Counts (dashboard.html): inline-styled buttons **161 → 145**, ad-hoc cards
+**199 → 183**, inline `style=` **1587 → 1553**. Regression ceilings: 145 / 183.
 
 ---
 
@@ -44,7 +45,7 @@ accent and the marketing-site brand colour). `#ff5500` is migrated away per phas
 
 1. ✅ **Phase 1** — tokens + primitives; **Command Center** (`#tab-overview`) launcher + Demo Sandbox.
 2. ✅ **Phase 2** — **Clients** (Demo Sandbox + Unipile cards), **Approvals** (approve-all bar + `.btn--ok/--danger`), **Money Engine** (copilot controls + empty-states).
-3. ⬜ **Phase 3** — Growth, AI, Billing, System.
+3. ✅ **Phase 3** — **Growth** + **AI** ("Coming soon" cards → `.card--placeholder`+`.soon-tag`), **Billing** (intro header), **System** (sub-nav action buttons, fixed stray `#ff5500`). Shared `.tab-intro-title/.tab-intro-sub` for tab headers.
 4. ⬜ **Phase 4** — `portal.html` (warm theme: same primitives, warm token values).
 
 ## Rules
