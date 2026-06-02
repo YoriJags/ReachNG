@@ -26,7 +26,49 @@
     --muted: #7a6a3f;
     --muted2: #9a8e6e;
     --dim: #b9ad90;
+
+    /* ── Design-system aliases + scales (warm values) ───────────────────────
+       Same primitive vocabulary as the admin dashboard, mapped to the warm
+       control-room palette so .card/.btn/.badge/etc. render warm here. */
+    --accent: var(--orange);
+    --line: var(--border);
+    --surface-2: var(--paper-soft);
+    --text-hi: var(--ink);
+    --text-mid: var(--muted);
+    --text-lo: var(--dim);
+    --amber: var(--gold);
+    --red: #b3261e;
+    --green-soft: rgba(46,125,50,0.10);
+    --amber-soft: rgba(211,165,46,0.12);
+    --red-soft:   rgba(179,38,30,0.10);
+    --blue-soft:  rgba(47,109,176,0.10);
+    --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-pill: 999px;
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px;
   }
+
+  /* ── Design-system primitives (warm) — mirror the admin classes ──────────── */
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--s4); }
+  .card--placeholder { border-style: dashed; color: var(--text-mid); font-size: 12px; }
+  .panel-title { font-size: 13px; font-weight: 700; color: var(--text-hi); margin: 0 0 var(--s3); }
+  .toolbar { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; border: none; border-radius: 8px;
+         padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer;
+         font-family: inherit; text-decoration: none; transition: opacity 0.15s; }
+  .btn:hover { opacity: 0.85; }
+  .btn--primary { background: var(--accent); color: #fff; }
+  .btn--ghost { background: var(--surface-2); color: var(--text-hi); border: 1px solid var(--line); }
+  .btn--ok { background: var(--green-soft); color: var(--green); border: 1px solid rgba(46,125,50,0.3); }
+  .btn--danger { background: var(--red-soft); color: var(--red); border: 1px solid rgba(179,38,30,0.3); }
+  .btn--sm { padding: 6px 11px; }
+  .btn--icon { padding: 6px 8px; }
+  .badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700;
+           text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 10px; border-radius: var(--r-pill); }
+  .badge--ok      { background: var(--green-soft); color: var(--green); }
+  .badge--warn    { background: var(--amber-soft); color: var(--gold); }
+  .badge--danger  { background: var(--red-soft);   color: var(--red); }
+  .badge--info    { background: var(--blue-soft);  color: var(--blue); }
+  .badge--neutral { background: var(--surface-2);  color: var(--text-mid); }
+  .empty-state { color: var(--text-mid); font-size: 12px; text-align: center; padding: 36px 16px; }
   /* ── Warm re-theme: normalize the hardcoded dark inline styles inherited from
      the old dark portal. Dark backgrounds -> paper, dark lines -> warm line,
      light text -> ink/muted. New chrome (tabs, CTA, Today, Customers) is
@@ -45,6 +87,10 @@
   [style*="#6a7280"], [style*="#6b7280"], [style*="color:#777"], [style*="color:#555"],
   [style*="color:#666"]
     { color: var(--muted) !important; }
+  /* Bright dark-theme accent text (low contrast on cream) -> warm equivalents.
+     Only used as text colour (no inline backgrounds), so a colour remap is safe. */
+  [style*="color:#5dd28a"], [style*="color: #5dd28a"] { color: var(--green) !important; }
+  [style*="color:#ffb84d"], [style*="color: #ffb84d"] { color: var(--gold) !important; }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -64,7 +110,7 @@
     align-items: center;
     padding: 14px 32px;
     border-bottom: 1px solid var(--border-subtle);
-    background: rgba(5,5,5,0.95);
+    background: rgba(250,246,238,0.92);
     backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
@@ -135,7 +181,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #111;
+    background: var(--paper-soft);
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 4px 12px;
@@ -253,7 +299,7 @@
   }
 
   .bar-track {
-    background: #141414;
+    background: var(--bg2);
     border-radius: 6px;
     height: 8px;
     overflow: hidden;
@@ -324,12 +370,12 @@
   }
 
   /* ── Business Brief ── */
-  .brief-section { padding: 16px 0; border-top: 1px solid #1e2530; }
+  .brief-section { padding: 16px 0; border-top: 1px solid var(--border); }
   .brief-section:first-of-type { border-top: none; padding-top: 8px; }
-  .brief-section-title { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #ff5500; margin-bottom: 12px; }
-  .brief-label { display: block; font-size: 11px; color: #777; margin: 12px 0 4px; }
-  .brief-input { width: 100%; padding: 10px 12px; background: #0a0a0a; border: 1px solid #1e2530; border-radius: 6px; color: #e8e8e8; font-size: 13px; font-family: inherit; resize: vertical; box-sizing: border-box; transition: 0.15s; }
-  .brief-input:focus { outline: none; border-color: #ff5500; }
+  .brief-section-title { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--orange); margin-bottom: 12px; }
+  .brief-label { display: block; font-size: 11px; color: var(--muted); margin: 12px 0 4px; }
+  .brief-input { width: 100%; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--ink); font-size: 13px; font-family: inherit; resize: vertical; box-sizing: border-box; transition: 0.15s; }
+  .brief-input:focus { outline: none; border-color: var(--orange); }
 
   .activity-feed {
     background: var(--surface);
@@ -349,7 +395,7 @@
   }
 
   .activity-item:last-child { border-bottom: none; }
-  .activity-item:hover { background: #0f0f0f; }
+  .activity-item:hover { background: var(--paper-soft); }
 
   .activity-icon {
     width: 8px;
@@ -366,7 +412,7 @@
 
   .activity-text {
     font-size: 13px;
-    color: #bbb;
+    color: var(--ink2);
     line-height: 1.5;
     flex: 1;
   }
@@ -402,13 +448,13 @@
     text-transform: uppercase;
     padding: 12px 16px;
     border-bottom: 1px solid var(--border-subtle);
-    background: #0a0a0a;
+    background: var(--paper-soft);
     cursor: pointer;
     user-select: none;
     white-space: nowrap;
   }
 
-  .leads-table th:hover { color: #888; }
+  .leads-table th:hover { color: var(--ink); }
 
   .leads-table td {
     padding: 12px 16px;
@@ -417,7 +463,7 @@
   }
 
   .leads-table tr:last-child td { border-bottom: none; }
-  .leads-table tr:hover td { background: #0f0f0f; }
+  .leads-table tr:hover td { background: var(--paper-soft); }
 
   .status-badge {
     display: inline-flex;
@@ -439,20 +485,20 @@
     border-radius: 50%;
   }
 
-  .status-new       { background: #111; color: var(--muted); }
+  .status-new       { background: var(--bg2); color: var(--muted); }
   .status-new::before { background: var(--dim); }
 
-  .status-contacted { background: #0e1e3a; color: var(--blue); }
+  .status-contacted { background: var(--blue-soft); color: var(--blue); }
   .status-contacted::before { background: var(--blue); }
 
-  .status-replied   { background: #0e2e1e; color: var(--green); box-shadow: 0 0 10px rgba(0,229,160,0.07); }
+  .status-replied   { background: var(--green-soft); color: var(--green); }
   .status-replied::before { background: var(--green); animation: pulse 2s infinite; }
 
-  .status-converted { background: #2e2000; color: var(--gold); box-shadow: 0 0 10px rgba(245,200,66,0.07); }
+  .status-converted { background: var(--amber-soft); color: var(--gold); }
   .status-converted::before { background: var(--gold); animation: pulse 2s infinite; }
 
-  .status-opted_out { background: #2e0e0e; color: #ff4444; }
-  .status-opted_out::before { background: #ff4444; }
+  .status-opted_out { background: var(--red-soft); color: var(--red); }
+  .status-opted_out::before { background: var(--red); }
 
   .rating-stars { color: var(--gold); font-size: 12px; letter-spacing: 1px; }
 
@@ -461,7 +507,7 @@
     font-weight: 700;
     color: var(--orange);
     font-variant-numeric: tabular-nums;
-    background: #1a0a00;
+    background: rgba(184,92,56,0.12);
     padding: 2px 8px;
     border-radius: 4px;
   }
@@ -709,17 +755,17 @@
     <!-- ── Outcomes Scorecard — last 30 days ─────────────────────────────── -->
     <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
       <span>Outcomes — last 30 days</span>
-      <a id="sc-export" href="#" target="_blank" style="font-size:11px;color:#999;text-decoration:none;border:1px solid #2a3340;padding:4px 10px;border-radius:5px;">↗ Export PDF</a>
+      <a id="sc-export" href="#" target="_blank" class="btn btn--ghost btn--sm">↗ Export PDF</a>
     </div>
     <div id="scorecard-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px;">
       <div class="sc-kpi" data-key="ngn_closed">
         <div class="sc-label">₦ Closed</div>
-        <div class="sc-value" id="sc-ngn-closed" style="color:#ff5500;">—</div>
+        <div class="sc-value" id="sc-ngn-closed" style="color:var(--orange);">—</div>
         <div class="sc-sub" id="sc-bookings">— bookings</div>
       </div>
       <div class="sc-kpi" data-key="hours_saved">
         <div class="sc-label">Hours Saved</div>
-        <div class="sc-value" id="sc-hours" style="color:#5dd28a;">—</div>
+        <div class="sc-value" id="sc-hours" style="color:var(--green);">—</div>
         <div class="sc-sub" id="sc-drafts">— drafts approved</div>
       </div>
       <div class="sc-kpi" data-key="response">
@@ -734,7 +780,7 @@
       </div>
       <div class="sc-kpi" data-key="pending">
         <div class="sc-label">Pending (claimed)</div>
-        <div class="sc-value" id="sc-pending" style="color:#ffb84d;">—</div>
+        <div class="sc-value" id="sc-pending" style="color:var(--gold);">—</div>
         <div class="sc-sub">awaiting verification</div>
       </div>
       <div class="sc-kpi" data-key="cost">
@@ -744,10 +790,10 @@
       </div>
     </div>
     <style>
-      .sc-kpi { background:#141414;border:1px solid #1f2530;border-radius:10px;padding:14px 16px; }
-      .sc-label { font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#6a7280;font-weight:700;margin-bottom:6px; }
-      .sc-value { font-size:22px;color:#fff;font-weight:700;letter-spacing:-0.5px;font-variant-numeric:tabular-nums; }
-      .sc-sub   { font-size:11px;color:#6a7280;margin-top:4px; }
+      .sc-kpi { background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px; }
+      .sc-label { font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-weight:700;margin-bottom:6px; }
+      .sc-value { font-size:22px;color:var(--ink);font-weight:700;letter-spacing:-0.5px;font-variant-numeric:tabular-nums; }
+      .sc-sub   { font-size:11px;color:var(--muted);margin-top:4px; }
     </style>
     <script>
       (async function loadScorecard() {
