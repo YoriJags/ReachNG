@@ -97,6 +97,43 @@ def test_old_simpler_roster_removed():
     assert 'id="roster-tbody"' not in HTML, "old roster-tbody still present"
 
 
+def test_design_tokens_present():
+    """Phase 1 design-system tokens must exist in :root."""
+    for tok in ("--r-md:", "--s3:", "--line:", "--surface:"):
+        assert tok in HTML, f"design token {tok} missing from :root"
+
+
+def test_canonical_orange_is_ff5c00():
+    """Accent is canonicalised to #ff5c00 (97x in use + brand/marketing)."""
+    assert "--accent: #ff5c00" in HTML, "canonical --accent must be #ff5c00"
+
+
+@pytest.mark.parametrize("primitive", [
+    ".card {", ".panel-title {", ".toolbar {", ".badge {", ".kpi {",
+    ".btn--primary {", ".btn--ghost {",
+])
+def test_design_primitives_defined(primitive):
+    style = HTML.split("</style>")[0]
+    assert primitive in style, f"design primitive {primitive!r} not defined in <style>"
+
+
+# Regression budget: these counts may only trend DOWN as screens migrate to the
+# primitives. Bump the ceiling DOWN (never up) after each migration phase.
+INLINE_BUTTON_CEILING = 154
+ADHOC_CARD_CEILING = 192
+
+
+def test_inline_styling_does_not_regrow():
+    inline_buttons = len(re.findall(r'<button[^>]*style="', HTML))
+    adhoc_cards = len(re.findall(r'style="[^"]*background[^"]*border[^"]*border-radius', HTML))
+    assert inline_buttons <= INLINE_BUTTON_CEILING, (
+        f"inline-styled buttons grew to {inline_buttons} (ceiling {INLINE_BUTTON_CEILING}); "
+        "use .btn / .btn--* instead of inline styles")
+    assert adhoc_cards <= ADHOC_CARD_CEILING, (
+        f"ad-hoc card divs grew to {adhoc_cards} (ceiling {ADHOC_CARD_CEILING}); "
+        "use .card instead of inline background+border+radius")
+
+
 def test_no_duplicate_static_ids():
     """Duplicate element IDs silently break getElementById (returns the first in
     DOM order). Ignore dynamic template-literal IDs like id="apf-${id}" — only

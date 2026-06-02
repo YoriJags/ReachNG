@@ -27,7 +27,73 @@
     --amber: #f5c842;
     --red: #ff5c5c;
     --blue: #5599ff;
+
+    /* ── Design system tokens (Phase 1) ──────────────────────────────────
+       Canonical scales so cards/buttons/badges stop drifting. Surfaces, text,
+       and accent already exist above; these add the missing radius, spacing,
+       soft-status, and friendly aliases. Additive — nothing below is renamed. */
+    --surface:   var(--bg-card);          /* default panel/card background */
+    --surface-2: var(--bg-card-hover);    /* raised / hover / input */
+    --line:      var(--border);           /* hairline borders */
+    --amber-soft: #f5c84218;
+    --red-soft:   #ff5c5c14;
+    --blue-soft:  #5599ff14;
+    --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-pill: 999px;
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px;
   }
+
+  /* ── Design system primitives (Phase 1) ────────────────────────────────
+     Reusable building blocks built on the tokens above. Introduced additively:
+     existing classes (.btn base, .ct-section, .ct-kpi, .pay-badge, .empty-state)
+     are untouched. New screens use these; old screens migrate incrementally. */
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-md); padding: var(--s4);
+  }
+  .card--flush { padding: 0; overflow: hidden; }
+
+  .panel-title {
+    font-size: 13px; font-weight: 700; color: var(--text-hi);
+    letter-spacing: 0.01em; margin: 0 0 var(--s3);
+  }
+  .panel-title--eyebrow {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--text-mid); margin: 0;
+  }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+  .toolbar--divided {
+    margin-top: var(--s3); padding-top: var(--s3); border-top: 1px solid var(--line);
+  }
+
+  /* Button modifiers layer on the existing .btn base (do NOT restyle .btn itself). */
+  .btn--primary { background: var(--accent); color: #fff; }
+  .btn--ghost {
+    background: var(--surface-2); color: var(--text-hi);
+    border: 1px solid var(--border-bright);
+  }
+  .btn--ghost:hover { opacity: 1; background: #1e2530; border-color: #2a3a4a; }
+  .btn--sm { padding: 6px 11px; }
+  .btn--icon { padding: 6px 8px; }
+
+  .badge {
+    display: inline-flex; align-items: center; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 3px 10px; border-radius: var(--r-pill);
+  }
+  .badge--ok      { background: var(--green-soft); color: var(--green); }
+  .badge--warn    { background: var(--amber-soft); color: var(--amber); }
+  .badge--danger  { background: var(--red-soft);   color: var(--red); }
+  .badge--info    { background: var(--blue-soft);  color: var(--blue); }
+  .badge--neutral { background: var(--surface-2);  color: var(--text-mid); }
+
+  .kpi {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-md); padding: var(--s4);
+  }
+  .kpi__label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em;
+                color: var(--text-lo); font-weight: 700; margin-bottom: 6px; }
+  .kpi__value { font-size: 24px; font-weight: 700; color: var(--text-hi); }
 
   body {
     font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -1974,16 +2040,16 @@ function copyDemoPortalLink(btn){
 <!-- ── Overview ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel active" id="tab-overview">
 
-  <!-- Command Center — needs-attention launcher (what's broken / what do I do next) -->
-  <section style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;padding:11px 14px;background:#0e1318;border:1px solid #1e2530;border-radius:10px;">
-    <span style="color:#7a8590;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-right:4px;">Jump to</span>
-    <button onclick="switchTabByName('approvals')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📝 Approvals</button>
-    <button onclick="switchTabByName('clients')" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">👥 Clients</button>
-    <button onclick="sidebarNav('growth', document.getElementById('ssn-growth'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">📡 Growth</button>
-    <button onclick="sidebarNav('tools', document.getElementById('ssn-tools'))" style="background:#15171a;color:#e8e8e8;border:1px solid #2a3340;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;">⚙ System</button>
-    <a href="/health" target="_blank" style="background:#15171a;color:#5dd28a;border:1px solid #123522;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;text-decoration:none;">🟢 Health</a>
+  <!-- Command Center — jump-to launcher. Phase 1 migration: card + toolbar + btn primitives. -->
+  <section class="card toolbar" style="margin-bottom:var(--s4);">
+    <span class="panel-title--eyebrow" style="margin-right:var(--s1);">Jump to</span>
+    <button class="btn btn--ghost btn--sm" onclick="switchTabByName('approvals')">📝 Approvals</button>
+    <button class="btn btn--ghost btn--sm" onclick="switchTabByName('clients')">👥 Clients</button>
+    <button class="btn btn--ghost btn--sm" onclick="sidebarNav('growth', document.getElementById('ssn-growth'))">📡 Growth</button>
+    <button class="btn btn--ghost btn--sm" onclick="sidebarNav('tools', document.getElementById('ssn-tools'))">⚙ System</button>
+    <a class="btn btn--ghost btn--sm" href="/health" target="_blank" style="color:var(--green);">🟢 Health</a>
     <span style="flex:1;"></span>
-    <span style="font-size:11px;color:#6a7280;">Money moving, queues, and health — start here.</span>
+    <span style="font-size:11px;color:var(--text-lo);">Money moving, queues, and health — start here.</span>
   </section>
   <div id="overview-reflow-body"></div>
 
@@ -2107,18 +2173,18 @@ function copyDemoPortalLink(btn){
     </div>
   </div>
 
-  <!-- Demo Sandbox shortcut -->
-  <div style="background:#0d1117;border:1px solid #1e2530;border-left:4px solid #7c3aed;border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+  <!-- Demo Sandbox shortcut. Phase 1 migration: card + btn primitives. -->
+  <div class="card" style="border-left:3px solid #7c3aed;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
     <div style="flex:1;min-width:200px;">
       <div style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:2px;">Demo Sandbox</div>
-      <div style="font-size:11px;color:#556;">Seed realistic demo data and show a live portal in seconds.</div>
+      <div style="font-size:11px;color:var(--text-mid);">Seed realistic demo data and show a live portal in seconds.</div>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn btn-approve" style="font-size:11px;padding:5px 12px;background:#7c3aed;border-color:#7c3aed;" onclick="seedDemoWithFeedback('all','demo-seed-result-overview')">Seed Both (recommended)</button>
-      <button class="btn btn-approve" style="font-size:11px;padding:5px 12px;" onclick="seedDemoWithFeedback('estate','demo-seed-result-overview')">EstateOS only</button>
-      <button class="btn btn-approve" style="font-size:11px;padding:5px 12px;background:#00a37a;border-color:#00a37a;" onclick="seedDemoWithFeedback('talent','demo-seed-result-overview')">TalentOS only</button>
+    <div class="toolbar">
+      <button class="btn btn--primary btn--sm" onclick="seedDemoWithFeedback('all','demo-seed-result-overview')">Seed Both (recommended)</button>
+      <button class="btn btn--ghost btn--sm" onclick="seedDemoWithFeedback('estate','demo-seed-result-overview')">EstateOS only</button>
+      <button class="btn btn--ghost btn--sm" onclick="seedDemoWithFeedback('talent','demo-seed-result-overview')">TalentOS only</button>
     </div>
-    <div id="demo-seed-result-overview" style="display:none;font-size:11px;width:100%;padding-top:8px;border-top:1px solid #1e2530;margin-top:4px;color:#aaa;"></div>
+    <div id="demo-seed-result-overview" style="display:none;font-size:11px;width:100%;padding-top:8px;border-top:1px solid var(--line);margin-top:4px;color:var(--text-mid);"></div>
   </div>
 
   <!-- Today's Work -->
