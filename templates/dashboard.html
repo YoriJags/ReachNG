@@ -1783,6 +1783,14 @@
 </div>
 
 <script>
+// Admin dashboard is served behind HTTP Basic Auth + session cookie. Same-origin
+// fetches resend those credentials automatically, so no extra headers are needed.
+// This helper exists because ~120 loaders call `authHeaders()` directly — without
+// it they throw `ReferenceError: authHeaders is not defined` and the panel never
+// loads (e.g. Outreach Analytics). Returning {} keeps every call site working.
+function authHeaders(){ return {}; }
+window.authHeaders = authHeaders;
+
 function copyDemoPortalLink(btn){
   const url = window.location.origin + '/portal/demo';
   navigator.clipboard.writeText(url).then(()=>{
@@ -2331,7 +2339,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </div>
 
   <!-- Revenue KPIs -->
-  <div class="ct-section" data-reflow="overview>
+  <div class="ct-section" data-reflow="overview">
     <div class="ct-section-title">Revenue</div>
     <div class="ct-kpi-row">
       <div class="ct-kpi green">
@@ -2366,7 +2374,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </div>
 
   <!-- Self-Outreach Dry-Run Preview (Client #0 founder-voice copy) -->
-  <div class="ct-section" data-reflow="growth>
+  <div class="ct-section" data-reflow="growth">
     <div class="ct-section-title">Self-Outreach — dry-run copy preview</div>
     <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Generate the actual cold-outreach drafts Client #0 will send. Nothing sends, nothing queues — pure copy preview so you can grade the tone before any real campaign fires. Cost ≈ ₦4 per draft.</p>
 
@@ -2489,7 +2497,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- Outreach Analytics (open / click / convert funnel) -->
-  <div class="ct-section" data-reflow="growth>
+  <div class="ct-section" data-reflow="growth">
     <div class="ct-section-title">Outreach Analytics — open rate, click rate, conversion</div>
     <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Live funnel for ReachNG Self-Outreach (Client #0). Opens + clicks come from Resend webhooks; conversions from waitlist signups attributed back via the /hi/{slug} link.</p>
 
@@ -2600,7 +2608,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- Prospect Interviews (Phase A validation capture) -->
-  <div class="ct-section" data-reflow="growth>
+  <div class="ct-section" data-reflow="growth">
     <div class="ct-section-title">Prospect Interviews — real conversations from outreach replies</div>
     <p style="color:#666;font-size:11px;margin:-4px 0 12px;">When a cold-outreach reply turns into a real DM/call, capture it here. The strongest <em>killer quotes</em> later land on the landing page as anonymous social proof.</p>
 
@@ -2764,7 +2772,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- Agent Learning (T0.4 close-out) -->
-  <div class="ct-section" data-reflow="ai>
+  <div class="ct-section" data-reflow="ai">
     <div class="ct-section-title">Agent Learning — outcomes engine (last 30 days)</div>
     <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Per-client wins / misses from the Outcome Loop. Active addendum = the prompt patch the weekly distil wrote into the agent. Click a row to open the per-client detail.</p>
     <div id="agent-learning-list" style="font-size:12px;">
@@ -2857,7 +2865,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- Pricing Settings (live, no deploy) -->
-  <div class="ct-section" data-reflow="billing>
+  <div class="ct-section" data-reflow="billing">
     <div class="ct-section-title">Pricing — live, no deploy needed</div>
     <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Edit any tier and Save. Takes effect immediately for new signups + the /pricing public page.</p>
     <div id="pricing-editor" style="display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:12px;">
@@ -2939,7 +2947,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- Billing — per-client API cost vs revenue (T0.2.5) -->
-  <div class="ct-section" data-reflow="billing>
+  <div class="ct-section" data-reflow="billing">
     <div class="ct-section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
       <span>Billing — API cost vs revenue (last 30 days)</span>
       <button onclick="loadBilling()" style="background:transparent;border:1px solid #2a3340;color:#9aa0a8;font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;">Refresh</button>
@@ -3039,7 +3047,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
   </script>
 
   <!-- MRR by Product Line -->
-  <div class="ct-section" data-reflow="billing>
+  <div class="ct-section" data-reflow="billing">
     <div class="ct-section-title">MRR by Product Line</div>
     <div class="ct-kpi-row">
       <div class="ct-kpi" style="border-color:#f5c842;">

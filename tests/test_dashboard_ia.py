@@ -49,3 +49,24 @@ def test_reflow_runs_on_load():
     assert "function reflowDashboard()" in HTML
     assert "reflowDashboard()" in HTML.split("function reflowDashboard()", 1)[1], \
         "reflowDashboard is defined but never called"
+
+
+def test_no_malformed_reflow_attrs():
+    """Every `data-reflow=` must be a properly quoted lowercase value.
+
+    The happy-path regex in test_every_reflow_target_has_a_body requires a
+    closing quote, so a typo'd `data-reflow="growth>` (missing quote) slips
+    past it while silently breaking the panel's DOM nesting. Catch it here.
+    """
+    total = len(re.findall(r'data-reflow=', HTML))
+    good = len(re.findall(r'data-reflow="[a-z]+"', HTML))
+    assert total == good, (
+        f'{total - good} malformed data-reflow attribute(s) '
+        '(missing/typo quote — must be data-reflow="lowercase")'
+    )
+
+
+def test_authheaders_is_defined():
+    """~120 loaders call authHeaders(); without a global definition every one
+    throws ReferenceError and its panel never loads (e.g. Outreach Analytics)."""
+    assert "function authHeaders(" in HTML, "global authHeaders() helper missing"
