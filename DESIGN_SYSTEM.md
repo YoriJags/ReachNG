@@ -5,7 +5,10 @@ hand-rolled cards, 4 competing button systems and 8 rounding values. We're
 migrating it to shared primitives **one screen at a time** — additively, never
 breaking IDs / JS hooks / fetch calls / tab logic.
 
-Status: **Phase 1 complete** — tokens + primitives defined, Command Center migrated.
+Status: **Phase 2 complete** — Command Center, Clients, Approvals, Money Engine migrated.
+
+Counts (dashboard.html): inline-styled buttons **161 → 147**, ad-hoc cards
+**199 → 189**, inline `style=` **1587 → 1569**. Regression ceilings: 147 / 189.
 
 ---
 
@@ -31,7 +34,7 @@ accent and the marketing-site brand colour). `#ff5500` is migrated away per phas
 - `.card` / `.card--flush` — replaces ad-hoc `background+border+border-radius` divs.
 - `.panel-title` / `.panel-title--eyebrow` — section headers.
 - `.toolbar` / `.toolbar--divided` — horizontal action row (wraps; full-width divider variant).
-- `.btn` (existing base) **+ modifiers** `--primary` `--ghost` `--sm` `--icon`.
+- `.btn` (existing base) **+ modifiers** `--primary` `--ghost` `--ok` `--danger` `--sm` `--icon`.
   Do **not** redefine `.btn`'s base — 122 buttons depend on it.
 - `.badge` + `--ok` `--warn` `--danger` `--info` `--neutral`.
 - `.kpi` (+`__label`/`__value`) — simple stat tile (the richer `.kpi-card` hero stays).
@@ -40,7 +43,7 @@ accent and the marketing-site brand colour). `#ff5500` is migrated away per phas
 ## Migration order
 
 1. ✅ **Phase 1** — tokens + primitives; **Command Center** (`#tab-overview`) launcher + Demo Sandbox.
-2. ⬜ **Phase 2** — Clients (roster done), Approvals, Money Engine.
+2. ✅ **Phase 2** — **Clients** (Demo Sandbox + Unipile cards), **Approvals** (approve-all bar + `.btn--ok/--danger`), **Money Engine** (copilot controls + empty-states).
 3. ⬜ **Phase 3** — Growth, AI, Billing, System.
 4. ⬜ **Phase 4** — `portal.html` (warm theme: same primitives, warm token values).
 
