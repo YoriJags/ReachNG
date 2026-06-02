@@ -286,9 +286,30 @@ class BaseCampaign:
         all_leads.sort(key=_sort_key, reverse=True)
         businesses = [b for b in all_leads if not _is_duplicate(b)]
 
+        # On a dry run, surface WHY each lead was dropped so the operator can
+        # judge filter quality before sending anything. Each entry is a compact
+        # snapshot — never the full draft (dropped leads aren't drafted).
+        dropped_previews: list[dict] = []
+        def _drop(biz: dict, reason: str) -> None:
+            if not dry_run:
+                return
+            dropped_previews.append({
+                "business":       biz.get("name"),
+                "category":       biz.get("category"),
+                "city":           biz.get("city"),
+                "rating":         biz.get("rating"),
+                "review_count":   biz.get("review_count"),
+                "quality_verdict": biz.get("quality_verdict"),
+                "quality_reasons": biz.get("quality_reasons") or [],
+                "reason":         reason,
+            })
+
         # Drop hard-cold leads from prospecting — save drafter spend.
         # Operators can still reach them manually via the dashboard.
         cold_dropped = sum(1 for b in businesses if b.get("quality_verdict") == "cold")
+        for b in businesses:
+            if b.get("quality_verdict") == "cold":
+                _drop(b, "scored cold (below quality floor)")
         businesses = [b for b in businesses if b.get("quality_verdict") != "cold"]
 
         hot_count  = sum(1 for b in businesses if b.get("quality_verdict") == "hot")
@@ -313,6 +334,7 @@ class BaseCampaign:
             # Step 3: Skip if already contacted — scoped to client in agency mode
             if has_been_contacted(biz["place_id"], client_name=client_name):
                 skipped_contacted += 1
+                _drop(biz, "already contacted (within refresh window)")
                 continue
 
             # Step 3.5: Rating filter — skip if below minimum threshold
@@ -320,6 +342,7 @@ class BaseCampaign:
                 biz_rating = biz.get("rating")
                 if biz_rating is None or biz_rating < min_rating:
                     skipped_no_channel += 1
+                    _drop(biz, f"rating {biz_rating if biz_rating is not None else 'unknown'} < min {min_rating}")
                     continue
 
             # Step 3.6: Review-count floor — premium campaigns want an established
@@ -329,6 +352,7 @@ class BaseCampaign:
                 biz_reviews = biz.get("review_count")
                 if biz_reviews is not None and biz_reviews < min_reviews:
                     skipped_no_channel += 1
+                    _drop(biz, f"{biz_reviews} reviews < min {min_reviews}")
                     continue
 
             # Step 4: Quality filter
@@ -340,12 +364,14 @@ class BaseCampaign:
                 has_website=bool(biz.get("website")),
             ):
                 skipped_no_channel += 1
+                _drop(biz, "failed quality gate (should_contact)")
                 continue
 
             # Step 5: Determine channel
             channel = self._pick_channel(biz)
             if not channel:
                 skipped_no_channel += 1
+                _drop(biz, "no reachable channel (email-only mode needs an email)")
                 continue
 
             # Step 5.5: Deep personalization — crawl website before writing
@@ -460,6 +486,8 @@ class BaseCampaign:
                 dry_run_previews.append({
                     "business": biz["name"],
                     "contact_name": biz.get("contact_name"),
+                    "category": biz.get("category"),
+                    "city": biz.get("city"),
                     "channel": channel,
                     "phone": biz.get("phone"),
                     "email": biz.get("email"),
@@ -470,6 +498,7 @@ class BaseCampaign:
                     "variant_style": generated.get("variant_style"),
                     "quality_verdict": biz.get("quality_verdict"),
                     "quality_score": biz.get("quality_score"),
+                    "quality_reasons": biz.get("quality_reasons") or [],
                     "rating": biz.get("rating"),
                     "review_count": biz.get("review_count"),
                 })
@@ -652,9 +681,15 @@ class BaseCampaign:
                 "total_after_dedup": len(businesses),
             },
         }
+        if dry_run:
+            summary["dropped_count"] = len(dropped_previews)
+        log.info("campaign_complete", **summary)
+        # Attach the heavy preview lists AFTER logging so the structured log stays
+        # compact. The dashboard reads these to render per-lead preview cards.
         if dry_run and dry_run_previews:
             summary["messages"] = dry_run_previews
-        log.info("campaign_complete", **summary)
+        if dry_run and dropped_previews:
+            summary["dropped"] = dropped_previews
         return summary
 
     async def run_followups(self, dry_run: bool = False) -> dict:

@@ -381,6 +381,7 @@ async def discover_businesses(
                 "phone": _normalise_phone(phone),
                 "website": details.get("website"),
                 "address": details.get("formatted_address") or place.get("formatted_address"),
+                "city": city,  # the city this lead was discovered under
                 "rating": details.get("rating") or place.get("rating"),
                 "review_count": user_ratings,  # user_ratings_total — feeds premium lead scoring
                 "category": _extract_category(place),

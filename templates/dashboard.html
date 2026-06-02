@@ -5899,8 +5899,8 @@ function renderResult(result, vertical, dryRun) {
       </div>
     </div>` : "";
 
-  // Main result rows — skip the discovery object itself
-  const skip = new Set(["discovery"]);
+  // Main result rows — skip the discovery object + the heavy preview lists
+  const skip = new Set(["discovery", "messages", "dropped"]);
   const rows = Object.entries(result)
     .filter(([k]) => !skip.has(k))
     .map(([k, v]) => {
@@ -5909,10 +5909,71 @@ function renderResult(result, vertical, dryRun) {
       return `<div class="v-row"><span class="lbl">${label}</span><span class="val">${val}</span></div>`;
     }).join("");
 
+  const esc = (s) => escapeHtml(String(s == null ? "" : s));
+  const VERDICT = {
+    hot:  { bg:"#0e2a18", bd:"#1f5c38", fg:"#5dd28a", label:"HOT" },
+    warm: { bg:"#2a230e", bd:"#5c4a1f", fg:"#e8c55d", label:"WARM" },
+    cold: { bg:"#1a1a1a", bd:"#333",    fg:"#888",    label:"COLD" },
+  };
+  const VARIANT_LABEL = { founder:"A · Founder", money_leak:"B · Money-leak", owner_relief:"C · Owner-relief" };
+  const verdictPill = (v) => {
+    const c = VERDICT[v] || VERDICT.cold;
+    return `<span style="font-size:10px;font-weight:700;letter-spacing:0.06em;background:${c.bg};border:1px solid ${c.bd};color:${c.fg};border-radius:5px;padding:2px 8px;">${c.label}</span>`;
+  };
+  const metaLine = (m) => {
+    const bits = [];
+    if (m.category) bits.push(esc(m.category));
+    if (m.city)     bits.push(esc(m.city));
+    if (m.rating != null)        bits.push(`★ ${esc(m.rating)}`);
+    if (m.review_count != null)  bits.push(`${esc(m.review_count)} reviews`);
+    if (m.channel)  bits.push(esc(m.channel));
+    return bits.join(" · ");
+  };
+
+  // Drafted preview cards (dry run) — the part that actually matters for review
+  const msgs = Array.isArray(result.messages) ? result.messages : [];
+  const cardsHtml = msgs.length ? `
+    <div style="margin-top:14px;">
+      <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Drafted previews (${msgs.length}) — nothing sent</div>
+      ${msgs.map(m => {
+        const variant = VARIANT_LABEL[m.variant_style] || (m.variant ? "Variant " + esc(m.variant) : "");
+        const reasons = (m.quality_reasons || []).slice(0, 6).map(r =>
+          `<span style="font-size:10px;background:#101418;border:1px solid #1e2733;color:#8aa0b4;border-radius:4px;padding:1px 6px;">${esc(r)}</span>`).join(" ");
+        return `<div style="background:#0c0f13;border:1px solid #1c2430;border-radius:9px;padding:13px 15px;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+            ${verdictPill(m.quality_verdict)}
+            <span style="font-size:14px;font-weight:700;color:#e8e8e8;">${esc(m.business)}</span>
+            ${m.quality_score != null ? `<span style="font-size:10px;color:#566;">score ${esc(m.quality_score)}</span>` : ""}
+            ${variant ? `<span style="margin-left:auto;font-size:10px;font-weight:700;color:#ff8a4c;background:#241405;border:1px solid #43250a;border-radius:5px;padding:2px 8px;">${variant}</span>` : ""}
+          </div>
+          <div style="font-size:11px;color:#6a7886;margin-bottom:8px;">${metaLine(m)}${m.email ? " · " + esc(m.email) : ""}</div>
+          ${reasons ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px;">${reasons}</div>` : ""}
+          ${m.subject ? `<div style="font-size:12px;color:#cdd6df;margin-bottom:4px;"><span style="color:#566;">Subject:</span> ${esc(m.subject)}</div>` : ""}
+          <div style="font-size:12px;color:#b6c2cf;line-height:1.55;white-space:pre-wrap;background:#080b0e;border:1px solid #161c24;border-radius:6px;padding:10px 12px;">${esc(m.message)}</div>
+        </div>`;
+      }).join("")}
+    </div>` : "";
+
+  // Dropped leads (dry run) — show WHY each was excluded
+  const dropped = Array.isArray(result.dropped) ? result.dropped : [];
+  const droppedHtml = dropped.length ? `
+    <div style="margin-top:14px;">
+      <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Dropped (${dropped.length}) — not contacted</div>
+      ${dropped.map(d => `
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid #141414;padding:6px 0;font-size:12px;">
+          ${verdictPill(d.quality_verdict)}
+          <span style="color:#cdd6df;font-weight:600;min-width:0;">${esc(d.business)}</span>
+          <span style="color:#5a6672;">${metaLine(d)}</span>
+          <span style="margin-left:auto;color:#c98a6a;font-size:11px;">${esc(d.reason)}</span>
+        </div>`).join("")}
+    </div>` : "";
+
   return `<div style="background:#0a0a0a;border:1px solid #1e1e1e;border-radius:8px;padding:14px 18px;">
     <div style="font-size:10px;color:#333;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;">${vertical.replace(/_/g," ")} ${dryRun?"(dry run)":"(live)"}</div>
     ${discHtml}
     ${rows}
+    ${cardsHtml}
+    ${droppedHtml}
   </div>`;
 }
 
