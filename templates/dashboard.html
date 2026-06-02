@@ -10627,7 +10627,7 @@ async function actSkip(id, btn) {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
       <div>
         <label style="font-size:11px;color:#4a6070;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:4px;">Plan</label>
-        <select id="ob-plan" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
+        <select id="ob-modal-plan" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
           <option value="starter">Solo — ₦60k/mo</option>
           <option value="growth">Team — ₦120k/mo</option>
           <option value="agency">Empire — ₦250k/mo</option>
@@ -10719,7 +10719,7 @@ async function confirmOnboard() {
   btn.textContent = "Creating…";
   btn.disabled = true;
 
-  const plan = document.getElementById("ob-plan").value;
+  const plan = document.getElementById("ob-modal-plan").value;
   const fee  = parseInt(document.getElementById("ob-fee").value) || null;
   const suite = document.getElementById("ob-suite").value || null;
 
@@ -10762,7 +10762,7 @@ async function generatePaymentLink() {
   const email = document.getElementById("ob-pay-email").value.trim();
   const fee   = parseInt(document.getElementById("ob-fee").value) || 0;
   const name  = document.getElementById("ob-client-name").textContent.trim();
-  const plan  = document.getElementById("ob-plan").value;
+  const plan  = document.getElementById("ob-modal-plan").value;
 
   if (!email) { alert("Enter client email first."); return; }
   if (!fee)   { alert("Enter monthly fee above first."); return; }

@@ -97,6 +97,16 @@ def test_old_simpler_roster_removed():
     assert 'id="roster-tbody"' not in HTML, "old roster-tbody still present"
 
 
+def test_no_duplicate_static_ids():
+    """Duplicate element IDs silently break getElementById (returns the first in
+    DOM order). Ignore dynamic template-literal IDs like id="apf-${id}" — only
+    static IDs must be unique. (Caught the ob-plan onboarding-modal bug.)"""
+    from collections import Counter
+    static_ids = [v for v in re.findall(r'\sid="([^"]+)"', HTML) if "$" not in v and "{" not in v]
+    dups = {k: n for k, n in Counter(static_ids).items() if n > 1}
+    assert not dups, f"duplicate static element id(s): {dups}"
+
+
 def test_rich_roster_reflows_into_clients():
     """The rich operator roster (#ct-client-grid) must carry data-reflow='clients'
     so it lands in the Clients tab (its container is the source shell)."""
