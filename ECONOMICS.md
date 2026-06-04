@@ -2,7 +2,7 @@
 
 Honest, operator-grade breakdown of what one paying client actually costs us to run, and what the existing admin dashboard sees vs. what it misses.
 
-Last updated: 2026-05-20 (pre-pricing session)
+Last updated: 2026-06-04 (added §4.1 — Meta Business Agent token-COGS line)
 
 ---
 
@@ -115,6 +115,38 @@ We have Meta Cloud integration coded too. Cost shifts:
 Per-client fixed via Meta direct: **~₦6,000/mo** (Resend + Mongo only).
 
 **Strategic implication:** offer clients on cheaper plans (Starter) Meta direct, while higher-tier (Growth/Scale) get Unipile for hosted-auth convenience. Cuts Starter fixed cost by ~75%.
+
+### 4.1 · Meta Business Agent era — the token-COGS line (added 2026-06-04)
+
+Meta's 3 Jun 2026 **Business Agent** launch (free entry tier + token-based pricing) raised a fair question: does Meta's pricing pressure our margins? **No — because EYO is reply-centric, not blast-marketing.**
+
+**What Meta actually charges (current per-message model — verify rates before quoting):**
+
+| Category | When it applies to EYO | Est. Nigeria rate (₦ @ ₦1,600/USD) |
+|---|---|---:|
+| Service / customer-initiated | Replies inside the 24h window — the bulk of EYO | **Free** |
+| Utility template | Chase/reminder sent outside 24h (rent, invoice) | ~₦13/msg |
+| Marketing template | Cold/promotional blasts | ~₦65/msg |
+| Authentication | OTPs (not our use case) | ~₦12/msg |
+
+EYO's architecture keeps us in the cheap lane by design:
+- **Replies to inbound = free.** A HITL draft answers a customer who just messaged → inside the 24h service window → ₦0.
+- **Cold outreach is email-only** (locked decision) → ~zero marketing-template spend.
+- **Only out-of-window chases** (rent / invoice reminders) hit the utility rate.
+
+**Meta-token COGS per client (EYO send mix):**
+
+| Profile | Utility-template sends/mo (est.) | Meta-token COGS ₦/mo |
+|---|---:|---:|
+| Light | ~50 | ~₦650 |
+| Medium | ~150 | ~₦1,950 |
+| Heavy | ~400 | ~₦5,200 |
+
+That's a **fraction of the ₦8,800/mo Unipile flat fee** — for a reply-centric client, Meta-direct is *cheaper* COGS, not dearer.
+
+**On the Business Agent's *own* token pricing:** that meter applies to *Meta's* AI agent answering for a business. It is **not** a cost EYO incurs when EYO rides the Cloud API — we pay the standard messaging fees above, not agent tokens. The agent-token line only matters if a client runs *Meta's* agent instead of EYO (then the coexistence/handoff design applies — currently transport-ready via the per-client Meta provider; the Business-Agent handover adapter is deferred until Meta publishes those hooks).
+
+**Margin impact:** the Meta-token COGS is **per-client-conditional** (only for clients on the Official Cloud API tier) and small (₦650–₦5,200/mo). It does **not** move the §6 tier margins materially — if anything it improves them vs Unipile's flat fee. Meta's pricing is a **positioning** challenge (don't sell commoditised chat), **not a COGS problem.** The moat is priced on money recovery + memory (Vault/NBA) + owner control + done-for-you, none of which Meta's free chat layer touches.
 
 ---
 
