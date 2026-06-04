@@ -60,6 +60,10 @@ class Settings(BaseSettings):
     # Shared secret Unipile sends back as X-Notify-Token on hosted-auth completion.
     # Optional but recommended in production — if unset, webhook routes by name field only.
     unipile_hosted_notify_token: str | None = Field(default=None, env="UNIPILE_HOSTED_NOTIFY_TOKEN")
+    # Optional protection floor: before a Unipile WhatsApp send, verify the number
+    # is actually on WhatsApp. Default OFF and fail-open — the Unipile endpoint
+    # must be validated before enabling, or it could block legitimate sends.
+    whatsapp_existence_check: bool = Field(default=False, env="WHATSAPP_EXISTENCE_CHECK")
 
     # MongoDB
     mongodb_uri: str = Field(..., env="MONGODB_URI")

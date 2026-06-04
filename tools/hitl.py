@@ -29,6 +29,11 @@ _PROSPECTING_SOURCES = {
     "outreach", "closer", "discovery", "campaign",
 }
 
+# Cold-discovery sources = strangers we found, with no prior relationship or
+# consent. Cold WhatsApp to these is not allowed (cold outreach is email-only);
+# they may only be WhatsApp'd after they message in first (24h session window).
+_COLD_DISCOVERY_SOURCES = {"maps", "apollo", "discovery", "social"}
+
 log = structlog.get_logger()
 
 
@@ -41,6 +46,41 @@ def _run_async(coro):
             return pool.submit(asyncio.run, coro).result(timeout=25)
     except RuntimeError:
         return asyncio.run(coro)
+
+
+class OutreachConsentMissing(Exception):
+    """Raised when a cold-discovery contact would be messaged on WhatsApp without
+    consent and without a recent inbound. Cold WhatsApp is not allowed — first
+    contact goes by email, or the contact must message in first."""
+
+    def __init__(self, contact_name: str, source: str):
+        self.contact_name = contact_name
+        self.source = source
+        super().__init__(
+            f"WhatsApp outreach to '{contact_name}' (source: {source}) blocked: "
+            f"no prior relationship and no inbound in the last 24h. Cold WhatsApp "
+            f"is not allowed — use email for first contact, or wait for them to "
+            f"message in."
+        )
+
+
+def _enforce_whatsapp_consent_gate(
+    *, source: str, channel: str, requires_template: bool, contact_name: str
+) -> None:
+    """Protection floor: never cold-WhatsApp a stranger.
+
+    Only applies to WhatsApp drafts from a cold-discovery source. If there was a
+    customer-initiated inbound in the last 24h (`requires_template` is False —
+    a session is open), the send is allowed. Otherwise it is blocked.
+
+    Transactional sources, BYO leads (client-attested consent), and all email
+    are unaffected.
+    """
+    if channel != "whatsapp" or source not in _COLD_DISCOVERY_SOURCES:
+        return
+    if not requires_template:
+        return  # open 24h session (they messaged us) — allowed
+    raise OutreachConsentMissing(contact_name=contact_name, source=source)
 
 
 class BriefIncompleteError(Exception):
@@ -129,6 +169,15 @@ def queue_draft(
                 requires_template = True
     except Exception:
         pass
+
+    # ── Consent floor: never cold-WhatsApp a stranger ──────────────────────────
+    # Cold-discovery WhatsApp with no open 24h session is blocked here (cold
+    # outreach is email-only). Raises OutreachConsentMissing for the caller to
+    # surface — same chokepoint pattern as the brief gate.
+    _enforce_whatsapp_consent_gate(
+        source=source, channel=channel,
+        requires_template=requires_template, contact_name=contact_name,
+    )
 
     # ── Tone scrub ────────────────────────────────────────────────────────────
     # Strip casual endearments ("babe", "love", "dear" etc.) that the drafter
@@ -484,6 +533,18 @@ def _try_autopilot_send(
             "edited_message":    None,
         })
         return None  # Signal caller to not store a second record
+
+    # ── Send-window floor ─────────────────────────────────────────────────────
+    # Hold automated sends outside Africa/Lagos business hours (08:00–20:00).
+    # Returning None falls back to the normal HITL queue — the draft is never
+    # dropped; the owner can approve it whenever. Human approvals are unaffected.
+    try:
+        from tools.account_guard import is_within_send_window
+        if not is_within_send_window():
+            log.info("autopilot_held_outside_send_window", contact=contact_name)
+            return None
+    except Exception as e:
+        log.warning("send_window_check_failed", error=str(e))
 
     # Dispatch
     from api.clients import get_clients

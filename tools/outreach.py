@@ -104,6 +104,39 @@ async def send_whatsapp_meta(
         return {"success": True, "message_id": msg_id}
 
 
+async def check_whatsapp_exists(phone: str, account_id: str) -> Optional[bool]:
+    """Best-effort: is `phone` reachable on WhatsApp via this Unipile account?
+
+    Returns True/False when known, or None when indeterminate (no config, error,
+    or unverified endpoint) — callers MUST treat None as fail-open and proceed.
+
+    NOTE: the exact Unipile existence-check endpoint has not been verified against
+    a live account. Until it is, `settings.whatsapp_existence_check` stays False
+    and this helper is inert. Wired conservatively so enabling it can never
+    silently drop a legitimate send.
+    """
+    settings = get_settings()
+    if not getattr(settings, "whatsapp_existence_check", False):
+        return None
+    dsn, api_key = settings.unipile_dsn, settings.unipile_api_key
+    if not (dsn and api_key and account_id):
+        return None
+    try:
+        url = f"https://{dsn}/api/v1/accounts/{account_id}/check"
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                url, headers={"X-API-KEY": api_key}, params={"phone": phone}
+            )
+            if resp.status_code != 200:
+                return None  # unknown — fail open
+            data = resp.json()
+            val = data.get("exists")
+            return bool(val) if val is not None else None
+    except Exception as e:
+        log.warning("whatsapp_existence_check_failed", error=str(e))
+        return None  # fail open
+
+
 async def send_whatsapp_unipile(phone: str, message: str, account_id: str) -> dict:
     """Send a WhatsApp message from a client's QR-connected Unipile account.
 
@@ -117,6 +150,14 @@ async def send_whatsapp_unipile(phone: str, message: str, account_id: str) -> di
         log.error("unipile_whatsapp_not_configured", has_account=bool(account_id))
         return {"success": False, "error": "unipile_not_configured",
                 "detail": "Unipile DSN/API key or account_id missing — message not sent"}
+
+    # Optional protection floor (off by default, fail-open): skip numbers that are
+    # definitively not on WhatsApp. None/True → proceed; only an explicit False blocks.
+    exists = await check_whatsapp_exists(phone, account_id)
+    if exists is False:
+        log.info("unipile_whatsapp_skipped_not_on_whatsapp")
+        return {"success": False, "error": "not_on_whatsapp",
+                "detail": "Number is not reachable on WhatsApp — message not sent"}
 
     url = f"https://{dsn}/api/v1/chats"
     payload = {"account_id": account_id, "attendees_ids": [phone], "text": message}

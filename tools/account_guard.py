@@ -17,11 +17,33 @@ from __future__ import annotations
 import re
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 from database import get_db
 import structlog
 
 log = structlog.get_logger()
+
+
+# ─── Send window (Africa/Lagos business hours) ───────────────────────────────
+# Automated sends (autopilot) are held outside these hours so EYO never messages
+# a customer at 3am. Human approvals are NEVER gated by this — the owner is in
+# control and may approve whenever they like.
+LAGOS_TZ = ZoneInfo("Africa/Lagos")
+SEND_WINDOW_START_HOUR = 8    # 08:00 inclusive
+SEND_WINDOW_END_HOUR   = 20   # 20:00 exclusive (last send 19:59 Lagos)
+
+
+def is_within_send_window(now: Optional[datetime] = None) -> bool:
+    """True when the current Africa/Lagos local time is within 08:00–20:00.
+
+    `now` may be passed (UTC-aware) for testing; defaults to current UTC.
+    """
+    now = now or datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=timezone.utc)
+    local_hour = now.astimezone(LAGOS_TZ).hour
+    return SEND_WINDOW_START_HOUR <= local_hour < SEND_WINDOW_END_HOUR
 
 
 # ─── Tunables (per-client overrides via clients.outreach_caps.*) ─────────────
