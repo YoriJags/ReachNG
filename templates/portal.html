@@ -726,14 +726,6 @@
 
   <div class="content">
 
-    <!-- TODAY · status header (WhatsApp + what needs you) -->
-    <section class="tabpanel active" data-tab="today">
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;">
-        <span class="wa-pill off" id="wa-pill"><span class="dot"></span><span id="wa-pill-text">WhatsApp: checking…</span></span>
-        <a href="#approvals" onclick="switchTab('approvals')" id="today-threads" style="font-size:13px;color:var(--muted);text-decoration:none;display:none;"></a>
-      </div>
-    </section>
-
     <!-- CUSTOMERS -->
     <section class="tabpanel" data-tab="customers">
       <div class="section-label">Your customers</div>
@@ -746,6 +738,15 @@
           <div class="cc-title">📇 Customer Book</div>
           <div class="cc-sub">Import your contacts (WhatsApp share-contact, vCard, paste or CSV) so EYO can work your existing relationships.</div>
         </a>
+      </div>
+
+      <!-- Recent customers + next best action -->
+      <div class="section-label">Recent customers &amp; next best action</div>
+      <div class="card" style="margin-bottom:24px;">
+        <div id="recent-customers-body" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <div id="recent-customers-empty" style="display:none;font-size:13px;color:var(--muted);">No customers in the Vault yet — import your Customer Book and EYO starts remembering everyone.</div>
+        <div id="recent-customers-loading" style="font-size:13px;color:var(--muted);">Loading your recent customers…</div>
+        <a href="/portal/{{ token }}/vault" class="btn btn--ghost btn--sm" style="margin-top:14px;display:inline-block;">Open the full Vault →</a>
       </div>
     </section>
 
@@ -921,10 +922,33 @@
       })();
     </script>
 
+    <!-- Share, export & owner-brief history -->
+    <div class="section-label">Share &amp; export</div>
+    <div class="cust-grid" style="margin-bottom:20px;">
+      <a class="cust-card" href="/portal/share-card/{{ token }}" target="_blank">
+        <div class="cc-title">📈 Shareable ROI card</div>
+        <div class="cc-sub">A 1200×630 image of your live results — open, screenshot, post.</div>
+      </a>
+      <a class="cust-card" href="/portal/{{ token }}/report.pdf" target="_blank">
+        <div class="cc-title">📄 Download PDF report</div>
+        <div class="cc-sub">One-page summary: cash, deposits, bookings, hours saved, brief streak.</div>
+      </a>
+      <div class="cust-card" style="cursor:default;">
+        <div class="cc-title">🗓 Owner Brief history</div>
+        <div id="feed-brief-history" class="cc-sub">Loading…</div>
+      </div>
+    </div>
+
     </section>
 
-    <!-- TODAY · Owner Brief + cash control room -->
+    <!-- TODAY · WhatsApp status + Owner Brief + what needs you + what EYO did -->
     <section class="tabpanel active" data-tab="today">
+
+    <!-- WhatsApp status + attention link -->
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;">
+      <span class="wa-pill off" id="wa-pill"><span class="dot"></span><span id="wa-pill-text">WhatsApp: checking…</span></span>
+      <a href="#approvals" onclick="switchTab('approvals')" id="today-threads" style="font-size:13px;color:var(--muted);text-decoration:none;display:none;"></a>
+    </div>
 
     <!-- Owner Brief — cash headline -->
     <div class="section-label">Owner Brief — today</div>
@@ -946,18 +970,43 @@
         <div id="ob-priceasked"   style="display:none;font-size:13px;color:#ff7a7a;">⚠️ <span id="ob-priceasked-cnt">0</span> asked for price, no quote sent yet</div>
       </div>
 
-      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);">
         <div style="font-size:11px;color:var(--muted);">Numbers refresh every load. The 8am WhatsApp brief uses the same signals.</div>
-        <a href="/portal/upload-leads/{{ token }}" class="btn btn--primary btn--sm" style="white-space:nowrap;">⚡ Lead Resurrection — upload old leads</a>
       </div>
     </div>
 
-    <!-- Money Leak + Speed Watch -->
+    <!-- What needs you (pending drafts + hot conversations) -->
+    <div class="section-label">What needs you</div>
+    <div class="card" style="margin-bottom:24px;">
+      <div id="today-needs-body" style="display:none;flex-wrap:wrap;gap:10px;">
+        <a href="#approvals" onclick="switchTab('approvals')" id="today-needs-drafts" class="badge badge--ok" style="display:none;text-decoration:none;">— drafts to approve</a>
+        <a href="#approvals" onclick="switchTab('approvals')" id="today-needs-hot" class="badge badge--warn" style="display:none;text-decoration:none;">— hot conversations</a>
+      </div>
+      <div id="today-needs-empty" style="display:none;font-size:13px;color:#5dd28a;">✅ Nothing waiting — you're all caught up.</div>
+      <div id="today-needs-loading" style="font-size:13px;color:var(--muted);">Checking what needs your attention…</div>
+    </div>
+
+    <!-- What EYO did since yesterday -->
+    <div class="section-label">What EYO did since yesterday</div>
+    <div class="card" style="margin-bottom:24px;">
+      <div id="eyo-recap-body" style="font-size:13px;color:var(--ink);line-height:1.7;">Loading what EYO handled for you…</div>
+    </div>
+
+    </section>
+
+    <!-- MONEY · leak + rescue + speed + receipts + missed enquiries -->
+    <section class="tabpanel" data-tab="money">
+
+    <!-- Money Leak + Revenue Rescue + Speed Watch -->
     <div class="section-label">Cash control room</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:24px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:24px;">
       <a href="/portal/{{ token }}/money-leak" class="card" style="text-decoration:none;display:block;border-left:3px solid var(--accent);">
         <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;">💸 Money Leak Report</div>
         <div id="ml-headline" style="font-size:15px;color:var(--ink);margin-top:8px;line-height:1.5;">See where money is quietly dying →</div>
+      </a>
+      <a href="/portal/{{ token }}/money-leak" class="card" style="text-decoration:none;display:block;border-left:3px solid var(--gold);">
+        <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.1em;">⏰ Revenue Rescue</div>
+        <div id="rescue-headline" style="font-size:15px;color:var(--ink);margin-top:8px;line-height:1.5;">Conversations worth reviving →</div>
       </a>
       <div class="card" style="border-left:3px solid var(--green);">
         <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.1em;">⚡ Speed watch</div>
@@ -965,23 +1014,44 @@
       </div>
     </div>
 
-    </section>
+    <!-- Receipts / bookings / time saved -->
+    <div class="section-label">Receipts, bookings &amp; time saved</div>
+    <div class="cust-grid" style="margin-bottom:24px;">
+      <div class="cust-card" style="cursor:default;">
+        <div class="cc-title">💳 Payments &amp; receipts</div>
+        <div id="feed-payments" class="cc-sub">Loading…</div>
+      </div>
+      <div class="cust-card" style="cursor:default;">
+        <div class="cc-title">🤝 Bookings closed</div>
+        <div id="feed-bookings" class="cc-sub">Loading…</div>
+      </div>
+      <div class="cust-card" style="cursor:default;">
+        <div class="cc-title">⏱ Hours saved <span style="font-size:10px;color:var(--muted2);">(est.)</span></div>
+        <div id="feed-savings" class="cc-sub">Loading…</div>
+      </div>
+    </div>
 
-    <!-- MONEY · radar -->
-    <section class="tabpanel" data-tab="money">
-
-    <!-- Missed Opportunity Radar -->
-    <div class="section-label">Missed Opportunity Radar</div>
+    <!-- Missed price enquiries -->
+    <div class="section-label">Missed price enquiries</div>
     <div id="radar-card" class="card" style="margin-bottom:24px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;flex-wrap:wrap;">
         <div>
-          <div style="font-size:14px;font-weight:600;color:#e8e8e8;">Asked for price · no quote sent</div>
-          <div style="font-size:12px;color:#555;margin-top:2px;">Conversations the agent flagged as price-asking that haven't had a follow-up. Last 30 days.</div>
+          <div style="font-size:14px;font-weight:600;color:var(--ink);">Asked for price · no quote sent</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Conversations the agent flagged as price-asking that haven't had a follow-up. Last 30 days.</div>
         </div>
         <div id="radar-count" style="font-size:24px;font-weight:700;color:#ff7a7a;">—</div>
       </div>
       <div id="radar-list" style="display:flex;flex-direction:column;gap:10px;"></div>
       <div id="radar-empty" style="display:none;font-size:13px;color:#5dd28a;padding:8px 0;">✅ No missed opportunities — every price-asker has been followed up.</div>
+    </div>
+
+    <!-- Revive old leads -->
+    <div class="card" style="margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--ink);">Revive old leads</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">Upload a list of old or cold contacts — EYO re-opens the conversations worth money.</div>
+      </div>
+      <a href="/portal/upload-leads/{{ token }}" class="btn btn--primary btn--sm" style="white-space:nowrap;">⚡ Lead Resurrection</a>
     </div>
 
     </section>
@@ -1005,59 +1075,6 @@
       </div>
       <div id="copilot-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;"></div>
       <div id="copilot-empty" style="display:none;font-size:13px;color:#5dd28a;padding:8px 0;">✅ No inbound threads need action right now.</div>
-    </div>
-
-    </section>
-
-    <!-- MONEY · stats + activity + coming-soon -->
-    <section class="tabpanel" data-tab="money">
-
-    <div class="cust-grid" style="margin-bottom:20px;">
-      <div class="cust-card" style="cursor:default;">
-        <div class="cc-title">💳 Payments &amp; receipts</div>
-        <div id="feed-payments" class="cc-sub">Loading…</div>
-      </div>
-      <div class="cust-card" style="cursor:default;">
-        <div class="cc-title">🤝 Bookings closed</div>
-        <div id="feed-bookings" class="cc-sub">Loading…</div>
-      </div>
-      <div class="cust-card" style="cursor:default;">
-        <div class="cc-title">⏱ Hours saved <span style="font-size:10px;color:var(--muted2);">(est.)</span></div>
-        <div id="feed-savings" class="cc-sub">Loading…</div>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-grid" id="stats-grid">
-      <div class="stat-card orange">
-        <div class="stat-label">Messages Sent</div>
-        <div class="stat-value" data-counter="0" id="val-contacted">0</div>
-        <div class="stat-change">Total outbound activity</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-label">Replied</div>
-        <div class="stat-value" data-counter="0" id="val-replied">0</div>
-        <div class="stat-change">Conversations opened</div>
-      </div>
-      <div class="stat-card gold">
-        <div class="stat-label">Closed</div>
-        <div class="stat-value" data-counter="0" id="val-converted">0</div>
-        <div class="stat-change">Marked done by you</div>
-      </div>
-      <div class="stat-card blue">
-        <div class="stat-label">This Week</div>
-        <div class="stat-value" data-counter="0" id="val-week">0</div>
-        <div class="stat-change">Messages this week</div>
-      </div>
-    </div>
-
-    <!-- Activity feed -->
-    <div class="section-label">Recent Activity</div>
-    <div class="activity-feed" id="activity-feed">
-      <div class="activity-item">
-        <span class="activity-icon"></span>
-        <span class="activity-text">Loading activity…</span>
-      </div>
     </div>
 
     </section>
@@ -1298,45 +1315,6 @@ discount only today"></textarea>
 
     </section>
 
-    <!-- REPORTS · outreach activity + ROI card -->
-    <section class="tabpanel" data-tab="reports">
-
-    <div class="cust-grid" style="margin-bottom:20px;">
-      <a class="cust-card" href="/portal/share-card/{{ token }}" target="_blank">
-        <div class="cc-title">📈 Shareable ROI card</div>
-        <div class="cc-sub">A 1200×630 image of your live results — open, screenshot, post.</div>
-      </a>
-      <a class="cust-card" href="/portal/{{ token }}/report.pdf" target="_blank">
-        <div class="cc-title">📄 Download PDF report</div>
-        <div class="cc-sub">One-page summary: cash, deposits, bookings, hours saved, brief streak.</div>
-      </a>
-      <div class="cust-card" style="cursor:default;">
-        <div class="cc-title">🗓 Owner Brief history</div>
-        <div id="feed-brief-history" class="cc-sub">Loading…</div>
-      </div>
-    </div>
-
-    <!-- Outreach activity table -->
-    <div class="section-label">Outreach Activity</div>
-    <div class="leads-table-wrap">
-      <table class="leads-table">
-        <thead>
-          <tr>
-            <th onclick="sortTable('name')">Contact</th>
-            <th onclick="sortTable('category')">Category</th>
-            <th onclick="sortTable('status')">Status</th>
-            <th onclick="sortTable('rating')">Rating</th>
-            <th onclick="sortTable('lead_score')">Score</th>
-          </tr>
-        </thead>
-        <tbody id="leads-tbody">
-          <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--dim);">Loading…</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    </section>
-
   </div>
 
   <footer class="footer">
@@ -1346,21 +1324,59 @@ discount only today"></textarea>
 </div>
 
 <script>
-// ── Counter animation ─────────────────────────────────────────────────────────
-
-function animateCounter(el, target, duration) {
-  const start = performance.now();
-  const from = 0;
-  function step(now) {
-    const elapsed = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-    const ease = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.round(from + (target - from) * ease);
-    if (progress < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
+{% if demo %}
+/* DEMO MODE — sample-data shim. Only rendered by the /portal/demo/eyo route;
+   real client portals never include this. Patches fetch() so the refactored
+   client IA can be previewed without a live client/token. */
+(function(){
+  const NOW = Date.now();
+  const iso = (h) => new Date(NOW - h*3600*1000).toISOString();
+  const SAMPLE = [
+    ["/portal/data/", {
+      cash: { collectible_total_ngn: 1840000, collectible_count: 6,
+              cash_received_overnight_ngn: 250000, hot_replies_overnight: 3,
+              asked_price_no_quote: 2,
+              breakdown: { rent:{count:2, amount_ngn:1200000}, debt:{count:4, amount_ngn:640000} } },
+      autopilot: false,
+      holding_message: "Hi! Thanks for reaching out — we'll be right with you with full details.",
+      stats: {} }],
+    ["/missed-opportunities/", { missed: [
+      { contact_name:"Tunde A.", phone:"2348031234567", reply_text:"How much for the VIP table on Saturday?", hours_since:5, channel:"whatsapp" },
+      { contact_name:"Bisi O.", phone:"2348039876543", reply_text:"Do you have space for 20 people next Friday?", hours_since:20, channel:"whatsapp" } ] }],
+    ["/sales-copilot/", { summary:{hot:3, drafts:2}, threads: [
+      { contact_name:"Tunde A.", phone:"2348031234567", channel:"whatsapp", received_at: iso(2), priority:"hot", intent:"price", reply_text:"How much for the VIP table on Saturday?", suggested_action:"Send the VIP table quote (₦90K) + ask party size.", draft_preview:"Hi Tunde! Our VIP table for Saturday primetime is ₦90,000 and seats up to 8. Want me to lock it for you?", approval_id:"demo1" },
+      { contact_name:"Bisi O.", phone:"2348039876543", channel:"whatsapp", received_at: iso(20), priority:"warm", intent:"availability", reply_text:"Space for 20 next Friday?", suggested_action:"Confirm Friday availability for 20 and share the group package.", draft_preview:"Hi Bisi! Yes, we can host 20 next Friday. The group package starts at ₦380K — shall I send the full pack?", approval_id:"demo2" } ] }],
+    ["/money-leak/data", { total_ngn: 640000, count: 4, headline: "₦640k in 4 conversations went quiet after a price was asked." }],
+    ["/revenue-rescue", { total_ngn: 420000, count: 3 }],
+    ["/speed-watch", { median_response_seconds: 540, headline: "Your median reply time is 9 minutes — fast." }],
+    ["/savings", { messages_handled: 184, hours_saved: 6.1, cost_saved_ngn: 92000 }],
+    ["/payments", { count: 5, total_ngn: 1250000, window_days: 30 }],
+    ["/bookings", { count: 4, total_ngn: 980000 }],
+    ["/brief-history", { count: 12, streak_days: 9, items:[{day:"today"}] }],
+    ["/scorecard", { ngn_closed: 980000, bookings_closed: 4, hours_saved: 6.1, drafts_approved: 41, median_response_seconds: 540, approval_rate: 0.86, drafts_edited: 5, drafts_skipped: 2, ngn_pending: 420000, cost_per_booking_ngn: 12000 }],
+    ["/agent-learning/", { stats:{wins:9, misses:2, win_rate:0.82}, addendum:"Lead with the price when a customer asks directly — don't bury it under pleasantries. Offer to lock the slot in the same message.", addendum_updated_at: iso(72), recent:[ {status:"win", source:"whatsapp", signal:"deposit paid", draft_excerpt:"Locked your VIP table — see you Saturday!"}, {status:"miss", source:"whatsapp", signal:"went cold", draft_excerpt:"Let me know if you have any other questions."} ] }],
+    ["/onboard/status", { wa_connected:true, onboarded_at: iso(720), current_step: 8 }],
+    ["/vault/customers", { customers:[
+      { name:"Tunde A.", phone:"2348031234567", lifetime_ngn:540000, last_seen_at: iso(2), next_best_action:"Confirm Saturday VIP booking" },
+      { name:"Bisi O.", phone:"2348039876543", lifetime_ngn:380000, last_seen_at: iso(20), next_best_action:"Send group package for 20" },
+      { name:"Chidi N.", phone:"2348021112233", lifetime_ngn:1200000, last_seen_at: iso(60), next_best_action:"Invite to month-end mixer" } ], count:3 }],
+    ["/autopilot/readiness", { approvals_count: 14, unedited_pct: 0.64, threshold: 20, rate_threshold: 0.7, ready: false }],
+  ];
+  const _fetch = window.fetch ? window.fetch.bind(window) : null;
+  window.fetch = function(input, init){
+    const url = (typeof input === "string") ? input : (input && input.url) || "";
+    for (const pair of SAMPLE) {
+      if (url.indexOf(pair[0]) !== -1) {
+        return Promise.resolve(new Response(JSON.stringify(pair[1]), { status:200, headers:{ "Content-Type":"application/json" } }));
+      }
+    }
+    if (url.indexOf("/portal-approvals/") !== -1) {
+      return Promise.resolve(new Response(JSON.stringify({ok:true}), {status:200, headers:{"Content-Type":"application/json"}}));
+    }
+    return _fetch ? _fetch(input, init) : Promise.reject(new Error("no fetch"));
+  };
+})();
+{% endif %}
 // ── Relative time ─────────────────────────────────────────────────────────────
 
 function relTime(iso) {
@@ -1373,45 +1389,6 @@ function relTime(iso) {
   if (hrs < 24) return `${hrs} hour${hrs !== 1 ? "s" : ""} ago`;
   const days = Math.floor(hrs / 24);
   return `${days} day${days !== 1 ? "s" : ""} ago`;
-}
-
-// ── Sort ──────────────────────────────────────────────────────────────────────
-
-let allContacts = [];
-let sortField = "lead_score";
-let sortAsc = false;
-
-function sortTable(field) {
-  if (sortField === field) sortAsc = !sortAsc;
-  else { sortField = field; sortAsc = false; }
-  renderLeads();
-}
-
-function renderLeads() {
-  const sorted = [...allContacts].sort((a, b) => {
-    const av = a[sortField] ?? "";
-    const bv = b[sortField] ?? "";
-    if (typeof av === "number") return sortAsc ? av - bv : bv - av;
-    return sortAsc ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
-  });
-
-  const tbody = document.getElementById("leads-tbody");
-  if (!sorted.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--dim);">No leads yet.</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = sorted.map(c => {
-    const stars = c.rating ? "★".repeat(Math.round(c.rating)) + "☆".repeat(5 - Math.round(c.rating)) : "—";
-    const status = c.status || "new";
-    return `<tr>
-      <td style="font-weight:500;">${c.name || "—"}</td>
-      <td style="color:var(--muted);font-size:12px;">${c.category || "—"}</td>
-      <td><span class="status-badge status-${status}">${status.replace(/_/g, " ")}</span></td>
-      <td><span class="rating-stars">${stars}</span></td>
-      <td><span class="score-badge">${c.lead_score ?? "—"}</span></td>
-    </tr>`;
-  }).join("");
 }
 
 // ── fmtNgn ────────────────────────────────────────────────────────────────────
@@ -1624,67 +1601,13 @@ async function load() {
     loadRadar();
     loadCopilot();
     loadCashRoom();
+    loadRescue();
     loadReadinessBreakdown();
     initTabsAndCta();
 
-    const s = data.stats || {};
-    const contacted = s.contacted || 0;
-    const replied   = s.replied || 0;
-    const converted = s.converted || 0;
-    const dailySent = s.daily_sent || 0;
-
-    // Animate counters
-    animateCounter(document.getElementById("val-contacted"), contacted, 800);
-    animateCounter(document.getElementById("val-replied"),   replied,   900);
-    animateCounter(document.getElementById("val-converted"), converted, 1000);
-    animateCounter(document.getElementById("val-week"),      dailySent, 700);
-
-    // Momentum bar (target = 200 contacts)
-    const target = 200;
-    const pct = Math.min(100, Math.round((contacted / target) * 100));
-    document.getElementById("momentum-pct").textContent = pct + "%";
-    setTimeout(() => {
-      document.getElementById("momentum-bar").style.width = pct + "%";
-    }, 100);
-    document.getElementById("momentum-sub").textContent =
-      `${contacted} of ${target} businesses reached this month — ${pct}% through your pipeline`;
-
-    // ROI strip
-    const roi = data.roi || {};
-    document.getElementById("roi-sent").textContent  = roi.messages_sent ?? "—";
-    document.getElementById("roi-value").textContent = fmtNgn(roi.value_generated_ngn);
-    document.getElementById("roi-multi").textContent = roi.roi_percent ? roi.roi_percent + "x" : "—";
-
-    // Activity feed
-    const contacts = data.contacts || [];
-    const feed = document.getElementById("activity-feed");
-    const feedItems = contacts.slice(0, 10).map(c => {
-      let iconClass = "sent";
-      let text = `ReachNG messaged ${c.name || "a business"}`;
-      if (c.status === "replied") {
-        iconClass = "replied";
-        text = `${c.name || "A business"} replied — interested`;
-      } else if (c.status === "converted") {
-        iconClass = "converted";
-        text = `${c.name || "A business"} converted — deal in progress`;
-      }
-      return `
-        <div class="activity-item">
-          <span class="activity-icon ${iconClass}"></span>
-          <span class="activity-text">${text}</span>
-          <span class="activity-time">${relTime(c.last_contacted_at || c.created_at)}</span>
-        </div>`;
-    });
-
-    if (!feedItems.length) {
-      feed.innerHTML = '<div class="activity-item"><span class="activity-icon"></span><span class="activity-text" style="color:var(--dim);">No activity yet — campaigns are warming up.</span></div>';
-    } else {
-      feed.innerHTML = feedItems.join("");
-    }
-
-    // Leads table
-    allContacts = contacts;
-    renderLeads();
+    // Today recap ("what EYO did since yesterday") + recent customers
+    loadEyoRecap(data);
+    loadRecentCustomers();
 
     // Autopilot toggle state
     const apEnabled = data.autopilot === true;
@@ -2020,6 +1943,69 @@ async function loadReportsFeeds(){
   } catch(e) { el.textContent = 'Couldn’t load right now.'; __feedsDone.reports = false; }
 }
 
+// ── Today recap: what EYO did since yesterday ───────────────────────────────
+async function loadEyoRecap(data){
+  const el = document.getElementById('eyo-recap-body');
+  if (!el) return;
+  const cash = (data && data.cash) || {};
+  const parts = [];
+  try {
+    const s = await fetch(`/portal/{{ token }}/savings`).then(r => r.json());
+    if (s && s.messages_handled) parts.push(`Handled <strong>${s.messages_handled}</strong> message${s.messages_handled===1?'':'s'} ≈ <strong>${s.hours_saved} hr${s.hours_saved===1?'':'s'}</strong> saved`);
+  } catch(e) {}
+  const received = cash.received_ngn || cash.received || 0;
+  if (received) parts.push(`Logged <strong style="color:var(--green);">${fmtNgn(received)}</strong> received`);
+  const hot = cash.hot_count || cash.hot || 0;
+  if (hot) parts.push(`Flagged <strong>${hot}</strong> hot lead${hot===1?'':'s'} to call first`);
+  const priceAsked = cash.price_asked_count || cash.price_asked || 0;
+  if (priceAsked) parts.push(`Spotted <strong>${priceAsked}</strong> price enquir${priceAsked===1?'y':'ies'} awaiting a quote`);
+  el.innerHTML = parts.length
+    ? parts.map(p => `• ${p}`).join('<br>')
+    : 'A quiet night — no new money signals. EYO is watching your inbox and will brief you the moment something moves.';
+}
+
+// ── Revenue Rescue headline ─────────────────────────────────────────────────
+async function loadRescue(){
+  const el = document.getElementById('rescue-headline');
+  if (!el) return;
+  try {
+    const r = await fetch(`/portal/{{ token }}/revenue-rescue`).then(r => r.json());
+    if (r && r.total_ngn > 0) {
+      el.innerHTML = `<strong style="color:var(--gold);">${fmtNgn(r.total_ngn)}</strong> in conversations worth reviving →`;
+    } else {
+      el.textContent = 'No stalled conversations to revive right now →';
+    }
+  } catch(e) { /* leave default copy */ }
+}
+
+// ── Recent customers + next best action ─────────────────────────────────────
+async function loadRecentCustomers(){
+  const body = document.getElementById('recent-customers-body');
+  const empty = document.getElementById('recent-customers-empty');
+  const loading = document.getElementById('recent-customers-loading');
+  if (!body) return;
+  try {
+    const d = await fetch(`/portal/{{ token }}/vault/customers?limit=5`).then(r => r.json());
+    const rows = (d && d.customers) || [];
+    if (loading) loading.style.display = 'none';
+    if (!rows.length) { if (empty) empty.style.display = 'block'; return; }
+    body.innerHTML = rows.map(c => {
+      const spend = c.lifetime_ngn ? fmtNgn(c.lifetime_ngn) : '—';
+      const seen = c.last_seen_at ? relTime(c.last_seen_at) : '';
+      const nba = c.next_best_action || c.nba || '';
+      return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);">
+        <div style="min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:var(--ink);">${(c.name || c.phone || 'Customer')}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${nba ? '➡ ' + nba : (seen ? 'Last seen ' + seen : '')}</div>
+        </div>
+        <div style="font-size:12px;color:var(--green);white-space:nowrap;">${spend}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    if (loading) loading.textContent = 'Couldn’t load your customers right now.';
+  }
+}
+
 function setWaPill(connected) {
   const pill = document.getElementById('wa-pill');
   const txt = document.getElementById('wa-pill-text');
@@ -2058,6 +2044,25 @@ async function selectPrimaryCta() {
     const n = pending + hot;
     if (n > 0) { threads.textContent = `${n} ${n === 1 ? 'thread needs' : 'threads need'} your attention →`; threads.style.display = ''; }
     else threads.style.display = 'none';
+  }
+
+  // Today "what needs you" chips
+  const needsBody    = document.getElementById('today-needs-body');
+  const needsDrafts  = document.getElementById('today-needs-drafts');
+  const needsHot     = document.getElementById('today-needs-hot');
+  const needsEmpty   = document.getElementById('today-needs-empty');
+  const needsLoading = document.getElementById('today-needs-loading');
+  if (needsLoading) needsLoading.style.display = 'none';
+  if (needsBody && needsEmpty) {
+    if (pending > 0 || hot > 0) {
+      needsBody.style.display = 'flex';
+      if (needsDrafts) { if (pending > 0) { needsDrafts.textContent = `${pending} draft${pending===1?'':'s'} to approve`; needsDrafts.style.display = ''; } else needsDrafts.style.display = 'none'; }
+      if (needsHot)    { if (hot > 0)     { needsHot.textContent = `${hot} hot conversation${hot===1?'':'s'}`; needsHot.style.display = ''; } else needsHot.style.display = 'none'; }
+      needsEmpty.style.display = 'none';
+    } else {
+      needsBody.style.display = 'none';
+      needsEmpty.style.display = 'block';
+    }
   }
 
   if (!ctx) return;

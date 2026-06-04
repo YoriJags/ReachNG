@@ -724,6 +724,27 @@ async def demo_portal_dashboard(request: Request, embed: int = 0):
          "vertical": "hospitality", "embed": bool(embed)})
 
 
+@router.get("/demo/eyo", response_class=HTMLResponse)
+async def demo_portal_eyo(request: Request):
+    """Preview the REAL refactored client portal (portal.html) with sample data.
+
+    Renders the production client IA in demo mode (a fetch-shim in the template
+    serves believable sample data), so the redesigned dashboard can be reviewed
+    without a live client or token. Registered before /demo/{vertical} so "eyo"
+    is not matched as a vertical.
+    """
+    templates = request.app.state.templates
+    return templates.TemplateResponse(request, "portal.html", {
+        "token":              "demo",
+        "client_name":        "Altitude Lagos",
+        "vertical":           "Hospitality",
+        "whatsapp_connected": True,
+        "whatsapp_health":    "OK",
+        "onboarded":          True,
+        "demo":               True,
+    })
+
+
 @router.get("/demo/{vertical}", response_class=HTMLResponse)
 async def demo_portal_vertical(vertical: str, request: Request, embed: int = 0):
     """Vertical-specific EYO Control Room sample. Same prospect-facing

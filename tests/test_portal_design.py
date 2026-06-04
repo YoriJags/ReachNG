@@ -69,3 +69,50 @@ def test_portal_inline_does_not_regrow():
     assert adhoc_cards <= PORTAL_ADHOC_CARD_CEILING, (
         f"portal ad-hoc card divs grew to {adhoc_cards} "
         f"(ceiling {PORTAL_ADHOC_CARD_CEILING}); use .card")
+
+
+# ── Redesigned IA guards (client dashboard simplification) ───────────────────
+
+EXPECTED_TABS = ["today", "money", "approvals", "customers", "settings", "reports"]
+
+
+def test_one_panel_per_tab():
+    """Each tab maps to exactly one <section class="tabpanel" data-tab="X"> — no
+    fragmented/duplicate panels (the pre-refactor portal had 2x today/money/reports)."""
+    from collections import Counter
+    panels = re.findall(r'<section class="tabpanel[^"]*" data-tab="([a-z]+)"', HTML)
+    counts = Counter(panels)
+    assert set(counts) == set(EXPECTED_TABS), (
+        f"tabs present {sorted(counts)} != expected {sorted(EXPECTED_TABS)}")
+    dupes = {t: n for t, n in counts.items() if n != 1}
+    assert not dupes, f"each tab must have exactly one panel; duplicates: {dupes}"
+
+
+def test_no_prospect_os_language_in_client_portal():
+    """The paying-client portal must not surface internal Prospect-OS / lead-gen
+    framing — rating, lead score, outreach activity, prospecting."""
+    banned = [
+        "Outreach Activity", "lead_score", "lead score", "Lead Quality",
+        "Prospect OS", "Missed Opportunity Radar",
+    ]
+    low = HTML.lower()
+    found = [b for b in banned if b.lower() in low]
+    assert not found, f"internal/prospecting language in client portal: {found}"
+
+
+def test_today_panel_has_core_surfaces():
+    """Today must answer: WhatsApp status, Owner Brief, what needs you, what EYO did."""
+    for marker in ('id="wa-pill"', 'id="owner-brief-card"',
+                   'id="today-needs-body"', 'id="eyo-recap-body"'):
+        assert marker in HTML, f"Today panel missing {marker}"
+
+
+def test_demo_shim_is_gated():
+    """The sample-data fetch shim must be wrapped in {% if demo %} so real client
+    portals never ship it."""
+    assert "{% if demo %}" in HTML and "window.fetch = function" in HTML, \
+        "demo shim present"
+    # The shim must sit inside the demo guard, not in the always-on path.
+    before_guard = HTML.split("{% if demo %}")[0]
+    assert "window.fetch = function" not in before_guard, \
+        "fetch override must be inside the {% if demo %} block"
