@@ -539,6 +539,16 @@ async def get_savings(token: str, days: int = 30):
     return savings_for(client["name"], days=max(1, min(180, days)))
 
 
+@router.get("/{token}/recap")
+async def get_recap(token: str, days: int = 1):
+    """'What EYO did since yesterday' — compact recap for the Today tab."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.portal_feeds import recap_for
+    return recap_for(client["name"], days=max(1, min(7, days)))
+
+
 @router.get("/{token}/brief-history")
 async def get_brief_history(token: str):
     """Owner Brief send history + current streak."""

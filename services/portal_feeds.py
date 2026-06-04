@@ -132,6 +132,54 @@ def savings_for(client_name: str, days: int = 30) -> dict:
     }
 
 
+def recap_for(client_name: str, days: int = 1) -> dict:
+    """'What EYO did since yesterday' — a compact recap of recent money + work.
+
+    Composes the messages EYO handled (savings) with the overnight cash signals
+    (received / hot replies / price-asked) into a few human-readable lines. All
+    defensive — a missing signal just drops its line, never raises.
+    """
+    save = savings_for(client_name, days=days)
+    cash = {}
+    try:
+        from tools.cash_signals import cash_signals_for
+        cash = cash_signals_for(client_name) or {}
+    except Exception as e:
+        log.warning("recap_cash_failed", error=str(e))
+
+    handled     = int(save.get("messages_handled") or 0)
+    hours       = save.get("hours_saved") or 0
+    received    = int(cash.get("cash_received_overnight_ngn") or 0)
+    hot         = int(cash.get("hot_replies_overnight") or 0)
+    price_asked = int(cash.get("asked_price_no_quote") or 0)
+
+    def _ngn(n):
+        n = int(n or 0)
+        if n >= 1_000_000: return f"₦{n / 1_000_000:.1f}M"
+        if n >= 1_000:     return f"₦{round(n / 1_000)}k"
+        return f"₦{n}"
+
+    lines = []
+    if handled:
+        lines.append(f"Handled {handled} message{'' if handled == 1 else 's'} ≈ {hours} hr{'' if hours == 1 else 's'} saved")
+    if received:
+        lines.append(f"Logged {_ngn(received)} received")
+    if hot:
+        lines.append(f"Flagged {hot} hot lead{'' if hot == 1 else 's'} to call first")
+    if price_asked:
+        lines.append(f"Spotted {price_asked} price enquir{'y' if price_asked == 1 else 'ies'} awaiting a quote")
+
+    return {
+        "window_days":       days,
+        "messages_handled":  handled,
+        "hours_saved":       hours,
+        "received_ngn":      received,
+        "hot_count":         hot,
+        "price_asked_count": price_asked,
+        "lines":             lines,
+    }
+
+
 def brief_history_for(client_name: str, limit: int = 30) -> dict:
     """Recent Owner Brief sends + current streak."""
     db = get_db()

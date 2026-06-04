@@ -68,6 +68,7 @@ def list_customers(
             "first_seen_at":   {"$min": "$created_at"},
             "top_fact":        {"$first": "$fact_text"},
             "top_fact_type":   {"$first": "$fact_type"},
+            "fact_texts":      {"$push": "$fact_text"},
         }},
         {"$sort":  {"last_seen_at": -1}},
         {"$limit": int(limit)},
@@ -96,15 +97,18 @@ def list_customers(
     out = []
     for r in rows:
         phone = r["_id"]
+        spend = spend_by_phone.get(phone, 0)
+        all_text = " ".join((t or "").lower() for t in (r.get("fact_texts") or []))
         out.append({
             "contact_phone":  phone,
             "contact_name":   r.get("contact_name") or "—",
             "fact_count":     int(r.get("fact_count") or 0),
             "last_seen_at":   r.get("last_seen_at"),
             "first_seen_at":  r.get("first_seen_at"),
-            "lifetime_ngn":   spend_by_phone.get(phone, 0),
+            "lifetime_ngn":   spend,
             "top_fact":       (r.get("top_fact") or "")[:160],
             "top_fact_type":  r.get("top_fact_type") or "context",
+            "next_best_action": _nba_from_text(all_text, spend, r.get("last_seen_at")),
         })
     return out
 
@@ -124,9 +128,17 @@ def next_best_action(facts_by_type: dict, lifetime_ngn: int, last_seen_at) -> st
         (f.get("fact_text") or "").lower()
         for fl in facts_by_type.values() for f in fl
     )
+    return _nba_from_text(all_text, lifetime_ngn, last_seen_at)
+
+
+def _nba_from_text(all_text: str, lifetime_ngn: int, last_seen_at) -> str:
+    """Core NBA logic over a pre-joined (lowercased) text blob — so both the
+    per-customer dossier and the list rollup can share it without an LLM call."""
     days_quiet = None
     if last_seen_at:
         try:
+            if getattr(last_seen_at, "tzinfo", None) is None:
+                last_seen_at = last_seen_at.replace(tzinfo=timezone.utc)
             days_quiet = (datetime.now(timezone.utc) - last_seen_at).days
         except Exception:
             days_quiet = None

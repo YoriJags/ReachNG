@@ -1350,6 +1350,8 @@ discount only today"></textarea>
     ["/revenue-rescue", { total_ngn: 420000, count: 3 }],
     ["/speed-watch", { median_response_seconds: 540, headline: "Your median reply time is 9 minutes — fast." }],
     ["/savings", { messages_handled: 184, hours_saved: 6.1, cost_saved_ngn: 92000 }],
+    ["/recap", { window_days:1, messages_handled:184, hours_saved:6.1, received_ngn:250000, hot_count:3, price_asked_count:2,
+      lines:[ "Handled 184 messages ≈ 6.1 hrs saved", "Logged ₦250k received", "Flagged 3 hot leads to call first", "Spotted 2 price enquiries awaiting a quote" ] }],
     ["/payments", { count: 5, total_ngn: 1250000, window_days: 30 }],
     ["/bookings", { count: 4, total_ngn: 980000 }],
     ["/brief-history", { count: 12, streak_days: 9, items:[{day:"today"}] }],
@@ -1606,7 +1608,7 @@ async function load() {
     initTabsAndCta();
 
     // Today recap ("what EYO did since yesterday") + recent customers
-    loadEyoRecap(data);
+    loadEyoRecap();
     loadRecentCustomers();
 
     // Autopilot toggle state
@@ -1944,24 +1946,17 @@ async function loadReportsFeeds(){
 }
 
 // ── Today recap: what EYO did since yesterday ───────────────────────────────
-async function loadEyoRecap(data){
+async function loadEyoRecap(){
   const el = document.getElementById('eyo-recap-body');
   if (!el) return;
-  const cash = (data && data.cash) || {};
-  const parts = [];
+  const quiet = 'A quiet night — no new money signals. EYO is watching your inbox and will brief you the moment something moves.';
   try {
-    const s = await fetch(`/portal/{{ token }}/savings`).then(r => r.json());
-    if (s && s.messages_handled) parts.push(`Handled <strong>${s.messages_handled}</strong> message${s.messages_handled===1?'':'s'} ≈ <strong>${s.hours_saved} hr${s.hours_saved===1?'':'s'}</strong> saved`);
-  } catch(e) {}
-  const received = cash.received_ngn || cash.received || 0;
-  if (received) parts.push(`Logged <strong style="color:var(--green);">${fmtNgn(received)}</strong> received`);
-  const hot = cash.hot_count || cash.hot || 0;
-  if (hot) parts.push(`Flagged <strong>${hot}</strong> hot lead${hot===1?'':'s'} to call first`);
-  const priceAsked = cash.price_asked_count || cash.price_asked || 0;
-  if (priceAsked) parts.push(`Spotted <strong>${priceAsked}</strong> price enquir${priceAsked===1?'y':'ies'} awaiting a quote`);
-  el.innerHTML = parts.length
-    ? parts.map(p => `• ${p}`).join('<br>')
-    : 'A quiet night — no new money signals. EYO is watching your inbox and will brief you the moment something moves.';
+    const r = await fetch(`/portal/{{ token }}/recap`).then(x => x.json());
+    const lines = (r && r.lines) || [];
+    el.innerHTML = lines.length ? lines.map(l => `• ${esc(l)}`).join('<br>') : quiet;
+  } catch(e) {
+    el.textContent = quiet;
+  }
 }
 
 // ── Revenue Rescue headline ─────────────────────────────────────────────────
