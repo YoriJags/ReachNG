@@ -21,8 +21,37 @@ os.environ.setdefault("ANTHROPIC_API_KEY", "sk-ant-test-dummy")
 os.environ.setdefault("MONGODB_URI", "mongodb://localhost:27017/reachng_test")
 
 from tools.account_guard import is_within_send_window  # noqa: E402
-from tools.hitl import _enforce_whatsapp_consent_gate, OutreachConsentMissing  # noqa: E402
+from tools.hitl import _enforce_whatsapp_consent_gate, OutreachConsentMissing, _client_transport  # noqa: E402
 from tools import outreach  # noqa: E402
+
+
+# ─── Transport awareness (build #0) ───────────────────────────────────────────
+
+class _FakeClients:
+    def __init__(self, doc):
+        self._doc = doc
+    def find_one(self, query, projection=None):
+        return self._doc
+
+
+def test_client_transport_resolves_meta(monkeypatch):
+    import api.clients as ac
+    monkeypatch.setattr(ac, "get_clients", lambda: _FakeClients({"whatsapp_provider": "meta"}))
+    assert _client_transport("Lex") == "meta"
+
+
+def test_client_transport_defaults_unipile_when_unset(monkeypatch):
+    import api.clients as ac
+    # client exists (has _id) but no whatsapp_provider field set
+    monkeypatch.setattr(ac, "get_clients", lambda: _FakeClients({"_id": "abc123"}))
+    assert _client_transport("Altitude") == "unipile"
+
+
+def test_client_transport_none_when_no_client(monkeypatch):
+    import api.clients as ac
+    monkeypatch.setattr(ac, "get_clients", lambda: _FakeClients(None))
+    assert _client_transport("Ghost") is None
+    assert _client_transport(None) is None
 
 
 def _utc(h, m=0):
@@ -54,15 +83,15 @@ def test_cold_discovery_whatsapp_blocked_without_session():
     with pytest.raises(OutreachConsentMissing):
         _enforce_whatsapp_consent_gate(
             source="maps", channel="whatsapp",
-            requires_template=True, contact_name="Stranger Ltd",
+            has_open_session=False, contact_name="Stranger Ltd",
         )
 
 
 def test_cold_discovery_whatsapp_allowed_with_open_session():
-    # They messaged in within 24h (requires_template False) → allowed.
+    # They messaged in within 24h (open session) → allowed.
     _enforce_whatsapp_consent_gate(
         source="maps", channel="whatsapp",
-        requires_template=False, contact_name="Replied Co",
+        has_open_session=True, contact_name="Replied Co",
     )
 
 
@@ -70,7 +99,7 @@ def test_cold_discovery_email_not_gated():
     # Email is the cold channel — never blocked by this floor.
     _enforce_whatsapp_consent_gate(
         source="maps", channel="email",
-        requires_template=True, contact_name="Cold Email Co",
+        has_open_session=False, contact_name="Cold Email Co",
     )
 
 
@@ -78,14 +107,14 @@ def test_byo_leads_whatsapp_not_gated():
     # BYO leads carry client-attested consent — not a cold-discovery source.
     _enforce_whatsapp_consent_gate(
         source="byo_leads", channel="whatsapp",
-        requires_template=True, contact_name="Imported Customer",
+        has_open_session=False, contact_name="Imported Customer",
     )
 
 
 def test_transactional_whatsapp_not_gated():
     _enforce_whatsapp_consent_gate(
         source="invoice", channel="whatsapp",
-        requires_template=True, contact_name="Known Debtor",
+        has_open_session=False, contact_name="Known Debtor",
     )
 
 

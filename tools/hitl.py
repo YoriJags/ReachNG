@@ -48,6 +48,30 @@ def _run_async(coro):
         return asyncio.run(coro)
 
 
+def _client_transport(client_name: str | None) -> str | None:
+    """Resolve a client's WhatsApp transport: "meta" | "unipile" | None.
+
+    Lets EYO adjust behaviour per transport (Meta enforces the 24h template
+    window; Unipile is free-form + caps). Defaults to "unipile" (the system
+    default) when the client exists without an explicit provider; None only when
+    there's no client_name or the lookup fails.
+    """
+    if not client_name:
+        return None
+    try:
+        from api.clients import get_clients
+        c = get_clients().find_one(
+            {"name": {"$regex": f"^{client_name}$", "$options": "i"}},
+            {"whatsapp_provider": 1},
+        )
+        if not c:
+            return None
+        return (c.get("whatsapp_provider") or "unipile").lower()
+    except Exception as e:
+        log.warning("client_transport_lookup_failed", client=client_name, error=str(e))
+        return None
+
+
 class OutreachConsentMissing(Exception):
     """Raised when a cold-discovery contact would be messaged on WhatsApp without
     consent and without a recent inbound. Cold WhatsApp is not allowed — first
@@ -65,20 +89,21 @@ class OutreachConsentMissing(Exception):
 
 
 def _enforce_whatsapp_consent_gate(
-    *, source: str, channel: str, requires_template: bool, contact_name: str
+    *, source: str, channel: str, has_open_session: bool, contact_name: str
 ) -> None:
     """Protection floor: never cold-WhatsApp a stranger.
 
     Only applies to WhatsApp drafts from a cold-discovery source. If there was a
-    customer-initiated inbound in the last 24h (`requires_template` is False —
-    a session is open), the send is allowed. Otherwise it is blocked.
+    customer-initiated inbound in the last 24h (`has_open_session` True), the send
+    is allowed. Otherwise it is blocked. Transport-agnostic — cold WhatsApp is
+    email-only whether the client runs on Meta or Unipile.
 
     Transactional sources, BYO leads (client-attested consent), and all email
     are unaffected.
     """
     if channel != "whatsapp" or source not in _COLD_DISCOVERY_SOURCES:
         return
-    if not requires_template:
+    if has_open_session:
         return  # open 24h session (they messaged us) — allowed
     raise OutreachConsentMissing(contact_name=contact_name, source=source)
 
@@ -152,12 +177,13 @@ def queue_draft(
     _enforce_brief_gate(source=source, client_name=client_name)
     _enforce_account_caps(source=source, client_name=client_name)
 
-    # ── 24h session-vs-template window (WhatsApp ban defence) ───────────────
-    # Meta forbids non-template outbound to a phone that hasn't messaged us in
-    # the last 24h. Flag the draft so the operator sees it needs a template
-    # send (or sees that this is a legitimate cold/transactional source like
-    # invoice / closer_revival that ships under an approved template).
-    requires_template = False
+    # ── Transport-aware session / template window ──────────────────────────
+    # has_open_session = the customer messaged us within 24h (transport-agnostic;
+    #   drives the cold-WhatsApp consent floor below).
+    # requires_template is a META-only concept: Meta forbids non-template
+    #   outbound outside that 24h window. Unipile has no template rule (free-form
+    #   anytime, gated instead by warm-up/caps), so it never "requires a template".
+    has_open_session = False
     try:
         if channel == "whatsapp" and phone and client_name:
             last_in = get_db()["inbound_messages"].find_one(
@@ -165,18 +191,22 @@ def queue_draft(
                  "received_at": {"$gte": datetime.now(timezone.utc) - timedelta(hours=24)}},
                 {"_id": 1},
             )
-            if not last_in:
-                requires_template = True
+            has_open_session = bool(last_in)
     except Exception:
         pass
 
+    transport = _client_transport(client_name)  # "meta" | "unipile" | None
+    requires_template = (
+        channel == "whatsapp" and transport == "meta" and not has_open_session
+    )
+
     # ── Consent floor: never cold-WhatsApp a stranger ──────────────────────────
     # Cold-discovery WhatsApp with no open 24h session is blocked here (cold
-    # outreach is email-only). Raises OutreachConsentMissing for the caller to
-    # surface — same chokepoint pattern as the brief gate.
+    # outreach is email-only), regardless of transport. Raises OutreachConsentMissing
+    # for the caller to surface — same chokepoint pattern as the brief gate.
     _enforce_whatsapp_consent_gate(
         source=source, channel=channel,
-        requires_template=requires_template, contact_name=contact_name,
+        has_open_session=has_open_session, contact_name=contact_name,
     )
 
     # ── Tone scrub ────────────────────────────────────────────────────────────
@@ -232,6 +262,7 @@ def queue_draft(
         "phone":         phone,
         "email":         email,
         "source":        source,
+        "transport":     transport,   # "meta" | "unipile" | None — reply on the same rail
         "platform":      platform,
         "post_context":  post_context,
         "profile_url":   profile_url,
