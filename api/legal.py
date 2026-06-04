@@ -45,7 +45,7 @@ public_router = APIRouter(prefix="/portal-legal", tags=["Legal Pack — Portal"]
 # Bump version when the underlying PDF changes — clients are then prompted to
 # re-accept the new version.
 LEGAL_DOCS: dict[str, dict] = {
-    "MSA":             {"name": "Master Service Agreement",  "version": "1.0", "required_for": "all"},
+    "MSA":             {"name": "Master Service Agreement",  "version": "1.1", "required_for": "all"},
     "DPA":             {"name": "Data Processing Agreement", "version": "1.0", "required_for": "all"},
     "MUTUAL_NDA":      {"name": "Mutual NDA",                "version": "1.0", "required_for": "all"},
     "CLOSER_ADDENDUM": {"name": "Closer Addendum",           "version": "1.0", "required_for": "closer"},

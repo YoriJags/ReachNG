@@ -57,6 +57,22 @@ ReachNG shall:
 - Notify the Client of a confirmed personal data breach within **72 hours**.
 - Not use Client data to train models or sell to third parties.
 
+## 5A. WhatsApp messaging — acceptable use and account safety
+
+WhatsApp delivery runs on the Client's own number and is governed by WhatsApp/Meta policies, which are outside ReachNG's control.
+
+**Client acceptable use.** The Client shall:
+
+- Message only contacts who have a prior relationship with the Client or have otherwise consented to be contacted, consistent with the NDPR basis attested at upload (clause 4).
+- Honour opt-out requests ("STOP" / "unsubscribe" / "remove") promptly and not re-contact opted-out recipients.
+- Not use the Platform for bulk unsolicited messaging, and comply with the WhatsApp Business Messaging Policy and Meta's commerce and messaging policies.
+
+**ReachNG safeguards.** To reduce the risk of WhatsApp account restriction, ReachNG applies by default: human approval of every outbound draft (HITL); a sender warm-up ramp on new numbers (approximately 10 / 25 / 50 messages per day over the first three weeks); per-day send caps; and automatic pausing of outreach when the opt-out rate exceeds 3% within a 24-hour window.
+
+**No guarantee.** These safeguards reduce risk but do **not** guarantee that a number will not be restricted, suspended, or banned by WhatsApp/Meta. Enforcement decisions are made solely by those platforms and are outside ReachNG's control; a resulting suspension is handled under clauses 10 (Force Majeure) and 11 (Suspension) and is not a breach by ReachNG. Clients seeking the strictest compliance posture may opt for the official WhatsApp Cloud API (Meta) transport where available.
+
+[LAWYER REVIEW] — confirm the acceptable-use obligations and the no-guarantee/limitation language are enforceable and market for Lagos SaaS.
+
 ## 6. Intellectual property
 
 - The **Platform**, including all source code, prompts, AI orchestration logic, and the BusinessBrief framework, is and remains the property of ReachNG.
