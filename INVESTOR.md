@@ -274,6 +274,28 @@ The Claude / OpenAI / Google horizontal AI commoditisation question matters. Fiv
 
 ---
 
+## 6.5 · Why Meta's AI launch is our tailwind, not our threat
+
+On 3 Jun 2026 Meta put a free AI agent on every business WhatsApp. The reflex question — *"doesn't Meta just crush you?"* — has it backwards. **Meta didn't enter our market. They paid to open it.**
+
+1. **They bought our market education.** Convincing a 50-year-old Lekki landlord that "an AI can run my WhatsApp" used to take a demo and a leap of faith. Meta is spending billions making that idea normal. We stop being the strange pitch and become the obvious *upgrade* — to a thing the buyer now already wants.
+2. **Their scale is the ceiling we exploit.** A horizontal agent serving 200M+ merchants can't reconcile a ₦90k transfer screenshot to a specific Saturday booking, won't remember the customer refuses the corner table, won't hold the one discount the owner banned. Generic by mandate. **EYO is one business deep.** Meta is a mile wide and an inch deep — structurally, it cannot follow us into the money moment.
+3. **We're demand on their rails, not a rival.** EYO runs on Meta's official Cloud API: ban-safe, it drives *more* WhatsApp volume for Meta, and — because EYO is reply-centric — near-zero messaging COGS (₦650–₦5.2k/client; see [ECONOMICS.md §4.1](./ECONOMICS.md)). Platforms protect what feeds them. The platform-risk question inverts into **platform alignment.**
+
+**The Meta API bottleneck — and our head start.** Meta's rails are powerful but high-friction to actually switch on. That gap between *"the rails exist"* and *"a Lagos SME getting value from them"* is exactly where we sit:
+
+| Meta API bottleneck | Where ReachNG is ahead + aligned |
+|---|---|
+| **WABA + business verification** — every business must verify on Business Manager, register a number, pass review (days-to-weeks, document-heavy). Most Lagos SMEs stall here. | **Done-for-you onboarding** onto the official rails, *plus* instant Unipile QR start while verification processes. We remove the activation energy Meta requires. |
+| **Template approval + the 24h window** — any message outside a customer's 24h reply window needs a Meta-approved template (review, rejections, delay). A generic agent hits this wall constantly. | EYO is **reply-centric** (lives inside the free 24h service window) and routes cold outreach to email. We sidestep the wall *by design* — and keep messaging COGS near zero. |
+| **The agent is generic + shallow today** — thin brand-voice control; deep custom-tools / knowledge / handoff hooks not yet published. Businesses wanting real depth have nowhere to go. | We already **are** the depth layer — money reconciliation, per-customer memory, owner control, Naija voice. We ride the official rails today and plug into the deep-integration hooks the day Meta ships them. |
+
+> **Meta makes WhatsApp the AI sales desk. EYO is what runs on it the moment the sale involves real money.**
+
+**The timing edge:** almost no Nigerian SME has priced in the consequence yet — that a free generic agent *raises customer expectations overnight while quietly leaking money* in the exact Naija spots (transfers, voice notes, haggling, memory) it can't handle. Whoever explains that first owns the framing. We're first, and we're already built to be the answer.
+
+---
+
 ## 7 · The voice-note safe-switch (a representative moat)
 
 A specific example of how we win on trust where generic AI loses.
@@ -298,9 +320,9 @@ Top five risks, ranked by impact × probability.
 
 WhatsApp linked-device sessions expire after ~14 days of phone inactivity. Silent expiry = silent product stop. Mitigation: scheduled health-check (6h cadence) + portal banner + owner WhatsApp alert + PostHog event. Queued for build before first paid client. ~1 day work.
 
-### 2 · Meta deprecates linked-device API or restricts third-party access
+### 2 · Meta deprecates the linked-device API or restricts third-party access
 
-Lower-probability but high-impact. Mitigation: we already have Meta Cloud API integration as the fallback. If Unipile breaks, clients can migrate (with friction).
+Lower-probability but high-impact — and scoped to the *unofficial* linked-device path (Unipile). Mitigation: per-client Meta **Cloud API** routing is already built (`send_whatsapp_for_client`), so clients migrate to the official rails with minimal friction. Note this risk is **separate from** Meta's Jun 2026 Business Agent launch, which is a tailwind, not a threat (see §6.5) — that launch runs on the same official Cloud API we already integrate.
 
 ### 3 · Mongo Atlas free tier outgrown
 
@@ -330,6 +352,7 @@ Not raising on this doc, but plausible uses:
 
 ## 10 · Why now
 
+- **Meta turned WhatsApp into an AI sales desk (Jun 2026).** It normalised "AI on WhatsApp" for every Nigerian SME overnight and handed us a pre-educated market that now *expects* exactly what we sell — while leaving the money moment (transfers, voice notes, haggling, memory) wide open. We're already built for it and on the same official rails. See §6.5.
 - **WhatsApp Business penetration in Nigeria** crossed 95% in 2024-2025. The channel is universal.
 - **Haiku 4.5 / GPT-4o latency** crossed the "feels live" threshold in 2025 — sub-2s drafts are now possible at ~₦4 per call.
 - **Lagos premium SMEs** are exiting COVID-era cost discipline and looking for force-multipliers, not headcount.
