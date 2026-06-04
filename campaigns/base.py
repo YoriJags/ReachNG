@@ -791,10 +791,13 @@ class BaseCampaign:
                 client_doc=client_doc,
             )
         elif channel == "email":
+            # Internal Prospect OS (Yori's acquisition) sends from
+            # hello@reachng.ng via Resend — never through Unipile email.
             return await send_email(
                 to_email=biz["email"],
                 subject=generated.get("subject", f"Quick question for {biz['name']}"),
                 body=generated["message"],
                 account_id=email_account_id,
+                force_smtp=True,
             )
         raise ValueError(f"Unknown channel: {channel}")

@@ -12,7 +12,7 @@ from tools.hitl import (
     get_approval_stats, ApprovalStatus,
 )
 from tools.roi import log_roi_event
-from tools.outreach import send_whatsapp, send_email
+from tools.outreach import send_whatsapp_for_client, send_email
 from tools.memory import record_outreach, upsert_contact
 import structlog
 
@@ -250,7 +250,18 @@ async def _send_approved(draft: dict):
         contact_id = str(draft["contact_id"])
 
         if channel == "whatsapp" and draft.get("phone"):
-            result = await send_whatsapp(phone=draft["phone"], message=message)
+            # Route by the CLIENT's provider so a Unipile client's reply sends
+            # from their connected number — never from ReachNG's own number.
+            client_doc = {}
+            cname = draft.get("client_name")
+            if cname:
+                from database import get_db
+                client_doc = get_db()["clients"].find_one(
+                    {"name": {"$regex": f"^{re.escape(cname)}$", "$options": "i"}}
+                ) or {}
+            result = await send_whatsapp_for_client(
+                phone=draft["phone"], message=message, client_doc=client_doc
+            )
         elif channel == "email" and draft.get("email"):
             # Self-outreach campaigns (Client #0) need force_smtp=True so the
             # send routes through hello@reachng.ng via Resend rather than the
@@ -266,7 +277,24 @@ async def _send_approved(draft: dict):
             log.warning("approved_draft_no_channel", draft_id=str(draft["_id"]))
             return
 
-        if result.get("success", True):
+        # No silent success: require an explicit success flag. On failure, log
+        # loudly, mark the draft, and DO NOT record it as sent.
+        if not result.get("success"):
+            log.error("approved_draft_send_failed", contact=draft.get("contact_name"),
+                      channel=channel, detail=result)
+            try:
+                from database import get_db
+                get_db()["pending_approvals"].update_one(
+                    {"_id": draft["_id"]},
+                    {"$set": {"send_failed": True,
+                              "send_error": result.get("error") or "unknown",
+                              "send_failed_at": datetime.now(timezone.utc)}},
+                )
+            except Exception:
+                pass
+            return
+
+        if result.get("success"):
             # Extract the /hi/{slug} from the body so we can attribute the
             # eventual click/open back to this row.
             slug_match = re.search(r"www\.reachng\.ng/hi/([a-z0-9]+)", message or "")

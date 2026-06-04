@@ -1,5 +1,19 @@
 """
-Outreach delivery — Meta Cloud API for WhatsApp, Unipile for email (fallback: Gmail SMTP).
+Outreach delivery — transport routing per ReachNG's two-sided stack.
+
+CLIENT EYO ENGINE (paying clients messaging their own customers):
+  WhatsApp is routed PER CLIENT by `client_doc.whatsapp_provider`:
+    - "unipile" (default)  → client's QR-connected Unipile account (`/api/v1/chats`)
+    - "meta"               → that client's Meta Cloud API / WABA credentials
+  A client reply is NEVER sent from ReachNG's own number, and we NEVER silently
+  fall back to Meta for a Unipile client. Missing credentials fail loudly.
+  Use `send_whatsapp_for_client()` for every customer-facing send.
+
+INTERNAL PROSPECT OS (Yori's acquisition outreach for selling ReachNG):
+  Email only, via Resend (force_smtp=True). Never Unipile email.
+
+`send_whatsapp()` (bare Meta) exists only for ReachNG's own number / legacy
+call sites — it must NOT be used to send a client's customer replies.
 Reply polling: Meta pushes replies via webhook; email replies polled via Unipile or Gmail IMAP.
 """
 import asyncio
@@ -90,6 +104,45 @@ async def send_whatsapp_meta(
         return {"success": True, "message_id": msg_id}
 
 
+async def send_whatsapp_unipile(phone: str, message: str, account_id: str) -> dict:
+    """Send a WhatsApp message from a client's QR-connected Unipile account.
+
+    Mirrors the established Unipile chat pattern used by notifier/morning-brief:
+    POST /api/v1/chats with the account_id, the recipient as an attendee, and text.
+    """
+    settings = get_settings()
+    dsn     = settings.unipile_dsn
+    api_key = settings.unipile_api_key
+    if not (dsn and api_key and account_id):
+        log.error("unipile_whatsapp_not_configured", has_account=bool(account_id))
+        return {"success": False, "error": "unipile_not_configured",
+                "detail": "Unipile DSN/API key or account_id missing — message not sent"}
+
+    url = f"https://{dsn}/api/v1/chats"
+    payload = {"account_id": account_id, "attendees_ids": [phone], "text": message}
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        resp = await client.post(
+            url,
+            headers={"X-API-KEY": api_key, "Content-Type": "application/json"},
+            json=payload,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"text": resp.text[:300]}
+            log.warning("unipile_whatsapp_failed", status=resp.status_code, detail=body)
+            return {"success": False, "error": "unipile_send_failed",
+                    "status": resp.status_code, "detail": body}
+        try:
+            data = resp.json()
+        except Exception:
+            data = {}
+        msg_id = data.get("id") or data.get("chat_id") or "unipile-wa"
+        log.info("whatsapp_sent_unipile", message_id=msg_id, account_id=account_id)
+        return {"success": True, "message_id": msg_id, "provider": "unipile"}
+
+
 def _pick_active_meta_account(client_doc: dict) -> Optional[dict]:
     """Multi-line failover (WhatsApp ban defence).
 
@@ -126,14 +179,28 @@ async def send_whatsapp_for_client(
     client_doc: Optional[dict] = None,
 ) -> dict:
     """
-    Route WhatsApp through the right Meta credentials with failover.
+    Route a client's customer-facing WhatsApp send by the client's provider.
 
-    If the client has `whatsapp_accounts: [...]` configured, picks the
-    healthy primary first; on send failure, marks that account NOT_OK and
-    retries on the next available line. Single-line clients fall through
-    unchanged.
+      provider == "meta"     → that client's Meta Cloud API credentials
+                               (multi-line health failover preserved).
+      provider == "unipile"  → that client's QR-connected Unipile account.
+      provider missing       → default to Unipile IF the client has a usable
+                               account_id, else fail loudly.
+
+    Hard rules (transport correctness):
+      - A "meta" client with no Meta credentials FAILS LOUDLY — we never fall
+        back to Unipile or to ReachNG's own number.
+      - A Unipile / default client is NEVER routed through Meta.
+      - No transport available → return success=False with a clear error and
+        leave the message unsent. Never a silent success, never a wrong sender.
     """
-    if client_doc and client_doc.get("whatsapp_provider") == "meta":
+    client_doc = client_doc or {}
+    provider = (client_doc.get("whatsapp_provider") or "").lower()
+    client_name = client_doc.get("name")
+    settings = get_settings()
+
+    # ── Meta-configured client ──────────────────────────────────────────────
+    if provider == "meta":
         accounts = client_doc.get("whatsapp_accounts") or []
         if accounts:
             # Try each healthy account, failing over on send error
@@ -166,22 +233,34 @@ async def send_whatsapp_for_client(
                 except Exception:
                     pass
                 log.warning("whatsapp_line_failover",
-                            client=client_doc.get("name"),
-                            failed_label=a.get("label"))
+                            client=client_name, failed_label=a.get("label"))
             if last_error:
-                log.error("all_whatsapp_lines_failed",
-                          client=client_doc.get("name"), last=last_error)
-                return last_error or {"success": False, "error": "all lines failed"}
+                log.error("all_whatsapp_lines_failed", client=client_name, last=last_error)
+                return last_error
         # No accounts list → try the legacy single-line credentials
         pick = _pick_active_meta_account(client_doc)
         if pick:
             return await send_whatsapp_meta(phone, message,
                                              pick["meta_phone_number_id"],
                                              pick["meta_access_token"])
-        log.warning("client_meta_credentials_missing", client=client_doc.get("name"))
+        # FAIL LOUDLY — a Meta client with no creds must never fall back.
+        log.error("meta_client_missing_credentials", client=client_name)
+        return {"success": False, "error": "meta_credentials_missing",
+                "detail": f"Client '{client_name}' is set to Meta but has no Meta "
+                          f"credentials — message not sent (no fallback)."}
 
-    # Default: ReachNG's own Meta account
-    return await send_whatsapp(phone, message)
+    # ── Unipile client / default ────────────────────────────────────────────
+    # Use the client's own connected account; the global account_id is only a
+    # last resort for ReachNG's own single-tenant use.
+    account_id = client_doc.get("whatsapp_account_id") or settings.unipile_whatsapp_account_id
+    if account_id:
+        return await send_whatsapp_unipile(phone, message, account_id)
+
+    # No transport at all → fail loudly. Never use ReachNG's own Meta number.
+    log.error("whatsapp_no_transport_for_client", client=client_name, provider=provider or None)
+    return {"success": False, "error": "no_whatsapp_transport",
+            "detail": f"Client '{client_name}' has no Unipile account and is not "
+                      f"configured for Meta — message not sent."}
 
 
 # ─── Email — Unipile (primary) / Gmail SMTP (fallback) ───────────────────────

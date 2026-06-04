@@ -14,7 +14,7 @@ Flow:
 import asyncio
 from typing import Optional
 from tools.csv_import import get_b2c_contacts_for_campaign, mark_b2c_contacted
-from tools.outreach import send_whatsapp, send_email
+from tools.outreach import send_whatsapp, send_whatsapp_for_client, send_email
 from tools.hitl import queue_draft
 from tools.roi import log_roi_event
 from tools.notifier import notify_whatsapp as notify_owner_whatsapp
@@ -50,6 +50,16 @@ class B2CCampaign:
             vertical=vertical,
             limit=max_contacts,
         )
+
+        # Resolve the client once so direct sends route through THIS client's
+        # WhatsApp transport (Unipile/Meta) — never ReachNG's own number.
+        client_doc = {}
+        if client_name:
+            import re as _re
+            from database import get_db as _get_db
+            client_doc = _get_db()["clients"].find_one(
+                {"name": {"$regex": f"^{_re.escape(client_name)}$", "$options": "i"}}
+            ) or {}
 
         sent = 0
         queued = 0
@@ -120,11 +130,10 @@ class B2CCampaign:
             success = False
             try:
                 if channel == "whatsapp" and phone:
-                    result = await asyncio.to_thread(
-                        send_whatsapp,
+                    result = await send_whatsapp_for_client(
                         phone=phone,
                         message=generated.get("message", ""),
-                        account_id=whatsapp_account_id,
+                        client_doc=client_doc,
                     )
                     success = result.get("success", False)
                 elif channel == "email" and email:

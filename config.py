@@ -42,10 +42,15 @@ class Settings(BaseSettings):
     # and recipient inboxes. Override via env if you need a different window.
     email_cooldown_days: int = Field(default=14, env="EMAIL_COOLDOWN_DAYS")
 
-    # Unipile — PRIMARY WhatsApp + email transport. Each client pairs their own
-    # number via QR; messages send from the client's number. Meta Cloud (above)
-    # is the secondary/fallback path. Optional here only so the app boots before
-    # the operator has paid for Unipile.
+    # Unipile — PRIMARY transport for the CLIENT EYO ENGINE's WhatsApp. Each
+    # client pairs their own number via QR (`whatsapp_account_id` on the client
+    # doc); customer replies send from that client's number via /api/v1/chats.
+    # Meta Cloud (above) is the optional official/compliant per-client provider.
+    #
+    # NOT for Yori's internal Prospect OS email — acquisition email goes through
+    # Resend (force_smtp), never Unipile. `unipile_whatsapp_account_id` below is
+    # only ReachNG's own single-tenant account (last-resort for clients with no
+    # connected account). Optional here so the app boots before Unipile is paid.
     unipile_api_key: str | None = Field(default=None, env="UNIPILE_API_KEY")
     unipile_dsn: str | None = Field(default=None, env="UNIPILE_DSN")
     unipile_whatsapp_account_id: str | None = Field(default=None, env="UNIPILE_WHATSAPP_ACCOUNT_ID")
