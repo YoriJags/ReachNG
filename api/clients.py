@@ -525,6 +525,30 @@ async def set_signal_listening(name: str, enabled: bool):
     return {"success": True, "client": name, "signal_listening": enabled}
 
 
+@router.get("/{name}/eyo-flags")
+async def get_eyo_flags(name: str):
+    """Read the per-client EYO invention flags (all keys, off by default)."""
+    from services.eyo_flags import eyo_flags_for
+    return {"client": name, "eyo": eyo_flags_for(name)}
+
+
+@router.patch("/{name}/eyo-flag")
+async def set_eyo_flag(name: str, feature: str, enabled: bool):
+    """Enable/disable one EYO invention for a client (Shield, Haggle, Radar,
+    Cashflow, Referral). Flags default OFF; this is how the founder turns each
+    on per client during onboarding once it's been seen to behave."""
+    from services.eyo_flags import EYO_FEATURES
+    if feature not in EYO_FEATURES:
+        raise HTTPException(400, f"unknown feature '{feature}' (one of {list(EYO_FEATURES)})")
+    result = get_clients().update_one(
+        {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}},
+        {"$set": {f"eyo.{feature}": enabled, "updated_at": datetime.now(timezone.utc)}},
+    )
+    if result.matched_count == 0:
+        raise HTTPException(404, f"Client '{name}' not found")
+    return {"success": True, "client": name, "feature": feature, "enabled": enabled}
+
+
 class HoldingMessageUpdate(BaseModel):
     holding_message: str
 
