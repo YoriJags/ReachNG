@@ -321,6 +321,52 @@ async def unipile_account_webhook(request: Request):
     return JSONResponse({"ok": True, "ignored_status": status})
 
 
+# ─── Inbound email (Unipile → us) ───────────────────────────────────────────
+
+@router.post("/api/v1/webhooks/unipile/email")
+async def unipile_email_webhook(request: Request):
+    """Receive inbound customer emails from a client's connected mailbox and hand
+    them to the brain for a HITL draft. Defensive parsing — Unipile's email event
+    shape varies, so we accept several field names and ignore our own sends."""
+    settings = get_settings()
+    notify_token = getattr(settings, "unipile_hosted_notify_token", None)
+    if notify_token:
+        provided = request.headers.get("x-notify-token") or request.headers.get("X-Notify-Token")
+        if provided and provided != notify_token:
+            raise HTTPException(401, "bad token")
+
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+
+    account_id = body.get("account_id") or body.get("accountId")
+    event = (body.get("event") or body.get("type") or "").lower()
+    direction = (body.get("direction") or "").lower()
+    if direction == "outbound" or "sent" in event:
+        return JSONResponse({"ok": True, "ignored": "outbound"})
+
+    frm = body.get("from") or body.get("from_attendee") or body.get("sender") or {}
+    if isinstance(frm, dict):
+        from_email = frm.get("identifier") or frm.get("email") or frm.get("address")
+        from_name = frm.get("display_name") or frm.get("name")
+    else:
+        from_email, from_name = frm, None
+
+    subject = body.get("subject")
+    text = body.get("body") or body.get("text") or body.get("message") or ""
+    if isinstance(text, dict):
+        text = text.get("text") or text.get("plain") or ""
+
+    if not (account_id and from_email and text):
+        return JSONResponse({"ok": True, "ignored": "incomplete"})
+
+    from services.email_inbound import handle_inbound_email
+    handle_inbound_email(account_id=account_id, from_email=from_email,
+                         from_name=from_name, subject=subject, body=text)
+    return JSONResponse({"ok": True})
+
+
 # ─── Multi-line management (portal, token-gated) ──────────────────────────
 
 class LineLabelPayload(BaseModel):
