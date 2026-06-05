@@ -1035,6 +1035,28 @@
       </div>
     </div>
 
+    <!-- Cashflow forecast (EYO Cashflow — flag-gated, hidden until enabled) -->
+    <div id="cashflow-card" class="card" style="margin-bottom:24px;display:none;border-left:3px solid var(--accent);">
+      <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;">💼 This week's cashflow</div>
+      <div id="cashflow-summary" style="font-size:15px;color:var(--ink);margin-top:8px;line-height:1.5;"></div>
+      <div id="cashflow-nudge" style="font-size:12.5px;color:var(--muted);margin-top:8px;"></div>
+    </div>
+    <script>
+    (async function loadCashflow(){
+      try {
+        const r = await fetch(`/portal/{{ token }}/cashflow/data`);
+        if(!r.ok) return;
+        const d = await r.json();
+        if(!d.enabled) return;
+        document.getElementById('cashflow-summary').textContent = d.summary || '';
+        const n = (d.nudge_targets||[]).length;
+        if(n) document.getElementById('cashflow-nudge').textContent =
+          `${n} ${n===1?'customer':'customers'} to nudge to wake this up.`;
+        document.getElementById('cashflow-card').style.display = 'block';
+      } catch(e){}
+    })();
+    </script>
+
     <!-- Receipts / bookings / time saved -->
     <div class="section-label">Receipts, bookings &amp; time saved</div>
     <div class="cust-grid" style="margin-bottom:24px;">
@@ -1065,6 +1087,32 @@
       <div id="radar-list" style="display:flex;flex-direction:column;gap:10px;"></div>
       <div id="radar-empty" style="display:none;font-size:13px;color:#5dd28a;padding:8px 0;">✅ No missed opportunities — every price-asker has been followed up.</div>
     </div>
+
+    <!-- Demand radar (EYO Radar — flag-gated, hidden until enabled) -->
+    <div id="demand-radar-card" class="card" style="margin-bottom:24px;display:none;">
+      <div style="font-size:14px;font-weight:600;color:var(--ink);">What people keep asking about</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Demand EYO heard across all your chats. Last 30 days.</div>
+      <div id="demand-radar-list" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;"></div>
+    </div>
+    <script>
+    (async function loadDemandRadar(){
+      try {
+        const r = await fetch(`/portal/{{ token }}/demand-radar/data`);
+        if(!r.ok) return;
+        const d = await r.json();
+        if(!d.enabled || !(d.headlines||[]).length) return;
+        const list = document.getElementById('demand-radar-list');
+        list.innerHTML = '';
+        d.headlines.forEach(h => {
+          const el = document.createElement('div');
+          el.style.cssText = 'font-size:13.5px;color:var(--ink);';
+          el.textContent = '📊 ' + h;          // textContent — XSS-safe
+          list.appendChild(el);
+        });
+        document.getElementById('demand-radar-card').style.display = 'block';
+      } catch(e){}
+    })();
+    </script>
 
     <!-- Revive old leads -->
     <div class="card" style="margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
