@@ -197,9 +197,11 @@ async def lifespan(app: FastAPI):
     from api.legal import ensure_legal_indexes as ensure_legal_api_indexes
     from services.demand_intel import ensure_demand_indexes
     from services.pricing import ensure_pricing_indexes
+    from services.identity import ensure_identity_indexes
     _safe("rent",        ensure_rent_indexes)
     _safe("demand",      ensure_demand_indexes)
     _safe("pricing",     ensure_pricing_indexes)
+    _safe("identity",    ensure_identity_indexes)
     _safe("closer",      ensure_closer_indexes)
     _safe("brief",       ensure_brief_indexes)
     _safe("primers",     seed_default_primers)

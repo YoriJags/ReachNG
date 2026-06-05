@@ -8,6 +8,7 @@ import secrets
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
 from bson import ObjectId
 from database import get_contacts, get_outreach_log, get_db
 from tools.roi import get_roi_summary
@@ -515,6 +516,40 @@ async def get_cashflow(token: str, days: int = 30):
     forecast = cashflow_for_client(name, days=max(1, min(180, days)))
     return {"client": name, "enabled": True,
             "summary": cashflow_summary_text(forecast), **forecast}
+
+
+class IdentityLink(BaseModel):
+    phone: str
+    email: str
+
+
+@router.get("/{token}/identity/suggestions")
+async def get_identity_suggestions(token: str):
+    """Pending email<->WhatsApp links for the owner to confirm (one-tap unify)."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.identity import pending_links
+    return {"client": client["name"], "suggestions": pending_links(client["name"])}
+
+
+@router.post("/{token}/identity/confirm")
+async def confirm_identity(token: str, link: IdentityLink):
+    """Owner confirms an email + WhatsApp number are the same customer."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.identity import confirm_link
+    return {"ok": confirm_link(client["name"], link.phone, link.email)}
+
+
+@router.post("/{token}/identity/reject")
+async def reject_identity(token: str, link: IdentityLink):
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    from services.identity import reject_link
+    return {"ok": reject_link(client["name"], link.phone, link.email)}
 
 
 @router.get("/{token}/revenue-rescue")

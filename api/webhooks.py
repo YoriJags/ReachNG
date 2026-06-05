@@ -577,6 +577,16 @@ async def _handle_message(
                     await maybe_haggle(matched_client, message_body, sender_phone)
                 except Exception:
                     pass
+                # Identity: an email in a WhatsApp message -> suggest linking this
+                # number to that email as one customer (owner confirms).
+                try:
+                    from services.identity import extract_email_from_text, suggest_link
+                    _eml = extract_email_from_text(message_body)
+                    if _eml:
+                        suggest_link(matched_client.get("name"), sender_phone, _eml,
+                                     reason="email in WhatsApp message")
+                except Exception:
+                    pass
     except Exception as e:
         log.warning("holding_reply_lookup_failed", error=str(e))
 

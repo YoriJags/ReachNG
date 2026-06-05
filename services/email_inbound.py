@@ -103,6 +103,25 @@ def handle_inbound_email(*, account_id: str, from_email: str,
             inbound_context=body,
         )
         log.info("email_inbound_drafted", client=cname, intent=intent)
+
+        # Identity: if the email carries a phone we already talk to on WhatsApp,
+        # auto-link them as one customer; otherwise suggest the link for the owner.
+        try:
+            from services.identity import (
+                extract_phone_from_text, link_identities, suggest_link,
+                linked_phone_for_email,
+            )
+            phone = extract_phone_from_text(body)
+            if phone and not linked_phone_for_email(cname, from_email):
+                known = _db()["contacts"].find_one(
+                    {"client_name": cname, "phone": {"$regex": phone[-10:]}}, {"_id": 1})
+                if known:
+                    link_identities(cname, phone, from_email, source="hard_signal")
+                else:
+                    suggest_link(cname, phone, from_email, reason="phone in email")
+        except Exception:
+            pass
+
         return True
     except Exception as e:
         log.warning("email_inbound_failed", error=str(e))
