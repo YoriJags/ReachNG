@@ -56,8 +56,8 @@ _STYLE_DIRECTIVES: dict[str, str] = {
         "for-writing sentence should make clear you're inviting a few premium "
         "businesses in their city to try the early version before launch. Tone: "
         "respectful peer-to-peer, not a pitch. Seed tone (do NOT copy verbatim, "
-        "rewrite as a proper email): \"I'm building ReachNG, an AI employee for "
-        "WhatsApp. I'm inviting a few premium {vertical} businesses in {city} to "
+        "rewrite as a proper email): \"I'm building ReachNG, a digital employee "
+        "for WhatsApp. I'm inviting a few premium {vertical} businesses in {city} to "
         "try the early version. Worth showing you a 2-minute demo?\""
     ),
     "money_leak": (
@@ -75,7 +75,7 @@ _STYLE_DIRECTIVES: dict[str, str] = {
         "Lead with relief for a busy owner: EYO watches WhatsApp, drafts replies in "
         "their voice, and sends a daily brief of what needs attention, every reply "
         "still waiting for their tap. Frame it as taking weight off the owner. Seed "
-        "tone (rewrite, don't copy): \"ReachNG is an AI operator that watches "
+        "tone (rewrite, don't copy): \"ReachNG is a digital employee that watches "
         "WhatsApp, drafts replies in your voice, and sends the owner a daily brief. "
         "Built for busy Nigerian SMEs. Onboarding a few early partners before launch.\""
     ),
