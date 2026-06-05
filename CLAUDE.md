@@ -1,20 +1,21 @@
 # ReachNG — Project Context
 
-Nigerian SME SaaS. **Current focus: land first Lagos paying client.** Product has been narrowed to two active suites:
+Nigerian SME SaaS. **Current focus: land first Lagos paying client.** There is now ONE active suite:
 
 - **EstateOS** — Real Estate (Rent Roll, KYC, PoF, Lawyer Bundle, chase sequences)
-- **TalentOS** — HR (Payroll, Policy Bot, Leave, Attendance)
 
-7 other suites exist in code but are hidden from UI. Do not work on them unless explicitly asked.
+The customer-facing product is **EYO**, a digital employee for WhatsApp (drafts replies in the owner's voice, reads transfer screenshots, voice notes, daily owner brief — all HITL).
 
-The original SDR/outreach product (Google Maps + Apollo + Unipile WhatsApp discovery) still exists and still runs — it's the acquisition funnel feeding EstateOS/TalentOS demos. Don't rip it out.
+**TalentOS (HR/Payroll) was removed (2026-06-05)** — files, routes, and UI deleted. Do not reintroduce payroll/PAYE/PENCOM/leave/attendance. The other hidden suites still exist in code but are hidden from the UI; do not work on them unless explicitly asked.
+
+The original SDR/outreach product (Google Maps + Apollo + Unipile WhatsApp discovery) still exists and still runs — it's the acquisition funnel feeding EstateOS/EYO demos. Don't rip it out. The SDR "recruitment" vertical is kept but now pitches EYO, not payroll.
 
 ---
 
 ## Stack
 
 - **Runtime**: Python 3.12, FastAPI, Uvicorn, Jinja2
-- **DB**: MongoDB Atlas (pymongo). Collection families: `estate_*`, `hr_*`, `clients`, `leads`, `campaigns`, `drafts`
+- **DB**: MongoDB Atlas (pymongo). Collection families: `estate_*`, `clients`, `leads`, `campaigns`, `drafts`
 - **LLM**: Claude Haiku 4.5 (`claude-haiku-4-5-20251001`) for drafts; Sonnet/Opus only for complex reasoning
 - **Messaging**: Unipile (WhatsApp, per-client account IDs)
 - **Scheduler**: APScheduler CronTrigger, timezone `Africa/Lagos`
@@ -32,16 +33,13 @@ Do not suggest Node/TypeScript/pnpm/Next.js — wrong stack.
 | `main.py` | FastAPI app, route registration, lifespan (index ensures), health + debug |
 | `config.py` | Pydantic settings |
 | `auth.py` | HTTP Basic Auth + portal-token auth |
-| `scheduler.py` | APScheduler jobs (rent period open, rent chase, payroll reminders, invoice chaser, fleet escalation) |
-| `templates/dashboard.html` | Master admin SPA (all suites as tabs) |
+| `scheduler.py` | APScheduler jobs (rent period open, rent chase, invoice chaser, fleet escalation) |
+| `templates/dashboard.html` | Master admin SPA (suites as tabs) |
 | `templates/portal.html` | Client portal SPA |
 | `api/rent_roll.py` | EstateOS rent roll + chase routes |
-| `api/payroll.py` | TalentOS payroll + payslip routes |
-| `api/hr_suite.py` | HR leave, attendance, policy bot |
 | `api/dashboard.py` | Admin dashboard backend |
 | `api/portal.py` | Client portal backend |
 | `services/estate/rent_roll.py` | Unit/tenant/ledger logic, chase staging |
-| `services/hr_suite/payroll.py` | PAYE, CRA, payslip compute + HTML render |
 | `tools/hitl.py` | `queue_draft()` — ALL outbound messages route through here |
 | `tools/discovery.py` | Google Maps Places discovery (SDR funnel) |
 | `tools/apollo_discovery.py` | Apollo.io discovery (SDR funnel) |
@@ -50,12 +48,6 @@ Do not suggest Node/TypeScript/pnpm/Next.js — wrong stack.
 ---
 
 ## Domain Rules (Don't Get These Wrong)
-
-### Nigerian Payroll
-- PAYE bands: 7 / 11 / 15 / 19 / 21 / 24 %
-- CRA = max(₦200,000, 1% × gross) + 20% × gross (annual)
-- PENCOM = 8% employee, 10% employer, on (basic + housing + transport)
-- NHF = 2.5% × basic, only if `nhf_enrolled == True`
 
 ### Rent Chase Escalation
 - **friendly** 1-6 days — warm, assumes oversight
@@ -67,7 +59,7 @@ Do not suggest Node/TypeScript/pnpm/Next.js — wrong stack.
 Period opening must be idempotent — unique compound index on `(unit_id, period)`.
 
 ### Multi-Tenant Isolation (P0)
-Every `/estate/*` and `/hr/*` route must scope by tenant (`landlord_company` or portal token). Leakage between landlords/companies is a P0 bug.
+Every `/estate/*` route must scope by tenant (`landlord_company` or portal token). Leakage between landlords/companies is a P0 bug.
 
 ---
 
@@ -131,5 +123,5 @@ Never hardcode — always via `config.get_settings()`.
 - Apollo free plan = org search only; $49/mo unlocks people search + emails
 - No Instagram scraping (brittle + ToS)
 - Per-client WhatsApp via Unipile — messages come from the client's own number
-- EstateOS + TalentOS are the only two suites shown in UI right now
+- EstateOS is the only suite shown in UI right now (TalentOS removed 2026-06-05)
 - Livestream rating belongs to Viibe, not ReachNG

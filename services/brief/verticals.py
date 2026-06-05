@@ -69,7 +69,7 @@ VERTICALS: dict[str, dict] = {
         "label":             "HR / Staffing / Recruitment",
         "pitch_mode":        "workload_removal",
         "outreach_priority": "tier_2",
-        "extras":            "full Nigerian payroll (PAYE/CRA/PENCOM/NHF), leave manager, attendance, probation tracker, policy oracle",
+        "extras":            "EYO on WhatsApp: drafts candidate and client replies in your voice, transcribes voice notes, reads transfer screenshots, and sends a daily brief — every reply waits for your tap",
     },
     "cooperatives": {
         "label":             "Cooperatives / Thrift",

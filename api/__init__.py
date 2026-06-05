@@ -29,10 +29,8 @@ from .fx_salary import router as fx_salary_router
 from .moonlighting import router as moonlighting_router
 from .salary_erosion import router as salary_erosion_router
 from .fx_lock import router as fx_lock_router
-from .hr_suite import router as hr_suite_router
 from .estate import router as estate_router
 from .portal_estate import router as portal_estate_router
-from .portal_talent import router as portal_talent_router
 from .closer import router as closer_router, public_router as closer_public_router
 from .brief import router as brief_router, public_router as brief_public_router
 from .legal import router as legal_router, public_router as legal_public_router
@@ -52,8 +50,8 @@ __all__ = [
     "material_check_router", "fuel_reprice_router", "float_optimizer_router",
     "fx_salary_router", "moonlighting_router",
     "salary_erosion_router", "fx_lock_router",
-    "hr_suite_router", "estate_router",
-    "portal_estate_router", "portal_talent_router",
+    "estate_router",
+    "portal_estate_router",
     "closer_router", "closer_public_router",
     "brief_router", "brief_public_router",
     "legal_router", "legal_public_router",

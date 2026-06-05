@@ -1931,12 +1931,7 @@ function copyDemoPortalLink(btn){
     <span class="sidebar-dot" style="background:#f5c842;"></span> EstateOS
   </div>
 
-  <span class="sidebar-label">HR &amp; Talent</span>
-  <div class="sidebar-item" data-product="talent_os" style="--suite-accent:#6366f1" onclick="switchProduct('talent_os', this)">
-    <span class="sidebar-dot" style="background:#6366f1;"></span> TalentOS
-  </div>
-
-  <!-- Hidden for launch focus — RE + HR only. Code preserved, sidebar entries disabled.
+  <!-- Hidden for launch focus — RE only. Code preserved, sidebar entries disabled.
   <span class="sidebar-label">Lending</span>
   <div class="sidebar-item" data-product="lend_os" style="--suite-accent:#16a34a" onclick="switchProduct('lend_os', this)">
     <span class="sidebar-dot" style="background:#16a34a;"></span> LendOS
@@ -2005,22 +2000,9 @@ function copyDemoPortalLink(btn){
 
 
 
-<!-- ── HR Suite Tab Nav ── -->
-<nav class="tab-nav product-tabs" data-product="talent_os" style="display:none;">
-  <button class="tab-btn active" onclick="switchTab('hr_overview', this); hrLoadOverview();">Overview</button>
-  <button class="tab-btn" onclick="switchTab('hr_screener', this); hrLoadScreenings();">Job Screener</button>
-  <button class="tab-btn" onclick="switchTab('hr_attendance', this); hrLoadAttendanceToday();">Attendance</button>
-  <button class="tab-btn" onclick="switchTab('hr_leave', this); hrLoadLeavePending();">Leave</button>
-  <button class="tab-btn" onclick="switchTab('hr_salary', this); hrLoadBenchmarks();">Salary</button>
-  <button class="tab-btn" onclick="switchTab('hr_pencom', this); hrLoadPencom();">PENCOM</button>
-  <button class="tab-btn" onclick="switchTab('hr_offboarding', this);">Offboarding</button>
-  <button class="tab-btn" onclick="switchTab('hr_erosion', this);">Erosion Tracker</button>
-  <button class="tab-btn" onclick="switchTab('hr_moonlighting', this); mlLoadOverview();">Moonlighting</button>
-  <button class="tab-btn" onclick="switchTab('hr_fxsalary', this); fxsLoadDashboard();">FX Salary</button>
-  <button class="tab-btn" onclick="switchTab('hr_probation', this); hrLoadProbationUpcoming();">Probation</button>
-  <button class="tab-btn" onclick="switchTab('hr_policy', this);">Policy Bot</button>
-  <button class="tab-btn" onclick="switchTab('hr_payroll', this); prLoadAll();">Payroll</button>
-</nav>
+<!-- HR Suite / TalentOS tab-nav removed — suite retired. Backend (api/payroll,
+     api/hr_suite, services/hr_suite) deleted; any orphaned hr_* panes below are
+     unreachable (no sidebar entry, no product switch) and 404 if hit. -->
 
 <!-- ── EstateOS Tab Nav ── -->
 <nav class="tab-nav product-tabs" data-product="estate_os" style="display:none;">
@@ -2190,9 +2172,7 @@ function copyDemoPortalLink(btn){
       <div style="font-size:11px;color:var(--text-mid);">Seed realistic demo data and show a live portal in seconds.</div>
     </div>
     <div class="toolbar">
-      <button class="btn btn--primary btn--sm" onclick="seedDemoWithFeedback('all','demo-seed-result-overview')">Seed Both (recommended)</button>
-      <button class="btn btn--ghost btn--sm" onclick="seedDemoWithFeedback('estate','demo-seed-result-overview')">EstateOS only</button>
-      <button class="btn btn--ghost btn--sm" onclick="seedDemoWithFeedback('talent','demo-seed-result-overview')">TalentOS only</button>
+      <button class="btn btn--primary btn--sm" onclick="seedDemoWithFeedback('estate','demo-seed-result-overview')">Seed EstateOS Demo</button>
     </div>
     <div id="demo-seed-result-overview" style="display:none;font-size:11px;width:100%;padding-top:8px;border-top:1px solid var(--line);margin-top:4px;color:var(--text-mid);"></div>
   </div>
@@ -3270,7 +3250,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
         Pitch Closer — Estate Agents
       </button>
       <button class="btn btn-approve" style="font-size:12px;background:#00a37a;border-color:#00a37a;" onclick="quickLaunch('recruitment')">
-        Pitch TalentOS — HR Teams
+        Pitch EYO — HR / Recruitment
       </button>
       <button class="btn" style="font-size:12px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="quickLaunch('real_estate', true)">
         Dry Run (Real Estate)
@@ -3351,7 +3331,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
       <div style="font-size:11px;color:#555;margin-bottom:8px;">Target sectors — pick which types of business to pitch ReachNG to:</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;" id="sector-checkboxes">
         <label class="sector-chip"><input type="checkbox" value="real_estate" checked> Real Estate (EstateOS)</label>
-        <label class="sector-chip"><input type="checkbox" value="recruitment" checked> HR / Employers (TalentOS)</label>
+        <label class="sector-chip"><input type="checkbox" value="recruitment" checked> HR / Employers (Recruitment)</label>
         <label class="sector-chip"><input type="checkbox" value="legal"> Legal / Law Firms</label>
         <label class="sector-chip"><input type="checkbox" value="events" checked> Events</label>
         <label class="sector-chip"><input type="checkbox" value="insurance"> Insurance</label>
@@ -3499,9 +3479,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <div class="section-title" style="color:var(--accent);margin:0 0 4px;">Demo Sandbox</div>
     <div style="font-size:11px;color:var(--text-mid);margin-bottom:14px;">Seed realistic demo data so you can show clients a live portal in seconds. Idempotent, safe to run multiple times.</div>
     <div class="toolbar" style="margin-bottom:14px;">
-      <button class="btn btn--primary btn--sm" onclick="seedDemo('all')">Seed Both (recommended)</button>
-      <button class="btn btn--ghost btn--sm" onclick="seedDemo('estate')">Seed EstateOS Demo</button>
-      <button class="btn btn--ghost btn--sm" onclick="seedDemo('talent')">Seed TalentOS Demo</button>
+      <button class="btn btn--primary btn--sm" onclick="seedDemo('estate')">Seed EstateOS Demo</button>
       <button class="btn btn--ghost btn--sm" onclick="backfillTokens()">Backfill Missing Tokens</button>
     </div>
     <div id="demo-seed-result" style="display:none;background:var(--bg-base);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;font-size:12px;color:var(--text-mid);line-height:1.8;"></div>
@@ -4878,7 +4856,6 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
         <span style="font-size:14px;font-weight:600;color:#e8e8e8;" id="portal-embed-client-name"></span>
         <div style="display:flex;gap:4px;">
           <button id="portal-tab-estate" onclick="switchPortalTab('estate')" style="font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid #ff5c00;background:#ff5c0022;color:#ff5c00;cursor:pointer;font-weight:600;">ReachNG — Real Estate</button>
-          <button id="portal-tab-talent" onclick="switchPortalTab('talent')" style="font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid #2a3340;background:#1e2530;color:#888;cursor:pointer;font-weight:600;">ReachNG — HR</button>
         </div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
@@ -5221,7 +5198,6 @@ function switchProduct(product, pill) {
   if (product === "legal_os")   { daLoadOverview(); }
   if (product === "lend_os")    { loLoadQueue(); mcLoadQueue(); fxlLoadMonitor(); }
   if (product === "biz_os")     { dcLoadOverview(); }
-  if (product === "talent_os")  { hrLoadOverview(); }
   if (product === "trust_os")   { paLoadHistory(); }
   if (product === "build_os")   { mchLoadResults(); }
   if (product === "fleet_os")   { fdLoadIncidents(); frLoadRoutes(); foLoadDashboard(); }
@@ -5628,20 +5604,14 @@ function openPortalEmbed(token, encodedName) {
 }
 
 function switchPortalTab(tab) {
-  _portalEmbedTab = tab;
-  const url = tab === "estate"
-    ? `/portal/estate/${_portalEmbedToken}`
-    : `/portal/talent/${_portalEmbedToken}`;
+  // TalentOS portal retired — the embed only shows the Real Estate portal now.
+  _portalEmbedTab = "estate";
+  const url = `/portal/estate/${_portalEmbedToken}`;
   document.getElementById("portal-embed-frame").src = url;
   document.getElementById("portal-open-new-tab").href = url;
   const estateBtn = document.getElementById("portal-tab-estate");
-  const talentBtn = document.getElementById("portal-tab-talent");
-  if (tab === "estate") {
+  if (estateBtn) {
     estateBtn.style.cssText = "font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid #ff5c00;background:#ff5c0022;color:#ff5c00;cursor:pointer;font-weight:600;";
-    talentBtn.style.cssText = "font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid #2a3340;background:#1e2530;color:#888;cursor:pointer;font-weight:600;";
-  } else {
-    talentBtn.style.cssText = "font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid #00e5a0;background:#00e5a022;color:#00e5a0;cursor:pointer;font-weight:600;";
-    estateBtn.style.cssText = "font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid #2a3340;background:#1e2530;color:#888;cursor:pointer;font-weight:600;";
   }
 }
 
@@ -5660,15 +5630,12 @@ async function seedDemo(type, resultElId) {
   el.innerHTML = '<span style="color:#888;">Seeding...</span>';
   try {
     const endpoint = type === "all" ? "/api/v1/demo/seed-all"
-      : type === "estate" ? "/api/v1/demo/seed-landlord"
-      : "/api/v1/demo/seed-talent";
+      : "/api/v1/demo/seed-landlord";
     const data = await fetch(endpoint, { method: "POST", credentials: "include" }).then(r => r.json());
     const origin = window.location.origin;
     let html = '<b style="color:#00e5a0;">Seeded successfully.</b><br>';
     if (data.estate_url) html += `EstateOS portal: <a href="${origin}${data.estate_url}" target="_blank" style="color:#ff5c00;">${origin}${data.estate_url}</a><br>`;
-    if (data.estate_token && !data.talent_url) html += `EstateOS portal: <a href="${origin}/portal/estate/${data.estate_token}" target="_blank" style="color:#ff5c00;">${origin}/portal/estate/${data.estate_token}</a><br>`;
-    if (data.talent_url) html += `TalentOS portal: <a href="${origin}${data.talent_url}" target="_blank" style="color:#00e5a0;">${origin}${data.talent_url}</a><br>`;
-    if (data.token && !data.talent_url) html += `TalentOS portal: <a href="${origin}/portal/talent/${data.token}" target="_blank" style="color:#00e5a0;">${origin}/portal/talent/${data.token}</a><br>`;
+    else if (data.token) html += `EstateOS portal: <a href="${origin}/portal/estate/${data.token}" target="_blank" style="color:#ff5c00;">${origin}/portal/estate/${data.token}</a><br>`;
     html += '<br><span style="color:#888;font-size:11px;">Refresh the client roster below to see the "View Portal" button.</span>';
     el.innerHTML = html;
     if (typeof refreshRoster === "function") refreshRoster();
@@ -5873,7 +5840,7 @@ function quickLaunch(vertical, dryRun = false) {
   startLogPolling();
 
   postJSON("/api/v1/campaigns/run", payload).then(result => {
-    const label = vertical === "real_estate" ? "Closer — Estate Agents" : "TalentOS — HR Teams";
+    const label = vertical === "real_estate" ? "Closer — Estate Agents" : "EYO — HR / Recruitment";
     const drafted = result.drafted ?? result.queued ?? "?";
     qlResult.innerHTML = `
       <span style="color:#4ade80;font-size:13px;">
@@ -10856,7 +10823,7 @@ async function actSkip(id, btn) {
       <select id="ob-suite" style="width:100%;background:#080c10;border:1px solid #1e3040;color:#d8eaf8;border-radius:6px;padding:8px;font-size:12px;">
         <option value="">Use contact's vertical</option>
         <option value="real_estate">EstateOS</option>
-        <option value="recruitment">TalentOS</option>
+        <option value="recruitment">HR / Recruitment</option>
         <option value="fintech">LendOS</option>
         <option value="legal">LegalOS</option>
         <option value="logistics">FleetOS</option>

@@ -20,13 +20,13 @@ Land first paying Lagos client on **ReachNG Closer (Real Estate)** within 30 day
 - [x] HITL draft queue — every outbound message human-approved before send
 - [x] Admin Control Tower dashboard at `/admin` (session auth)
 - [x] Client portal at `/portal/{token}` (token auth, one client = one token, two sub-portals)
-- [x] Demo Sandbox — one-click seed for EstateOS + TalentOS demo data
+- [x] Demo Sandbox — one-click seed for EstateOS demo data
 - [x] SDR prompts pivoted: real estate leads with Closer, recruitment pitches back-office
 - [x] External branding rule — outreach says "ReachNG", never TalentOS/EstateOS
 - [x] Placeholder leak fixed — no more `[Partner Name]` in sent emails
 - [x] Recruitment-agency hard rule — never pitch sourcing to staffing firms
 - [x] Overview stat cards clickable (Pipeline / Replies / Clients)
-- [x] TalentOS back-office built: payroll, PAYE/CRA/PENCOM/NHF, leave, attendance, probation, policy oracle, candidate screener, offboarding
+- [x] ~~TalentOS back-office (payroll, PAYE/CRA/PENCOM/NHF, leave, attendance, probation, policy oracle, screener, offboarding)~~ — **REMOVED 2026-06-05** (suite retired; code/routes/UI deleted)
 - [x] EstateOS built (now demoted to Closer upsells): KYC vault, PoF screener, scorecard, lawyer bundle, rent chase
 
 ## NOW — Phase R: Reliability Net (production-readiness) *(~1.5 days)*
@@ -39,7 +39,7 @@ Make the whole product provably safe to deploy: a CI gate so a red commit can't 
 
 **R1 — Golden tests on what we sell**
 - [ ] EstateOS rent: escalation-band boundaries (6/7, 13/14, 29/30, 59/60 days) + idempotent period-open (unique `(unit_id, period)`)
-- [ ] TalentOS payroll math — *on hold pending scope decision (founder reviewing payroll's place in the active product)*
+- [x] TalentOS payroll math — **REMOVED (2026-06-05).** Founder retired the HR/payroll suite: files, routes, and UI deleted; reliability focus is EstateOS rent + EYO only
 
 **R2 — Wire the 5 EYO inventions, safely** *(flag off-by-default + non-blocking try/except + one owner surface + a wiring smoke test, each)*
 - [ ] Cashflow + Radar (read-only) → Referral → Haggle → Shield (already live)
