@@ -129,6 +129,52 @@ async def portal_pairing_status(token: str):
     return {"status": "none"}
 
 
+# ─── Email pairing (portal, token-gated) ────────────────────────────────────
+
+@router.post("/api/v1/portal/{token}/email/connect/start")
+async def portal_start_email_pairing(token: str):
+    """Begin connecting a client's email (Gmail/Outlook) via Unipile hosted-auth.
+    EYO will then read + reply to their customer emails (HITL), alongside WhatsApp."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "portal not found")
+
+    from config import unipile_enabled
+    if not unipile_enabled():
+        raise HTTPException(503, "Email connect is not yet enabled on this deployment.")
+
+    from services.email_pairing import start_email_hosted_auth
+    settings = get_settings()
+    link = await start_email_hosted_auth(
+        client_id=str(client["_id"]),
+        app_base_url=settings.app_base_url.rstrip("/"),
+    )
+    _clients().update_one(
+        {"_id": client["_id"]},
+        {"$set": {
+            "email_pairing_pending":    True,
+            "email_pairing_link_id":    link["id"],
+            "email_pairing_started_at": datetime.now(timezone.utc),
+        }},
+    )
+    return {"url": link["url"], "expires_on": link["expires_on"]}
+
+
+@router.get("/api/v1/portal/{token}/email/connect/status")
+async def portal_email_status(token: str):
+    """connected | pending | none — for the portal to poll while connecting."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "portal not found")
+    if client.get("email_account_id"):
+        return {"status": "connected",
+                "account_id": client["email_account_id"],
+                "since": (client.get("email_connected_at") or "").__str__()}
+    if client.get("email_pairing_pending"):
+        return {"status": "pending"}
+    return {"status": "none"}
+
+
 # ─── Admin (Basic Auth) ─────────────────────────────────────────────────────
 
 @router.post("/api/v1/admin/clients/{client_id}/whatsapp/connect/start")
@@ -197,9 +243,18 @@ async def unipile_account_webhook(request: Request):
 
     client_id = parse_client_id_from_name(name)
     label     = parse_label_from_name(name)  # 'primary' for legacy callbacks
+
+    # Channel routing: the same Unipile webhook delivers WhatsApp AND email
+    # pairings. We tag `chan:email` in the name on email connects; fall back to
+    # the account type for safety.
+    from services.email_pairing import parse_channel_from_name, is_email_account_type
+    channel = parse_channel_from_name(name)
+    if channel != "email" and is_email_account_type(acc_type):
+        channel = "email"
+
     log.info("unipile_account_webhook_received",
              account_id=account_id, status=status, type=acc_type,
-             has_client_id=bool(client_id), label=label)
+             has_client_id=bool(client_id), label=label, channel=channel)
 
     if not (account_id and client_id):
         # No-op — could be a different notification type, don't 4xx Unipile
@@ -219,6 +274,17 @@ async def unipile_account_webhook(request: Request):
                                         {"whatsapp_accounts": 1, "whatsapp_account_id": 1})
         if not existing:
             return JSONResponse({"ok": False, "error": "client not found"})
+
+        # ── Email pairing: store on the email slot, not WhatsApp ──────────────
+        if channel == "email":
+            _clients().update_one({"_id": oid}, {"$set": {
+                "email_account_id":      account_id,
+                "email_provider":        "unipile",
+                "email_connected_at":    now,
+                "email_pairing_pending": False,
+            }})
+            log.info("email_paired", client_id=client_id, account_id=account_id)
+            return JSONResponse({"ok": True, "stored": True, "channel": "email"})
 
         accounts = list(existing.get("whatsapp_accounts") or [])
         # Replace any prior entry with the same label, else append
@@ -381,5 +447,35 @@ async def whatsapp_failed_landing():
   <div style='font-size:48px;margin-bottom:16px;color:#c62828;'>!</div>
   <h1 style='font-family:Georgia,serif;font-size:28px;letter-spacing:-1px;margin:0 0 12px;'>Pairing didn't finish</h1>
   <p style='color:#3d3a33;line-height:1.65;margin:0 0 24px;'>The QR may have expired or the scan was cancelled. Open your portal and tap "Connect WhatsApp" to try again.</p>
+  <p style='color:#7a6a3f;font-size:13px;'>Reach<span style='color:#B85C38;'>NG</span></p>
+</div></body></html>""")
+
+
+@router.get("/portal/email/connected")
+async def email_connected_landing():
+    from fastapi.responses import HTMLResponse
+    return HTMLResponse("""<!DOCTYPE html><html><head><meta charset='utf-8'>
+<title>Email connected · ReachNG</title>
+<meta name='viewport' content='width=device-width,initial-scale=1'></head>
+<body style='font-family:-apple-system,sans-serif;background:#FAF6EE;color:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;'>
+<div style='text-align:center;max-width:420px;padding:40px 24px;'>
+  <div style='font-size:64px;margin-bottom:16px;'>✓</div>
+  <h1 style='font-family:Georgia,serif;font-size:32px;letter-spacing:-1px;margin:0 0 12px;'>Email connected</h1>
+  <p style='color:#3d3a33;line-height:1.65;margin:0 0 24px;'>EYO can now read and reply to your customer emails — every reply still waits for your tap. You can close this tab.</p>
+  <p style='color:#7a6a3f;font-size:13px;'>Reach<span style='color:#B85C38;'>NG</span></p>
+</div></body></html>""")
+
+
+@router.get("/portal/email/failed")
+async def email_failed_landing():
+    from fastapi.responses import HTMLResponse
+    return HTMLResponse("""<!DOCTYPE html><html><head><meta charset='utf-8'>
+<title>Email connect didn't complete · ReachNG</title>
+<meta name='viewport' content='width=device-width,initial-scale=1'></head>
+<body style='font-family:-apple-system,sans-serif;background:#FAF6EE;color:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;'>
+<div style='text-align:center;max-width:420px;padding:40px 24px;'>
+  <div style='font-size:48px;margin-bottom:16px;color:#c62828;'>!</div>
+  <h1 style='font-family:Georgia,serif;font-size:28px;letter-spacing:-1px;margin:0 0 12px;'>Email connect didn't finish</h1>
+  <p style='color:#3d3a33;line-height:1.65;margin:0 0 24px;'>The link may have expired or sign-in was cancelled. Open your portal and tap "Connect email" to try again.</p>
   <p style='color:#7a6a3f;font-size:13px;'>Reach<span style='color:#B85C38;'>NG</span></p>
 </div></body></html>""")
