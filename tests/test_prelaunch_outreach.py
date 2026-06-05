@@ -60,21 +60,23 @@ def test_premium_fit_gate():
     assert premium_fit({"rating": None}) is False
 
 
-# ── A/B/C variant system ─────────────────────────────────────────────────────
+# ── A/B/C/D variant system ───────────────────────────────────────────────────
 
-def test_three_variants_exist():
-    assert VARIANTS == ("A", "B", "C")
-    assert set(VARIANT_STYLES) == {"A", "B", "C"}
-    assert set(VARIANT_STYLES.values()) == {"founder", "money_leak", "owner_relief"}
+def test_four_variants_exist():
+    assert VARIANTS == ("A", "B", "C", "D")
+    assert set(VARIANT_STYLES) == {"A", "B", "C", "D"}
+    assert set(VARIANT_STYLES.values()) == {
+        "founder", "money_leak", "owner_relief", "exclusivity"
+    }
 
 
 def test_assign_variant_in_range():
-    seen = {assign_variant() for _ in range(200)}
-    assert seen <= {"A", "B", "C"} and seen, "assign_variant produced an out-of-range value"
+    seen = {assign_variant() for _ in range(400)}
+    assert seen <= {"A", "B", "C", "D"} and seen, "assign_variant produced an out-of-range value"
 
 
 def test_style_directive_resolves():
-    for v in ("A", "B", "C"):
+    for v in ("A", "B", "C", "D"):
         assert _style_directive(v), f"variant {v} has no style directive"
     assert _style_directive(None) == ""
     assert _style_directive("Z") == ""   # unknown letter → neutral founder intro

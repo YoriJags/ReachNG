@@ -420,7 +420,7 @@ class BaseCampaign:
             try:
                 if _is_self_outreach:
                     from services.reachng_self_outreach import draft_with_link
-                    _ab_variant = assign_variant()  # A | B | C
+                    _ab_variant = assign_variant()  # A | B | C | D
                     _reviews_excerpt = (biz.get("reviews_excerpt")
                                          or biz.get("review_excerpt")
                                          or (biz.get("reviews") or [{}])[0].get("text") if isinstance(biz.get("reviews"), list) else None)

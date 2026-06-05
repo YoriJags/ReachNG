@@ -47,28 +47,35 @@ VARIANT_STYLES: dict[str, str] = {
     "A": "founder",
     "B": "money_leak",
     "C": "owner_relief",
+    "D": "exclusivity",
 }
 
 _STYLE_DIRECTIVES: dict[str, str] = {
     "founder": (
         "VARIANT ANGLE: FOUNDER / DIRECT.\n"
-        "Lead as the founder making a genuine early-access invitation. The reason-"
-        "for-writing sentence should make clear you're inviting a few premium "
-        "businesses in their city to try the early version before launch. Tone: "
-        "respectful peer-to-peer, not a pitch. Seed tone (do NOT copy verbatim, "
-        "rewrite as a proper email): \"I'm building ReachNG, a digital employee "
-        "for WhatsApp. I'm inviting a few premium {vertical} businesses in {city} to "
-        "try the early version. Worth showing you a 2-minute demo?\""
+        "Lead as the founder, but lead with the PRODUCT and what it does for them, "
+        "NOT with the invitation. Pitch it directly as a real product that runs "
+        "today. Do NOT call it a beta, an early version, a test, or unlaunched, "
+        "and do not make the recipient feel like a guinea pig. Near the ask, use "
+        "ONE honest why-now line grounded in operational truth, not flattery: we "
+        "hand-build each setup for a small first group of Lagos businesses, with "
+        "founder pricing locked for that cohort. Tone: respectful peer-to-peer, "
+        "confident, not hype. Seed tone (do NOT copy verbatim, rewrite as a proper "
+        "email): \"I'm Yori, founder of ReachNG. We make EYO, a digital employee "
+        "for WhatsApp. We're hand-building this for a small first group of Lagos "
+        "businesses, with founder pricing locked for that cohort. Worth a 2-minute "
+        "demo?\""
     ),
     "money_leak": (
         "VARIANT ANGLE: MONEY-LEAK.\n"
         "Lead with money quietly dying in WhatsApp chats: missed price enquiries, "
         "unpaid follow-ups, slow replies, unconfirmed transfer receipts. Frame the "
         "two capabilities you pick around catching those leaks. Do NOT invent "
-        "figures or promise recovered revenue. Seed tone (rewrite, don't copy): "
-        "\"I'm building ReachNG to help businesses spot money dying in WhatsApp "
-        "chats, missed enquiries, unpaid follow-ups, slow replies. I'm testing it "
-        "with a few premium {vertical} businesses before launch.\""
+        "figures or promise recovered revenue, and do NOT call it a beta, an early "
+        "version, or a test. Seed tone (rewrite, don't copy): \"I'm Yori, founder "
+        "of ReachNG. EYO helps businesses spot money dying in WhatsApp chats, "
+        "missed enquiries, unpaid follow-ups, slow replies. We're hand-building it "
+        "for a small first group of premium {vertical} businesses in Lagos.\""
     ),
     "owner_relief": (
         "VARIANT ANGLE: OWNER-RELIEF.\n"
@@ -77,7 +84,24 @@ _STYLE_DIRECTIVES: dict[str, str] = {
         "still waiting for their tap. Frame it as taking weight off the owner. Seed "
         "tone (rewrite, don't copy): \"ReachNG is a digital employee that watches "
         "WhatsApp, drafts replies in your voice, and sends the owner a daily brief. "
-        "Built for busy Nigerian SMEs. Onboarding a few early partners before launch.\""
+        "Built for busy Nigerian SMEs. We're hand-building it for a small first "
+        "group of Lagos businesses.\" Do NOT call it a beta, an early version, or a test."
+    ),
+    "exclusivity": (
+        "VARIANT ANGLE: FOUNDER / EXCLUSIVITY.\n"
+        "Same founder angle as variant A, but lead with CURATION instead of value: "
+        "ReachNG is taking on only a small first group of Lagos businesses, hand-"
+        "built one at a time, and you're reaching out because theirs is exactly the "
+        "kind of business it's built for. The admission/selection is the hook, the "
+        "product detail follows it. Still pitch a real product that runs today, do "
+        "NOT call it a beta, an early version, a test, or unlaunched, and NEVER use "
+        "fake-countdown scarcity ('only 3 spots left'). Founder pricing is locked "
+        "for this first cohort. Tone: confident, selective, respectful peer-to-peer, "
+        "never flattering or salesy. Seed tone (do NOT copy verbatim, rewrite as a "
+        "proper email): \"I'm Yori, founder of ReachNG. We're hand-building EYO, a "
+        "digital employee for WhatsApp, for a small first group of premium "
+        "{vertical} businesses in Lagos, and yours is exactly who it's built for. "
+        "Founder pricing is locked for this first cohort. Worth a 2-minute demo?\""
     ),
 }
 

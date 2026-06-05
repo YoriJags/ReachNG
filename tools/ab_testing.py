@@ -2,10 +2,12 @@
 A/B/C message testing — tracks which message variant was sent per contact
 and compares reply rates across variants.
 
-Variants are A/B/C. For the ReachNG pre-launch founder outreach they map to
-three angles (see services/reachng_self_outreach.VARIANT_STYLES):
-    A → founder/direct    B → money-leak    C → owner-relief
-Older 2-variant campaigns that only ever produced A/B still work unchanged.
+Variants are A/B/C/D. For the ReachNG pre-launch founder outreach they map to
+four angles (see services/reachng_self_outreach.VARIANT_STYLES):
+    A → founder/value    B → money-leak    C → owner-relief    D → founder/exclusivity
+A and D are the same founder angle pitched two ways (value-led vs admission-led)
+so we can A/B the positioning head-to-head. Older 2-variant campaigns that only
+ever produced A/B still work unchanged.
 """
 import random
 from datetime import datetime, timezone, timedelta
@@ -14,7 +16,7 @@ from pymongo import ASCENDING, DESCENDING
 
 # The full variant set. Kept in one place so the drafter, the runner, and the
 # stats reader never drift out of sync.
-VARIANTS = ("A", "B", "C")
+VARIANTS = ("A", "B", "C", "D")
 
 
 def get_ab_collection():
@@ -30,7 +32,7 @@ def ensure_ab_indexes():
 
 
 def assign_variant() -> str:
-    """Randomly assign one variant with equal probability across A/B/C."""
+    """Randomly assign one variant with equal probability across A/B/C/D."""
     return random.choice(VARIANTS)
 
 
