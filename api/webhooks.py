@@ -163,38 +163,40 @@ async def _handle_image_attachment(
                 from bson import ObjectId
                 cdoc = db["clients"].find_one({"_id": ObjectId(client_id)})
             cname = (cdoc or {}).get("name")
-            prior_refs = []
-            if cname:
+            from services.eyo_flags import eyo_enabled
+            # Flag-gated per client (off by default). Skip entirely when off so
+            # no receipts are stored and no owner is alerted for that client.
+            if cname and eyo_enabled(cname, "shield"):
                 prior_refs = [d.get("reference") for d in db["shield_receipts"].find(
                     {"client_name": cname, "reference": {"$nin": [None, ""]}},
                     {"reference": 1}).limit(500)]
-            verdict = assess_transfer(
-                receipt,
-                expected_amount=match.expected_ngn,
-                client_account_names=[cname] if cname else None,
-                prior_references=prior_refs,
-            )
-            if verdict.get("is_receipt"):
-                db["shield_receipts"].insert_one({
-                    "client_name":  cname,
-                    "sender_phone": sender_phone,
-                    "reference":    (getattr(receipt, "reference", None) or None),
-                    "amount_ngn":   getattr(receipt, "amount_ngn", None),
-                    "risk":         verdict["risk"],
-                    "score":        verdict["score"],
-                    "reasons":      verdict["reasons"],
-                    "created_at":   datetime.now(timezone.utc),
-                })
-            if verdict.get("verify") and cdoc and cdoc.get("owner_phone"):
-                from tools.outreach import send_whatsapp_for_client
-                await send_whatsapp_for_client(
-                    phone=cdoc["owner_phone"],
-                    message=shield_alert_text(
-                        match.debtor_name or getattr(receipt, "sender_name", None),
-                        receipt, verdict),
-                    client_doc=cdoc,
+                verdict = assess_transfer(
+                    receipt,
+                    expected_amount=match.expected_ngn,
+                    client_account_names=[cname],
+                    prior_references=prior_refs,
                 )
-                log.info("shield_owner_alerted", client=cname, risk=verdict["risk"])
+                if verdict.get("is_receipt"):
+                    db["shield_receipts"].insert_one({
+                        "client_name":  cname,
+                        "sender_phone": sender_phone,
+                        "reference":    (getattr(receipt, "reference", None) or None),
+                        "amount_ngn":   getattr(receipt, "amount_ngn", None),
+                        "risk":         verdict["risk"],
+                        "score":        verdict["score"],
+                        "reasons":      verdict["reasons"],
+                        "created_at":   datetime.now(timezone.utc),
+                    })
+                if verdict.get("verify") and cdoc and cdoc.get("owner_phone"):
+                    from tools.outreach import send_whatsapp_for_client
+                    await send_whatsapp_for_client(
+                        phone=cdoc["owner_phone"],
+                        message=shield_alert_text(
+                            match.debtor_name or getattr(receipt, "sender_name", None),
+                            receipt, verdict),
+                        client_doc=cdoc,
+                    )
+                    log.info("shield_owner_alerted", client=cname, risk=verdict["risk"])
         except Exception as e:
             log.warning("shield_assess_failed", error=str(e), phone=sender_phone)
 

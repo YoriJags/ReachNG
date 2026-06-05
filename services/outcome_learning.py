@@ -157,6 +157,23 @@ def tag_from_inbound(*, contact_phone: str, client_id: Optional[str],
     res = _col().update_many({"_id": {"$in": ids}}, {"$set": updates})
     log.info("outcomes_resolved_from_inbound", count=res.modified_count,
              contact=contact_phone, intent=intent_lc, status=new_status)
+
+    # EYO Referral (invention #5): on a genuine win, EYO may draft a referral
+    # ask for the owner to approve. Best-effort + flag-gated — never blocks the
+    # outcome resolution or the customer reply.
+    if new_status == "win":
+        try:
+            from services.referral_wire import maybe_ask_referral
+            row = open_rows[0]
+            maybe_ask_referral(
+                client_name=row.get("client_name"),
+                contact_phone=contact_phone,
+                contact_name=row.get("contact_name"),
+                win_signal=win_signal,
+            )
+        except Exception:
+            pass
+
     return res.modified_count
 
 
