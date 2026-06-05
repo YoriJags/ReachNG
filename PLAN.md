@@ -48,7 +48,11 @@ Make the whole product provably safe to deploy: a CI gate so a red commit can't 
 - [x] **Radar** — built its data source: `services/demand_extract.py` (deterministic topic extraction, variant-convergent) + `services/demand_intel.py` (capture/store/assemble). Flag-gated capture in the inbound webhook; surfaces via `GET /portal/{token}/demand-radar/data` + an Owner-Brief line. Tested (28).
 - [x] **Pipeline-value data source** — `services/deal_value.py` (currency-aware `parse_money` + `deal_value_for_contact`); HITL captures quoted prices onto contacts; `money_leak` now values leads for real (flat ₦50k retired), foreign quotes surfaced apart. Tested (25).
 - [x] **Cashflow** — `services/cashflow_brief.py` maps the real money-leak numbers onto the forecast core; `GET /portal/{token}/cashflow/data` + an Owner-Brief line, flag-gated. Tested (3).
-- [ ] **Haggle — DEFERRED (needs a structured pricing source):** negotiate() needs each product's list_price + floor_price + sweeteners, and inbound offer-detection. The BusinessBrief has freeform pricing rules, not structured per-product floors — so Haggle's real blocker is a pricing-rules data source, not the reply hook. Build that first.
+- [x] **Haggle** — built its data source (`services/pricing.py`, admin GET/PUT pricing) + detection (`haggle_detect.py`) + `haggle_wire.py`. **Owner-first**: on any haggle EYO pings the owner with its suggestion and lets them set the fair price/option; customer reply is an editable HITL draft; never quotes below floor. Tested (13).
+- [x] **Cashflow close_rate** now uses each client's win-rate history (>=5 resolved), else default.
+- [x] **Portal Money tab** renders the Cashflow + demand-Radar cards (flag-gated).
+
+**All 5 EYO inventions are live** (Shield, Haggle, Radar, Cashflow, Referral), each flag-gated off-by-default, non-blocking, tested.
 
 **R3 — Prod confidence**
 - [x] Deeper `/health` — db + scheduler liveness (running/jobs) + sentry + env; status stays keyed on db so the Railway healthcheck doesn't flap
