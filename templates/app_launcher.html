@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EYO by ReachNG</title>
+<link rel="manifest" href="/static/manifest.webmanifest"/>
+<meta name="theme-color" content="#B85C38"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="EYO"/>
+<link rel="apple-touch-icon" href="/static/icons/icon-192.png"/>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+       font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;
+       background:#FAF6EE;color:#2b2117;padding:24px}
+  .card{max-width:380px;width:100%;text-align:center}
+  .dot{width:64px;height:64px;border-radius:999px;background:#B85C38;margin:0 auto 20px}
+  h1{font-size:22px;margin:0 0 6px;font-weight:700}
+  p{color:#7a6a52;font-size:14px;line-height:1.5;margin:0 0 22px}
+  input{width:100%;padding:13px 14px;border:1px solid #E8DEC8;border-radius:12px;
+        font-size:15px;background:#fff;margin-bottom:12px}
+  button{width:100%;padding:13px;border:none;border-radius:12px;background:#B85C38;
+         color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+  .err{color:#b3261e;font-size:13px;min-height:18px;margin-top:8px}
+  .muted{font-size:12px;color:#9a8a70;margin-top:18px}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="dot"></div>
+    <h1>EYO by ReachNG</h1>
+    <div id="view"></div>
+  </div>
+
+<script>
+(function () {
+  var KEY = "eyo_portal_token";
+  var params = new URLSearchParams(location.search);
+  var offline = params.get("offline");
+  var qToken = (params.get("t") || "").trim();
+  if (qToken) localStorage.setItem(KEY, qToken);
+  var token = qToken || localStorage.getItem(KEY);
+
+  // Already know the owner's portal and we're online -> go straight in.
+  if (token && !offline) { location.replace("/portal/" + token); return; }
+
+  var view = document.getElementById("view");
+
+  function parseToken(raw) {
+    raw = (raw || "").trim();
+    var m = raw.match(/\/portal\/([^\/?#\s]+)/);  // pasted full link
+    if (m) return m[1];
+    return raw.replace(/^\/+|\/+$/g, "");          // raw token
+  }
+
+  if (offline && token) {
+    view.innerHTML =
+      '<p>You are offline. EYO needs a connection to show live money and approvals.</p>' +
+      '<button id="retry">Try again</button>';
+    document.getElementById("retry").onclick = function () {
+      location.replace("/portal/" + token);
+    };
+    return;
+  }
+
+  view.innerHTML =
+    '<p>Paste your portal link to open EYO. We will remember it on this device.</p>' +
+    '<input id="tok" placeholder="reachng.ng/portal/..." autocomplete="off"/>' +
+    '<button id="go">Open EYO</button>' +
+    '<div class="err" id="err"></div>' +
+    '<div class="muted">The link came in your welcome message from ReachNG.</div>';
+
+  document.getElementById("go").onclick = function () {
+    var t = parseToken(document.getElementById("tok").value);
+    if (!t) { document.getElementById("err").textContent = "Paste the portal link from your welcome message."; return; }
+    localStorage.setItem(KEY, t);
+    location.replace("/portal/" + t);
+  };
+})();
+</script>
+</body>
+</html>

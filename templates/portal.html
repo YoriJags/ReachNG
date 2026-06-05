@@ -4,6 +4,27 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>{{ client_name }} — ReachNG</title>
+<link rel="manifest" href="/static/manifest.webmanifest"/>
+<meta name="theme-color" content="#B85C38"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="EYO"/>
+<link rel="apple-touch-icon" href="/static/icons/icon-192.png"/>
+<script>
+  // Remember this owner's portal token so the installed app (/app) reopens it,
+  // and register the service worker for installability + an offline shell.
+  (function () {
+    try {
+      var m = location.pathname.match(/\/portal\/([^\/?#]+)/);
+      if (m) localStorage.setItem("eyo_portal_token", m[1]);
+    } catch (e) {}
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/sw.js").catch(function () {});
+      });
+    }
+  })();
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 

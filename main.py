@@ -6,7 +6,8 @@ import structlog
 import uvicorn
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, Response
+from fastapi.staticfiles import StaticFiles
 from tools.log_buffer import buffer_processor
 
 # Configure structlog to capture logs into the dashboard buffer
@@ -361,6 +362,32 @@ app.include_router(dashboard_router, **_auth)
 
 # Mount MCP server — exposes tools to Claude
 app.mount("/mcp", mcp.http_app())
+
+
+# ── PWA: installable client portal ───────────────────────────────────────────
+# Static assets (manifest, icons, service-worker source) + the two PWA
+# entrypoints. Registered BEFORE the marketing router so its "/" catch-all can
+# never swallow /app or /sw.js.
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/sw.js", include_in_schema=False)
+async def service_worker():
+    """Serve the service worker from the root so its scope covers /portal/*."""
+    from pathlib import Path
+    sw = (Path(__file__).resolve().parent / "static" / "sw.js").read_text(encoding="utf-8")
+    return Response(
+        sw,
+        media_type="application/javascript",
+        headers={"Service-Worker-Allowed": "/", "Cache-Control": "no-cache"},
+    )
+
+
+@app.get("/app", include_in_schema=False)
+async def pwa_launcher(request: Request):
+    """Installed-app entrypoint: redirects to the owner's saved /portal/{token}
+    (client-side), or prompts for the portal link on first run."""
+    return app.state.templates.TemplateResponse(request, "app_launcher.html")
 
 
 # Public marketing site (landing, pricing, how-it-works, about, contact, vertical landers,
