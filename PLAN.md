@@ -54,6 +54,17 @@ Make the whole product provably safe to deploy: a CI gate so a red commit can't 
 
 **All 5 EYO inventions are live** (Shield, Haggle, Radar, Cashflow, Referral), each flag-gated off-by-default, non-blocking, tested.
 
+## NOW — Multi-channel: EYO beyond WhatsApp *(email shipped; IG/FB gated on CAC)*
+
+EYO's brain is channel-agnostic; channels are transport adapters feeding one brain + one owner brief + one unified customer. See `docs/META_AND_CHANNELS.md`.
+
+- [x] **Email P1** — per-client mailbox pairing via Unipile hosted-auth (`email_account_id`); shared webhook routes by channel; portal connect/status + landings.
+- [x] **Email P2** — inbound email → same brain → HITL email draft (`channel="email"`).
+- [x] **Email P3** — identity resolution: tie email ↔ WhatsApp number into one customer (hard-signal auto-link + owner one-tap confirm). Portal suggestions/confirm/reject.
+- [x] **Email P4** — unified customer dossier (`/portal/{token}/customer`) merging both inboxes; Radar now captures email demand too.
+- [ ] **Follows:** outbound email send from the *client's* mailbox (dispatcher currently sends from ReachNG's account); money-leak "silent inbound" to include unanswered emails.
+- [ ] **Meta IG + Facebook Messenger** — build on Meta's framework (reuses the Meta App + webhook). **Gated on CAC registration → Meta Business Verification → App Review.** Not blocking the wedge; pilot in Dev Mode meanwhile.
+
 **R3 — Prod confidence**
 - [x] Deeper `/health` — db + scheduler liveness (running/jobs) + sentry + env; status stays keyed on db so the Railway healthcheck doesn't flap
 - [x] `scripts/smoke_prod.py` — post-deploy smoke against live `/health` + `/portal/demo` + PWA manifest (exit 1 on failure)
