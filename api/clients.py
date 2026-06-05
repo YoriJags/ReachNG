@@ -549,6 +549,33 @@ async def set_eyo_flag(name: str, feature: str, enabled: bool):
     return {"success": True, "client": name, "feature": feature, "enabled": enabled}
 
 
+class PricingRule(BaseModel):
+    product: str
+    list_price_ngn: float = Field(..., ge=0)
+    floor_price_ngn: float = Field(..., ge=0)
+    sweeteners: list[str] = Field(default_factory=list)
+    max_rounds: int = Field(default=3, ge=1, le=10)
+
+
+@router.get("/{name}/pricing")
+async def get_client_pricing(name: str):
+    """List a client's product pricing rules (powers EYO Haggle)."""
+    from services.pricing import list_pricing
+    return {"client": name, "pricing": list_pricing(name)}
+
+
+@router.put("/{name}/pricing")
+async def put_client_pricing(name: str, rule: PricingRule):
+    """Set one product's pricing — public list price + the SECRET floor EYO never
+    drops below + allowed sweeteners. This is the data EYO Haggle negotiates on."""
+    if rule.floor_price_ngn > rule.list_price_ngn:
+        raise HTTPException(400, "floor_price_ngn cannot exceed list_price_ngn")
+    from services.pricing import set_pricing
+    key = set_pricing(name, rule.product, rule.list_price_ngn, rule.floor_price_ngn,
+                      sweeteners=rule.sweeteners, max_rounds=rule.max_rounds)
+    return {"success": True, "client": name, "product_key": key}
+
+
 class HoldingMessageUpdate(BaseModel):
     holding_message: str
 

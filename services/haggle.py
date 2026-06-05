@@ -137,3 +137,28 @@ def owner_escalation_text(move: dict, contact_name: Optional[str],
     offer_s = f"₦{customer_offer:,.0f}" if customer_offer else "below your floor"
     return (f"💬 {who} is pushing to {offer_s} — under your floor of ₦{floor_price:,.0f}. "
             f"EYO held the line. Want it to stand firm, or can it go lower?")
+
+
+def owner_haggle_prompt(move: dict, contact_name: Optional[str],
+                        customer_offer: Optional[float],
+                        product: Optional[str] = None) -> str:
+    """Owner-first prompt on ANY price haggle: surface the customer's offer + EYO's
+    suggested move, then hand the call back to the owner to set the fair price or
+    option. The owner stays in control of the number — EYO only suggests."""
+    who = contact_name or "A customer"
+    prod = f" on {product}" if product else ""
+    offer_s = f" (offered ₦{customer_offer:,.0f})" if customer_offer else ""
+    price = move.get("price")
+    price_s = f"₦{price:,.0f}" if price is not None else "your current price"
+    sweetener = move.get("sweetener")
+    action = move.get("action")
+    if action == ACCEPT:
+        suggestion = f"accept at {price_s}"
+    elif action == COUNTER:
+        suggestion = f"counter at {price_s}"
+    elif action == SWEETEN:
+        suggestion = f"hold {price_s} and add {sweetener}" if sweetener else f"hold {price_s}"
+    else:  # HOLD
+        suggestion = f"hold at {price_s}"
+    return (f"💬 {who} is negotiating{prod}{offer_s}. EYO suggests {suggestion}. "
+            f"What's your fair price or option? Approve or edit EYO's draft before it goes out.")

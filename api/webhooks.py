@@ -570,6 +570,13 @@ async def _handle_message(
                     maybe_capture_demand(matched_client, message_body, sender_phone)
                 except Exception:
                     pass
+                # EYO Haggle (invention #2): if they're haggling a priced product,
+                # draft the next move for approval. Flag-gated + non-blocking.
+                try:
+                    from services.haggle_wire import maybe_haggle
+                    await maybe_haggle(matched_client, message_body, sender_phone)
+                except Exception:
+                    pass
     except Exception as e:
         log.warning("holding_reply_lookup_failed", error=str(e))
 
