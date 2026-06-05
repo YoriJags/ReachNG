@@ -45,7 +45,8 @@ Make the whole product provably safe to deploy: a CI gate so a red commit can't 
 - [x] `services/eyo_flags.py` — per-client flags (off by default, fail-safe) + admin GET/PATCH `/clients/{name}/eyo-flag[s]`
 - [x] **Referral** — `services/referral_wire.py`: HITL ask after a genuine win (paid/booked/deposit), deduped, non-blocking; hooked in `outcome_learning.tag_from_inbound`
 - [x] **Shield** — gated behind `eyo_enabled(client, "shield")` in the webhook path (off by default)
-- [ ] **Cashflow / Radar / Haggle — DEFERRED (data not captured yet):** Cashflow needs a ₦ pipeline-value source (today it'd just restate the collectible headline), Radar needs demand-topic clustering (the existing missed-opps radar already covers the simple case), Haggle needs negotiation-detection in the reply path. Wiring now = redundant or fires on nothing. Build the data sources first.
+- [x] **Radar** — built its data source: `services/demand_extract.py` (deterministic topic extraction, variant-convergent) + `services/demand_intel.py` (capture/store/assemble). Flag-gated capture in the inbound webhook; surfaces via `GET /portal/{token}/demand-radar/data` + an Owner-Brief line. Tested (28).
+- [ ] **Cashflow / Haggle — DEFERRED (data not captured yet):** Cashflow needs a ₦ pipeline-value source (today it'd just restate the collectible headline); Haggle needs negotiation-detection in the reply path. Wiring now = redundant or fires on nothing.
 
 **R3 — Prod confidence**
 - [x] Deeper `/health` — db + scheduler liveness (running/jobs) + sentry + env; status stays keyed on db so the Railway healthcheck doesn't flap
