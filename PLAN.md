@@ -4,7 +4,7 @@
 
 Queued work waiting to be promoted into a phase: see [BACKLOG.md](./BACKLOG.md).
 
-Last updated: 2026-05-19
+Last updated: 2026-06-05
 
 ---
 
@@ -28,6 +28,25 @@ Land first paying Lagos client on **ReachNG Closer (Real Estate)** within 30 day
 - [x] Overview stat cards clickable (Pipeline / Replies / Clients)
 - [x] TalentOS back-office built: payroll, PAYE/CRA/PENCOM/NHF, leave, attendance, probation, policy oracle, candidate screener, offboarding
 - [x] EstateOS built (now demoted to Closer upsells): KYC vault, PoF screener, scorecard, lawyer bundle, rent chase
+
+## NOW — Phase R: Reliability Net (production-readiness) *(~1.5 days)*
+
+Make the whole product provably safe to deploy: a CI gate so a red commit can't ship, golden tests on the money math we sell, and a safe pattern for wiring new EYO features. Chosen approach: **net-first** — build the safety net before wiring the 5 EYO inventions.
+
+**R0 — CI gate + skip guard**
+- [x] `.github/workflows/ci.yml` — full pytest suite on every push/PR to `main`; Railway-deployed `main` is now test-gated (red = no ship)
+- [x] `tests/conftest.py` — DB-dependent isolation probes skip unless `RUN_DB_TESTS=1` (config requires a dummy `MONGODB_URI` to boot, so we key on an explicit flag, not URI presence)
+
+**R1 — Golden tests on what we sell**
+- [ ] EstateOS rent: escalation-band boundaries (6/7, 13/14, 29/30, 59/60 days) + idempotent period-open (unique `(unit_id, period)`)
+- [ ] TalentOS payroll math — *on hold pending scope decision (founder reviewing payroll's place in the active product)*
+
+**R2 — Wire the 5 EYO inventions, safely** *(flag off-by-default + non-blocking try/except + one owner surface + a wiring smoke test, each)*
+- [ ] Cashflow + Radar (read-only) → Referral → Haggle → Shield (already live)
+
+**R3 — Prod confidence**
+- [ ] Deeper `/health` (scheduler liveness) + post-deploy smoke against live `/health` + `/portal/demo`
+- [ ] Confirm Sentry receiving in Railway (`SENTRY_DSN`), errors visible, no PII
 
 ## Now — Phase 1: Closer Lead Intake *(1–2 days)*
 
