@@ -69,6 +69,20 @@ def test_money_leak_composition(monkeypatch):
     assert kinds["asked_price_no_quote"] == "pipeline"
 
 
+def test_money_leak_keeps_foreign_quotes_separate(monkeypatch):
+    ml = _patch_detectors(
+        monkeypatch,
+        missed=[{"contact_id": "c1", "phone": "+1", "reply_text": "how much?"}],
+    )
+    # A captured USD quote on that contact — must NOT enter the ₦ total.
+    monkeypatch.setattr(ml, "_resolve_contacts", lambda items: (
+        {"c1": {"_id": "c1", "last_quote_amount": 50_000, "last_quote_currency": "USD"}}, {}))
+    rep = ml.money_leak_report("FX Co", avg_deal_ngn=50_000)
+    assert rep["foreign_quotes"] == {"USD": 50_000}
+    assert rep["pipeline_ngn"] == 50_000          # the lead values at NGN default
+    assert rep["total_ngn"] == 50_000             # USD not folded in
+
+
 def test_rescue_targets_dedup_and_priority(monkeypatch):
     import services.money_leak as ml
 

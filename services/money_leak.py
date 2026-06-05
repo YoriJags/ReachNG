@@ -129,25 +129,21 @@ def _silent_inbound(client_name: str, days: int, min_hours_silent: int = 4, limi
     return out
 
 
-def _value_items(items: list[dict], avg_deal_ngn: int) -> int:
-    """Sum real per-contact deal values for a pipeline list, batch-resolving the
-    contacts. Falls back to avg_deal_ngn for any contact we can't value — so the
-    figure is real where we've captured a quote/unit price, conservative elsewhere.
-    """
-    if not items:
-        return 0
-    from bson import ObjectId
-    from services.deal_value import deal_value_for_contact
+def _resolve_contacts(items: list[dict]) -> tuple[dict, dict]:
+    """Batch-fetch the contacts behind pipeline items. Best-effort: a DB hiccup
+    returns empty maps so callers fall back to the conservative default."""
     by_id: dict[str, dict] = {}
     by_phone: dict[str, dict] = {}
-    # Batch-resolve contacts. Best-effort: a DB hiccup just means every item
-    # falls back to avg_deal_ngn — the figure stays conservative, never errors.
+    if not items:
+        return by_id, by_phone
     try:
+        from bson import ObjectId
         db = get_db()
         ids = [ObjectId(str(i["contact_id"])) for i in items
                if i.get("contact_id") and ObjectId.is_valid(str(i["contact_id"]))]
         phones = [i["phone"] for i in items if not i.get("contact_id") and i.get("phone")]
-        proj = {"deal_value_ngn": 1, "last_quote_ngn": 1, "unit_rent_ngn": 1, "phone": 1}
+        proj = {"deal_value_ngn": 1, "last_quote_ngn": 1, "unit_rent_ngn": 1,
+                "last_quote_amount": 1, "last_quote_currency": 1, "phone": 1}
         if ids:
             for c in db["contacts"].find({"_id": {"$in": ids}}, proj):
                 by_id[str(c["_id"])] = c
@@ -156,11 +152,37 @@ def _value_items(items: list[dict], avg_deal_ngn: int) -> int:
                 by_phone[c.get("phone")] = c
     except Exception:
         pass
-    total = 0
-    for it in items:
-        c = by_id.get(str(it.get("contact_id"))) or by_phone.get(it.get("phone"))
-        total += deal_value_for_contact(c, default_ngn=avg_deal_ngn)
-    return total
+    return by_id, by_phone
+
+
+def _contact_for(item: dict, by_id: dict, by_phone: dict) -> dict | None:
+    return by_id.get(str(item.get("contact_id"))) or by_phone.get(item.get("phone"))
+
+
+def _value_items(items: list[dict], avg_deal_ngn: int, by_id: dict, by_phone: dict) -> int:
+    """Sum real per-contact NGN deal values, default only where unknown."""
+    from services.deal_value import deal_value_for_contact
+    return sum(
+        deal_value_for_contact(_contact_for(it, by_id, by_phone), default_ngn=avg_deal_ngn)
+        for it in items
+    )
+
+
+def _foreign_quotes(by_id: dict, by_phone: dict) -> dict[str, int]:
+    """Captured non-Naira quotes among these contacts, totalled per currency.
+    Kept SEPARATE from the ₦ figure — we never apply a silent FX rate."""
+    totals: dict[str, int] = {}
+    seen: set[str] = set()
+    for c in list(by_id.values()) + list(by_phone.values()):
+        key = str(c.get("_id") or c.get("phone"))
+        if key in seen:
+            continue
+        seen.add(key)
+        ccy = (c.get("last_quote_currency") or "NGN")
+        amt = c.get("last_quote_amount")
+        if ccy != "NGN" and isinstance(amt, (int, float)) and amt > 0:
+            totals[ccy] = totals.get(ccy, 0) + int(amt)
+    return totals
 
 
 def money_leak_report(
@@ -184,6 +206,10 @@ def money_leak_report(
     bd = cash.get("breakdown", {})
     confirmed_ngn = float(cash.get("collectible_total_ngn") or 0)
 
+    # Resolve the pipeline contacts once; reuse for valuation + foreign quotes.
+    by_id, by_phone = _resolve_contacts(missed + promises + silent)
+    foreign_quotes = _foreign_quotes(by_id, by_phone)
+
     categories = [
         {
             "key": "confirmed_owed",
@@ -199,7 +225,7 @@ def money_leak_report(
             "label": "Asked your price — never got a quote back",
             "kind": "pipeline",
             "count": len(missed),
-            "amount_ngn": _value_items(missed, avg_deal_ngn),
+            "amount_ngn": _value_items(missed, avg_deal_ngn, by_id, by_phone),
             "examples": missed[:8],
         },
         {
@@ -207,7 +233,7 @@ def money_leak_report(
             "label": "Said “I'll pay” — then went quiet",
             "kind": "pipeline",
             "count": len(promises),
-            "amount_ngn": _value_items(promises, avg_deal_ngn),
+            "amount_ngn": _value_items(promises, avg_deal_ngn, by_id, by_phone),
             "examples": promises[:8],
         },
         {
@@ -215,7 +241,7 @@ def money_leak_report(
             "label": "Messaged you — got no reply at all",
             "kind": "pipeline",
             "count": len(silent),
-            "amount_ngn": _value_items(silent, avg_deal_ngn),
+            "amount_ngn": _value_items(silent, avg_deal_ngn, by_id, by_phone),
             "examples": silent[:8],
         },
     ]
@@ -231,6 +257,7 @@ def money_leak_report(
         "pipeline_ngn":   pipeline_ngn,
         "total_ngn":      confirmed_ngn + pipeline_ngn,
         "total_leak_count": total_leak_count,
+        "foreign_quotes": foreign_quotes,   # {ccy: amount} — shown apart, never in total_ngn
         "categories":     categories,
         "headline": (
             f"₦{(confirmed_ngn + pipeline_ngn):,.0f} sitting in "
