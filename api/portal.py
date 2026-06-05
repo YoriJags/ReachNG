@@ -467,6 +467,34 @@ async def get_money_leak(token: str, days: int = 30):
     return money_leak_report(client["name"], days=max(1, min(180, days)))
 
 
+@router.get("/{token}/demand-radar/data")
+async def get_demand_radar(token: str, days: int = 30):
+    """EYO Radar — what the market keeps asking for, aggregated from inbound.
+
+    Flag-gated (off by default). Returns ranked demand topics + honest owner
+    lines ('N people asked the price of X this week'). Empty until the radar
+    flag is on and signals accumulate.
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    name = client["name"]
+    from services.eyo_flags import eyo_enabled
+    if not eyo_enabled(name, "radar"):
+        return {"client": name, "enabled": False, "signals": [], "headlines": []}
+
+    from services.demand_intel import radar_for_client
+    days = max(1, min(180, days))
+    radar = radar_for_client(name, days=days)
+    lines = []
+    for s in radar.get("signals", []):
+        n = s["price_asks"] or s["mentions"]
+        who = "person" if n == 1 else "people"
+        verb = "asked the price of" if s["price_asks"] else "asked about"
+        lines.append(f"{n} {who} {verb} {s['display']} in the last {days} days.")
+    return {"client": name, "enabled": True, "days": days, "headlines": lines, **radar}
+
+
 @router.get("/{token}/revenue-rescue")
 async def get_revenue_rescue(token: str, days: int = 30):
     """'Find cash this week' — prioritised, de-duplicated follow-up targets

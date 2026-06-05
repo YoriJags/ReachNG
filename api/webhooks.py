@@ -563,6 +563,13 @@ async def _handle_message(
                 _maybe_learn_memory(matched_client, message_body)
                 # Tag any open outcomes against this contact based on classifier
                 _maybe_resolve_outcomes(matched_client, message_body)
+                # EYO Radar (invention #3): capture what the market is asking for.
+                # Flag-gated + non-blocking — feeds the demand radar, never blocks.
+                try:
+                    from services.demand_intel import maybe_capture_demand
+                    maybe_capture_demand(matched_client, message_body, sender_phone)
+                except Exception:
+                    pass
     except Exception as e:
         log.warning("holding_reply_lookup_failed", error=str(e))
 
