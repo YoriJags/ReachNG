@@ -47,3 +47,24 @@ def test_default_close_rate_when_unset(monkeypatch):
     fc = cb.cashflow_for_client("Altitude")   # close_rate=None -> core default
     assert 0.0 <= fc["close_rate"] <= 1.0
     assert fc["expected_ngn"] >= 500_000      # at least the confirmed owed
+
+
+def _patch_stats(monkeypatch, stats):
+    import database
+    class _Col:
+        def find_one(self, *a, **k): return {"_id": "abc"}
+    class _Db:
+        def __getitem__(self, n): return _Col()
+    monkeypatch.setattr(database, "get_db", lambda: _Db())
+    import services.outcome_learning as ol
+    monkeypatch.setattr(ol, "client_outcome_stats", lambda cid, **k: stats)
+
+
+def test_close_rate_uses_client_history(monkeypatch):
+    _patch_stats(monkeypatch, {"wins": 6, "misses": 4, "win_rate": 0.6})
+    assert cb._close_rate("Altitude") == 0.6
+
+
+def test_close_rate_none_when_history_too_thin(monkeypatch):
+    _patch_stats(monkeypatch, {"wins": 1, "misses": 1, "win_rate": 0.5})
+    assert cb._close_rate("Altitude") is None   # < 5 resolved -> not trusted

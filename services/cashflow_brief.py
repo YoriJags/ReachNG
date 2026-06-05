@@ -26,11 +26,39 @@ from services.cashflow import forecast_week
 
 log = structlog.get_logger()
 
+# Need at least this many resolved deals before a client's own win-rate is
+# trustworthy; below it we fall back to the core default.
+_MIN_RESOLVED = 5
+
+
+def _close_rate(client_name: str) -> Optional[float]:
+    """A client's historical win-rate as the close_rate, or None (-> core
+    default) when there isn't enough history yet. Best-effort, never raises."""
+    try:
+        from database import get_db
+        c = get_db()["clients"].find_one({"name": client_name}, {"_id": 1})
+        if not c:
+            return None
+        from services.outcome_learning import client_outcome_stats
+        stats = client_outcome_stats(str(c["_id"]))
+        resolved = (stats.get("wins") or 0) + (stats.get("misses") or 0)
+        wr = stats.get("win_rate")
+        return wr if (wr is not None and resolved >= _MIN_RESOLVED) else None
+    except Exception:
+        return None
+
 
 def cashflow_for_client(client_name: str, *, days: int = 30,
                         close_rate: Optional[float] = None) -> dict:
-    """Forecast the week for one client from real money-leak numbers."""
+    """Forecast the week for one client from real money-leak numbers.
+
+    close_rate: explicit override wins; otherwise we use the client's own
+    historical win-rate when there's enough history, else the core default.
+    """
     from services.money_leak import money_leak_report, rescue_targets
+
+    if close_rate is None:
+        close_rate = _close_rate(client_name)
 
     rep = money_leak_report(client_name, days=days)
     cats = {c["key"]: c for c in rep.get("categories", [])}
