@@ -83,6 +83,12 @@ def init_sentry() -> bool:
         return False
 
 
+def sentry_active() -> bool:
+    """True once init_sentry() has successfully initialised Sentry (DSN set +
+    sdk imported). Lets /health report whether errors are actually being sent."""
+    return _sentry_on
+
+
 def capture_message(message: str, level: str = "warning", **tags) -> None:
     """Send a scrubbed breadcrumb/event to Sentry. No-op when Sentry is off.
     Use for things FastAPI swallows (e.g. webhook signature failures) that we

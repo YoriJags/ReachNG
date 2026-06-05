@@ -41,12 +41,19 @@ Make the whole product provably safe to deploy: a CI gate so a red commit can't 
 - [x] EstateOS rent: escalation-band boundaries (6/7, 13/14, 29/30, 59/60 days) locked in `tests/test_rent_roll.py`; idempotent period-open covered by a `@pytest.mark.db` test (runs with `RUN_DB_TESTS=1`)
 - [x] TalentOS payroll math — **REMOVED (2026-06-05).** Founder retired the HR/payroll suite: files, routes, and UI deleted; reliability focus is EstateOS rent + EYO only
 
-**R2 — Wire the 5 EYO inventions, safely** *(flag off-by-default + non-blocking try/except + one owner surface + a wiring smoke test, each)*
-- [ ] Cashflow + Radar (read-only) → Referral → Haggle → Shield (already live)
+**R2 — Wire the EYO inventions, safely** *(flag off-by-default + non-blocking + tested)*
+- [x] `services/eyo_flags.py` — per-client flags (off by default, fail-safe) + admin GET/PATCH `/clients/{name}/eyo-flag[s]`
+- [x] **Referral** — `services/referral_wire.py`: HITL ask after a genuine win (paid/booked/deposit), deduped, non-blocking; hooked in `outcome_learning.tag_from_inbound`
+- [x] **Shield** — gated behind `eyo_enabled(client, "shield")` in the webhook path (off by default)
+- [ ] **Cashflow / Radar / Haggle — DEFERRED (data not captured yet):** Cashflow needs a ₦ pipeline-value source (today it'd just restate the collectible headline), Radar needs demand-topic clustering (the existing missed-opps radar already covers the simple case), Haggle needs negotiation-detection in the reply path. Wiring now = redundant or fires on nothing. Build the data sources first.
 
 **R3 — Prod confidence**
-- [ ] Deeper `/health` (scheduler liveness) + post-deploy smoke against live `/health` + `/portal/demo`
-- [ ] Confirm Sentry receiving in Railway (`SENTRY_DSN`), errors visible, no PII
+- [x] Deeper `/health` — db + scheduler liveness (running/jobs) + sentry + env; status stays keyed on db so the Railway healthcheck doesn't flap
+- [x] `scripts/smoke_prod.py` — post-deploy smoke against live `/health` + `/portal/demo` + PWA manifest (exit 1 on failure)
+- [x] Sentry: confirm path `POST /api/v1/debug/sentry-test` (auth) + `sentry` flag in `/health`; init is PII-scrubbed (`tools/observability.py`). **Action for founder: set `SENTRY_DSN` in Railway**, then call the endpoint and check the Sentry inbox
+
+**PWA** *(market-facing, shipped)*
+- [x] Installable client portal: manifest + 192/512 icons + conservative service worker (navigations network-first) + `/app` launcher that reopens the owner's saved `/portal/{token}`
 
 ## Now — Phase 1: Closer Lead Intake *(1–2 days)*
 

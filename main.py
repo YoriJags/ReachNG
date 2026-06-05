@@ -397,13 +397,54 @@ app.include_router(marketing_router)
 
 @app.get("/health")
 async def health():
+    """Liveness + readiness for Railway and the post-deploy smoke.
+
+    `status` stays keyed on the DB (the only hard dependency) so the platform
+    healthcheck doesn't flap when the scheduler is intentionally disabled on a
+    worker. Scheduler / Sentry are reported as informational fields. No PII, no
+    auth — safe to curl.
+    """
     from database import get_db
     try:
         get_db().command("ping")
         db_ok = True
     except Exception:
         db_ok = False
-    return {"status": "ok" if db_ok else "degraded", "db": db_ok}
+
+    # Scheduler liveness (in-process read, no network).
+    try:
+        from scheduler import scheduler as _sched
+        sched = {"running": bool(getattr(_sched, "running", False)),
+                 "jobs": len(_sched.get_jobs())}
+    except Exception:
+        sched = {"running": False, "jobs": 0}
+
+    try:
+        from tools.observability import sentry_active
+        sentry_on = sentry_active()
+    except Exception:
+        sentry_on = False
+
+    return {
+        "status":    "ok" if db_ok else "degraded",
+        "db":        db_ok,
+        "scheduler": sched,
+        "sentry":    sentry_on,
+        "env":       get_settings().app_env,
+    }
+
+
+@app.post("/api/v1/debug/sentry-test", dependencies=[Depends(require_auth)])
+async def sentry_test():
+    """Send one scrubbed test event to confirm Sentry is actually receiving in
+    this environment. Returns sentry_active=False (and sends nothing) when
+    SENTRY_DSN isn't configured. Check the Sentry inbox after calling."""
+    from tools.observability import sentry_active, capture_message
+    active = sentry_active()
+    if active:
+        capture_message("Sentry connectivity test from /api/v1/debug/sentry-test",
+                        level="info")
+    return {"sentry_active": active, "sent": active}
 
 
 @app.get("/api/v1/logs/recent", dependencies=[Depends(require_auth)])
