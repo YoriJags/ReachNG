@@ -129,6 +129,40 @@ def _silent_inbound(client_name: str, days: int, min_hours_silent: int = 4, limi
     return out
 
 
+def _value_items(items: list[dict], avg_deal_ngn: int) -> int:
+    """Sum real per-contact deal values for a pipeline list, batch-resolving the
+    contacts. Falls back to avg_deal_ngn for any contact we can't value — so the
+    figure is real where we've captured a quote/unit price, conservative elsewhere.
+    """
+    if not items:
+        return 0
+    from bson import ObjectId
+    from services.deal_value import deal_value_for_contact
+    by_id: dict[str, dict] = {}
+    by_phone: dict[str, dict] = {}
+    # Batch-resolve contacts. Best-effort: a DB hiccup just means every item
+    # falls back to avg_deal_ngn — the figure stays conservative, never errors.
+    try:
+        db = get_db()
+        ids = [ObjectId(str(i["contact_id"])) for i in items
+               if i.get("contact_id") and ObjectId.is_valid(str(i["contact_id"]))]
+        phones = [i["phone"] for i in items if not i.get("contact_id") and i.get("phone")]
+        proj = {"deal_value_ngn": 1, "last_quote_ngn": 1, "unit_rent_ngn": 1, "phone": 1}
+        if ids:
+            for c in db["contacts"].find({"_id": {"$in": ids}}, proj):
+                by_id[str(c["_id"])] = c
+        if phones:
+            for c in db["contacts"].find({"phone": {"$in": phones}}, proj):
+                by_phone[c.get("phone")] = c
+    except Exception:
+        pass
+    total = 0
+    for it in items:
+        c = by_id.get(str(it.get("contact_id"))) or by_phone.get(it.get("phone"))
+        total += deal_value_for_contact(c, default_ngn=avg_deal_ngn)
+    return total
+
+
 def money_leak_report(
     client_name: str,
     days: int = 30,
@@ -137,8 +171,10 @@ def money_leak_report(
     """The headline report. One ₦ figure, four categories, real examples.
 
     `confirmed_ngn`  = money actually owed (ledgers — real).
-    `pipeline_ngn`   = estimated value of revivable conversations
-                       (count × avg_deal_ngn — clearly an estimate).
+    `pipeline_ngn`   = value of revivable conversations, valued PER LEAD where we
+                       know it (captured quote / closed-deal value / unit rent)
+                       and `avg_deal_ngn` only as a fallback. Still an estimate,
+                       but no longer a flat count × one rate.
     """
     cash = cash_signals_for(client_name)
     missed   = missed_opportunities_for(client_name, days=days, limit=50)
@@ -163,7 +199,7 @@ def money_leak_report(
             "label": "Asked your price — never got a quote back",
             "kind": "pipeline",
             "count": len(missed),
-            "amount_ngn": len(missed) * avg_deal_ngn,
+            "amount_ngn": _value_items(missed, avg_deal_ngn),
             "examples": missed[:8],
         },
         {
@@ -171,7 +207,7 @@ def money_leak_report(
             "label": "Said “I'll pay” — then went quiet",
             "kind": "pipeline",
             "count": len(promises),
-            "amount_ngn": len(promises) * avg_deal_ngn,
+            "amount_ngn": _value_items(promises, avg_deal_ngn),
             "examples": promises[:8],
         },
         {
@@ -179,7 +215,7 @@ def money_leak_report(
             "label": "Messaged you — got no reply at all",
             "kind": "pipeline",
             "count": len(silent),
-            "amount_ngn": len(silent) * avg_deal_ngn,
+            "amount_ngn": _value_items(silent, avg_deal_ngn),
             "examples": silent[:8],
         },
     ]

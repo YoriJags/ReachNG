@@ -368,6 +368,7 @@ def approve_draft(approval_id: str) -> dict | None:
         return None
     updated = _update_status(approval_id, ApprovalStatus.APPROVED)
     _open_outcome_safe(updated or draft)
+    _capture_quote_safe(updated or draft)
     return updated
 
 
@@ -406,6 +407,7 @@ def edit_draft(approval_id: str, new_message: str) -> dict | None:
         log.warning("edit_tone_loop_record_failed", error=str(e))
 
     _open_outcome_safe(doc)
+    _capture_quote_safe(doc, new_message)
     return doc
 
 
@@ -419,6 +421,39 @@ def _open_outcome_safe(approval_doc: dict | None) -> None:
         open_outcome_from_approval(approval_doc)
     except Exception as e:
         log.warning("outcome_open_failed", error=str(e))
+
+
+def _capture_quote_safe(approval_doc: dict | None, message: str | None = None) -> None:
+    """Best-effort: if the approved outbound carries a ₦ quote, remember it on the
+    contact (`last_quote_ngn`) so pipeline value (money_leak / cashflow) reflects
+    real numbers instead of a flat estimate. Never raises."""
+    try:
+        if not approval_doc:
+            return
+        text = message or approval_doc.get("message") or ""
+        from services.deal_value import parse_money
+        m = parse_money(text)
+        if not m:
+            return
+        phone = approval_doc.get("phone") or approval_doc.get("contact_phone")
+        if not phone:
+            return
+        from database import get_db
+        q = {"phone": phone}
+        cname = approval_doc.get("client_name")
+        if cname:
+            q["client_name"] = cname
+        patch = {
+            "last_quote_amount":   m["amount"],
+            "last_quote_currency": m["currency"],
+            "last_quote_at":       datetime.now(timezone.utc),
+        }
+        # Only feed the NGN pipeline figure with NGN quotes — never assume FX.
+        if m["currency"] == "NGN":
+            patch["last_quote_ngn"] = m["amount"]
+        get_db()["contacts"].update_one(q, {"$set": patch})
+    except Exception as e:
+        log.warning("quote_capture_failed", error=str(e))
 
 
 def _enforce_brief_gate(*, source: str, client_name: str | None) -> None:
