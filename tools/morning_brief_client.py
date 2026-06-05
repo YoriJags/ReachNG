@@ -272,13 +272,32 @@ def compile_client_brief(client_name: str, portal_url: str = "") -> str:
     except Exception:
         pass
 
+    # ── Demand radar (EYO invention #3) — what the market kept asking for ──
+    # Flag-gated + best-effort. Honest copy (no unverifiable "you have no price"
+    # claim); only shows once 3+ people asked about the same thing this week.
+    radar_line = ""
+    try:
+        from services.eyo_flags import eyo_enabled
+        if eyo_enabled(client_name, "radar"):
+            from services.demand_intel import radar_for_client
+            sigs = radar_for_client(client_name, days=7).get("signals", [])[:2]
+            if sigs:
+                bits = []
+                for s in sigs:
+                    n = s["price_asks"] or s["mentions"]
+                    verb = "asked the price of" if s["price_asks"] else "asked about"
+                    bits.append(f"• {n} {verb} {s['display']}")
+                radar_line = "\n\n📊 *This week people kept asking about:*\n" + "\n".join(bits)
+    except Exception:
+        pass
+
     # ── Compose ─────────────────────────────────────────────────────────
     brief = f"""🌅 *Good morning, {client_name.split()[0]}!*
 {day_str} — Owner Brief{cap_line}
 
 {headline_block}{missed_section}
 
-{approval_line}{health_line}
+{approval_line}{health_line}{radar_line}
 
 _Overnight: {activity_recap}_{streak_line}
 _Powered by ReachNG — your AI sales engine_"""
