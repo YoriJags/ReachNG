@@ -38,7 +38,7 @@ Make the whole product provably safe to deploy: a CI gate so a red commit can't 
 - [x] `tests/conftest.py` — DB-dependent isolation probes skip unless `RUN_DB_TESTS=1` (config requires a dummy `MONGODB_URI` to boot, so we key on an explicit flag, not URI presence)
 
 **R1 — Golden tests on what we sell**
-- [ ] EstateOS rent: escalation-band boundaries (6/7, 13/14, 29/30, 59/60 days) + idempotent period-open (unique `(unit_id, period)`)
+- [x] EstateOS rent: escalation-band boundaries (6/7, 13/14, 29/30, 59/60 days) locked in `tests/test_rent_roll.py`; idempotent period-open covered by a `@pytest.mark.db` test (runs with `RUN_DB_TESTS=1`)
 - [x] TalentOS payroll math — **REMOVED (2026-06-05).** Founder retired the HR/payroll suite: files, routes, and UI deleted; reliability focus is EstateOS rent + EYO only
 
 **R2 — Wire the 5 EYO inventions, safely** *(flag off-by-default + non-blocking try/except + one owner surface + a wiring smoke test, each)*
