@@ -46,7 +46,9 @@ Make the whole product provably safe to deploy: a CI gate so a red commit can't 
 - [x] **Referral** — `services/referral_wire.py`: HITL ask after a genuine win (paid/booked/deposit), deduped, non-blocking; hooked in `outcome_learning.tag_from_inbound`
 - [x] **Shield** — gated behind `eyo_enabled(client, "shield")` in the webhook path (off by default)
 - [x] **Radar** — built its data source: `services/demand_extract.py` (deterministic topic extraction, variant-convergent) + `services/demand_intel.py` (capture/store/assemble). Flag-gated capture in the inbound webhook; surfaces via `GET /portal/{token}/demand-radar/data` + an Owner-Brief line. Tested (28).
-- [ ] **Cashflow / Haggle — DEFERRED (data not captured yet):** Cashflow needs a ₦ pipeline-value source (today it'd just restate the collectible headline); Haggle needs negotiation-detection in the reply path. Wiring now = redundant or fires on nothing.
+- [x] **Pipeline-value data source** — `services/deal_value.py` (currency-aware `parse_money` + `deal_value_for_contact`); HITL captures quoted prices onto contacts; `money_leak` now values leads for real (flat ₦50k retired), foreign quotes surfaced apart. Tested (25).
+- [x] **Cashflow** — `services/cashflow_brief.py` maps the real money-leak numbers onto the forecast core; `GET /portal/{token}/cashflow/data` + an Owner-Brief line, flag-gated. Tested (3).
+- [ ] **Haggle — DEFERRED (needs a structured pricing source):** negotiate() needs each product's list_price + floor_price + sweeteners, and inbound offer-detection. The BusinessBrief has freeform pricing rules, not structured per-product floors — so Haggle's real blocker is a pricing-rules data source, not the reply hook. Build that first.
 
 **R3 — Prod confidence**
 - [x] Deeper `/health` — db + scheduler liveness (running/jobs) + sentry + env; status stays keyed on db so the Railway healthcheck doesn't flap
