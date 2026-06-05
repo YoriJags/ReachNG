@@ -104,6 +104,13 @@ def handle_inbound_email(*, account_id: str, from_email: str,
         )
         log.info("email_inbound_drafted", client=cname, intent=intent)
 
+        # Radar spans channels: capture email demand too (flag-gated, non-blocking).
+        try:
+            from services.demand_intel import maybe_capture_demand
+            maybe_capture_demand(client, body, from_email)
+        except Exception:
+            pass
+
         # Identity: if the email carries a phone we already talk to on WhatsApp,
         # auto-link them as one customer; otherwise suggest the link for the owner.
         try:

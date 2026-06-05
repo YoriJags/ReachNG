@@ -552,6 +552,19 @@ async def reject_identity(token: str, link: IdentityLink):
     return {"ok": reject_link(client["name"], link.phone, link.email)}
 
 
+@router.get("/{token}/customer")
+async def get_customer_dossier(token: str, phone: str = "", email: str = ""):
+    """Unified customer dossier — one timeline across WhatsApp + email, resolved
+    via the identity links. Pass a phone or an email."""
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    if not (phone or email):
+        raise HTTPException(400, "pass a phone or an email")
+    from services.customer_dossier import dossier_for
+    return dossier_for(client["name"], phone=phone or None, email=email or None)
+
+
 @router.get("/{token}/revenue-rescue")
 async def get_revenue_rescue(token: str, days: int = 30):
     """'Find cash this week' — prioritised, de-duplicated follow-up targets
