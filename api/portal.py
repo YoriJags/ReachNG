@@ -495,6 +495,28 @@ async def get_demand_radar(token: str, days: int = 30):
     return {"client": name, "enabled": True, "days": days, "headlines": lines, **radar}
 
 
+@router.get("/{token}/cashflow/data")
+async def get_cashflow(token: str, days: int = 30):
+    """EYO Cashflow — this week's likely collections + what's stuck + who to nudge.
+
+    Flag-gated (off by default). Built from the real per-lead money-leak numbers,
+    clearly an estimate. Foreign quotes ride along separately, never in expected.
+    """
+    client = _get_client_by_token(token)
+    if not client:
+        raise HTTPException(404, "Portal not found or client inactive")
+    name = client["name"]
+    from services.eyo_flags import eyo_enabled
+    if not eyo_enabled(name, "cashflow"):
+        return {"client": name, "enabled": False}
+
+    from services.cashflow_brief import cashflow_for_client
+    from services.cashflow import cashflow_summary_text
+    forecast = cashflow_for_client(name, days=max(1, min(180, days)))
+    return {"client": name, "enabled": True,
+            "summary": cashflow_summary_text(forecast), **forecast}
+
+
 @router.get("/{token}/revenue-rescue")
 async def get_revenue_rescue(token: str, days: int = 30):
     """'Find cash this week' — prioritised, de-duplicated follow-up targets

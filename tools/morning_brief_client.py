@@ -272,6 +272,21 @@ def compile_client_brief(client_name: str, portal_url: str = "") -> str:
     except Exception:
         pass
 
+    # ── Cashflow (EYO invention #4) — this week's likely collections ──────
+    # Flag-gated + best-effort. Reuses the real money-leak numbers; labelled an
+    # estimate by the core summary. Only shows if there's something to forecast.
+    cashflow_line = ""
+    try:
+        from services.eyo_flags import eyo_enabled
+        if eyo_enabled(client_name, "cashflow"):
+            from services.cashflow_brief import cashflow_for_client
+            from services.cashflow import cashflow_summary_text
+            fc = cashflow_for_client(client_name, days=30)
+            if fc.get("expected_ngn") or fc.get("at_risk_ngn"):
+                cashflow_line = "\n\n💼 " + cashflow_summary_text(fc)
+    except Exception:
+        pass
+
     # ── Demand radar (EYO invention #3) — what the market kept asking for ──
     # Flag-gated + best-effort. Honest copy (no unverifiable "you have no price"
     # claim); only shows once 3+ people asked about the same thing this week.
@@ -297,7 +312,7 @@ def compile_client_brief(client_name: str, portal_url: str = "") -> str:
 
 {headline_block}{missed_section}
 
-{approval_line}{health_line}{radar_line}
+{approval_line}{health_line}{cashflow_line}{radar_line}
 
 _Overnight: {activity_recap}_{streak_line}
 _Powered by ReachNG — your AI sales engine_"""
