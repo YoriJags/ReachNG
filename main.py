@@ -9,10 +9,13 @@ from fastapi import FastAPI, Depends, Request
 from fastapi.responses import RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from tools.log_buffer import buffer_processor
+from tools.log_redact import redact_pii
 
-# Configure structlog to capture logs into the dashboard buffer
+# Configure structlog to capture logs into the dashboard buffer. redact_pii runs
+# FIRST so PII (phone/email) never reaches the dashboard buffer OR the console.
 structlog.configure(
     processors=[
+        redact_pii,
         structlog.stdlib.add_log_level,
         structlog.processors.TimeStamper(fmt="iso"),
         buffer_processor,
