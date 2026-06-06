@@ -33,15 +33,17 @@ def _client_for_account(account_id: str) -> Optional[dict]:
 def handle_inbound_email(*, account_id: str, from_email: str,
                          from_name: Optional[str] = None,
                          subject: Optional[str] = None,
-                         body: str = "") -> bool:
+                         body: str = "", client: Optional[dict] = None) -> bool:
     """Store the inbound email, draft a reply via the brain, queue it HITL.
 
-    Returns True if a draft was queued. Best-effort, never raises.
+    `client` may be passed directly (the IMAP poller already has the doc);
+    otherwise we resolve it by account_id (the Unipile path). Returns True if a
+    draft was queued. Best-effort, never raises.
     """
     try:
-        if not account_id or not from_email or not body:
+        if not from_email or not body:
             return False
-        client = _client_for_account(account_id)
+        client = client or _client_for_account(account_id)
         if not client:
             log.info("email_inbound_no_client", account_id=account_id)
             return False

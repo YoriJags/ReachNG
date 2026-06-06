@@ -265,14 +265,26 @@ async def _send_approved(draft: dict):
         elif channel == "email" and draft.get("email"):
             # Self-outreach campaigns (Client #0) need force_smtp=True so the
             # send routes through hello@reachng.ng via Resend rather than the
-            # client's connected Unipile mailbox. Detect by source.
+            # client's connected mailbox. Detect by source.
             _force = (draft.get("source") in ("closer", "maps", "byo_leads", "social", "signal"))
-            result = await send_email(
-                to_email=draft["email"],
-                subject=draft.get("subject", f"Quick question for {draft['contact_name']}"),
-                body=message,
-                force_smtp=_force,
-            )
+            cname = draft.get("client_name")
+            client_doc = {}
+            if cname:
+                from database import get_db
+                client_doc = get_db()["clients"].find_one(
+                    {"name": {"$regex": f"^{re.escape(cname)}$", "$options": "i"}}
+                ) or {}
+            subject = draft.get("subject", f"Quick question for {draft['contact_name']}")
+            # A client's own reply sends FROM their connected mailbox (IMAP/SMTP),
+            # not from ReachNG — closes the email loop. Falls back to Resend.
+            if not _force and client_doc.get("email_provider") == "imap":
+                from services.email_imap import send_email_via_client
+                ok = send_email_via_client(client_doc, to_email=draft["email"],
+                                           subject=subject, body=message)
+                result = {"success": ok, "provider": "client_smtp"}
+            else:
+                result = await send_email(to_email=draft["email"], subject=subject,
+                                          body=message, force_smtp=_force)
         else:
             log.warning("approved_draft_no_channel", draft_id=str(draft["_id"]))
             return

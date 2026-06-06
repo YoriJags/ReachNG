@@ -52,5 +52,8 @@ markdown>=3.5
 # Observability — error tracking (no-op until SENTRY_DSN is set)
 sentry-sdk[fastapi]>=2.0.0
 
+# Encryption at rest for per-client email (IMAP/SMTP) passwords
+cryptography>=42.0.0
+
 # Tests
 pytest>=8.0.0

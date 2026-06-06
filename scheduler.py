@@ -15,6 +15,7 @@ SDR outreach campaigns are run manually from the Control Tower dashboard.
 """
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 from tools.reply_router import process_replies
 from tools.brief import compile_morning_brief
 from tools.notifier import notify_owner
@@ -450,8 +451,28 @@ async def _outcome_weekly_distil():
         log.error("outcome_weekly_distil_crashed", error=str(e))
 
 
+async def _poll_email_inboxes():
+    """Poll every IMAP-provider client's mailbox for new customer emails. The
+    IMAP work is blocking, so run it off the event loop. Best-effort."""
+    try:
+        import asyncio
+        from services.email_imap import poll_all_email_inboxes
+        await asyncio.get_event_loop().run_in_executor(None, poll_all_email_inboxes)
+    except Exception as e:
+        log.warning("poll_email_inboxes_failed", error=str(e))
+
+
 def setup_scheduler():
     """Register all jobs and return configured scheduler."""
+
+    # Direct IMAP email polling — every 3 minutes, for clients on the imap
+    # provider (no-op when none are configured).
+    scheduler.add_job(
+        _poll_email_inboxes,
+        IntervalTrigger(minutes=3),
+        id="poll_email_inboxes", replace_existing=True, coalesce=True,
+        max_instances=1, misfire_grace_time=120,
+    )
 
     # Outcome learning — nightly silence sweep + weekly distil
     scheduler.add_job(

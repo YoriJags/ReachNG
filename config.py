@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     imap_host: str = Field(default="imap.gmail.com", env="IMAP_HOST")
     imap_port: int = Field(default=993, env="IMAP_PORT")
 
+    # Fernet key used to encrypt per-client email passwords at rest (direct
+    # IMAP/SMTP connect, no Unipile). When unset, the IMAP email feature refuses
+    # to store credentials rather than ever persisting a plaintext password.
+    email_cred_key: str | None = Field(default=None, env="EMAIL_CRED_KEY")
+
     # SDR email cadence: don't email the same business twice within N days,
     # even if it appears in overlapping campaigns. Protects sender reputation
     # and recipient inboxes. Override via env if you need a different window.

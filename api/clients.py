@@ -557,6 +557,33 @@ class PricingRule(BaseModel):
     max_rounds: int = Field(default=3, ge=1, le=10)
 
 
+class EmailCredentials(BaseModel):
+    imap_host: str
+    imap_port: int = 993
+    smtp_host: str
+    smtp_port: int = 465
+    username: str
+    password: str
+    use_ssl: bool = True
+
+
+@router.put("/{name}/email-credentials")
+async def put_client_email_credentials(name: str, creds: EmailCredentials):
+    """Connect a client's mailbox directly over IMAP/SMTP (no Unipile). The
+    password is encrypted at rest; refuses if EMAIL_CRED_KEY isn't configured."""
+    from services.email_creds import set_email_credentials, encryption_available
+    if not encryption_available():
+        raise HTTPException(503, "EMAIL_CRED_KEY not configured — cannot store an "
+                                  "email password without encryption")
+    ok = set_email_credentials(
+        name, imap_host=creds.imap_host, imap_port=creds.imap_port,
+        smtp_host=creds.smtp_host, smtp_port=creds.smtp_port,
+        username=creds.username, password=creds.password, use_ssl=creds.use_ssl)
+    if not ok:
+        raise HTTPException(404, f"Client '{name}' not found")
+    return {"success": True, "client": name, "provider": "imap", "username": creds.username}
+
+
 @router.get("/{name}/pricing")
 async def get_client_pricing(name: str):
     """List a client's product pricing rules (powers EYO Haggle)."""
