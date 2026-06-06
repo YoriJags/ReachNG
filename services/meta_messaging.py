@@ -81,7 +81,7 @@ async def send_message(account_id: str, page_access_token: str,
         async with httpx.AsyncClient(timeout=15.0) as c:
             resp = await c.post(
                 f"{_GRAPH}/{account_id}/messages",
-                params={"access_token": page_access_token},
+                headers={"Authorization": f"Bearer {page_access_token}"},
                 json={
                     "recipient": {"id": recipient_id},
                     "messaging_type": "RESPONSE",

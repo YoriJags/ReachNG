@@ -50,7 +50,11 @@ async def meta_receive(request: Request):
         body = {}
 
     from services.meta_inbound import handle_meta_message
-    for ev in parse_webhook(body):
+    events = parse_webhook(body)
+    if not events and body.get("entry"):
+        # Shape changed / unexpected — log object only (no PII) to learn it.
+        log.info("meta_webhook_unparsed", object=body.get("object"))
+    for ev in events:
         try:
             handle_meta_message(channel=ev["channel"], account_id=ev["account_id"],
                                 sender_id=ev["sender_id"], text=ev["text"])

@@ -359,6 +359,10 @@ async def unipile_email_webhook(request: Request):
         text = text.get("text") or text.get("plain") or ""
 
     if not (account_id and from_email and text):
+        # Log the SHAPE (keys only, no PII) so the first real Unipile email event
+        # reveals its structure and we can tighten the parser.
+        log.info("unipile_email_unparsed",
+                 keys=list(body.keys()) if isinstance(body, dict) else None)
         return JSONResponse({"ok": True, "ignored": "incomplete"})
 
     from services.email_inbound import handle_inbound_email

@@ -89,7 +89,7 @@ def _wire(monkeypatch, client, *, draft="Thanks for the DM!"):
     import services.inbound_classifier as ic
     monkeypatch.setattr(ic, "classify_inbound", lambda t: {"intent": "question"}, raising=False)
     import agent.brain as brain
-    monkeypatch.setattr(brain, "generate_auto_reply_draft", lambda **kw: draft)
+    monkeypatch.setattr(brain, "draft_inbound_reply", lambda **kw: draft)
     calls = []
     import tools.hitl
     monkeypatch.setattr(tools.hitl, "queue_draft", lambda **kw: calls.append(kw) or "id")

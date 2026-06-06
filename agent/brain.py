@@ -1091,6 +1091,71 @@ def generate_auto_reply_draft(
     return response.content[0].text.strip()
 
 
+_INBOUND_INTENT_INSTRUCTIONS = {
+    "interested":     "They're keen. Confirm warmly and move them one concrete step forward (a question, a next action).",
+    "question":       "Answer their question directly and helpfully. End with a soft next step.",
+    "price_question": "Give a helpful steer on price (a from-figure or 'depends on X') and invite the next step — don't dodge with only 'let's hop on a call'.",
+    "booked":         "Acknowledge the booking/commitment, confirm the next detail (deposit, time, address).",
+    "paid":           "Thank them for the payment and confirm what happens next.",
+    "complaint":      "Acknowledge the issue sincerely, take ownership, and offer to make it right. No excuses.",
+}
+
+
+def draft_inbound_reply(
+    *,
+    inbound_text: str,
+    business_name: str,
+    vertical: str,
+    intent: str,
+    channel: str = "whatsapp",
+    customer_name: Optional[str] = None,
+) -> str:
+    """Draft a reply to a CUSTOMER-INITIATED inbound message, shaped per channel.
+
+    Unlike generate_auto_reply_draft (built for the SDR flow where WE messaged
+    first), this frames the customer as the initiator and formats correctly per
+    channel: email gets a greeting + a short paragraph + a sign-off; WhatsApp /
+    Instagram / Messenger stay short and chatty. Returns the message body only
+    (email subject is handled by the caller).
+    """
+    instruction = _INBOUND_INTENT_INSTRUCTIONS.get(
+        intent, "Respond helpfully and professionally; move the conversation forward.")
+    who = f" The customer's name is {customer_name}." if customer_name else ""
+    is_email = (channel == "email")
+
+    if is_email:
+        fmt = (
+            "Write a brief, professional EMAIL reply. Open with a short greeting "
+            "(use the customer's name if known), one short paragraph that addresses "
+            "their message, then a warm sign-off ending with the business name "
+            f"('{business_name}'). Do NOT write a subject line. 60-110 words.")
+        max_tokens = 400
+    else:
+        fmt = (
+            f"Write a natural, human-sounding {channel} reply. Max 3 sentences, "
+            "chat style — no greeting line, no signature.")
+        max_tokens = 220
+
+    client = _get_client()
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=max_tokens,
+        messages=[{
+            "role": "user",
+            "content": (
+                f"A customer messaged a Lagos {vertical.replace('_', ' ')} business "
+                f"('{business_name}') on {channel}, starting the conversation.{who} "
+                f"You are drafting the business's reply in the owner's voice.\n\n"
+                f"Customer's message:\n\"{inbound_text}\"\n\n"
+                f"Detected intent: {intent}. {instruction}\n\n"
+                f"{fmt}\nWarm Nigerian-English business tone. "
+                f"Return ONLY the message text. No preamble."
+            ),
+        }],
+    )
+    return response.content[0].text.strip()
+
+
 def classify_for_autopilot(
     draft_message: str,
     inbound_context: Optional[str] = None,

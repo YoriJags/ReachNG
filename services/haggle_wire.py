@@ -78,12 +78,13 @@ async def maybe_haggle(client_doc: Optional[dict], body_text: str,
         move = negotiate(rules, customer_offer=offer, state=state)
         _save_state(cname, contact_phone, rules["product_key"], move["next_state"])
 
-        # OWNER-FIRST: on ANY haggle, ping the owner with EYO's suggestion and let
-        # them set the fair price / option. EYO only ever suggests — the owner
-        # stays in control of the number, and nothing reaches the customer until
-        # they approve (or edit) the draft below. Below-floor gets the firmer
-        # "stand firm or go lower?" prompt.
-        if client_doc.get("owner_phone"):
+        # OWNER-FIRST: ping the owner with EYO's suggestion so they set the fair
+        # price / option. To avoid spamming on every back-and-forth (they also see
+        # each draft in the queue), the proactive ping fires on the FIRST turn of a
+        # negotiation and on any below-floor ESCALATE. EYO only suggests — the
+        # owner owns the number; nothing reaches the customer until they approve.
+        _alert_owner = (move["action"] == ESCALATE) or (move.get("round") == 1)
+        if _alert_owner and client_doc.get("owner_phone"):
             try:
                 from tools.outreach import send_whatsapp_for_client
                 if move["action"] == ESCALATE:

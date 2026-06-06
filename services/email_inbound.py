@@ -73,16 +73,16 @@ def handle_inbound_email(*, account_id: str, from_email: str,
         except Exception as e:
             log.warning("email_classify_failed", error=str(e))
 
-        # Draft a reply in the owner's voice (brain already takes channel=).
+        # Draft a reply in the owner's voice — channel-shaped, inbound-framed.
         try:
-            from agent.brain import generate_auto_reply_draft
-            draft = generate_auto_reply_draft(
-                original_message="",
-                their_reply=body,
+            from agent.brain import draft_inbound_reply
+            draft = draft_inbound_reply(
+                inbound_text=body,
                 business_name=cname,
                 vertical=vertical,
                 intent=intent,
                 channel="email",
+                customer_name=from_name,
             )
         except Exception as e:
             log.warning("email_draft_failed", error=str(e))

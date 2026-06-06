@@ -60,10 +60,10 @@ def handle_meta_message(*, channel: str, account_id: str, sender_id: str,
             log.warning("meta_classify_failed", error=str(e))
 
         try:
-            from agent.brain import generate_auto_reply_draft
-            draft = generate_auto_reply_draft(
-                original_message="", their_reply=text, business_name=cname,
-                vertical=vertical, intent=intent, channel=channel)
+            from agent.brain import draft_inbound_reply
+            draft = draft_inbound_reply(
+                inbound_text=text, business_name=cname, vertical=vertical,
+                intent=intent, channel=channel)
         except Exception as e:
             log.warning("meta_draft_failed", error=str(e))
             return False
