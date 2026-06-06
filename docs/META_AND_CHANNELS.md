@@ -131,6 +131,30 @@ wedge. Don't let them block shipping.
 
 ---
 
+## 5b. Meta App setup — dev-mode pilot (step by step)
+
+Prerequisite: a **Facebook Page** + an **Instagram professional/business account
+linked to that Page** (both yours, for the pilot). And your Railway HTTPS URL.
+
+1. **Create the app** — developers.facebook.com/apps → **Create App**.
+   - If it asks a use case, pick **Other** → **Business** (so you can add both
+     Messenger + Instagram). Name it e.g. `ReachNG EYO`, your email. Business
+     portfolio can stay empty for dev testing.
+2. **Add products** — App dashboard → Add products → **Messenger** and **Instagram**.
+3. **Webhook** (Messenger → Settings → Webhooks; repeat for Instagram):
+   - Callback URL: `https://<your-railway-domain>/api/v1/webhooks/meta/messaging`
+   - Verify Token: the value you'll set as `WEBHOOK_VERIFY_TOKEN`
+   - Subscribe to fields: `messages`, `messaging_postbacks` (+ IG messaging).
+4. **Connect your test Page + IG**, generate a **Page access token**, note the
+   **Page ID** and **IG account ID**. Add yourself as a **Tester** (Roles).
+5. **Railway env**: `META_APP_SECRET` (App Settings → Basic), `WEBHOOK_VERIFY_TOKEN`
+   (same string as step 3), and `META_MESSAGING_ENABLED=true`, plus `EMAIL_CRED_KEY`
+   (a Fernet key — encrypts the Page token at rest).
+6. **Register the client in EYO**:
+   `PUT /api/v1/clients/{name}/meta-messaging` with `{page_id, page_token, ig_id}`.
+7. **Test**: DM the IG/Page from another account → EYO drafts a reply in the
+   approvals queue. No CAC / no App Review needed for tester accounts.
+
 ## 6. Action checklist
 
 - [ ] (Background) Start **CAC registration** for ReachNG — unblocks everything Meta.
