@@ -285,6 +285,19 @@ async def _send_approved(draft: dict):
             else:
                 result = await send_email(to_email=draft["email"], subject=subject,
                                           body=message, force_smtp=_force)
+        elif channel in ("instagram", "messenger") and draft.get("contact_id"):
+            # Reply to an IG/Messenger DM from the client's own Page/IG.
+            cname = draft.get("client_name")
+            client_doc = {}
+            if cname:
+                from database import get_db
+                client_doc = get_db()["clients"].find_one(
+                    {"name": {"$regex": f"^{re.escape(cname)}$", "$options": "i"}}
+                ) or {}
+            from services.meta_messaging import send_message_for_client
+            ok = await send_message_for_client(
+                client_doc, channel, recipient_id=str(draft["contact_id"]), text=message)
+            result = {"success": ok, "provider": "meta"}
         else:
             log.warning("approved_draft_no_channel", draft_id=str(draft["_id"]))
             return

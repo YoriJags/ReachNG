@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     meta_phone_number_id: str | None = Field(default=None, env="META_PHONE_NUMBER_ID")
     meta_access_token: str | None = Field(default=None, env="META_ACCESS_TOKEN")
 
+    # Meta Instagram + Messenger channel — DORMANT by default. The webhook is
+    # signature-verified but inert until this is on, so the adapter ships safely
+    # and pilots in Dev Mode without touching anything live.
+    meta_messaging_enabled: bool = Field(default=False, env="META_MESSAGING_ENABLED")
+
     # Resend — transactional email API (HTTPS, no SMTP egress required)
     resend_api_key: str | None = Field(default=None, env="RESEND_API_KEY")
     resend_from_email: str = Field(default="EYO from ReachNG <hello@reachng.ng>", env="RESEND_FROM_EMAIL")

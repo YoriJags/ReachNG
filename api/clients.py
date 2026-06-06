@@ -557,6 +557,33 @@ class PricingRule(BaseModel):
     max_rounds: int = Field(default=3, ge=1, le=10)
 
 
+class MetaMessagingConfig(BaseModel):
+    page_id: str
+    page_token: str
+    ig_id: Optional[str] = None
+
+
+@router.put("/{name}/meta-messaging")
+async def put_client_meta_messaging(name: str, cfg: MetaMessagingConfig):
+    """Connect a client's Facebook Page + Instagram for EYO DM handling. The Page
+    access token is encrypted at rest. Requires EMAIL_CRED_KEY (shared secret key)."""
+    from services.crypto import encrypt, available
+    if not available():
+        raise HTTPException(503, "EMAIL_CRED_KEY not configured — cannot store the "
+                                  "Page token without encryption")
+    enc = encrypt(cfg.page_token)
+    if not enc:
+        raise HTTPException(500, "failed to encrypt token")
+    result = get_clients().update_one(
+        {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}},
+        {"$set": {"meta_page_id": cfg.page_id, "meta_ig_id": cfg.ig_id,
+                  "meta_page_token_enc": enc, "updated_at": datetime.now(timezone.utc)}},
+    )
+    if result.matched_count == 0:
+        raise HTTPException(404, f"Client '{name}' not found")
+    return {"success": True, "client": name, "page_id": cfg.page_id, "ig_id": cfg.ig_id}
+
+
 class EmailCredentials(BaseModel):
     imap_host: str
     imap_port: int = 993

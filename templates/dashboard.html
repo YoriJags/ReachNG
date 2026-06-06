@@ -1897,6 +1897,9 @@ function copyDemoPortalLink(btn){
   <!-- Phase D: section sub-nav under active suite — replaces top tab strip -->
   <div class="sidebar-section" id="sidebar-outreach-sections">
     <!-- 8-tab command tower (DASHBOARD_IA.md), workflow order -->
+    <div class="sidebar-section-item" id="ssn-welcome" onclick="sidebarNav('welcome', this)">
+      <span class="ssi-left"><span class="material-symbols-outlined">waving_hand</span> Welcome</span>
+    </div>
     <div class="sidebar-section-item active" id="ssn-overview"  onclick="sidebarNav('overview', this); loadNeedsAttention();">
       <span class="ssi-left"><span class="material-symbols-outlined">dashboard</span> Command Center</span>
       <span class="tab-badge" id="tab-badge-attention-side"></span>
@@ -2028,6 +2031,24 @@ function copyDemoPortalLink(btn){
 
 <!-- ── FleetOS Tab Nav (Dispatcher + Fuel Reprice + Float Optimizer) ── -->
 
+
+<!-- ── Welcome ────────────────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-welcome">
+  <p class="tab-intro-title">Welcome — onboard a client in ~15 minutes</p>
+  <p class="tab-intro-sub">The plug-and-play starter flow to get EYO live for a new client.</p>
+  <div class="card">
+    <ol style="margin:0;padding-left:20px;line-height:1.95;font-size:13.5px;color:var(--text-strong);">
+      <li><b>Create the client</b> — Clients tab → Add client (name, owner WhatsApp, vertical). Generates a portal token + link.</li>
+      <li><b>Send the portal link</b> — it's a PWA; the owner can install it to their home screen.</li>
+      <li><b>Connect channels</b> in the portal — WhatsApp (QR, ~30s) + email (IMAP app-password or Unipile). IG / Facebook once enabled.</li>
+      <li><b>Set the Business Brief</b> — tone, never-say words, pricing rules, and <b>products + floor prices</b> (powers Haggle).</li>
+      <li><b>Import their book</b> <span style="color:var(--text-mid);">(optional)</span> — vCard / CSV / paste, so EYO works existing contacts day one.</li>
+      <li><b>Flip on inventions</b> per client — start conservative: <b>Shield + Referral</b>, then Radar / Cashflow / Haggle.</li>
+      <li><b>Live</b> — every inbound → EYO drafts in their voice → owner approves → sends from their own number / mailbox. 7am owner brief daily.</li>
+    </ol>
+  </div>
+  <p class="tab-intro-sub" style="margin-top:12px;">The portal wizard <code>/portal/{token}/onboard</code> walks the client through steps 3–5.</p>
+</div>
 
 <!-- ── Overview ───────────────────────────────────────────────────────────────── -->
 <div class="tab-panel active" id="tab-overview">
