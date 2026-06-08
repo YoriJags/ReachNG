@@ -335,6 +335,7 @@ from api.waitlist import router as waitlist_router
 from api.waitlist_admin import router as waitlist_admin_router
 from api.copilot import router as copilot_router
 from api.billing import router as billing_router
+from api.traction import router as traction_router
 from api.pipeline import router as pipeline_router
 from api.whatsapp_connect import router as whatsapp_connect_router
 from api.onboarding import router as onboarding_router
@@ -355,6 +356,7 @@ app.include_router(waitlist_router)
 app.include_router(waitlist_admin_router)
 app.include_router(copilot_router)
 app.include_router(billing_router)
+app.include_router(traction_router)
 app.include_router(agent_learning_router, prefix="/api/v1")
 app.include_router(prospect_interviews_router)
 app.include_router(self_outreach_router)

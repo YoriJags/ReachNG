@@ -73,6 +73,15 @@ class IntakePayload(BaseModel):
     save: bool = Field(default=False, description="If true, also write the structured draft to the client doc")
 
 
+class DraftBriefPayload(BaseModel):
+    """Stateless brief draft — runs BEFORE a client record exists, so the
+    operator can compose the brief inside the Add-Client form instead of
+    hand-writing it (or going to a chat). No persistence; pure draft."""
+    vertical: str = "general"
+    url: Optional[str] = None
+    free_text: Optional[str] = None
+
+
 # ─── Admin: vertical primers ─────────────────────────────────────────────────
 
 @router.get("/primers")
@@ -161,6 +170,22 @@ async def admin_intake(name: str, payload: IntakePayload):
     if payload.save:
         brief = BusinessBrief(**{k: v for k, v in result["brief"].items() if k in BusinessBrief.model_fields})
         update_brief(brief=brief, client_name=name)
+    return result
+
+
+@router.post("/draft")
+async def admin_draft_brief(payload: DraftBriefPayload):
+    """Draft a structured brief from raw owner notes (+ optional website URL),
+    WITHOUT needing a client record yet. Powers the 'Draft with AI' button in
+    the Add-Client form: paste what you know → get a clean brief to review and
+    save. Never persists — the operator saves it via Create Client."""
+    if not (payload.url or (payload.free_text and payload.free_text.strip())):
+        raise HTTPException(400, "Provide a website URL or some notes to draft from.")
+    result = await assist_intake(
+        vertical=payload.vertical or "general",
+        url=payload.url,
+        free_text=payload.free_text,
+    )
     return result
 
 

@@ -2034,20 +2034,72 @@ function copyDemoPortalLink(btn){
 
 <!-- ── Welcome ────────────────────────────────────────────────────────────────── -->
 <div class="tab-panel" id="tab-welcome">
-  <p class="tab-intro-title">Welcome — onboard a client in ~15 minutes</p>
-  <p class="tab-intro-sub">The plug-and-play starter flow to get EYO live for a new client.</p>
-  <div class="card">
-    <ol style="margin:0;padding-left:20px;line-height:1.95;font-size:13.5px;color:var(--text-strong);">
-      <li><b>Create the client</b> — Clients tab → Add client (name, owner WhatsApp, vertical). Generates a portal token + link.</li>
-      <li><b>Send the portal link</b> — it's a PWA; the owner can install it to their home screen.</li>
-      <li><b>Connect channels</b> in the portal — WhatsApp (QR, ~30s) + email (IMAP app-password or Unipile). IG / Facebook once enabled.</li>
-      <li><b>Set the Business Brief</b> — tone, never-say words, pricing rules, and <b>products + floor prices</b> (powers Haggle).</li>
-      <li><b>Import their book</b> <span style="color:var(--text-mid);">(optional)</span> — vCard / CSV / paste, so EYO works existing contacts day one.</li>
-      <li><b>Flip on inventions</b> per client — start conservative: <b>Shield + Referral</b>, then Radar / Cashflow / Haggle.</li>
-      <li><b>Live</b> — every inbound → EYO drafts in their voice → owner approves → sends from their own number / mailbox. 7am owner brief daily.</li>
-    </ol>
+  <p class="tab-intro-title">Welcome — bring a client live (WhatsApp + email)</p>
+  <p class="tab-intro-sub">The plug-and-play runbook. You do steps 1–2; the owner self-serves 3–4 from their portal link; you flip inventions in step 5.</p>
+
+  <!-- The 5-step runbook -->
+  <div class="card" style="border-left:3px solid var(--green);">
+    <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px;">5 steps to live</div>
+
+    <div style="display:flex;gap:12px;margin-bottom:14px;">
+      <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;">1</div>
+      <div style="font-size:13px;color:var(--text-strong);line-height:1.6;">
+        <b>Create the client.</b> Clients tab → Add client. Set name, vertical (Real Estate), <b>brief</b> (2–3 lines in the owner's voice — EYO drafts <i>as</i> this), agent name, plan (Solo ₦60k / Team ₦120k / Empire ₦250k). Channel <b>WhatsApp</b>, provider <b>Unipile</b>.
+        <div style="font-size:11px;color:var(--text-mid);margin-top:3px;">API: <code>PUT /api/v1/clients/{name}</code> (upsert)</div>
+        <div class="ob-step-action" onclick="switchTabByName('clients')" style="margin-top:4px;">Go to Clients →</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-bottom:14px;">
+      <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;">2</div>
+      <div style="font-size:13px;color:var(--text-strong);line-height:1.6;">
+        <b>Generate &amp; send the portal link.</b> One link the owner uses for everything. It's a PWA — they can install it to their home screen.
+        <div style="font-size:11px;color:var(--text-mid);margin-top:3px;">API: <code>POST /api/v1/portal/generate/{client_name}</code> → <code>https://reachng-production.up.railway.app/portal/{token}</code></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-bottom:14px;">
+      <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:#2563eb;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;">3</div>
+      <div style="font-size:13px;color:var(--text-strong);line-height:1.6;">
+        <b>Owner connects WhatsApp</b> <span style="color:var(--text-mid);font-size:11px;">(they do this, ~30s)</span>. Portal → Connect WhatsApp → scan QR with their phone. Their number, their conversations — nothing from your side.
+        <div style="font-size:11px;color:var(--text-mid);margin-top:3px;">Portal page: <code>/portal/{token}/connect-whatsapp</code></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-bottom:14px;">
+      <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:#2563eb;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;">4</div>
+      <div style="font-size:13px;color:var(--text-strong);line-height:1.6;">
+        <b>Owner connects email</b> <span style="color:var(--text-mid);font-size:11px;">(optional, same portal)</span>. Unipile hosted-auth (Gmail/Outlook), or direct IMAP/SMTP (any mailbox, app-password). Poller reads inbound every 3 min; approved replies send from <i>their</i> mailbox.
+        <div style="font-size:11px;color:var(--text-mid);margin-top:3px;">API: <code>PUT /api/v1/clients/{name}/email-credentials</code> · needs <code>EMAIL_CRED_KEY</code> set on Railway</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;">
+      <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:#7c3aed;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;">5</div>
+      <div style="font-size:13px;color:var(--text-strong);line-height:1.6;">
+        <b>Flip on inventions</b> per client — off by default, fail-safe. Start conservative, add as they trust it:
+        <div style="margin-top:6px;font-size:12px;">
+          <span style="display:inline-block;background:var(--green);color:#fff;border-radius:4px;padding:1px 7px;margin:2px;">Shield</span>
+          <span style="display:inline-block;background:var(--green);color:#fff;border-radius:4px;padding:1px 7px;margin:2px;">Referral</span>
+          <span style="color:var(--text-mid);">→ then →</span>
+          <span style="display:inline-block;background:#2563eb;color:#fff;border-radius:4px;padding:1px 7px;margin:2px;">Radar</span>
+          <span style="display:inline-block;background:#2563eb;color:#fff;border-radius:4px;padding:1px 7px;margin:2px;">Cashflow</span>
+          <span style="display:inline-block;background:#7c3aed;color:#fff;border-radius:4px;padding:1px 7px;margin:2px;">Haggle</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-mid);margin-top:5px;">API: <code>PUT /api/v1/clients/{name}/eyo-flag</code> per feature. <b>Haggle</b> needs pricing first (<code>PUT /api/v1/clients/{name}/pricing</code> — list/floor) and is <b>owner-first</b>: EYO alerts the owner with the fair price before drafting to the customer.</div>
+      </div>
+    </div>
   </div>
-  <p class="tab-intro-sub" style="margin-top:12px;">The portal wizard <code>/portal/{token}/onboard</code> walks the client through steps 3–5.</p>
+
+  <!-- What happens once live -->
+  <div class="card" style="margin-top:12px;">
+    <div style="font-size:12px;font-weight:700;color:var(--text-strong);margin-bottom:6px;">Then it runs itself (HITL)</div>
+    <p style="margin:0;font-size:13px;color:var(--text-mid);line-height:1.7;">
+      Every inbound → EYO drafts a reply <b>in the owner's voice</b> → owner taps <b>Approve</b> in the portal → it sends from their own number / mailbox. <b>Nothing leaves without a tap.</b> The 7am owner brief and Money-Leak / Cashflow surfaces light up as signal accumulates.
+    </p>
+  </div>
+
+  <p class="tab-intro-sub" style="margin-top:12px;">The portal wizard <code>/portal/{token}/onboard</code> walks the client through steps 3–4. IG / Facebook (Meta) is a later, CAC-gated expansion — the wedge needs none of it.</p>
 </div>
 
 <!-- ── Overview ───────────────────────────────────────────────────────────────── -->
@@ -2126,6 +2178,29 @@ function copyDemoPortalLink(btn){
       <div class="kpi-label">Replies Received</div>
       <div class="kpi-value" id="kpi-replied">—</div>
       <div class="kpi-foot"><span class="material-symbols-outlined icon-sm">mark_chat_read</span> all-time inbound</div>
+    </div>
+  </section>
+
+  <!-- Traction — North Star scoreboard (docs/NORTH_STAR.md). The fundraising /
+       acquisition numbers, computed from data EYO already collects. -->
+  <section class="card" id="traction-card" style="margin-bottom:18px;border-left:3px solid #00e5a0;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+      <span style="font-size:12px;font-weight:700;color:#00e5a0;text-transform:uppercase;letter-spacing:.5px;">Traction — North Star</span>
+      <span style="font-size:11px;color:var(--text-mid);">the numbers an acquirer / investor asks for · last 30 days</span>
+      <span style="flex:1;"></span>
+      <span style="font-size:10px;color:var(--text-lo);" id="traction-stamp">—</span>
+    </div>
+    <div class="summary-bar" id="traction-grid">
+      <div class="stat-card green"><div class="label">₦ Recovered <span style="opacity:.6;">(est)</span></div><div class="value" id="tr-recovered">—</div></div>
+      <div class="stat-card blue"><div class="label">Active Clients</div><div class="value" id="tr-clients">—</div></div>
+      <div class="stat-card amber"><div class="label">30-Day Retention</div><div class="value" id="tr-retention">—</div></div>
+      <div class="stat-card fire"><div class="label">Messages Handled</div><div class="value" id="tr-messages">—</div></div>
+    </div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--text-mid);">
+      <span>Win rate: <b id="tr-winrate" style="color:var(--text-strong);">—</b></span>
+      <span>Drafts approved: <b id="tr-approved" style="color:var(--text-strong);">—</b></span>
+      <span>Channel mix: <b id="tr-mix" style="color:var(--text-strong);">—</b></span>
+      <span style="color:var(--text-lo);" id="tr-basis"></span>
     </div>
   </section>
 
@@ -3630,9 +3705,15 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
       <input id="ob-meta-token" placeholder="Meta System User Access Token (permanent)" style="flex:1;" />
     </div>
     <p class="form-hint" id="ob-provider-hint">Quick Connect (QR): fastest setup. Connects through the client's WhatsApp QR session. Protected by warm-up, caps, and human approval.</p>
-    <div class="row" style="margin-top:8px;">
+    <div class="row" style="margin-top:8px;align-items:center;gap:8px;flex-wrap:wrap;">
+      <input id="ob-brief-url" placeholder="Their website / IG link (optional — EYO reads it)" style="flex:1;min-width:200px;" />
+      <button class="btn" id="ob-draft-btn" onclick="draftBriefAI()" style="background:#1a1030;border:1px solid #4c2a8a;color:#c9a8ff;white-space:nowrap;">✨ Draft with AI</button>
+    </div>
+    <p class="form-hint" style="margin-top:2px;">Paste a few raw facts below (or a link above), tap <b>Draft with AI</b>, and EYO writes the brief in the owner's voice. Review, tweak, then save. No need to leave the dashboard.</p>
+    <div class="row" style="margin-top:6px;">
       <textarea id="ob-brief" placeholder="Who is this client? What do they sell? What tone? Who is their target customer?&#10;&#10;Example: Altitude Lagos is a luxury property agency on Victoria Island. Tone: professional, warm. Target: HNI buyers, diaspora investors."></textarea>
     </div>
+    <div id="ob-draft-result" style="margin-top:6px;display:none;"></div>
     <button class="btn btn-approve" id="ob-create-btn" onclick="createClient()" style="margin-top:4px;">Save Client</button>
     <div id="ob-create-result" style="margin-top:10px;display:none;"></div>
 
@@ -6746,6 +6827,7 @@ async function refresh() {
     setHero("kpi-replied",   fmt(all.replied));
     // hot/drafts/threads are populated by loadKpiHeroOperator() below — async copilot fetch
     if (typeof loadKpiHeroOperator === "function") loadKpiHeroOperator();
+    if (typeof loadTraction === "function") loadTraction();
 
     // Source attribution pills
     const bySource   = all.by_source   || {};
@@ -6980,6 +7062,66 @@ document.querySelectorAll('input[name="ob-wa-provider"]').forEach(radio => {
 });
 
 // ── Client Onboarding ─────────────────────────────────────────────────────────
+
+async function loadTraction() {
+  try {
+    const d = await fetch("/api/v1/admin/traction", { credentials: "include" }).then(r => r.json());
+    const h = d.headline || {}, c = d.clients || {}, o = d.outcomes || {}, m = d.messages || {};
+    const ngn = (n) => "₦" + (Number(n) || 0).toLocaleString();
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    set("tr-recovered", ngn(h.est_value_recovered_ngn));
+    set("tr-clients", c.active != null ? c.active : "—");
+    set("tr-retention", c.retention_30d_pct != null ? c.retention_30d_pct + "%" : "—");
+    set("tr-messages", (m.total != null ? m.total : 0).toLocaleString());
+    set("tr-winrate", o.win_rate_pct != null ? o.win_rate_pct + "% (" + o.wins + "/" + o.resolved + ")" : "—");
+    set("tr-approved", (m.approved != null ? m.approved : 0).toLocaleString());
+    const mix = m.channel_mix || {};
+    set("tr-mix", Object.keys(mix).length ? Object.entries(mix).map(([k, v]) => `${k} ${v}`).join(" · ") : "—");
+    set("tr-basis", h.est_value_basis || "");
+    if (d.generated_at) set("traction-stamp", "updated " + new Date(d.generated_at).toLocaleTimeString());
+  } catch (e) { /* panel stays as — ; never blocks the dashboard */ }
+}
+
+async function draftBriefAI() {
+  const btn   = document.getElementById("ob-draft-btn");
+  const url   = document.getElementById("ob-brief-url").value.trim();
+  const notes = document.getElementById("ob-brief").value.trim();
+  const vertical = document.getElementById("ob-vertical").value;
+  const res   = document.getElementById("ob-draft-result");
+
+  if (!url && !notes) {
+    res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Add a website link or a few notes for EYO to draft from.</div>`;
+    res.style.display = "block"; return;
+  }
+
+  btn.textContent = "Drafting…"; btn.disabled = true;
+  try {
+    const data = await postJSON("/api/v1/admin/brief/draft", {
+      vertical, url: url || null, free_text: notes || null,
+    });
+    const b = data.brief || {};
+    // Compose a clean, human-readable brief from the structured draft and
+    // drop it into the textarea for review. The operator owns the final text.
+    const lines = [];
+    if (b.one_liner)  lines.push(b.one_liner);
+    if (b.tone_overrides && Object.keys(b.tone_overrides).length)
+      lines.push("Tone: " + Object.entries(b.tone_overrides).map(([k,v]) => `${k} ${v}`).join(", "));
+    if (Array.isArray(b.never_say) && b.never_say.length)
+      lines.push("Never say: " + b.never_say.join("; "));
+    if (b.signature) lines.push("Signs as: " + b.signature);
+    const composed = lines.filter(Boolean).join("\n");
+    if (composed) document.getElementById("ob-brief").value = composed;
+
+    const warn = (data.warnings || []).length
+      ? `<div style="color:#e0a000;font-size:11px;margin-top:4px;">${data.warnings.join(" · ")}</div>` : "";
+    res.innerHTML = `<div style="color:#00e5a0;font-size:12px;">✨ Draft ready — review the brief above, edit anything, then Save Client.</div>${warn}`;
+  } catch (err) {
+    res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Couldn't draft: ${err.message}</div>`;
+  } finally {
+    res.style.display = "block";
+    btn.textContent = "✨ Draft with AI"; btn.disabled = false;
+  }
+}
 
 async function createClient() {
   const btn      = document.getElementById("ob-create-btn");
