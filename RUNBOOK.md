@@ -132,11 +132,32 @@ mention their category/city; never mention Maps/scraping. Position EYO as a
 trainable AI employee for WhatsApp that replies faster, catches payment/customer
 signals, and briefs the owner daily — every reply waits for the owner's tap.
 
+### Email strategy — v2 SHARP MODE (prompt: `agent/prompts/reachng_outreach.txt`)
+
+**Strictly email**, founder-voiced. (WhatsApp is for the *client-facing* EYO
+product, never for ReachNG's own prospecting.) Core rules:
+
+- **One idea per email.** Exactly ONE vertically-matched capability, rendered as a
+  concrete moment. No second capability, no "it does more" breadth line — lists
+  read as templated.
+- **3-touch sequence** (caller passes `touch`; defaults to 1):
+  - **TOUCH 1** — Introduction, 60-90 words, one capability, soft ask.
+  - **TOUCH 2** — ~3 days later, 40-70 words, a *different* capability (pass
+    `prev_capability` so it won't repeat T1). Meta-bridge line is optional here only.
+  - **TOUCH 3** — ~8 days after T1, 25-45 words, no pitch, an easy one-word-reply exit.
+- **Real estate is the priority vertical** (deepest product / strongest demo).
+  Weight targeting toward Lagos RE until the first 1-2 paying RE clients land;
+  keep the other vertical rows for later.
+
+> **Pending wiring:** the senders currently fire **TOUCH 1 only**. The touch 2/3
+> drip (3-day / 8-day cadence) + **stop-on-reply** is the next build — until then
+> the sequence model is callable but not yet scheduled.
+
 ### 1. Dry-run discovery (safe, nothing sends)
 Dashboard → **Growth · Prospect OS → Run Campaign**:
 - Vertical: **⭐ ReachNG Pre-launch (Premium SMEs · founder voice)**
 - City: Lagos or Abuja · keep **Dry run** ticked · **Review before send** is forced on
-- Run. You'll see drafted emails + each lead's variant (A/B/C), rating, review count, verdict.
+- Run. You'll see drafted emails + each lead's variant (A/B/C/D), rating, review count, verdict.
 
 Or via API (admin Basic Auth):
 ```
@@ -149,7 +170,7 @@ POST /api/v1/campaigns/run
 ### 2. Queue real drafts for review (still no auto-send)
 Same control, untick **Dry run** but leave **Review before send** on (forced for this
 vertical). Drafts land in **Approvals** — nothing leaves until you approve. Each
-contact is recorded with its A/B/C angle at queue time.
+contact is recorded with its A/B/C/D angle at queue time.
 
 ### 3. Review + send approved messages
 **Approvals** tab → read each draft → Approve (sends) / Edit / Skip. Edits feed the
@@ -157,12 +178,13 @@ learning loop. Sending is capped by `DAILY_SEND_LIMIT` (default 50/day).
 
 ### 4. Check results
 - **Growth → Outreach Analytics** — opens / clicks / waitlist conversions (Resend + `/hi/{slug}`).
-- A/B/C reply rates: `GET /api/v1/ab/stats?vertical=b2b_saas` (winner across the 3 angles).
+- A/B/C/D reply rates: `GET /api/v1/ab/stats?vertical=b2b_saas` (winner across the 4 angles).
 
-### Variants (A/B/C, auto-assigned per contact)
-- **A · Founder/direct** — early-access invitation from the founder.
+### Variants (A/B/C/D, auto-assigned per contact)
+- **A · Founder/direct** — lead with the product, pitched as a real product that runs today.
 - **B · Money-leak** — money dying in WhatsApp chats (missed enquiries, unpaid follow-ups).
 - **C · Owner-relief** — EYO watches WhatsApp, drafts in your voice, daily brief.
+- **D · Founder/exclusivity** — hand-building for a small first cohort; curation is the hook.
 
 ### Lead scoring (who gets contacted)
 `tools/lead_scorer.py` ranks Hot/Warm/Cold. Premium signals: rating ≥ 4.3, reviews
