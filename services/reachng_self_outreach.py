@@ -70,7 +70,7 @@ _STYLE_DIRECTIVES: dict[str, str] = {
         "VARIANT ANGLE: MONEY-LEAK.\n"
         "Lead with money quietly dying in WhatsApp chats: missed price enquiries, "
         "unpaid follow-ups, slow replies, unconfirmed transfer receipts. Frame the "
-        "two capabilities you pick around catching those leaks. Do NOT invent "
+        "ONE capability you pick around catching those leaks. Do NOT invent "
         "figures or promise recovered revenue, and do NOT call it a beta, an early "
         "version, or a test. Seed tone (rewrite, don't copy): \"I'm Yori, founder "
         "of ReachNG. EYO helps businesses spot money dying in WhatsApp chats, "
@@ -124,8 +124,10 @@ def _build_user_block(*, business_name: str, vertical: str,
                        address: Optional[str], category: Optional[str],
                        rating: Optional[float], reviews_excerpt: Optional[str],
                        contact_name: Optional[str], contact_title: Optional[str],
-                       website: Optional[str]) -> str:
+                       website: Optional[str],
+                       touch: int = 1, prev_capability: Optional[str] = None) -> str:
     lines = [
+        f"TOUCH: {touch}",
         f"Business: {business_name}",
         f"Vertical (internal label): {vertical}",
     ]
@@ -141,8 +143,12 @@ def _build_user_block(*, business_name: str, vertical: str,
         lines.append(f"Recent review excerpt: \"{reviews_excerpt[:200]}\"")
     if website:
         lines.append(f"Website: {website}")
+    # Touch 2/3 must not reuse touch 1's capability — feed the prior one back so
+    # the model picks a fresh angle (the system prompt's sequence rule).
+    if touch >= 2 and prev_capability:
+        lines.append(f"Capability already used in touch 1 (do NOT repeat it): {prev_capability}")
     lines.append("")
-    lines.append("Draft the cold-outreach email per the system rules. "
+    lines.append(f"Draft TOUCH {touch} per the system rules and its word count. "
                   "Return ONLY the JSON object — no preamble, no fences.")
     return "\n".join(lines)
 
@@ -159,12 +165,18 @@ def draft_outreach_email(
     contact_title: Optional[str] = None,
     website: Optional[str] = None,
     variant: Optional[str] = None,
+    touch: int = 1,
+    prev_capability: Optional[str] = None,
 ) -> dict:
     """
-    Returns {"subject": str, "message": str} for the cold first-touch email.
+    Returns {"subject": str, "message": str} for a cold outreach email.
 
-    `variant` (A/B/C) selects the angle the email leads with (see VARIANT_STYLES);
-    None falls back to the neutral founder intro. Throws if the model produces
+    `variant` (A/B/C/D) selects the angle the email leads with (see
+    VARIANT_STYLES); None falls back to the neutral founder intro.
+    `touch` (1/2/3) selects which email in the sequence to draft — intro,
+    new-angle, or close-the-loop (see the SEQUENCE MODEL in the system prompt);
+    defaults to 1. For touch 2+, pass `prev_capability` (the capability touch 1
+    used) so the model picks a different one. Throws if the model produces
     unparseable output — the caller should skip this prospect and log, never
     send the broken draft.
     """
@@ -179,7 +191,7 @@ def draft_outreach_email(
         address=address, category=category, rating=rating,
         reviews_excerpt=reviews_excerpt,
         contact_name=contact_name, contact_title=contact_title,
-        website=website,
+        website=website, touch=touch, prev_capability=prev_capability,
     )
     directive = _style_directive(variant)
     if directive:
