@@ -462,6 +462,18 @@ async def _poll_email_inboxes():
         log.warning("poll_email_inboxes_failed", error=str(e))
 
 
+async def _poll_outreach_replies():
+    """Stop-on-reply for the self-outreach drip — poll the cold-email reply
+    mailbox and cancel remaining touches for anyone who replied. No-op unless
+    OUTREACH_IMAP_* is configured. Blocking IMAP runs off the event loop."""
+    try:
+        import asyncio
+        from services.outreach_reply_poll import poll_outreach_replies
+        await asyncio.get_event_loop().run_in_executor(None, poll_outreach_replies)
+    except Exception as e:
+        log.warning("poll_outreach_replies_failed", error=str(e))
+
+
 def setup_scheduler():
     """Register all jobs and return configured scheduler."""
 
@@ -472,6 +484,15 @@ def setup_scheduler():
         IntervalTrigger(minutes=3),
         id="poll_email_inboxes", replace_existing=True, coalesce=True,
         max_instances=1, misfire_grace_time=120,
+    )
+
+    # Stop-on-reply for the self-outreach drip — every 10 minutes (no-op until
+    # OUTREACH_IMAP_* creds are set).
+    scheduler.add_job(
+        _poll_outreach_replies,
+        IntervalTrigger(minutes=10),
+        id="poll_outreach_replies", replace_existing=True, coalesce=True,
+        max_instances=1, misfire_grace_time=300,
     )
 
     # Outcome learning — nightly silence sweep + weekly distil

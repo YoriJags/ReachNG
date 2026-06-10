@@ -335,6 +335,9 @@ async def _send_approved(draft: dict):
                 to_phone=draft.get("phone"),
                 provider_message_id=result.get("message_id") or result.get("id"),
                 outreach_slug=outreach_slug,
+                # Self-outreach (b2b_saas) follows the v2 drip cadence: touch 2
+                # ~3 days after this first touch.
+                followup_in_days=3 if draft.get("vertical") == "b2b_saas" else None,
             )
             log_roi_event(
                 contact_name=draft["contact_name"],

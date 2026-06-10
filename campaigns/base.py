@@ -510,6 +510,7 @@ class BaseCampaign:
                 place_id=biz["place_id"],
                 name=biz["name"],
                 vertical=self.vertical,
+                biz_vertical=biz.get("vertical"),
                 phone=biz.get("phone"),
                 email=biz.get("email"),
                 address=biz.get("address"),
@@ -622,6 +623,9 @@ class BaseCampaign:
                 channel=channel,
                 message=message_text,
                 attempt_number=1,
+                # Self-outreach drips on the v2 cadence (~3d to touch 2);
+                # other campaigns keep the default 48h follow-up window.
+                followup_in_days=3 if self.vertical == "b2b_saas" else None,
             )
             record_ab_send(
                 contact_id=contact_id,
@@ -705,26 +709,52 @@ class BaseCampaign:
                 break
 
             attempt = contact.get("outreach_count", 1) + 1
-            channel = contact.get("preferred_channel") or self.preferred_channel
+            _is_self_outreach = self.vertical == "b2b_saas"
+            # Self-outreach is strictly email; client campaigns use their channel.
+            channel = "email" if _is_self_outreach else (contact.get("preferred_channel") or self.preferred_channel)
 
             # Need phone for WhatsApp, skip if missing
             if channel == "whatsapp" and not contact.get("phone"):
                 continue
+            if channel == "email" and not contact.get("email"):
+                continue
 
             try:
-                generated = generate_outreach_message(
-                    vertical=self.vertical,
-                    business_name=contact["name"],
-                    channel=channel,
-                    address=contact.get("address"),
-                    category=contact.get("category"),
-                    rating=contact.get("rating"),
-                    website=contact.get("website"),
-                    is_followup=True,
-                    attempt_number=attempt,
-                    contact_name=contact.get("contact_name"),
-                    contact_title=contact.get("contact_title"),
-                )
+                if _is_self_outreach:
+                    # v2 SHARP MODE drip: attempt 2 → TOUCH 2, attempt 3 → TOUCH 3,
+                    # vertically matched off the persisted biz_vertical, and told
+                    # which capability TOUCH 1 used so it never repeats itself.
+                    from services.reachng_self_outreach import draft_with_link, prev_capability_for
+                    from tools.ab_testing import assign_variant
+                    touch = min(attempt, 3)
+                    biz_vertical = contact.get("biz_vertical") or "general"
+                    generated = draft_with_link(
+                        business_name=contact["name"],
+                        vertical=biz_vertical,
+                        variant=contact.get("ab_variant") or assign_variant(),
+                        touch=touch,
+                        prev_capability=prev_capability_for(biz_vertical, touch),
+                        address=contact.get("address"),
+                        category=contact.get("category"),
+                        website=contact.get("website"),
+                        contact_name=contact.get("contact_name"),
+                        contact_title=contact.get("contact_title"),
+                        contact_id=str(contact["_id"]),
+                    )
+                else:
+                    generated = generate_outreach_message(
+                        vertical=self.vertical,
+                        business_name=contact["name"],
+                        channel=channel,
+                        address=contact.get("address"),
+                        category=contact.get("category"),
+                        rating=contact.get("rating"),
+                        website=contact.get("website"),
+                        is_followup=True,
+                        attempt_number=attempt,
+                        contact_name=contact.get("contact_name"),
+                        contact_title=contact.get("contact_title"),
+                    )
             except Exception as e:
                 log.error("followup_generation_failed", contact=contact["name"], error=str(e))
                 errors += 1
@@ -739,11 +769,17 @@ class BaseCampaign:
                     continue
 
                 message_text = generated.get("message", str(generated))
+                followup_in_days = None
+                if _is_self_outreach:
+                    from services.reachng_self_outreach import followup_days_after_touch
+                    followup_in_days = followup_days_after_touch(min(attempt, 3))
                 record_outreach(
                     contact_id=str(contact["_id"]),
                     channel=channel,
                     message=message_text,
                     attempt_number=attempt,
+                    subject=generated.get("subject"),
+                    followup_in_days=followup_in_days,
                 )
             sent += 1
             import random

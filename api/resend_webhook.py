@@ -159,6 +159,16 @@ async def resend_webhook(request: Request):
         return {"ok": True, "ignored": event_type}
 
     res = log_col.update_one(query, update)
+
+    # Stop the self-outreach drip on a hard bounce or spam complaint — never
+    # keep emailing a dead/hostile address.
+    if event_type in ("email.bounced", "email.complained") and to_email:
+        try:
+            from tools.memory import stop_followups_for_email
+            stop_followups_for_email(to_email, reason="bounced")
+        except Exception as e:
+            log.warning("bounce_stop_followups_failed", error=str(e))
+
     log.info("resend_event_recorded",
              type=event_type, email_id=email_id,
              matched=bool(res.matched_count))

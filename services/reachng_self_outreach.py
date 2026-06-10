@@ -114,6 +114,42 @@ def _style_directive(variant: Optional[str]) -> str:
     return _STYLE_DIRECTIVES.get(style or "", "")
 
 
+# ── Sequence helpers (v2 SHARP MODE 3-touch drip) ────────────────────────────
+# The capability TOUCH 1 uses per vertical, matching the prompt's default touch
+# order (row item (a)). Fed back as `prev_capability` on touch 2+ so the model
+# picks a different one and never repeats itself across the sequence.
+_T1_CAPABILITY_BY_VERTICAL: dict[str, str] = {
+    "real_estate": "the warm-buyer follow-up — the buyer who asked about a unit and went quiet",
+    "hospitality": "qualifying a reservation (date, party size, deposit)",
+    "events":      "qualifying a reservation (date, party size, deposit)",
+    "clinic":      "triaging a new enquiry and drafting the booking reply",
+    "clinics":     "triaging a new enquiry and drafting the booking reply",
+    "legal":       "triaging a new matter and drafting the consultation reply",
+    "fashion":     "taking the order over WhatsApp and quoting from the price list",
+    "retail":      "taking the order over WhatsApp and quoting from the price list",
+    "general":     "qualifying a new WhatsApp enquiry and drafting the reply",
+}
+
+# Days from the previous touch to the next, keyed by the touch just sent:
+# touch 1 → +3d (touch 2), touch 2 → +5d (touch 3, ~8d from touch 1).
+TOUCH_FOLLOWUP_DAYS: dict[int, float] = {1: 3, 2: 5}
+
+
+def prev_capability_for(vertical: Optional[str], touch: int) -> Optional[str]:
+    """The capability touch 1 used (per the prompt's default touch order), so
+    touch 2+ can be told not to repeat it. None for touch 1."""
+    if touch < 2:
+        return None
+    key = (vertical or "general").lower().replace(" ", "_").replace("/", "_")
+    return _T1_CAPABILITY_BY_VERTICAL.get(key, _T1_CAPABILITY_BY_VERTICAL["general"])
+
+
+def followup_days_after_touch(touch_just_sent: int) -> Optional[float]:
+    """Spacing to the next touch after sending `touch_just_sent`; None when the
+    sequence is finished (no further touch)."""
+    return TOUCH_FOLLOWUP_DAYS.get(touch_just_sent)
+
+
 def _load_system_prompt() -> str:
     base = _PROMPT_PATH.read_text(encoding="utf-8") if _PROMPT_PATH.exists() else ""
     ctx  = _NG_CTX_PATH.read_text(encoding="utf-8") if _NG_CTX_PATH.exists() else ""

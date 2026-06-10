@@ -84,6 +84,15 @@ class Settings(BaseSettings):
     daily_send_limit: int = Field(default=50, env="DAILY_SEND_LIMIT")
     followup_delay_hours: int = Field(default=48, env="FOLLOWUP_DELAY_HOURS")
     max_followup_attempts: int = Field(default=2, env="MAX_FOLLOWUP_ATTEMPTS")
+
+    # Self-outreach reply mailbox (stop-on-reply for the v2 drip). When a Lekki
+    # agent replies to a cold email, we poll this inbox, match the sender to a
+    # contact, and cancel their remaining touches. Dormant unless host+user+pass
+    # are all set — no creds, no poll, drip still bounded by the 3-touch cap.
+    outreach_imap_host: str | None = Field(default=None, env="OUTREACH_IMAP_HOST")
+    outreach_imap_port: int = Field(default=993, env="OUTREACH_IMAP_PORT")
+    outreach_imap_user: str | None = Field(default=None, env="OUTREACH_IMAP_USER")
+    outreach_imap_password: str | None = Field(default=None, env="OUTREACH_IMAP_PASSWORD")
     lead_refresh_days: int = Field(default=90, env="LEAD_REFRESH_DAYS")
     city_expand_threshold: float = Field(default=0.4, env="CITY_EXPAND_THRESHOLD")
 

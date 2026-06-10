@@ -2,6 +2,7 @@
 Outreach memory — tracks every contact and every message sent.
 Prevents duplicate outreach, enforces daily limits, surfaces follow-up candidates.
 """
+import re
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 from bson import ObjectId
@@ -68,8 +69,14 @@ def upsert_contact(
     contact_name: Optional[str] = None,
     contact_title: Optional[str] = None,
     review_count: Optional[int] = None,
+    biz_vertical: Optional[str] = None,
 ) -> str:
-    """Insert or update a contact. Returns the contact _id as string."""
+    """Insert or update a contact. Returns the contact _id as string.
+
+    `biz_vertical` is the business's *real* vertical (real_estate, hospitality…)
+    as distinct from `vertical`, which for self-outreach is the campaign label
+    ("b2b_saas"). We persist it so the v2 drip can keep touches 2/3 vertically
+    matched at follow-up time."""
     contacts = get_contacts()
     now = datetime.now(timezone.utc)
 
@@ -149,6 +156,8 @@ def upsert_contact(
         doc["contact_name"] = contact_name
     if contact_title:
         doc["contact_title"] = contact_title
+    if biz_vertical:
+        doc["biz_vertical"] = biz_vertical
 
     # Compound filter: scoped to client in agency mode, global otherwise.
     # This allows multiple clients to independently contact the same business
@@ -246,6 +255,7 @@ def record_outreach(
     to_phone: str | None = None,
     provider_message_id: str | None = None,
     outreach_slug: str | None = None,
+    followup_in_days: float | None = None,
 ) -> str:
     """Log a sent message and update contact status. Returns log entry _id.
 
@@ -253,10 +263,16 @@ def record_outreach(
     is the Resend (or Meta) message id we received on send — it's how the
     Resend webhook joins open/click events back to the right row.
     outreach_slug is the personalised /hi/{slug} embedded in the email so
-    we can attribute conversions back to a specific recipient."""
+    we can attribute conversions back to a specific recipient.
+
+    `followup_in_days` overrides the default 48h cadence — the v2 self-outreach
+    drip uses it to space touches (~3 days to touch 2, ~5 to touch 3)."""
     settings = get_settings()
     now = datetime.now(timezone.utc)
-    next_followup = now + timedelta(hours=settings.followup_delay_hours)
+    if followup_in_days is not None:
+        next_followup = now + timedelta(days=followup_in_days)
+    else:
+        next_followup = now + timedelta(hours=settings.followup_delay_hours)
 
     log = get_outreach_log()
     entry = log.insert_one({
@@ -316,6 +332,34 @@ def mark_opted_out(contact_id: str):
         {"_id": ObjectId(contact_id)},
         {"$set": {"status": Status.OPTED_OUT}}
     )
+
+
+def stop_followups_for_email(email: str, *, reason: str = "replied") -> int:
+    """Stop the self-outreach drip for whoever owns this email address.
+
+    Used by the outreach reply poller (and the Resend bounce webhook) for
+    stop-on-reply: a reply or hard bounce means we never send the next touch.
+    Marks matching CONTACTED/NOT_CONTACTED contacts as replied and clears
+    next_followup_at (which removes them from get_followup_candidates).
+    Returns the number of contacts updated. Case-insensitive, exact match."""
+    if not email or "@" not in email:
+        return 0
+    now = datetime.now(timezone.utc)
+    status = Status.OPTED_OUT if reason == "bounced" else Status.REPLIED
+    res = get_contacts().update_many(
+        {
+            "email": {"$regex": f"^{re.escape(email.strip())}$", "$options": "i"},
+            "status": {"$in": [Status.CONTACTED, Status.NOT_CONTACTED]},
+        },
+        {"$set": {
+            "status": status,
+            "replied_at": now if status == Status.REPLIED else None,
+            "next_followup_at": None,
+            "followup_stop_reason": reason,
+            "updated_at": now,
+        }},
+    )
+    return res.modified_count
 
 
 def get_followup_candidates(vertical: Optional[str] = None) -> list[dict]:
