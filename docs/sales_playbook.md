@@ -1,41 +1,66 @@
 # ReachNG Sales Playbook — From Outreach to Onboarded Client
 
+How to turn a reply into a paying EYO client. You're selling **EYO**, a trainable
+digital employee for WhatsApp that works the owner's *own* customers — drafts every
+reply in their voice, reads transfer screenshots, handles voice notes, remembers
+every customer, and sends a 7am cash brief. Every reply waits for the owner's tap
+(HITL) until they enable Autopilot. For real estate, EYO comes with **EstateOS**
+(rent roll, KYC, Proof of Funds, chase sequences).
+
+> You are **not** selling outreach/lead-gen. EYO runs the WhatsApp side of *their*
+> business. Don't promise to "find them clients" — that's the old pitch.
+
 ---
 
 ## When they reply "yes / interested / tell me more"
 
 Respond within 2 hours. They're curious, not sold yet.
 
-**Opening qualifier (WhatsApp):**
-> "Great! Quick question before we set a time — what's your main source of new clients right now? Referrals, ads, or something else?"
+**Opening qualifier:**
+> "Glad it caught your eye. Quick one before we set a time — when a customer messages your WhatsApp asking about price or to book, who handles the reply right now, and how fast?"
 
-Listen for: "referrals only", "Instagram ads that don't convert", "we have a sales rep doing manual outreach" — those are your hooks.
+Listen for: "me, when I get a chance", "my assistant but she's slow", "we lose people because we reply late", "voice notes pile up", "I can't tell who actually paid". Those are your hooks — every one is something EYO does.
 
 ---
 
 ## The 10-Minute Call Structure
 
 **1. Open (1 min)**
-"Tell me about [Business Name] — how long have you been running it and what does your typical client look like?"
+"Tell me about [Business Name] — how long have you been running it and what does your typical customer look like?"
 Let them talk. People buy from people who listen first.
 
 **2. Pain (3 min)**
-"How's your current pipeline? Are you getting enough of the right clients consistently, or does it feel unpredictable?"
-Listen for: slow months, referral dependence, ad spend frustration, manual outreach fatigue.
+"Walk me through what happens when a customer messages on WhatsApp after hours or when you're busy. How many enquiries do you think slip because nobody replied in time?"
+Listen for: slow replies, missed enquiries, chasing payments manually, voice notes ignored, no record of who paid, the owner glued to their phone.
 
-**3. Demo — show the dashboard (4 min)**
-"Let me show you exactly what your dashboard would look like."
+**3. Demo — show what EYO does (4 min)**
+"Let me show you exactly what EYO would do inside your business."
 
 Walk them through:
-- **Pipeline view** — every business we find for them, their name, sector, location, rating
-- **Approvals** — drafts of every message before it sends (they see the quality before it goes out)
-- **Replies tab** — where all responses come in, sorted by intent (Interested / Warm / Not Ready / Cold)
-- **Their portal** — a live client-facing view they can open on their phone anytime to see contacts, replies, ROI
+- **The Message Queue (Approvals)** — a real customer enquiry comes in, EYO drafts the reply *in their tone* with the right info, waiting for one tap. "Nothing ever sends without you approving it."
+- **Transfer screenshot** — drop a GTBank/OPay screenshot in; EYO matches it to the right order and drafts the confirmation. "No more squinting at receipts."
+- **The 7am owner brief** — "Every morning, one page: who paid, who's about to ghost, what needs you today."
+- **Money Leak / Revenue Rescue** — "EYO finds money quietly dying in your chats — the price enquiry nobody answered, the deposit half-paid — and wakes it up."
+- **Their portal** — a live, phone-friendly view of everything EYO did, that they open anytime.
 
-Say: "Every message is personalised to the specific business we're reaching — not a template blast. You review the first batch in the Approvals tab before anything goes out. Once you're happy with quality, we automate the approvals."
+Say: "Every reply is in *your* voice, from *your* number. You approve the first batch in the queue so you see the quality before anything goes out. Once you trust it, you let it run."
 
 **4. Close the pilot (2 min)**
-"We're doing a free 2-week pilot — 50 contacts, you see real results before paying a naira. I just need your WhatsApp business number, your target customer description, and which city you want to start in. Want me to set it up this week?"
+"Here's how we start — a free 2-week pilot. You connect your WhatsApp by QR, EYO starts drafting replies to your real customers, and you approve each one. You see the value before paying a naira. I just need you to scan a QR and give me a two-line description of your business. Want me to set it up this week?"
+
+---
+
+## Pricing (founder cohort — locked for the first 50 paying customers)
+
+Only quote on the call or the site, **never in a cold email.**
+
+| Tier | Price | For |
+|------|-------|-----|
+| **Solo** | ₦60k/mo | One owner, one WhatsApp line |
+| **Team** | ₦120k/mo | A small team, multiple verticals |
+| **Empire** | ₦250k/mo | Full suite, high volume |
+
+Lead with the **free 2-week pilot**, not the price. Prove value first, then talk tier.
 
 ---
 
@@ -43,24 +68,25 @@ Say: "Every message is personalised to the specific business we're reaching — 
 
 | Objection | Response |
 |-----------|----------|
-| "How is this different from spam?" | "Every message is written specifically for that business — we research them first. It reads like you sat down and wrote it personally, not like a blast. You can see each message before it sends." |
-| "We already have a sales team" | "This doesn't replace them — it fills their inbox. They spend time closing, not cold calling." |
-| "What's the price?" | "₦80K/month. But the pilot is free — let's prove the value first, then talk price." |
-| "Let me think about it" | "Completely fine. I'll send you 3 sample messages we'd send on your behalf so you can judge the quality yourself — then decide." |
-| "Will it work for my industry?" | "Yes — we've built specific discovery and message logic for [their sector]. The system already knows what buyers/clients in that sector respond to." |
+| "How is this different from a chatbot?" | "A chatbot sends canned replies in a robot voice. EYO learns *your* tone, your pricing, your customers, and drafts like you would — then waits for your tap. It's a trained employee, not a bot." |
+| "Will it send things I wouldn't say?" | "No. Nothing leaves until you approve it. It drafts, you tap. You only switch on Autopilot once you've seen it get your voice right for weeks." |
+| "What about Meta's WhatsApp AI?" | "EYO works right beside it, or on its own. Meta can handle the first hello; EYO catches the money and keeps you in control. Either way it's your number, your voice, your tap." |
+| "What's the price?" | "Founder pricing starts at ₦60k/month, but the 2-week pilot is free — let's prove it on your real customers first, then pick a tier." |
+| "I don't have time to set it up" | "Setup is a QR scan and two lines about your business. We handle the rest. You'll see your first drafted replies the same day." |
+| "Will it work for my business?" | "Yes — it's tuned per vertical. For real estate it also runs rent roll, KYC and Proof-of-Funds chasing. Tell me your line of business and I'll show you the exact flow." |
+| "Let me think about it" | "Completely fine. Connect your WhatsApp for the free pilot and let EYO draft a few real replies this week — judge it on your own customers, then decide." |
 
 ---
 
 ## After the Call — Same Day
 
-Send a WhatsApp follow-up within 1 hour:
+Follow up within the hour, on whatever channel they engaged on:
 
-> "Good speaking with you [Name]. To set up your pilot I need:
-> 1. Your target client type (who do you want to reach?)
-> 2. City / cities to target
-> 3. Your WhatsApp business number (for the QR scan)
+> "Good speaking with you [Name]. To switch on your free EYO pilot I need just two things:
+> 1. A QR scan to connect your WhatsApp business number (takes 30 seconds)
+> 2. Two lines on your business — what you sell and the tone you'd want EYO to use
 >
-> Once I have those, I'll have the first batch ready in 48 hours."
+> Send those over and you'll see EYO drafting replies to your real customers today."
 
 This creates momentum and a micro-commitment before they cool off.
 
@@ -68,29 +94,29 @@ This creates momentum and a micro-commitment before they cool off.
 
 ## Onboarding Steps (Once They Confirm)
 
-See the **Clients tab** on the dashboard for the full SOP.
+The full runbook is on the dashboard **Welcome** tab. Quick version:
 
-Quick version:
-1. Collect brief — who they are, what they sell, tone, target customer, city
-2. Unipile QR scan — they scan with their WhatsApp business phone, you get their Account ID
-3. Create client record on the dashboard (Clients tab → Client Onboarding)
-4. Generate portal link → send to them via WhatsApp
-5. Run dry run → share preview leads for approval
-6. Go live with max 10 contacts, Review before send checked
-7. Scale to 20–30/run once quality confirmed
+1. **Create the client** — Clients tab → Add client (name, vertical, a 2-line brief in their voice, agent name, plan). Use **✨ Draft with AI** to compose the brief from their two lines.
+2. **Generate the portal link** — one link they use for everything (it's a PWA, installs to their home screen).
+3. **They connect WhatsApp** — QR scan from their portal, ~30 seconds. Their number, their conversations.
+4. **They connect email** (optional) — Gmail/Outlook or IMAP, so EYO works their inbox too.
+5. **Flip on inventions** — start conservative (Shield + Referral), then Radar / Cashflow / Haggle as they trust it. For real estate, EstateOS is on by default.
+
+Then it runs: customer messages → EYO drafts in their voice → owner approves → it sends from their own number. 7am brief daily.
 
 ---
 
-## What the Client Dashboard Shows Them
+## What the Client Portal Shows Them
 
 When you share their portal link, they can see:
-- Every business contacted on their behalf (name, sector, rating, address)
-- Status of each contact (Sent / Replied / Interested / Converted)
-- Every reply that came in
-- ROI tracker — how many conversations, how many converted
+- Every customer conversation EYO is handling, in their voice
+- Drafts waiting for their approval
+- Money Leak / Revenue Rescue — money to wake up
+- The daily owner brief — who paid, who's about to ghost
+- Their customers remembered over time (the vault)
 
-Tell them: "This is your live pipeline. You can check it anytime on your phone. When someone replies and is interested, you'll see it here in real time."
+Tell them: "This is your business on one screen. Open it anytime on your phone. EYO does the work; you just tap approve."
 
 ---
 
-*Last updated: 2026-04-13*
+*Last updated: 2026-06-08*
