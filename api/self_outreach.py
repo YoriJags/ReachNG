@@ -164,3 +164,21 @@ async def preview_one(sample: Sample):
         raise HTTPException(502, f"Drafter failed: {e}")
     out["word_count"] = len([w for w in (out["message"] or "").split() if w])
     return out
+
+
+@router.get("/reply-poll")
+async def reply_poll_state():
+    """Stop-on-reply watchdog state for the admin UI: is the IMAP poller
+    configured, and what did the last run see. No Railway logs required."""
+    from services.outreach_reply_poll import reply_poll_status
+    return reply_poll_status()
+
+
+@router.post("/reply-poll/run")
+async def reply_poll_run_now():
+    """Run the reply poll immediately (the scheduler also runs it every 10
+    minutes). Blocking IMAP work goes off the event loop."""
+    import asyncio
+    from services.outreach_reply_poll import poll_outreach_replies, reply_poll_status
+    result = await asyncio.get_event_loop().run_in_executor(None, poll_outreach_replies)
+    return {"result": result, **reply_poll_status()}

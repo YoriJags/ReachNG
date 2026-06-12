@@ -2660,6 +2660,50 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     }
   </script>
 
+  <!-- Stop-on-reply watchdog (IMAP poller status — no Railway logs needed) -->
+  <div class="ct-section" data-reflow="growth">
+    <div class="ct-section-title">Stop-on-reply — drip cancels the moment a prospect replies</div>
+    <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Watches hello@reachng.ng every 10 minutes. When a reply lands, the sender's remaining touches are cancelled automatically. Configure with OUTREACH_IMAP_* on Railway.</p>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:12.5px;">
+      <span>Status: <b id="rp-configured" style="color:#888;">—</b></span>
+      <span>Last check: <b id="rp-at" style="color:#d8eaf8;">—</b></span>
+      <span>Emails scanned: <b id="rp-scanned" style="color:#d8eaf8;">—</b></span>
+      <span>Drips stopped: <b id="rp-stopped" style="color:#00e5a0;">—</b></span>
+      <button class="btn" style="font-size:11px;padding:6px 14px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="rpCheckNow(this)">Check now</button>
+      <span id="rp-error" style="font-size:11px;color:#ff7a7a;"></span>
+    </div>
+  </div>
+
+  <script>
+    async function rpRefresh() {
+      try {
+        const r = await fetch('/api/v1/admin/self-outreach/reply-poll', {headers: authHeaders()});
+        if (!r.ok) return;
+        rpRender(await r.json());
+      } catch (e) { /* card stays as — */ }
+    }
+    function rpRender(d) {
+      const last = d.last || {};
+      const conf = document.getElementById('rp-configured');
+      conf.textContent = d.configured ? 'ACTIVE' : 'NOT CONFIGURED';
+      conf.style.color = d.configured ? '#00e5a0' : '#e0a000';
+      document.getElementById('rp-at').textContent = last.at ? new Date(last.at).toLocaleString() : 'never';
+      document.getElementById('rp-scanned').textContent = last.scanned != null ? last.scanned : '—';
+      document.getElementById('rp-stopped').textContent = last.stopped != null ? last.stopped : '—';
+      document.getElementById('rp-error').textContent =
+        (last.error && last.error !== 'not_configured') ? 'Last error: ' + last.error : '';
+    }
+    async function rpCheckNow(btn) {
+      btn.textContent = 'Checking…'; btn.disabled = true;
+      try {
+        const r = await fetch('/api/v1/admin/self-outreach/reply-poll/run', {method:'POST', headers: authHeaders()});
+        if (r.ok) rpRender(await r.json());
+      } catch (e) { /* leave card */ }
+      btn.textContent = 'Check now'; btn.disabled = false;
+    }
+    rpRefresh();
+  </script>
+
   <!-- Outreach Analytics (open / click / convert funnel) -->
   <div class="ct-section" data-reflow="growth">
     <div class="ct-section-title">Outreach Analytics — open rate, click rate, conversion</div>
