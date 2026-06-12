@@ -324,20 +324,33 @@ async def _send_approved(draft: dict):
             # eventual click/open back to this row.
             slug_match = re.search(r"www\.reachng\.ng/hi/([a-z0-9]+)", message or "")
             outreach_slug = slug_match.group(1) if slug_match else None
+            # Self-outreach (b2b_saas) follows the v2 drip cadence: the touch
+            # number comes from how many sends this contact already had, and
+            # the next touch is scheduled accordingly (T1→+3d, T2→+5d, T3→end).
+            attempt_number = 1
+            followup_in_days = None
+            if draft.get("vertical") == "b2b_saas":
+                try:
+                    from bson import ObjectId as _OID
+                    from database import get_contacts as _gc
+                    _c = _gc().find_one({"_id": _OID(contact_id)}, {"outreach_count": 1}) or {}
+                    attempt_number = int(_c.get("outreach_count") or 0) + 1
+                except Exception:
+                    attempt_number = 1
+                from services.reachng_self_outreach import followup_days_after_touch
+                followup_in_days = followup_days_after_touch(min(attempt_number, 3))
             record_outreach(
                 contact_id=contact_id,
                 channel=channel,
                 message=message,
-                attempt_number=1,
+                attempt_number=attempt_number,
                 client_name=draft.get("client_name"),
                 subject=draft.get("subject"),
                 to_email=draft.get("email"),
                 to_phone=draft.get("phone"),
                 provider_message_id=result.get("message_id") or result.get("id"),
                 outreach_slug=outreach_slug,
-                # Self-outreach (b2b_saas) follows the v2 drip cadence: touch 2
-                # ~3 days after this first touch.
-                followup_in_days=3 if draft.get("vertical") == "b2b_saas" else None,
+                followup_in_days=followup_in_days,
             )
             log_roi_event(
                 contact_name=draft["contact_name"],

@@ -462,6 +462,18 @@ async def _poll_email_inboxes():
         log.warning("poll_email_inboxes_failed", error=str(e))
 
 
+async def _self_outreach_followups():
+    """Daily v2 drip tick — queue due touch-2/3 drafts for the founder's
+    self-outreach contacts. Everything lands in the HITL approvals queue;
+    nothing sends without a tap. Weekdays only (cold email etiquette)."""
+    try:
+        from campaigns.b2b_saas import B2BSaaSCampaign
+        result = await B2BSaaSCampaign().run_followups(dry_run=False)
+        log.info("self_outreach_followups_done", **{k: v for k, v in result.items() if k != "vertical"})
+    except Exception as e:
+        log.error("self_outreach_followups_failed", error=str(e))
+
+
 async def _poll_outreach_replies():
     """Stop-on-reply for the self-outreach drip — poll the cold-email reply
     mailbox and cancel remaining touches for anyone who replied. No-op unless
@@ -493,6 +505,15 @@ def setup_scheduler():
         IntervalTrigger(minutes=10),
         id="poll_outreach_replies", replace_existing=True, coalesce=True,
         max_instances=1, misfire_grace_time=300,
+    )
+
+    # v2 drip tick — weekday mornings, Lagos time. Queues due touch-2/3 drafts
+    # into the HITL approvals queue (never sends directly).
+    scheduler.add_job(
+        _self_outreach_followups,
+        CronTrigger(day_of_week="mon-fri", hour=9, minute=15, timezone="Africa/Lagos"),
+        id="self_outreach_followups", replace_existing=True, coalesce=True,
+        max_instances=1, misfire_grace_time=3600,
     )
 
     # Outcome learning — nightly silence sweep + weekly distil

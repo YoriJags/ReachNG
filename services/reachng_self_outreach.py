@@ -233,34 +233,54 @@ def draft_outreach_email(
     if directive:
         user_block = f"{directive}\n\n{user_block}"
 
-    resp = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=500,
-        temperature=0.6,
-        system=system_prompt,
-        messages=[{"role": "user", "content": user_block}],
-    )
-    raw = "".join(b.text for b in resp.content
-                   if getattr(b, "type", None) == "text").strip()
+    def _generate(extra_directive: str = "") -> str:
+        content = f"{user_block}\n\n{extra_directive}" if extra_directive else user_block
+        resp = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=500,
+            temperature=0.6,
+            system=system_prompt,
+            messages=[{"role": "user", "content": content}],
+        )
+        return "".join(b.text for b in resp.content
+                       if getattr(b, "type", None) == "text").strip()
 
-    # Tolerate ``` fences and stray prose
-    if raw.startswith("```"):
-        raw = re.sub(r"^```(?:json)?\s*|\s*```\s*$", "", raw, flags=re.S)
-    if not raw.startswith("{"):
-        m = re.search(r"\{.*\}", raw, flags=re.S)
-        if m:
-            raw = m.group(0)
+    def _parse(raw: str) -> tuple[str, str]:
+        # Tolerate ``` fences and stray prose
+        if raw.startswith("```"):
+            raw = re.sub(r"^```(?:json)?\s*|\s*```\s*$", "", raw, flags=re.S)
+        if not raw.startswith("{"):
+            m = re.search(r"\{.*\}", raw, flags=re.S)
+            if m:
+                raw = m.group(0)
+        try:
+            data = json.loads(raw)
+        except Exception as e:
+            log.error("reachng_outreach_parse_failed", error=str(e), raw=raw[:200])
+            raise RuntimeError(f"could not parse draft: {e}")
+        subject = (data.get("subject") or "").strip()
+        message = (data.get("message") or "").strip()
+        if not subject or not message:
+            raise RuntimeError("draft missing subject or body")
+        return subject, message
 
-    try:
-        data = json.loads(raw)
-    except Exception as e:
-        log.error("reachng_outreach_parse_failed", error=str(e), raw=raw[:200])
-        raise RuntimeError(f"could not parse draft: {e}")
+    subject, message = _parse(_generate())
 
-    subject = (data.get("subject") or "").strip()
-    message = (data.get("message") or "").strip()
-    if not subject or not message:
-        raise RuntimeError("draft missing subject or body")
+    # Banned-phrase lint — the model occasionally breaks a hard rule (e.g. the
+    # "Saturday night" time-of-day cliché). One retry with the violation named;
+    # if it still slips, fail loudly so a rule-breaking draft never reaches the
+    # queue (the caller skips this prospect and logs).
+    violations = _lint_banned(subject, message)
+    if violations:
+        log.warning("reachng_outreach_lint_retry", violations=violations)
+        subject, message = _parse(_generate(
+            "YOUR PREVIOUS DRAFT BROKE A HARD RULE. It contained the banned "
+            f"phrase(s): {', '.join(violations)}. Redraft without them — name "
+            "the behaviour, never the clock, and avoid all banned words."
+        ))
+        violations = _lint_banned(subject, message)
+        if violations:
+            raise RuntimeError(f"draft kept banned phrases after retry: {violations}")
 
     # Tone scrub at the boundary (same rule as every other ReachNG send)
     try:
@@ -270,35 +290,65 @@ def draft_outreach_email(
     except Exception:
         pass
 
-    # Em-dash / en-dash scrub — these are the AI-smell tell. Replace with the
-    # right ASCII punctuation depending on context. Spaced ' — ' becomes ', '
-    # (parenthetical), bare '—' becomes ',', '–' (en-dash) used in ranges
-    # becomes '-', and '…' ellipsis collapses to '.'.
+    # Em-dash / ellipsis scrub (AI-smell tells), then deterministic signature
+    # placement — never trust the model with the sign-off block.
     subject = _scrub_dashes(subject)
-    message = _scrub_dashes(message)
+    message = _normalize_signature(_scrub_dashes(message))
 
     return {"subject": subject, "message": message}
 
 
 def _scrub_dashes(text: str) -> str:
     """Remove AI-smell punctuation. Numeric ranges (110–150) become hyphenated
-    (110-150); spaced em/en dashes become commas; lingering bare dashes become
-    commas; ellipses become periods."""
+    (110-150); em/en dashes (spaced or bare) become comma + space; ellipses
+    become periods. Bare dashes MUST gain a trailing space — 'lands—party'
+    becoming 'lands,party' was a real production bug."""
     if not text:
         return text
     # Numeric range first: keep as ASCII hyphen, no spaces (e.g. 110–150 → 110-150)
     text = re.sub(r"(\d)\s*[—–]\s*(\d)", r"\1-\2", text)
-    # Spaced em/en dash between words → comma + space
-    text = re.sub(r"\s+[—–]\s+", ", ", text)
-    # Any remaining bare em/en dash → comma
-    text = text.replace("—", ",").replace("–", ",")
-    # Collapse accidental double commas
-    text = re.sub(r",\s*,", ",", text)
+    # Any em/en dash, spaced or bare, → comma + single space
+    text = re.sub(r"\s*[—–]\s*", ", ", text)
+    # Tidy artifacts: space before comma, doubled commas
+    text = re.sub(r"\s+,", ",", text)
+    text = re.sub(r",(\s*,)+", ",", text)
     # Ellipsis → period
     text = text.replace("…", ".")
     # Collapse multi-space artifacts
     text = re.sub(r"[ \t]{2,}", " ", text)
     return text
+
+
+_SIGNATURE = "Best,\nYori\nFounder, ReachNG\nLagos · www.reachng.ng"
+
+
+def _normalize_signature(message: str) -> str:
+    """Deterministically place the signature: the body ends with a clean blank
+    line, then the exact four-line signature. The model sometimes jams 'Best,'
+    onto the end of the ask sentence — never trust it with the sign-off."""
+    if not message:
+        return message
+    idx = message.rfind("Best,")
+    body = (message[:idx] if idx != -1 else message).rstrip()
+    return f"{body}\n\n{_SIGNATURE}"
+
+
+# Hard-banned phrases (subset of the prompt's rules we can check mechanically).
+# Time-of-day clichés + the dead corporate words. Lowercase substring match.
+_BANNED_PHRASES = (
+    "saturday", "sunday", "friday", "weekend", "after-hours", "midnight",
+    "8pm", "2am", "i hope this finds you well", "hope all is well",
+    "leverage", "seamless", "synergy", "robust", "cutting-edge",
+    "revolutionary", "game-changer", "10x", "growth hack",
+    "leaving money on the table", "just checking in", "bumping this",
+    "gentle reminder",
+)
+
+
+def _lint_banned(subject: str, message: str) -> list[str]:
+    """Return the banned phrases present in the draft (empty = clean)."""
+    hay = f"{subject}\n{message}".lower()
+    return [p for p in _BANNED_PHRASES if p in hay]
 
 
 def attach_landing_link(

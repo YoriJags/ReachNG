@@ -761,6 +761,34 @@ class BaseCampaign:
                 continue
 
             if not dry_run:
+                if _is_self_outreach:
+                    # HITL: touches 2/3 wait for the founder's tap exactly like
+                    # touch 1 — never send a follow-up directly. The approval
+                    # send records the outreach + schedules the next touch;
+                    # clearing next_followup_at here prevents tomorrow's tick
+                    # from re-queueing a duplicate while this one sits in queue.
+                    try:
+                        queue_draft(
+                            contact_id=str(contact["_id"]),
+                            contact_name=contact.get("contact_name") or contact["name"],
+                            vertical=self.vertical,
+                            channel="email",
+                            message=generated.get("message", ""),
+                            subject=generated.get("subject"),
+                            email=contact.get("email"),
+                            source="self_outreach_followup",
+                            client_name=contact.get("client_name"),
+                        )
+                        from database import get_contacts as _gc
+                        _gc().update_one({"_id": contact["_id"]},
+                                          {"$set": {"next_followup_at": None}})
+                    except Exception as e:
+                        log.error("followup_queue_failed", contact=contact["name"], error=str(e))
+                        errors += 1
+                        continue
+                    sent += 1
+                    continue
+
                 try:
                     await self._send(channel, contact, generated)
                 except Exception as e:
@@ -769,17 +797,12 @@ class BaseCampaign:
                     continue
 
                 message_text = generated.get("message", str(generated))
-                followup_in_days = None
-                if _is_self_outreach:
-                    from services.reachng_self_outreach import followup_days_after_touch
-                    followup_in_days = followup_days_after_touch(min(attempt, 3))
                 record_outreach(
                     contact_id=str(contact["_id"]),
                     channel=channel,
                     message=message_text,
                     attempt_number=attempt,
                     subject=generated.get("subject"),
-                    followup_in_days=followup_in_days,
                 )
             sent += 1
             import random

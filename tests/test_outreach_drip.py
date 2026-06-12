@@ -93,3 +93,40 @@ def test_reply_poll_dormant_without_creds(monkeypatch):
 
     assert orp.outreach_reply_polling_enabled() is False
     assert orp.poll_outreach_replies() == {"skipped": "not_configured"}
+
+
+# ── Copy-quality fixes (calibration session findings, 2026-06-12) ────────────
+
+import services.reachng_self_outreach as so2
+
+
+def test_scrub_bare_dashes_get_spaces():
+    # The production bug: "lands—party size…—and" became "lands,party …,and"
+    out = so2._scrub_dashes("it qualifies the reservation the moment an enquiry lands—party size, date, deposit ask—and drafts the reply")
+    assert ",party" not in out and ",and" not in out
+    assert "lands, party size, date, deposit ask, and drafts" in out
+
+
+def test_scrub_keeps_numeric_ranges():
+    assert so2._scrub_dashes("110–150 words") == "110-150 words"
+
+
+def test_signature_normalized_when_jammed_inline():
+    msg = "Hi Tunde,\n\nGreat product. There's a demo on our site. Best,\nYori\nFounder, ReachNG\nLagos · www.reachng.ng"
+    out = so2._normalize_signature(msg)
+    assert out.endswith("Best,\nYori\nFounder, ReachNG\nLagos · www.reachng.ng")
+    assert "site.\n\nBest,\n" in out  # blank line before the sign-off
+
+
+def test_signature_appended_when_missing():
+    out = so2._normalize_signature("Hi team,\n\nShort note.")
+    assert out.endswith("\n\nBest,\nYori\nFounder, ReachNG\nLagos · www.reachng.ng")
+
+
+def test_lint_catches_saturday_cliche():
+    hits = so2._lint_banned("Quick intro", "Saturday night enquiries get answered in minutes.")
+    assert "saturday" in hits
+
+
+def test_lint_clean_draft_passes():
+    assert so2._lint_banned("Introducing ReachNG", "It drafts the reply when enquiries spike, waiting for your tap.") == []

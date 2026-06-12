@@ -2669,7 +2669,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
       <span>Last check: <b id="rp-at" style="color:#d8eaf8;">—</b></span>
       <span>Emails scanned: <b id="rp-scanned" style="color:#d8eaf8;">—</b></span>
       <span>Drips stopped: <b id="rp-stopped" style="color:#00e5a0;">—</b></span>
-      <button class="btn" style="font-size:11px;padding:6px 14px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="rpCheckNow(this)">Check now</button>
+      <button class="btn btn--ghost btn--sm" onclick="rpCheckNow(this)">Check now</button>
       <span id="rp-error" style="font-size:11px;color:#ff7a7a;"></span>
     </div>
   </div>
@@ -3751,7 +3751,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <p class="form-hint" id="ob-provider-hint">Quick Connect (QR): fastest setup. Connects through the client's WhatsApp QR session. Protected by warm-up, caps, and human approval.</p>
     <div class="row" style="margin-top:8px;align-items:center;gap:8px;flex-wrap:wrap;">
       <input id="ob-brief-url" placeholder="Their website / IG link (optional — EYO reads it)" style="flex:1;min-width:200px;" />
-      <button class="btn" id="ob-draft-btn" onclick="draftBriefAI()" style="background:#1a1030;border:1px solid #4c2a8a;color:#c9a8ff;white-space:nowrap;">✨ Draft with AI</button>
+      <button class="btn btn--ghost" id="ob-draft-btn" onclick="draftBriefAI()">✨ Draft with AI</button>
     </div>
     <p class="form-hint" style="margin-top:2px;">Paste a few raw facts below (or a link above), tap <b>Draft with AI</b>, and EYO writes the brief in the owner's voice. Review, tweak, then save. No need to leave the dashboard.</p>
     <div class="row" style="margin-top:6px;">
