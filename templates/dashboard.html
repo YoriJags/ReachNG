@@ -90,6 +90,12 @@
   .btn--sm { padding: 6px 11px; }
   .btn--icon { padding: 6px 8px; }
 
+  /* Dark field primitive — inputs/textareas in result panels. */
+  .field-dark {
+    background: #0a0a0a; border: 1px solid #1e1e1e; border-radius: 6px;
+    color: #e8e8e8;
+  }
+
   /* Button affordances — every button telegraphs "I'm pressable" and shows
      its state. Layered on .btn without restyling the base. */
   .btn { transition: transform .12s ease, box-shadow .12s ease, opacity .15s, background .15s, border-color .15s; }
@@ -2105,8 +2111,8 @@ function copyDemoPortalLink(btn){
     <div style="display:flex;gap:12px;margin-bottom:14px;">
       <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;">2</div>
       <div style="font-size:13px;color:var(--text-strong);line-height:1.6;">
-        <b>Generate &amp; send the portal link.</b> One link the owner uses for everything. It's a PWA — they can install it to their home screen.
-        <div style="font-size:11px;color:var(--text-mid);margin-top:3px;">API: <code>POST /api/v1/portal/generate/{client_name}</code> → <code>https://reachng-production.up.railway.app/portal/{token}</code></div>
+        <b>Send the portal link + welcome message.</b> Both appear automatically the moment you save the client — copy, paste into their WhatsApp, done. One link the owner uses for everything (it's a PWA; installs to their home screen).
+        <div style="font-size:11px;color:var(--text-mid);margin-top:3px;">Generated on save. Manual fallback: <code>POST /api/v1/portal/generate/{client_name}</code></div>
       </div>
     </div>
 
@@ -2138,7 +2144,7 @@ function copyDemoPortalLink(btn){
           <span style="display:inline-block;background:#2563eb;color:#fff;border-radius:4px;padding:1px 7px;margin:2px;">Cashflow</span>
           <span style="display:inline-block;background:#7c3aed;color:#fff;border-radius:4px;padding:1px 7px;margin:2px;">Haggle</span>
         </div>
-        <div style="font-size:11px;color:var(--text-mid);margin-top:5px;">API: <code>PUT /api/v1/clients/{name}/eyo-flag</code> per feature. <b>Haggle</b> needs pricing first (<code>PUT /api/v1/clients/{name}/pricing</code> — list/floor) and is <b>owner-first</b>: EYO alerts the owner with the fair price before drafting to the customer.</div>
+        <div style="font-size:11px;color:var(--text-mid);margin-top:5px;">Toggle them right in the save-result panel (Clients tab) — no API calls needed. <b>Haggle</b> needs pricing first (<code>PUT /api/v1/clients/{name}/pricing</code> — list/floor) and is <b>owner-first</b>: EYO alerts the owner with the fair price before drafting to the customer.</div>
       </div>
     </div>
   </div>
@@ -2595,7 +2601,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Generate the actual cold-outreach drafts Client #0 will send. Nothing sends, nothing queues — pure copy preview so you can grade the tone before any real campaign fires. Cost ≈ ₦4 per draft.</p>
 
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
-      <button class="btn btn-approve" style="font-size:12px;padding:8px 18px;" onclick="soGenerateBaked()">Generate 5 sample drafts (₦20)</button>
+      <button class="btn btn-approve" style="font-size:12px;padding:8px 18px;" onclick="soGenerateBaked()" title="Pure copy preview against 5 baked-in Lagos profiles. Nothing sends, nothing queues — grade the tone before any real campaign fires.">Generate 5 sample drafts (₦20)</button>
       <button class="btn" style="font-size:12px;padding:8px 18px;background:#1e2530;color:#aaa;border:1px solid #2a3340;" onclick="document.getElementById('so-custom-form').style.display='block';">+ Preview a real business</button>
       <span id="so-status" style="font-size:11px;color:#6a7280;"></span>
     </div>
@@ -3810,7 +3816,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
       <textarea id="ob-brief" placeholder="Who is this client? What do they sell? What tone? Who is their target customer?&#10;&#10;Example: Altitude Lagos is a luxury property agency on Victoria Island. Tone: professional, warm. Target: HNI buyers, diaspora investors."></textarea>
     </div>
     <div id="ob-draft-result" style="margin-top:6px;display:none;"></div>
-    <button class="btn btn-approve" id="ob-create-btn" onclick="createClient()" style="margin-top:4px;">Save Client</button>
+    <button class="btn btn-approve" id="ob-create-btn" onclick="createClient()" style="margin-top:4px;" title="Creates the client, generates their portal link, composes the welcome message, and shows the EYO invention toggles — the whole onboarding in one tap.">Save Client &amp; Get Portal Link</button>
     <div id="ob-create-result" style="margin-top:10px;display:none;"></div>
 
     <hr class="form-divider" />
@@ -3818,7 +3824,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     <p class="step-label">Step 2 — Generate Portal Link</p>
     <div class="row">
       <input id="ob-portal-name" placeholder="Client name (same as above)" style="flex:1;" />
-      <button class="btn btn-approve" id="ob-portal-btn" onclick="generatePortal()" style="white-space:nowrap;">Generate Portal</button>
+      <button class="btn btn-approve" id="ob-portal-btn" onclick="generatePortal()" style="white-space:nowrap;" title="Re-fetch an existing client's portal link. New clients get theirs automatically when you save.">Generate Portal</button>
     </div>
     <div id="ob-portal-result" style="margin-top:10px;display:none;"></div>
 
@@ -3840,7 +3846,7 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
       <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#777;white-space:nowrap;">
         <input type="checkbox" id="ob-run-dryrun" checked style="width:auto;accent-color:#ff5c00;" /> Dry run
       </label>
-      <button class="btn btn-approve" id="ob-run-btn" onclick="runClientCampaign()" style="white-space:nowrap;">Run</button>
+      <button class="btn btn-approve" id="ob-run-btn" onclick="runClientCampaign()" style="white-space:nowrap;" title="Discovery → score → drafts → HITL queue. Dry run previews only; nothing sends without approval.">Run</button>
     </div>
     <div id="ob-run-result" style="margin-top:10px;display:none;"></div>
   </div>
@@ -7178,6 +7184,81 @@ async function loadTraction() {
   } catch (e) { /* panel stays as — ; never blocks the dashboard */ }
 }
 
+// ── One-flow onboarding: after Save Client, everything the operator needs
+//    (portal link, ready-to-send welcome, invention toggles) appears in one
+//    panel. No second button, no curl, no leaving the form. ──
+let _obFlagClient = "";
+
+async function onboardAfterSave(name, res, action) {
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  res.innerHTML = `<div style="color:#00e5a0;font-size:13px;">Client <strong>${esc(name)}</strong> ${esc(action)}. Preparing their portal…</div>`;
+  res.style.display = "block";
+  _obFlagClient = name;
+  try {
+    const portal = await fetch(`/api/v1/portal/generate/${encodeURIComponent(name)}`, { method: "POST", credentials: "include" }).then(r => r.json());
+    const url = window.location.origin + portal.portal_url;
+    const first = name.trim().split(/\s+/)[0];
+    const welcome = `Hi ${first}, welcome to ReachNG. EYO is now set up for ${name}.\n\nYour control room: ${url}\n\nOpen it on your phone, tap Connect WhatsApp, and scan the QR code (takes about 30 seconds). From that moment EYO drafts replies to your real customers in your voice, and nothing sends without your tap.\n\nTip: you can install the page to your home screen like an app. I'm one message away if you need anything.\n\nYori`;
+
+    let flags = {};
+    try {
+      const fr = await fetch(`/api/v1/clients/${encodeURIComponent(name)}/eyo-flags`, { credentials: "include" }).then(r => r.json());
+      flags = fr.eyo || {};
+    } catch (e) { /* toggles render off */ }
+
+    const FEATURES = [
+      ["shield",   "🛡 Shield",   "Recommended day one"],
+      ["referral", "🤝 Referral", "Recommended day one"],
+      ["radar",    "📡 Radar",    "After first week"],
+      ["cashflow", "💰 Cashflow", "After first week"],
+      ["haggle",   "⚖ Haggle",   "Set pricing first"],
+    ];
+    const toggles = FEATURES.map(([key, label, hint]) =>
+      `<button class="btn btn--sm ${flags[key] ? "btn--ok" : "btn--ghost"}" data-feature="${key}" onclick="obToggleFlag(this)" title="${esc(hint)}">${label}</button>`
+    ).join(" ");
+
+    res.innerHTML = `
+      <div class="card" style="border-left:3px solid #00e5a0;">
+        <div class="step-label">Client is live — three things, all here</div>
+
+        <div style="font-size:11px;color:var(--text-mid);margin-bottom:4px;">1 · Their portal link</div>
+        <div class="toolbar" style="margin-bottom:12px;">
+          <input value="${esc(url)}" readonly onclick="this.select()" class="field-dark"
+                 style="flex:1;min-width:240px;padding:8px 10px;color:#00e5a0;font-size:12.5px;font-family:'JetBrains Mono',monospace;" />
+          <button class="btn btn--ghost btn--sm" onclick="navigator.clipboard.writeText(this.previousElementSibling.value).then(()=>this.textContent='Copied!')">Copy link</button>
+        </div>
+
+        <div style="font-size:11px;color:var(--text-mid);margin-bottom:4px;">2 · Ready-to-send welcome (WhatsApp or email — edit freely)</div>
+        <textarea id="ob-welcome-text" rows="7" class="field-dark" style="width:100%;padding:10px;font-size:12.5px;line-height:1.55;font-family:inherit;resize:vertical;box-sizing:border-box;">${esc(welcome)}</textarea>
+        <div class="toolbar" style="margin:6px 0 14px;">
+          <button class="btn btn--ghost btn--sm" onclick="navigator.clipboard.writeText(document.getElementById('ob-welcome-text').value).then(()=>this.textContent='Copied!')">Copy message</button>
+        </div>
+
+        <div style="font-size:11px;color:var(--text-mid);margin-bottom:6px;">3 · EYO inventions — start with Shield + Referral, add the rest as trust builds</div>
+        <div class="toolbar" id="ob-flag-row">${toggles}</div>
+      </div>`;
+  } catch (err) {
+    res.innerHTML = `<div style="color:#00e5a0;font-size:13px;">Client <strong>${esc(name)}</strong> ${esc(action)}.</div>
+      <div style="color:#ff4444;font-size:12px;margin-top:4px;">Portal link failed (${esc(err.message)}) — use Step 2 below.</div>`;
+  }
+}
+
+async function obToggleFlag(btn) {
+  const feature = btn.dataset.feature;
+  const next = !btn.classList.contains("btn--ok");
+  btn.disabled = true;
+  try {
+    const r = await fetch(
+      `/api/v1/clients/${encodeURIComponent(_obFlagClient)}/eyo-flag?feature=${encodeURIComponent(feature)}&enabled=${next}`,
+      { method: "PATCH", credentials: "include" });
+    if (r.ok) {
+      btn.classList.toggle("btn--ok", next);
+      btn.classList.toggle("btn--ghost", !next);
+    }
+  } catch (e) { /* leave as-was */ }
+  btn.disabled = false;
+}
+
 async function draftBriefAI() {
   const btn   = document.getElementById("ob-draft-btn");
   const url   = document.getElementById("ob-brief-url").value.trim();
@@ -7253,10 +7334,10 @@ async function createClient() {
       meta_phone_number_id: metaPhoneId || null,
       meta_access_token: metaToken || null,
     });
-    res.innerHTML = `<div style="color:#00e5a0;font-size:13px;">Client <strong>${name}</strong> ${data.action}. Now generate their portal link in Step 2.</div>`;
     document.getElementById("ob-portal-name").value = name;
     document.getElementById("ob-run-name").value = name;
     document.getElementById("ob-run-vertical").value = vertical;
+    await onboardAfterSave(name, res, data.action);
   } catch (err) {
     res.innerHTML = `<div style="color:#ff4444;font-size:13px;">Error: ${err.message}</div>`;
   } finally {
