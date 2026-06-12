@@ -42,3 +42,7 @@ Thumbs.db
 
 # Graphify analysis output
 graphify-out/
+
+# Separate venture (game concepts) — never commit to ReachNG
+strategy/JAPA_GAME_CONCEPT.md
+strategy/WAHALA_GAME_CONCEPT.md
