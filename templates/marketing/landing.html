@@ -60,16 +60,50 @@
   <div class="eyebrow">Your digital employee for WhatsApp · Lagos &amp; Abuja</div>
   <h1>Stop losing sales <em>on WhatsApp.</em></h1>
   <p class="sub">EYO is the digital employee that works your WhatsApp like your sharpest staff. It catches every transfer, remembers every customer, and closes the deals you're too busy to reply to. From your own number, and nothing sends without your tap.</p>
-  <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px 22px; margin:22px 0 6px; font-size:14.5px; color:var(--text-strong); font-weight:600;">
-    <span>💸 Catches money</span>
-    <span>🧠 Remembers everyone</span>
-    <span>✋ You stay in control</span>
+  <style>
+    /* Hero proof chips - quiet pills, not floating emoji. */
+    .hero-chips {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 10px; margin: 24px 0 8px;
+    }
+    .hero-chip {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 16px; border-radius: 999px;
+      background: var(--surface); border: 1px solid var(--border);
+      font-size: 13.5px; font-weight: 600; color: var(--text-strong);
+      box-shadow: 0 1px 2px rgba(20, 17, 13, 0.04);
+    }
+    .hero-chip .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); flex: 0 0 auto;
+    }
+    /* Trust strip - three short facts, separated, instead of one long line. */
+    .hero-trust {
+      display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+      gap: 8px 18px; margin-top: 30px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em;
+      color: var(--muted); text-transform: uppercase;
+    }
+    .hero-trust a { color: var(--accent); font-weight: 600; }
+    .hero-trust .sep { opacity: 0.45; }
+    @media (max-width: 540px) { .hero-trust .sep { display: none; } .hero-trust { flex-direction: column; gap: 6px; } }
+  </style>
+  <div class="hero-chips">
+    <span class="hero-chip"><span class="dot"></span>Catches money</span>
+    <span class="hero-chip"><span class="dot"></span>Remembers everyone</span>
+    <span class="hero-chip"><span class="dot"></span>You stay in control</span>
   </div>
-  <div class="hero-ctas">
+  <div class="hero-ctas" style="margin-top: 22px;">
     <a href="/waitlist" class="btn btn-primary" data-ph="hero_cta_join">Apply for the first cohort →</a>
     <a href="/portal/demo" class="btn btn-ghost" target="_blank" data-ph="hero_cta_demo">See it run · 90 seconds</a>
   </div>
-  <p style="margin-top: 28px; font-size: 12px; color: var(--muted); letter-spacing: 0.04em;">From <a href="/pricing" data-ph="hero_pricing_peek" style="color: var(--orange); text-decoration: none; font-weight: 600;">₦60,000/mo</a> · Hand-built for a small first group of Lagos businesses · Founder pricing locked for that first cohort · Priority applicants get a tailored WhatsApp demo within 48 hours</p>
+  <div class="hero-trust">
+    <span>From <a href="/pricing" data-ph="hero_pricing_peek">₦60,000/mo</a></span>
+    <span class="sep">·</span>
+    <span>Hand-built for a small first Lagos cohort</span>
+    <span class="sep">·</span>
+    <span>Tailored WhatsApp demo within 48 hours</span>
+  </div>
 </section>
 
 
@@ -79,7 +113,7 @@
 <section style="background: var(--bg-dark); color: #f0e9dc; border-top: 1px solid #2a241b; border-bottom: 1px solid #2a241b;">
   <div class="inner" style="max-width: 980px;">
     <div class="section-label" style="color: #ff9b66;">Works with Meta</div>
-    <h2 style="font-family: Georgia, 'Times New Roman', serif; font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.8px; color: #fff; margin: 0 0 14px; line-height: 1.15;">Meta's bringing more chats to your WhatsApp. <em style="color:#ff9b66; font-style:italic;">EYO helps you keep up.</em></h2>
+    <h2 style="font-family: var(--serif); font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.8px; color: #fff; margin: 0 0 14px; line-height: 1.15;">Meta's bringing more chats to your WhatsApp. <em style="color:#ff9b66; font-style:italic;">EYO helps you keep up.</em></h2>
     <p style="max-width: 760px; font-size: 15.5px; line-height: 1.7; color: #cbbfa9;">As Meta's agent pulls more conversations in, EYO works quietly in the background, confirming payments, keeping a note on every customer, and lining up replies in your voice for you to approve. An extra pair of hands, not another system to manage.</p>
 
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin-top:30px;">
@@ -118,7 +152,7 @@
           <div class="eyo-orbit eyo-orbit-3"><span>💰</span></div>
           <div class="eyo-orbit eyo-orbit-4"><span>📋</span></div>
           <div class="eyo-badge">
-            <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 60px; font-weight: 600; color: #fff; letter-spacing: -2px; line-height: 1;">EYO</span>
+            <span style="font-family: var(--serif); font-size: 60px; font-weight: 600; color: #fff; letter-spacing: -2px; line-height: 1;">EYO</span>
           </div>
         </div>
         <div style="margin-top: 22px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ff9b66; font-weight: 700;">The agent</div>
@@ -127,7 +161,7 @@
 
       <div>
         <div style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ff9b66; font-weight: 700; margin-bottom: 14px;">Meet EYO</div>
-        <h2 style="font-family: Georgia, 'Times New Roman', serif; font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.8px; color: #fff; margin: 0 0 14px; line-height: 1.12;">An agentic employee that runs your WhatsApp.</h2>
+        <h2 style="font-family: var(--serif); font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.8px; color: #fff; margin: 0 0 14px; line-height: 1.12;">An agentic employee that runs your WhatsApp.</h2>
         <p style="font-size: 16px; line-height: 1.7; color: #d4c8b3; margin: 0 0 28px; max-width: 640px;">Reads every inbound. Drafts every reply in your voice. Parses bank screenshots. Speaks five Nigerian languages. Remembers every customer. Briefs you every morning. <strong style="color:#fff;">You only tap to approve.</strong></p>
 
         <!-- 8 capability cards, each = icon + title + one-line proof -->
@@ -280,7 +314,7 @@
     display: flex; flex-direction: column; gap: 4px;
   }
   .eyo-pulse-num {
-    font-family: Georgia, 'Times New Roman', serif;
+    font-family: var(--serif);
     font-size: clamp(22px, 3vw, 30px); font-weight: 600;
     color: #fff; letter-spacing: -0.5px; line-height: 1;
   }
@@ -642,7 +676,7 @@
     animation: tryOrbBreathe 3.6s ease-in-out infinite;
   }
   .try-orb-text {
-    font-family: Georgia, 'Times New Roman', serif;
+    font-family: var(--serif);
     font-size: 11px; font-weight: 600; color: #fff; letter-spacing: -0.5px; line-height: 1;
   }
   .try-orb-ring {
@@ -954,7 +988,7 @@
   <div class="inner" style="max-width: 1040px;">
     <div style="text-align: center;">
       <div style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ff9b66; font-weight: 700; margin-bottom: 14px;">Behind the tap</div>
-      <h2 style="font-family: Georgia, 'Times New Roman', serif; font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.8px; color: #fff; margin: 0 0 14px; line-height: 1.15;">There's a whole <em style="color: #ff9b66; font-style: italic;">Control Room</em> running this.</h2>
+      <h2 style="font-family: var(--serif); font-size: clamp(28px, 4vw, 40px); font-weight: 600; letter-spacing: -0.8px; color: #fff; margin: 0 0 14px; line-height: 1.15;">There's a whole <em style="color: #ff9b66; font-style: italic;">Control Room</em> running this.</h2>
       <p style="font-size: 16px; line-height: 1.7; color: #d4c8b3; margin: 0 auto 36px; max-width: 680px;">Every reply that lands in your customer's WhatsApp came from a queue you can see, a customer EYO remembers, a brief that landed at 7am, and a scorecard you can show your CFO. Walk through a live one, no signup.</p>
     </div>
 
@@ -1091,15 +1125,15 @@
     <!-- Three-jobs map, gives the reader the structure before the detailed scenes -->
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:28px;">
       <div style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px;">
-        <span style="font-family:Georgia,serif; font-size:22px; font-weight:600; color:var(--orange); line-height:1;">01</span>
+        <span style="font-family:var(--serif); font-size:22px; font-weight:600; color:var(--orange); line-height:1;">01</span>
         <div><div style="font-weight:700; color:var(--text-strong); font-size:14px;">Replies in your voice</div><div style="font-size:12.5px; color:var(--muted-strong); line-height:1.55; margin-top:3px;">Every enquiry answered in seconds, in your house tone, you just tap send.</div></div>
       </div>
       <div style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px;">
-        <span style="font-family:Georgia,serif; font-size:22px; font-weight:600; color:var(--orange); line-height:1;">02</span>
+        <span style="font-family:var(--serif); font-size:22px; font-weight:600; color:var(--orange); line-height:1;">02</span>
         <div><div style="font-weight:700; color:var(--text-strong); font-size:14px;">Reads transfer receipts</div><div style="font-size:12.5px; color:var(--muted-strong); line-height:1.55; margin-top:3px;">GTB, OPay, Kuda screenshots matched to the right invoice, queued for your verify.</div></div>
       </div>
       <div style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px;">
-        <span style="font-family:Georgia,serif; font-size:22px; font-weight:600; color:var(--orange); line-height:1;">03</span>
+        <span style="font-family:var(--serif); font-size:22px; font-weight:600; color:var(--orange); line-height:1;">03</span>
         <div><div style="font-weight:700; color:var(--text-strong); font-size:14px;">Briefs you every morning</div><div style="font-size:12.5px; color:var(--muted-strong); line-height:1.55; margin-top:3px;">One WhatsApp before coffee: cash that landed, who to call, what needs your tap.</div></div>
       </div>
     </div>
@@ -1109,7 +1143,7 @@
          ──────────────────────────────────────────────────────────────── -->
     <div style="margin-top: 56px;">
       <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px; flex-wrap: wrap;">
-        <span style="font-family: Georgia, serif; font-size: 32px; font-weight: 600; color: var(--orange); letter-spacing: -1px;">01</span>
+        <span style="font-family: var(--serif); font-size: 32px; font-weight: 600; color: var(--orange); letter-spacing: -1px;">01</span>
         <h3 style="font-size: clamp(22px, 3.2vw, 28px); font-weight: 700; color: var(--text-strong); letter-spacing: -0.4px; margin: 0;">Replies in your voice, not in generic AI.</h3>
       </div>
       <p style="color: var(--muted-strong); font-size: 15px; line-height: 1.7; max-width: 720px; margin: 0 0 28px;">No "Thank you for contacting us, we will revert shortly." EYO drafts in your house voice, references your menu, your prices, your booth name, and waits for your tap.</p>
@@ -1142,7 +1176,7 @@
          ──────────────────────────────────────────────────────────────── -->
     <div style="margin-top: 72px;">
       <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; flex-wrap: wrap;">
-        <span style="font-family: Georgia, serif; font-size: 32px; font-weight: 600; color: var(--orange); letter-spacing: -1px;">02</span>
+        <span style="font-family: var(--serif); font-size: 32px; font-weight: 600; color: var(--orange); letter-spacing: -1px;">02</span>
         <h3 style="font-size: clamp(22px, 3.2vw, 28px); font-weight: 700; color: var(--text-strong); letter-spacing: -0.4px; margin: 0;">Reads bank-transfer screenshots and queues the right receipt for your tap.</h3>
       </div>
       <p style="margin-bottom: 32px; color: var(--muted-strong); font-size: 15px; line-height: 1.7; max-width: 720px;">Lagos and Abuja run on bank transfers. GTB, OPay, Kuda, UBA, PalmPay. Screenshots, slips, share-photos. ReachNG reads them in 3 seconds, matches them to the right invoice, drafts a <strong style="color:var(--text-strong)">conditional acknowledgment</strong>, and waits for your bank verification before sending.</p>
@@ -1235,7 +1269,7 @@
          ──────────────────────────────────────────────────────────────── -->
     <div style="margin-top: 72px;">
       <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; flex-wrap: wrap;">
-        <span style="font-family: Georgia, serif; font-size: 32px; font-weight: 600; color: var(--orange); letter-spacing: -1px;">03</span>
+        <span style="font-family: var(--serif); font-size: 32px; font-weight: 600; color: var(--orange); letter-spacing: -1px;">03</span>
         <h3 style="font-size: clamp(22px, 3.2vw, 28px); font-weight: 700; color: var(--text-strong); letter-spacing: -0.4px; margin: 0;">Briefs you every morning, before coffee.</h3>
       </div>
       <p style="margin-bottom: 32px; color: var(--muted-strong); font-size: 15px; line-height: 1.7; max-width: 720px;">Every morning at 7am (WAT), a short WhatsApp from the operator. Last night's signals, this morning's queue, where revenue almost slipped. Five-minute read. Then you go run your day.</p>

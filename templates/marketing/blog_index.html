@@ -21,7 +21,7 @@
             <span style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange); font-weight: 700;">{{ p.vertical or "Field notes" }}</span>
             <span style="font-size: 12px; color: var(--muted);">{{ p.date }}</span>
           </div>
-          <h2 style="font-family: Georgia, serif; font-size: 22px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 8px; color: var(--text-strong);">{{ p.title }}</h2>
+          <h2 style="font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 8px; color: var(--text-strong);">{{ p.title }}</h2>
           {% if p.description %}
           <p style="margin: 0; font-size: 14px; line-height: 1.65; color: var(--muted-strong);">{{ p.description }}</p>
           {% endif %}
