@@ -121,3 +121,40 @@ Three things were still stranded after the original split and have now been reso
 - Placeholders (lead scoring, nurture, model-cost-by-feature, autopilot-in-admin)
   render as "Coming soon" cards — never faked.
 - Verify each phase: Jinja parse · `<div>`/`<script>` balance unchanged · smoke tests.
+
+---
+
+## Button → workflow map (operator surfaces)
+
+What every primary action actually does end-to-end. Source of truth for hints,
+tooltips, and onboarding copy. (Updated 2026-06-12.)
+
+### Clients · Onboarding
+| Button | Workflow |
+|---|---|
+| **✨ Draft with AI** | POST `/api/v1/admin/brief/draft` — Haiku reads the pasted notes/URL → composes the brief into the textarea. Nothing persists; operator reviews then saves. |
+| **Save Client** | PUT `/api/v1/clients/` (upsert by name) → client doc created/updated; warm-up window seeded at creation. |
+| **Generate Portal** | POST `/api/v1/portal/generate/{name}` → mints (or returns existing) portal token → copyable link. Send to client; no login needed. |
+| **Run (campaign)** | POST `/api/v1/campaigns/run` → discovery (Maps/Apify/social) → score/dedup → drafts → **HITL queue**. Dry-run = preview only, nothing queues. |
+
+### Approvals (Message Queue)
+| Button | Workflow |
+|---|---|
+| **Approve** | Sends via the contact's channel (Unipile WA / Resend email / client SMTP / Meta) → records outreach → for self-outreach, schedules the next drip touch (T1→+3d, T2→+5d). |
+| **Edit → Save & Send** | Same as Approve, but the edit is stored and feeds the per-client learning loop (next drafts improve). |
+| **Skip** | Marks skipped. Nothing sends; no follow-up scheduled from this draft. |
+
+### Growth · Prospect OS
+| Button | Workflow |
+|---|---|
+| **Generate 5 sample drafts** | POST `/admin/self-outreach/dry-run` — pure copy preview (≈₦4/draft). Nothing sends, nothing queues. The calibration surface. |
+| **+ Preview a real business** | Same drafter against one real prospect's enrichment. Preview only. |
+| **Check now (Stop-on-reply)** | POST `/admin/self-outreach/reply-poll/run` — polls hello@reachng.ng inbox now; any sender who replied gets remaining drip touches cancelled. Also runs automatically every 10 min. |
+| **Refresh (Analytics)** | Reloads the Resend open/click/bounce funnel + per-prospect table. Read-only. |
+
+### Scheduled (no button — runs itself)
+| Job | Workflow |
+|---|---|
+| **Drip tick** (weekdays 09:15 Lagos) | Finds contacts due for touch 2/3 → drafts via v2 (different capability than T1) → **queues to Approvals**. Never sends directly. |
+| **Stop-on-reply poll** (every 10 min) | IMAP-polls the reply mailbox → marks repliers → cancels their remaining touches. |
+| **Bounce stop** (Resend webhook) | Hard bounce/complaint → contact opted-out, drip ends. |

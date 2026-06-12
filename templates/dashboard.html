@@ -6,7 +6,7 @@
 <title>ReachNG — Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Chakra+Petch:wght@500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -64,8 +64,12 @@
     letter-spacing: 0.12em; color: var(--text-mid); margin: 0;
   }
   /* Tab-level intro header (title + subtitle) shared by Growth / AI / Billing. */
-  .tab-intro-title { font-size: 18px; font-weight: 700; color: var(--text-hi); margin-bottom: 4px; }
-  .tab-intro-sub   { color: var(--text-mid); font-size: 12px; margin: 0 0 16px; }
+  .tab-intro-title {
+    font-family: 'Chakra Petch', 'Manrope', sans-serif;
+    font-size: 22px; font-weight: 600; letter-spacing: 0.01em;
+    color: var(--text-hi); margin-bottom: 4px;
+  }
+  .tab-intro-sub   { color: var(--text-mid); font-size: 12.5px; margin: 0 0 18px; max-width: 760px; line-height: 1.55; }
 
   .toolbar { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
   .toolbar--divided {
@@ -85,6 +89,14 @@
   .btn--danger { background: var(--red-soft);   color: var(--red);   border: 1px solid rgba(255,92,92,0.3); }
   .btn--sm { padding: 6px 11px; }
   .btn--icon { padding: 6px 8px; }
+
+  /* Button affordances — every button telegraphs "I'm pressable" and shows
+     its state. Layered on .btn without restyling the base. */
+  .btn { transition: transform .12s ease, box-shadow .12s ease, opacity .15s, background .15s, border-color .15s; }
+  .btn:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.35); }
+  .btn:not(:disabled):active { transform: translateY(0); box-shadow: none; }
+  .btn:focus-visible { outline: 2px solid #ff5c00; outline-offset: 2px; }
+  .btn:disabled { opacity: 0.55; cursor: wait; }
 
   .badge {
     display: inline-flex; align-items: center; font-size: 10px; font-weight: 700;
@@ -207,14 +219,18 @@
   .tab-panel { display: none; padding: 24px; max-width: 1440px; margin: 0 auto; }
   .tab-panel.active { display: block; }
 
-  /* ── Section title ── */
+  /* ── Section title (in-panel eyebrow divider) ── */
   .section-title {
-    font-size: 10px; color: var(--text-lo); text-transform: uppercase;
-    font-weight: 600; letter-spacing: 0.12em;
+    font-size: 10.5px; color: var(--text-mid); text-transform: uppercase;
+    font-weight: 700; letter-spacing: 0.14em;
     margin-bottom: 12px; margin-top: 28px;
     display: flex; align-items: center; gap: 10px;
   }
   .section-title:first-child { margin-top: 0; }
+  .section-title::before {
+    content: ""; flex: 0 0 auto;
+    width: 14px; height: 2px; border-radius: 1px; background: #ff5c00;
+  }
   .section-title::after {
     content: ""; flex: 1; height: 1px;
     background: linear-gradient(90deg, var(--border), transparent);
@@ -435,7 +451,13 @@
     outline: none; border-color: #ff5c00; box-shadow: 0 0 0 2px #ff5c0015;
   }
   .form-card textarea { resize: vertical; min-height: 100px; }
-  .step-label { font-size: 10px; color: #ff5c00; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+  .step-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600; color: #ff5c00;
+    text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .step-label::before { content: "▸"; font-size: 9px; opacity: 0.8; }
   .form-divider { border: none; border-top: 1px solid #1a1a1a; margin: 18px 0; }
   .form-hint { font-size: 11px; color: #333; margin-top: 6px; }
 
@@ -489,7 +511,28 @@
   .ct-kpi.muted .ct-kpi-val  { color:#888; }
 
   .ct-section { margin-bottom:32px; }
-  .ct-section-title { font-size:11px; text-transform:uppercase; letter-spacing:0.14em; color:#555; font-weight:700; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #1a1f28; }
+  /* Section heading — terminal display type, orange signal tick, hairline rule.
+     One class upgrades every section across the app. */
+  .ct-section-title {
+    font-family: 'Chakra Petch', 'Manrope', sans-serif;
+    font-size: 15px; font-weight: 600; letter-spacing: 0.02em;
+    color: var(--text-hi); text-transform: none;
+    display: flex; align-items: baseline; gap: 10px;
+    margin-bottom: 12px; padding-bottom: 10px;
+    border-bottom: 1px solid #1a1f28;
+    position: relative;
+  }
+  .ct-section-title::before {
+    content: ""; align-self: center; flex: 0 0 auto;
+    width: 4px; height: 16px; border-radius: 2px;
+    background: linear-gradient(180deg, #ff5c00, #b33d00);
+    box-shadow: 0 0 8px rgba(255, 92, 0, 0.35);
+  }
+  .ct-section-title::after {
+    content: ""; position: absolute; left: 0; bottom: -1px;
+    width: 64px; height: 1px;
+    background: linear-gradient(90deg, #ff5c00, transparent);
+  }
 
   .ct-client-grid { display:flex; flex-direction:column; gap:10px; }
   .ct-client-row {
@@ -620,7 +663,16 @@
     background: #0a0f18; border: 1px solid #1e2a3a; border-left: 2px solid #4488ff;
     border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
   }
-  .sop-box .sop-title { font-size: 10px; color: #4488ff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .sop-box .sop-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600; color: #4488ff;
+    text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sop-box .sop-title::before {
+    content: ""; width: 4px; height: 12px; border-radius: 2px;
+    background: #4488ff; opacity: 0.8;
+  }
   .sop-step { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 6px; font-size: 12px; color: #6080a0; line-height: 1.5; }
   .sop-step:last-child { margin-bottom: 0; }
   .sop-num { background: #0e1e30; color: #4488ff; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
