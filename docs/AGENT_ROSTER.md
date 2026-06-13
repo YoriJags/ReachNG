@@ -60,6 +60,13 @@ Analyst, Promoter · **Empire** = the full staff.
 6. **The Paralegal** — drafts quit notices / tenancy documents from chase
    data EstateOS already holds. **Lawyer-reviewed templates only.**
 
+> **Substrate note:** The Scheduler, Reconciler, and Paralegal all need to *act*
+> in the client's own tools (Calendar, Sheets, Drive). The plumbing for that —
+> the **MCP action layer** — is shipped and dormant behind `MCP_ACTIONS_ENABLED`
+> (HITL-gated: EYO proposes, owner taps, code executes). Hiring these agents is
+> now "wire a connector + flip a flag," not "build an integration." See
+> [MCP_ACTIONS.md](MCP_ACTIONS.md).
+
 ---
 
 ## Demo Agent — switch-on runbook (config, not build)

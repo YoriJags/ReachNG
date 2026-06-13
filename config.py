@@ -45,7 +45,17 @@ class Settings(BaseSettings):
     # Fernet key used to encrypt per-client email passwords at rest (direct
     # IMAP/SMTP connect, no Unipile). When unset, the IMAP email feature refuses
     # to store credentials rather than ever persisting a plaintext password.
+    # Also used by the EYO action layer (services/connections.py) to encrypt
+    # per-client MCP credentials at rest — same fail-safe rule.
     email_cred_key: str | None = Field(default=None, env="EMAIL_CRED_KEY")
+
+    # EYO action layer (MCP connectors) — lets EYO DO work in a client's own
+    # tools (Google Calendar, Zoho CRM, Sheets) via the client's registered MCP
+    # server. Every action is HITL-gated exactly like a message draft: EYO
+    # proposes, the owner taps, then code executes the approved tool call.
+    # DORMANT by default — flag off + no client connection means nothing ever
+    # queues or fires. See docs/MCP_ACTIONS.md.
+    mcp_actions_enabled: bool = Field(default=False, env="MCP_ACTIONS_ENABLED")
 
     # SDR email cadence: don't email the same business twice within N days,
     # even if it appears in overlapping campaigns. Protects sender reputation

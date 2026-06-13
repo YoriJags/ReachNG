@@ -327,6 +327,10 @@ def get_pending(vertical: str | None = None, limit: int = 50) -> list[dict]:
     now = datetime.now(timezone.utc)
     query = {
         "status": ApprovalStatus.PENDING,
+        # Message drafts only. Action proposals (kind="action") live in the same
+        # collection but have their own queue + executor — never send them as a
+        # message. $ne also matches docs with no kind field (all existing drafts).
+        "kind": {"$ne": "action"},
         "$or": [{"expires_at": {"$gt": now}}, {"expires_at": {"$exists": False}}],
     }
     if vertical:

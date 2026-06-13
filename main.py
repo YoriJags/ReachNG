@@ -212,6 +212,8 @@ async def lifespan(app: FastAPI):
     _safe("capacity",    ensure_capacity_indexes)
     from tools.client_signal_listener import ensure_signal_indexes
     _safe("signals",     ensure_signal_indexes)
+    from services.connections import ensure_connection_indexes
+    _safe("connections", ensure_connection_indexes)
     scheduler = None
     if get_settings().scheduler_enabled:
         scheduler = setup_scheduler()
@@ -348,6 +350,7 @@ from api.prospect_interviews import router as prospect_interviews_router
 from api.self_outreach import router as self_outreach_router
 from api.outreach_analytics import router as outreach_analytics_router
 from api.resend_webhook import router as resend_webhook_router
+from api.mcp_actions import router as mcp_actions_router
 app.include_router(kb_router)
 app.include_router(client_rules_router)
 app.include_router(scorecard_router)
@@ -369,6 +372,7 @@ app.include_router(inventory_router)
 app.include_router(admin_docs_router)
 app.include_router(try_eyo_router)
 app.include_router(blog_router)
+app.include_router(mcp_actions_router)  # EYO action layer — admin, dormant unless MCP_ACTIONS_ENABLED
 
 app.include_router(dashboard_router, **_auth)
 
