@@ -96,5 +96,14 @@ The cap is a backstop, not the norm — typical SME volume sits well inside it.
 - ✅ Wired into the client-facing reply brain: `generate_b2c_message`,
   `generate_auto_reply_draft`, `draft_inbound_reply` (agent/brain.py), and the
   closer `draft_next_move` (services/closer/brain.py).
-- ⏳ Fair-use metering + soft-cap (deferred until real volume exists — `tools/account_guard.py` already meters sends and is the natural home).
+- ✅ **Cost accounting is tier-accurate.** The drafter records the client's real
+  brain cost (`model_tier.draft_cost_for` → ₦4/₦12/₦20), so the admin Billing
+  dashboard margin stays true for Team/Empire — no longer assumes flat Haiku.
+- ✅ **Anti-runaway rate limit** already live: hard per-minute ceiling per client
+  (`usage_meter.check_rate`, drafter 60/min) + 200/day anti-ban send cap
+  (`account_guard`) + monthly cost ledger.
+- ⏳ **Monthly fair-use cap** (soft-cap / overage / auto-downgrade past the plan
+  allowance) — the per-minute ceiling and monthly ledger exist, but nothing yet
+  *acts* on the monthly total. Deferred until a real client generates volume;
+  `usage_meter` (month bucket) + `account_guard` are the natural home.
 - ⏳ Pricing-page copy: surface the brain per tier ("Solo runs on Haiku, Team on Sonnet, Empire on Opus").

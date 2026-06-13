@@ -271,10 +271,13 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
         log.error("closer_drafter_failed", lead=lead_id, error=str(e))
         return None
 
-    # T0.2.5 record drafter call cost
+    # T0.2.5 record drafter call cost — at the client's actual brain rate
+    # (Haiku ₦4 / Sonnet ₦12 / Opus ₦20), not a flat Haiku rate.
     try:
         from services.usage_meter import record
-        record(str(lead_client_id) if lead_client_id else None, "drafter", units=1)
+        from services.model_tier import draft_cost_for
+        record(str(lead_client_id) if lead_client_id else None, "drafter", units=1,
+               ngn_cost=draft_cost_for(client_name))
     except Exception:
         pass
 

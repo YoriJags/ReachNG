@@ -48,9 +48,25 @@ _PLAN_BRAIN: dict[str, str] = {
 # Human-facing label for the brain, for the dashboard/portal.
 _BRAIN_LABEL = {HAIKU: "Haiku 4.5", SONNET: "Sonnet 4.6", OPUS: "Opus 4.8"}
 
+# Per-draft ₦ cost by model (short reply, ~1,500 in / ~200 out tokens). Mirrors
+# docs/MODEL_ECONOMICS.md. The usage meter charges this instead of a flat Haiku
+# rate so the Billing dashboard stays margin-accurate once Team/Empire clients
+# draft on the pricier brains.
+_DRAFT_COST_NGN = {HAIKU: 4.0, SONNET: 12.0, OPUS: 20.0}
+
 
 def brain_label(model: str) -> str:
     return _BRAIN_LABEL.get(model, model)
+
+
+def draft_cost_ngn(model: str) -> float:
+    """Approximate ₦ cost of one reply draft on the given model."""
+    return _DRAFT_COST_NGN.get(model, _DRAFT_COST_NGN[HAIKU])
+
+
+def draft_cost_for(client_name: Optional[str]) -> float:
+    """₦ cost of one reply draft for this client, at their plan's brain."""
+    return draft_cost_ngn(model_for(client_name))
 
 
 def model_for(client_name: Optional[str], *, default: str = HAIKU) -> str:

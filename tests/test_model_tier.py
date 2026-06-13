@@ -77,3 +77,23 @@ def test_db_error_fails_safe(monkeypatch):
 def test_brain_label():
     assert mt.brain_label(OPUS) == "Opus 4.8"
     assert mt.brain_label(HAIKU) == "Haiku 4.5"
+
+
+def test_draft_cost_per_model():
+    assert mt.draft_cost_ngn(HAIKU) == 4.0
+    assert mt.draft_cost_ngn(SONNET) == 12.0
+    assert mt.draft_cost_ngn(OPUS) == 20.0
+    assert mt.draft_cost_ngn("unknown-model") == 4.0   # floor
+
+
+def test_draft_cost_for_client_uses_plan(monkeypatch):
+    _install(monkeypatch, {"plan": "agency"})          # Empire → Opus
+    assert mt.draft_cost_for("Empire Biz") == 20.0
+
+
+def test_draft_cost_for_fails_safe(monkeypatch):
+    class _Boom:
+        def __getitem__(self, name):
+            raise RuntimeError("db down")
+    monkeypatch.setattr(mt, "get_db", lambda: _Boom())
+    assert mt.draft_cost_for("Anyone") == 4.0          # Haiku floor on failure

@@ -78,7 +78,8 @@ FEATURE_COSTS = {
     "voice":      8.0,    # Whisper, ~30-90s of audio
     "receipt":   10.0,    # Claude Haiku 4.5 vision
     "classifier": 2.0,    # Haiku, ~200-400 tokens in/out
-    "drafter":    4.0,    # Haiku, ~400-700 tokens in/out
+    "drafter":    4.0,    # Haiku floor — callers override ngn_cost per plan brain
+                          # (Sonnet ₦12 / Opus ₦20) via model_tier.draft_cost_for
     "memory":     3.0,    # Haiku, structured extraction
     "copilot":    8.0,    # Haiku planner + narrator
 }

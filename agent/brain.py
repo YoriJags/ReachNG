@@ -222,7 +222,11 @@ def _meter_drafter_record(client_name: Optional[str], *, channel: str = "whatsap
         return
     try:
         from services.usage_meter import record
-        record(client_id=client_id, feature="drafter", units=1, extra={"channel": channel})
+        from services.model_tier import draft_cost_for
+        # Charge the client's actual brain cost (Haiku ₦4 / Sonnet ₦12 / Opus ₦20),
+        # not a flat Haiku rate — keeps the Billing dashboard margin-accurate.
+        record(client_id=client_id, feature="drafter", units=1,
+               ngn_cost=draft_cost_for(client_name), extra={"channel": channel})
     except Exception:
         pass
 
