@@ -8,6 +8,7 @@ import json as _json
 from pathlib import Path
 from typing import Optional
 from config import get_settings
+from services.model_tier import model_for
 import structlog
 
 log = structlog.get_logger()
@@ -544,7 +545,7 @@ No explanations. No preamble. Just the message.
     import json
     client = _get_client()
     response = client.messages.create(
-        model="claude-haiku-4-5-20251001",
+        model=model_for(client_name),   # plan-tiered brain
         max_tokens=400,
         system=system,
         messages=[{"role": "user", "content": user_prompt}],
@@ -1072,7 +1073,7 @@ def generate_auto_reply_draft(
 
     client = _get_client()
     response = client.messages.create(
-        model="claude-haiku-4-5-20251001",
+        model=model_for(business_name),   # plan-tiered brain
         max_tokens=200,
         messages=[{
             "role": "user",
@@ -1138,7 +1139,7 @@ def draft_inbound_reply(
 
     client = _get_client()
     response = client.messages.create(
-        model="claude-haiku-4-5-20251001",
+        model=model_for(business_name),   # plan-tiered brain
         max_tokens=max_tokens,
         messages=[{
             "role": "user",

@@ -24,6 +24,7 @@ from bson import ObjectId
 from config import get_settings
 from services.brief import assemble_context
 from services.closer.store import get_lead, update_stage, VALID_STAGES
+from services.model_tier import model_for
 from tools.hitl import queue_draft, BriefIncompleteError
 from tools.account_guard import OutreachCapExceeded, OutreachPaused
 import structlog
@@ -261,7 +262,7 @@ def draft_next_move(lead_id: str) -> Optional[dict]:
     client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
     try:
         msg = client.messages.create(
-            model="claude-haiku-4-5-20251001",
+            model=model_for(client_name),   # plan-tiered brain
             max_tokens=350,
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}],
