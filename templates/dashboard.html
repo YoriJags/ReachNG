@@ -3425,6 +3425,162 @@ else document.addEventListener('DOMContentLoaded', loadNeedsAttention);
     </div>
   </div>
 
+  <!-- EYO Action Layer (MCP) — connect a client's own tools; every action is HITL-gated -->
+  <div class="ct-section" data-reflow="tools">
+    <div class="ct-section-title">EYO Action Layer (MCP) — connect a client's tools; every action waits for your tap</div>
+    <p style="color:#666;font-size:11px;margin:-4px 0 12px;">Lets EYO DO work in a client's own systems (Google Calendar, Zoho, Sheets) via their MCP server. Dormant until MCP_ACTIONS_ENABLED is set on Railway. EYO proposes → you approve → code runs the call. See docs/MCP_ACTIONS.md.</p>
+
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:12.5px;margin-bottom:16px;">
+      <span>Action layer: <b id="mcp-enabled" style="color:#888;">—</b></span>
+      <span>Encryption: <b id="mcp-enc" style="color:#888;">—</b></span>
+      <span>MCP client: <b id="mcp-client" style="color:#888;">—</b></span>
+      <button class="btn btn--ghost btn--sm" onclick="mcpRefresh(this)">Refresh</button>
+    </div>
+
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#5a6675;margin-bottom:6px;">Connected tools</div>
+    <div id="mcp-conn-list" style="font-size:12.5px;margin-bottom:10px;color:#888;">—</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:18px;">
+      <input id="mcp-f-client" class="field-dark" placeholder="Client name" style="width:150px;">
+      <select id="mcp-f-provider" class="field-dark" style="width:160px;"></select>
+      <input id="mcp-f-url" class="field-dark" placeholder="MCP server URL" style="width:230px;">
+      <input id="mcp-f-token" class="field-dark" type="password" placeholder="Bearer token (optional)" style="width:200px;">
+      <button class="btn btn--ghost btn--sm" onclick="mcpAddConn(this)">Connect</button>
+    </div>
+
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#5a6675;margin-bottom:6px;">Actions awaiting your tap</div>
+    <div id="mcp-actions-list" style="font-size:12.5px;color:#888;">—</div>
+  </div>
+
+  <script>
+    let _mcpConns = [];
+    let _mcpActions = [];
+    function mcpEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+    function mcpHdr(){ return Object.assign({'Content-Type':'application/json'}, authHeaders()); }
+
+    async function mcpStatusLoad(){
+      try{
+        const r = await fetch('/api/v1/admin/mcp/status', {headers: authHeaders()});
+        if(!r.ok) return;
+        const d = await r.json();
+        const en = document.getElementById('mcp-enabled');
+        en.textContent = d.enabled ? 'ENABLED' : 'DORMANT (set MCP_ACTIONS_ENABLED)';
+        en.style.color = d.enabled ? '#00e5a0' : '#e0a000';
+        const enc = document.getElementById('mcp-enc');
+        enc.textContent = d.encryption_ready ? 'ready' : 'no key';
+        enc.style.color = d.encryption_ready ? '#00e5a0' : '#ff7a7a';
+        const cl = document.getElementById('mcp-client');
+        cl.textContent = d.client_ready ? 'ready' : 'lib missing';
+        cl.style.color = d.client_ready ? '#00e5a0' : '#ff7a7a';
+        const sel = document.getElementById('mcp-f-provider');
+        if(sel && !sel.dataset.filled && d.known_providers){
+          sel.innerHTML = Object.entries(d.known_providers)
+            .map(([k,v]) => `<option value="${mcpEsc(k)}">${mcpEsc(v)}</option>`).join('');
+          sel.dataset.filled = '1';
+        }
+      }catch(e){}
+    }
+
+    async function mcpConnLoad(){
+      const box = document.getElementById('mcp-conn-list');
+      try{
+        const r = await fetch('/api/v1/admin/mcp/connections', {headers: authHeaders()});
+        if(!r.ok){ box.textContent='—'; return; }
+        _mcpConns = await r.json();
+        if(!_mcpConns.length){ box.innerHTML='<span style="color:#5a6675;">No tools connected yet.</span>'; return; }
+        box.innerHTML = _mcpConns.map((c,i) => {
+          const dot = c.enabled ? '<span style="color:#00e5a0;">●</span>' : '<span style="color:#5a6675;">●</span>';
+          return `<div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #161c25;">
+            ${dot}<b style="color:#d8eaf8;">${mcpEsc(c.client_name)}</b>
+            <span style="color:#9fb0c0;">${mcpEsc(c.label)}</span>
+            <span style="color:#5a6675;font-size:11px;">${c.has_token?'🔒 token':'no auth'}</span>
+            <span style="flex:1;"></span>
+            <button class="btn btn--ghost btn--sm" onclick="mcpTestConn(${i},this)">Test</button>
+            <button class="btn btn--danger btn--sm" onclick="mcpDelConn(${i})">Remove</button>
+          </div>`;
+        }).join('');
+      }catch(e){ box.textContent='—'; }
+    }
+
+    async function mcpAddConn(btn){
+      const client = document.getElementById('mcp-f-client').value.trim();
+      const provider = document.getElementById('mcp-f-provider').value;
+      const url = document.getElementById('mcp-f-url').value.trim();
+      const token = document.getElementById('mcp-f-token').value;
+      if(!client || !url){ alert('Client name and MCP server URL are required.'); return; }
+      const t = btn.textContent; btn.disabled=true; btn.textContent='Connecting…';
+      try{
+        const r = await fetch('/api/v1/admin/mcp/connections', {method:'POST', headers: mcpHdr(),
+          body: JSON.stringify({client_name:client, provider:provider, url:url,
+                                 auth_type: token?'bearer':'none', token: token||null})});
+        if(!r.ok){ const e=await r.json().catch(()=>({})); alert('Failed: '+(e.detail||('HTTP '+r.status))); }
+        else{ document.getElementById('mcp-f-url').value=''; document.getElementById('mcp-f-token').value=''; mcpConnLoad(); }
+      }catch(e){ alert('Failed: '+e.message); }
+      btn.textContent=t; btn.disabled=false;
+    }
+
+    async function mcpTestConn(i,btn){
+      const c=_mcpConns[i]; const t=btn.textContent; btn.disabled=true; btn.textContent='Testing…';
+      try{
+        const r = await fetch('/api/v1/admin/mcp/connections/test', {method:'POST', headers: mcpHdr(),
+          body: JSON.stringify({client_name:c.client_name, provider:c.provider})});
+        const d = await r.json().catch(()=>({}));
+        if(r.ok){ alert('✓ Connected. Tools: '+((d.tools||[]).map(x=>x.name).join(', ')||'(none reported)')); }
+        else{ alert('✗ '+(d.detail||('HTTP '+r.status))); }
+      }catch(e){ alert('✗ '+e.message); }
+      btn.textContent=t; btn.disabled=false;
+    }
+
+    async function mcpDelConn(i){
+      const c=_mcpConns[i];
+      if(!confirm('Remove '+c.client_name+' → '+c.label+'?')) return;
+      try{
+        const r = await fetch('/api/v1/admin/mcp/connections/delete', {method:'POST', headers: mcpHdr(),
+          body: JSON.stringify({client_name:c.client_name, provider:c.provider})});
+        if(r.ok) mcpConnLoad();
+      }catch(e){}
+    }
+
+    async function mcpActionsLoad(){
+      const box = document.getElementById('mcp-actions-list');
+      try{
+        const r = await fetch('/api/v1/admin/mcp/actions', {headers: authHeaders()});
+        if(!r.ok){ box.textContent='—'; return; }
+        _mcpActions = await r.json();
+        if(!_mcpActions.length){ box.innerHTML='<span style="color:#5a6675;">No actions waiting.</span>'; return; }
+        box.innerHTML = _mcpActions.map((a,i) => {
+          const prov = (a.action && a.action.provider) || '';
+          return `<div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #161c25;">
+            <b style="color:#d8eaf8;">${mcpEsc(a.summary||'(action)')}</b>
+            <span style="color:#9fb0c0;font-size:11px;">${mcpEsc(a.client_name||'')} · ${mcpEsc(prov)}</span>
+            <span style="flex:1;"></span>
+            <button class="btn btn--ok btn--sm" onclick="mcpApprove(${i},this)">Approve</button>
+            <button class="btn btn--danger btn--sm" onclick="mcpSkip(${i},this)">Skip</button>
+          </div>`;
+        }).join('');
+      }catch(e){ box.textContent='—'; }
+    }
+
+    async function mcpApprove(i,btn){
+      const a=_mcpActions[i]; btn.disabled=true; btn.textContent='…';
+      try{ const r=await fetch('/api/v1/admin/mcp/actions/'+a.id+'/approve',{method:'POST',headers:authHeaders()});
+           if(r.ok) mcpActionsLoad(); else btn.disabled=false;
+      }catch(e){ btn.disabled=false; }
+    }
+    async function mcpSkip(i,btn){
+      const a=_mcpActions[i]; btn.disabled=true;
+      try{ const r=await fetch('/api/v1/admin/mcp/actions/'+a.id+'/skip',{method:'POST',headers:authHeaders()});
+           if(r.ok) mcpActionsLoad();
+      }catch(e){ btn.disabled=false; }
+    }
+
+    async function mcpRefresh(btn){
+      if(btn) btn.disabled=true;
+      await mcpStatusLoad(); await mcpConnLoad(); await mcpActionsLoad();
+      if(btn) btn.disabled=false;
+    }
+    mcpRefresh();
+  </script>
+
 </div>
 
 <!-- ── Campaigns ───────────────────────────────────────────────────────────────── -->
