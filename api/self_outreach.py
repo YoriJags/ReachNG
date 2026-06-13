@@ -149,7 +149,7 @@ async def dry_run(payload: Optional[DryRunPayload] = None):
     return {
         "drafts":       drafts,
         "count":        len(drafts),
-        "cost_ngn_est": round(cost_units * 4.0, 2),  # ~₦4 per Haiku draft
+        "cost_ngn_est": round(cost_units * 65.0, 2),  # ~₦65 per Opus 4.8 draft
     }
 
 

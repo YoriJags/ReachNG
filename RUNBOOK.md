@@ -194,7 +194,7 @@ leads are dropped from the campaign automatically.
 
 ### Env vars
 - `GOOGLE_MAPS_API_KEY` — discovery (missing → discovery returns nothing + logs `maps_discovery_skipped_no_key`; the rest of the run still works).
-- `ANTHROPIC_API_KEY` — founder-voice drafts (Haiku, ~₦4 each).
+- `ANTHROPIC_API_KEY` — founder-voice drafts (Opus 4.8, ~₦65 each — deliberately premium; this surface is the company's face).
 - `RESEND_API_KEY` — email send from `hello@reachng.ng`.
 - `MONGODB_URI` — contacts / dedup / A/B store.
 - Optional: `DAILY_SEND_LIMIT` (default 50), `DEFAULT_CITY` (default Lagos).

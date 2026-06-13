@@ -13,7 +13,10 @@ Pipeline:
      the sign-off — guaranteed, never trusted to the LLM
   5. queue_draft() puts it in HITL — Yori approves every send for first 50
 
-Cost: ~₦4 per draft (Haiku ~600 tokens out). 100 sends ≈ ₦400 total.
+Cost: ~₦65 per draft (Opus 4.8 + adaptive thinking). 100 sends ≈ ₦6,500 total —
+deliberately premium: founder cold email is the company's face, and one landed
+₦60k/mo client pays for years of the Haiku→Opus difference. High-volume client
+reply drafting stays on Haiku elsewhere; this surface alone buys the smart model.
 """
 from __future__ import annotations
 
@@ -235,10 +238,15 @@ def draft_outreach_email(
 
     def _generate(extra_directive: str = "") -> str:
         content = f"{user_block}\n\n{extra_directive}" if extra_directive else user_block
+        # Opus 4.8 — founder outreach is low-volume, highest-stakes-per-message:
+        # these emails are the company's face to a ₦60k/mo-recurring prospect, so
+        # we buy the strongest writing model (~₦65/draft vs Haiku's ~₦9; one
+        # landed client pays for years of the difference). Adaptive thinking
+        # helps it honor the many hard rules; no sampling params (400 on 4.8).
         resp = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=500,
-            temperature=0.6,
+            model="claude-opus-4-8",
+            max_tokens=2000,
+            thinking={"type": "adaptive"},
             system=system_prompt,
             messages=[{"role": "user", "content": content}],
         )
